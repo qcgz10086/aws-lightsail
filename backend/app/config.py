@@ -4,6 +4,8 @@ from cryptography.fernet import Fernet
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from app.password_strength import validate_secret_key, validate_strong_password
+
 # 已公开的默认值 / 占位值：启动时一律拒绝，绝不能用于生产。
 # （H-1/H-2 修复：SECRET_KEY / ENCRYPTION_KEY / ADMIN_PASSWORD 均为必填、无默认值）
 _DENIED_SECRET_KEYS = {
@@ -46,10 +48,13 @@ class Settings(BaseSettings):
         ):
             raise ValueError(
                 "SECRET_KEY 未配置或是公开的默认值/占位值："
-                "请在 .env 中设置强随机 SECRET_KEY（至少 32 位），拒绝启动"
+                "请在 .env 中设置强随机 SECRET_KEY，拒绝启动"
             )
-        if len(self.secret_key) < 32:
-            raise ValueError("SECRET_KEY 太短：至少 32 位随机字符串，拒绝启动")
+        # R-1：只要求长度不够——32 位以上的低熵值（如 "a"*32）也要拒绝。
+        try:
+            validate_secret_key(self.secret_key)
+        except ValueError as exc:
+            raise ValueError(f"{exc}，拒绝启动") from exc
 
         if (
             not self.encryption_key
@@ -76,6 +81,11 @@ class Settings(BaseSettings):
                 "ADMIN_PASSWORD 未配置或是默认密码 admin123："
                 "请在 .env 中设置强管理员密码，拒绝启动"
             )
+        # R-1：只防已知默认值不够——ADMIN_PASSWORD 须满足与实例密码同一强度标准。
+        try:
+            validate_strong_password(self.admin_password, field_name="ADMIN_PASSWORD")
+        except ValueError as exc:
+            raise ValueError(f"{exc}，拒绝启动") from exc
         return self
 
     @property

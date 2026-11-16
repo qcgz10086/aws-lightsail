@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.deps import get_current_admin
 from app.models import User
+from app.password_strength import validate_strong_password
 from app.schemas import UserCreate, UserOut, UserUpdate
 from app.security import hash_password
 
@@ -21,6 +22,14 @@ def _user_out(user: User) -> UserOut:
         has_credentials=bool(user.credentials),
         credential_count=len(user.credentials or []),
     )
+
+
+def _validate_user_password(password: str) -> None:
+    """R-4：用户密码须满足与实例密码同一强度标准，不满足返回 400。"""
+    try:
+        validate_strong_password(password)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @router.get("", response_model=list[UserOut])
@@ -41,6 +50,7 @@ def create_user(
     exists = db.query(User).filter(User.username == body.username).first()
     if exists:
         raise HTTPException(status_code=400, detail="用户名已存在")
+    _validate_user_password(body.password)
     user = User(
         username=body.username,
         password_hash=hash_password(body.password),
@@ -65,6 +75,7 @@ def update_user(
     if not user:
         raise HTTPException(status_code=404, detail="用户不存在")
     if body.password is not None:
+        _validate_user_password(body.password)
         user.password_hash = hash_password(body.password)
     if body.is_admin is not None:
         user.is_admin = body.is_admin

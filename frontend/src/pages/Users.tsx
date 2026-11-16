@@ -15,6 +15,16 @@ import {
 import { useEffect, useState } from 'react'
 import api, { User, getErrorMessage } from '../api/client'
 
+// 与后端 app.password_strength 同一标准：12-64 位，含大小写字母、数字、符号。
+function validateStrongPassword(pwd: string): string | null {
+  if (pwd.length < 12 || pwd.length > 64) return '密码长度需为 12-64 位'
+  if (pwd !== pwd.trim()) return '密码不能包含首尾空格'
+  if (!/[a-z]/.test(pwd) || !/[A-Z]/.test(pwd) || !/[0-9]/.test(pwd) || !/[^A-Za-z0-9]/.test(pwd)) {
+    return '密码须同时包含小写字母、大写字母、数字和符号'
+  }
+  return null
+}
+
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(false)
@@ -86,15 +96,16 @@ export default function UsersPage() {
                       title: `重置密码 - ${row.username}`,
                       content: (
                         <Input.Password
-                          placeholder="新密码（至少 6 位）"
+                          placeholder="新密码（12-64 位，含大小写字母、数字、符号）"
                           onChange={(e) => {
                             pwd = e.target.value
                           }}
                         />
                       ),
                       onOk: async () => {
-                        if (!pwd || pwd.length < 6) {
-                          message.error('密码至少 6 位')
+                        const err = validateStrongPassword(pwd)
+                        if (err) {
+                          message.error(err)
                           throw new Error('invalid')
                         }
                         await api.patch(`/users/${row.id}`, { password: pwd })
@@ -148,7 +159,19 @@ export default function UsersPage() {
           <Form.Item name="username" label="用户名" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="password" label="密码" rules={[{ required: true, min: 6 }]}>
+          <Form.Item
+            name="password"
+            label="密码"
+            rules={[
+              { required: true, message: '请输入密码' },
+              {
+                validator: async (_, value) => {
+                  const err = value ? validateStrongPassword(String(value)) : null
+                  if (err) throw new Error(err)
+                },
+              },
+            ]}
+          >
             <Input.Password />
           </Form.Item>
           <Form.Item name="is_admin" label="管理员" valuePropName="checked">

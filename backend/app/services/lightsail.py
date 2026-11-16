@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import base64
 import logging
-import re
-import string
 import time
 from datetime import datetime, timezone
 from typing import Any
 
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
+
+from app.password_strength import validate_strong_password
 
 logger = logging.getLogger(__name__)
 
@@ -452,21 +452,12 @@ def _is_windows_platform(platform: str | None, blueprint_id: str | None = None) 
 
 
 def _validate_instance_password(password: str, *, windows: bool) -> None:
-    # H-3 修复：自定义密码至少 12 位，且须同时包含大小写字母、数字和符号，
+    # H-3/R-4：与用户密码同一强度标准，见 app.password_strength；
     # 不满足时由调用方以 400 返回（LightsailError -> HTTPException 400）。
-    if not password or len(password) < 12 or len(password) > 64:
-        raise LightsailError("自定义密码长度需为 12-64 位", code="InvalidPassword")
-    if (
-        not re.search(r"[a-z]", password)
-        or not re.search(r"[A-Z]", password)
-        or not re.search(r"[0-9]", password)
-        or not any(ch in string.punctuation for ch in password)
-    ):
-        raise LightsailError(
-            "自定义密码须同时包含小写字母、大写字母、数字和符号", code="InvalidPassword"
-        )
-    if password != password.strip() or re.search(r"[\x00-\x1f\x7f]", password):
-        raise LightsailError("自定义密码不能包含首尾空格或控制字符", code="InvalidPassword")
+    try:
+        validate_strong_password(password, field_name="自定义密码")
+    except ValueError as exc:
+        raise LightsailError(str(exc), code="InvalidPassword") from exc
     if windows and any(ch in password for ch in ['"', "'", "`"]):
         raise LightsailError("Windows 密码请勿包含引号或反引号", code="InvalidPassword")
 

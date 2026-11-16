@@ -16,7 +16,7 @@ class LoginRequest(BaseModel):
 
 class ChangePasswordRequest(BaseModel):
     old_password: str
-    new_password: str = Field(min_length=6)
+    new_password: str  # 强度由路由层统一校验（12-64 位 + 复杂度），见 app.password_strength
 
 
 class UserOut(BaseModel):
@@ -34,14 +34,14 @@ class UserOut(BaseModel):
 
 class UserCreate(BaseModel):
     username: str = Field(min_length=2, max_length=64)
-    password: str = Field(min_length=6)
+    password: str  # 强度由路由层统一校验（12-64 位 + 复杂度）
     is_admin: bool = False
     monthly_limit_gb: float | None = None
     auto_stop_on_limit_default: bool = False
 
 
 class UserUpdate(BaseModel):
-    password: str | None = Field(default=None, min_length=6)
+    password: str | None = None  # 有值时强度由路由层统一校验
     is_admin: bool | None = None
     monthly_limit_gb: float | None = None
     auto_stop_on_limit_default: bool | None = None

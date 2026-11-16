@@ -91,7 +91,7 @@ cp .env.example .env
 编辑 `.env`，**三项均为必填、无默认值**：`SECRET_KEY`、`ENCRYPTION_KEY`、`ADMIN_PASSWORD` 缺失、为空或是默认值/占位值时，应用启动即拒绝，不会用弱值静默启动。`ADMIN_PASSWORD` 填好后，首次启动时若用户表为空才会创建管理员账号：
 
 ```env
-SECRET_KEY=随机长字符串（至少 32 位）
+SECRET_KEY=随机长字符串（至少 32 位，且须含大小写字母、数字、符号中至少 3 类、至少 8 个不同字符）
 ENCRYPTION_KEY=用下面命令生成
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=强管理员密码（禁止用默认密码 admin123）
@@ -213,7 +213,7 @@ pip install -r requirements.txt
 set DATABASE_URL=sqlite:///./dev.db
 # SECRET_KEY / ENCRYPTION_KEY / ADMIN_PASSWORD 均为必填（见 .env.example），
 # 缺失或为默认值时应用拒绝启动；本地开发也须先配好这三项。
-set SECRET_KEY=（至少 32 位随机字符串）
+set SECRET_KEY=（至少 32 位随机字符串，且须含大小写字母、数字、符号中至少 3 类）
 set ENCRYPTION_KEY=（Fernet key）
 set ADMIN_PASSWORD=（强管理员密码）
 uvicorn app.main:app --reload --port 8000
@@ -279,8 +279,8 @@ Vite 已将 `/api` 代理到 `http://127.0.0.1:8000`。
 
 ## 安全建议
 
-1. `SECRET_KEY`、`ENCRYPTION_KEY`、`ADMIN_PASSWORD` 均为必填且无默认值：缺失或为默认值/占位值时启动即拒绝；不要把 `.env` 提交到仓库
-2. 新建实例默认不开放全部端口（`open_all_ports` 默认关闭）；自定义实例密码至少 12 位且须含大小写字母、数字和符号，留空则走密钥登录、不开密码登录
+1. `SECRET_KEY`、`ENCRYPTION_KEY`、`ADMIN_PASSWORD` 均为必填且无默认值：缺失或为默认值/占位值时启动即拒绝；不要把 `.env` 提交到仓库。其中 `SECRET_KEY` 至少 32 位且须有足够熵（大小写字母、数字、符号中至少 3 类、至少 8 个不同字符），`ADMIN_PASSWORD` 12-64 位且须同时含大小写字母、数字、符号
+2. 新建实例默认不开放全部端口（`open_all_ports` 默认关闭）；自定义实例密码至少 12 位且须含大小写字母、数字和符号，留空则走密钥登录、不开密码登录；新建/修改用户密码与改密同样要求 12 位加复杂度；同一 IP+用户名 15 分钟内累计登录失败 5 次后锁定 15 分钟（返回 429）
 3. 生产环境建议置于反向代理 / HTTPS 之后
 4. 为 AWS IAM 用户最小化 Lightsail 权限
 5. 不要将 `.env` 提交到公开仓库
