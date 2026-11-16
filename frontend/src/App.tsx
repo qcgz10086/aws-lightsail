@@ -10,6 +10,7 @@ import CreateInstancePage from './pages/CreateInstance'
 import InstanceDetailPage from './pages/InstanceDetail'
 import CredentialsPage from './pages/Credentials'
 import TrafficPage from './pages/Traffic'
+import BillingPage from './pages/Billing'
 import UsersPage from './pages/Users'
 
 function PrivateRoute({ children, adminOnly = false }: { children: ReactNode; adminOnly?: boolean }) {
@@ -44,6 +45,7 @@ export default function App() {
           <Route path="instances/:region/:name" element={<InstanceDetailPage />} />
           <Route path="create" element={<CreateInstancePage />} />
           <Route path="traffic" element={<TrafficPage />} />
+          <Route path="billing" element={<BillingPage />} />
           <Route path="credentials" element={<CredentialsPage />} />
           <Route
             path="users"

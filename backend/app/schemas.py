@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -242,6 +242,88 @@ class OperationResult(BaseModel):
     message: str
     region: str
     name: str
+
+
+class CreditCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=128)
+    credit_id: str | None = Field(default=None, max_length=128)
+    total_amount: float = Field(gt=0)
+    currency: str = Field(default="USD", max_length=8)
+    start_date: date
+    expires_at: date | None = None
+    note: str | None = None
+    credential_id: int | None = None
+
+
+class CreditOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    credit_id: str | None = None
+    total_amount: float
+    currency: str = "USD"
+    start_date: date
+    expires_at: date | None = None
+    note: str | None = None
+    credential_id: int | None = None
+    created_at: datetime | None = None
+    # 估算值：仅在 /billing/summary 里由 Cost Explorer 算出；
+    # CE 不可用时为 None。/billing/credits 列表里同样可能为 None。
+    remaining_estimate: float | None = None
+    credits_applied_since_start: float | None = None
+
+
+class BillingServiceCost(BaseModel):
+    service: str
+    total: float
+    net: float
+    credits_applied: float
+    currency: str = "USD"
+
+
+class AwsCredit(BaseModel):
+    """AWS Billing GetCredits 返回的一条官方赠金（真实余额，非估算）。
+
+    remaining_amount：截至上个账单周期的余额；
+    estimated_amount：含未出账单的估算剩余。
+    """
+
+    credit_id: str | None = None
+    description: str | None = None
+    credit_type: str | None = None
+    status: str | None = None
+    initial_amount: float | None = None
+    remaining_amount: float | None = None
+    estimated_amount: float | None = None
+    currency: str = "USD"
+    start_date: str | None = None
+    end_date: str | None = None
+    exhaust_date: str | None = None
+    applicable_products: list[str] = []
+
+
+class BillingSummary(BaseModel):
+    # ok / unavailable（CE 未启用或暂无数据）/ no_permission（缺 IAM 权限）
+    status: str = "ok"
+    message: str | None = None
+    year_month: str
+    currency: str = "USD"
+    total_cost: float | None = None
+    net_cost: float | None = None
+    credits_applied: float | None = None
+    lightsail_cost: float | None = None
+    forecast_cost: float | None = None
+    by_service: list[BillingServiceCost] = []
+    # 手动录入的赠金记录（补充，剩余是估算）；与下方官方赠金分开。
+    credits: list[CreditOut] = []
+    # AWS Billing GetCredits 返回的官方赠金；status 为
+    # ok / unavailable / no_permission / invalid（参数无效，400 级）。
+    aws_credits: list[AwsCredit] = []
+    aws_credits_status: str = "unavailable"
+    aws_credits_error: str | None = None
+    aws_account_id: str | None = None
+    required_permissions: list[str] = []
 
 
 TokenResponse.model_rebuild()

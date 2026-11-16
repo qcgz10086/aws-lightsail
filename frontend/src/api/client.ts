@@ -109,6 +109,74 @@ export interface Instance {
   account_label?: string | null
 }
 
+export interface BillingServiceCost {
+  service: string
+  total: number
+  net: number
+  credits_applied: number
+  currency: string
+}
+
+export interface CreditRecordOut {
+  id: number
+  name: string
+  credit_id?: string | null
+  total_amount: number
+  currency: string
+  start_date: string
+  expires_at?: string | null
+  note?: string | null
+  credential_id?: number | null
+  created_at?: string | null
+  remaining_estimate?: number | null
+  credits_applied_since_start?: number | null
+}
+
+export interface CreditCreateInput {
+  name: string
+  credit_id?: string | null
+  total_amount: number
+  currency?: string
+  start_date: string
+  expires_at?: string | null
+  note?: string | null
+  credential_id?: number | null
+}
+
+export interface AwsCredit {
+  credit_id?: string | null
+  description?: string | null
+  credit_type?: string | null
+  status?: string | null
+  initial_amount?: number | null
+  remaining_amount?: number | null
+  estimated_amount?: number | null
+  currency: string
+  start_date?: string | null
+  end_date?: string | null
+  exhaust_date?: string | null
+  applicable_products: string[]
+}
+
+export interface BillingSummary {
+  status: 'ok' | 'unavailable' | 'no_permission' | string
+  message?: string | null
+  year_month: string
+  currency: string
+  total_cost: number | null
+  net_cost: number | null
+  credits_applied: number | null
+  lightsail_cost: number | null
+  forecast_cost: number | null
+  by_service: BillingServiceCost[]
+  credits: CreditRecordOut[]
+  aws_credits: AwsCredit[]
+  aws_credits_status: 'ok' | 'unavailable' | 'no_permission' | 'invalid' | string
+  aws_credits_error?: string | null
+  aws_account_id?: string | null
+  required_permissions?: string[]
+}
+
 export interface TrafficSummary {
   year_month: string
   instances: {

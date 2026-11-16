@@ -1,8 +1,9 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from sqlalchemy import (
     BigInteger,
     Boolean,
+    Date,
     DateTime,
     Float,
     ForeignKey,
@@ -42,6 +43,11 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
     operation_logs: Mapped[list["OperationLog"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    # 赠金记录：用户手动录入，AWS 没有 API 能直接查官方剩余余额，
+    # 剩余值由 Cost Explorer 累计抵扣额估算（见 services/billing.py）。
+    credit_records: Mapped[list["CreditRecord"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
 
@@ -143,6 +149,39 @@ class TrafficUsage(Base):
 
     user: Mapped[User] = relationship(back_populates="traffic_usages")
     credential: Mapped[AwsCredential] = relationship(back_populates="traffic_usages")
+
+
+class CreditRecord(Base):
+    """用户手动录入的赠金/抵扣金记录（不自动插入任何官方赠金）。
+
+    total_amount 为该笔赠金总额；剩余为估算值：
+    remaining_estimate = total_amount - 自 start_date 起
+    Cost Explorer 累计抵扣额（Unblended - Net），以官方 Credits 页为准。
+    """
+
+    __tablename__ = "credit_records"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    credential_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("aws_credentials.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    name: Mapped[str] = mapped_column(String(128), nullable=False)
+    credit_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    total_amount: Mapped[float] = mapped_column(Float, nullable=False)
+    currency: Mapped[str] = mapped_column(String(8), default="USD", nullable=False)
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    expires_at: Mapped[date | None] = mapped_column(Date, nullable=True)
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    user: Mapped[User] = relationship(back_populates="credit_records")
+    credential: Mapped["AwsCredential | None"] = relationship()
 
 
 class OperationLog(Base):

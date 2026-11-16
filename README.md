@@ -14,6 +14,7 @@
 - 实例流量监控（NetworkIn + NetworkOut）
 - 实例月流量限额 + **可选「超限自动关机」勾选**（默认关闭，仅告警）
 - **按地区汇总流量**：同区 2 台各 1024 GB → 显示 2048 GB
+- **账单与赠金**：AWS Billing GetCredits 查官方赠金真实余额（remaining / estimated），Cost Explorer 本月费用（总费用 / 净费用 / 已抵扣 / Lightsail 费用 / 本月预测 / 按服务明细），手动赠金记录作为补充看剩余估算与到期提醒
 
 > 流量基于 Lightsail 指标估算，与官方账单可能存在差异。月份按 **UTC 自然月** 统计。
 
@@ -64,6 +65,7 @@ docker compose up -d --build
 4. 在「实例」查看已有机器（可按凭证筛选），或「开通实例」时选择使用哪组 Key
 5. 在实例「限额」中设置月流量上限，并**可选勾选「超限自动关机」**
 6. 在「流量」页可手动同步当月用量，查看地区汇总与超限告警
+7. 在「账单」页查看本月费用与官方赠金余额（先绑定凭证；官方赠金由 Billing GetCredits 自动查，手动记录仅作补充）
 
 ## 架构
 
@@ -118,6 +120,36 @@ Vite 已将 `/api` 代理到 `http://127.0.0.1:8000`。
 | DELETE | `/api/instances/{region}/{name}` | 删除+释放静态 IP |
 | GET | `/api/traffic/summary` | 流量汇总 |
 | POST | `/api/traffic/sync` | 手动同步流量（并执行已勾选的超限关机） |
+| GET | `/api/billing/summary?credential_id=` | 本月费用（Cost Explorer）+ 官方赠金（Billing GetCredits）+ 手动赠金记录 |
+| GET/POST | `/api/billing/credits` | 列出 / 新增赠金记录（手动录入，补充用） |
+| DELETE | `/api/billing/credits/{id}` | 删除自己的赠金记录 |
+
+## 账单与赠金
+
+### 官方赠金（AWS Billing GetCredits，优先展示）
+
+账单页的官方赠金直接调 AWS Billing API `GetCredits`（boto3 `billing`，固定 `us-east-1`）：
+
+- accountId 不手填：先用 STS `GetCallerIdentity` 从当前凭证自动取 12 位账号 ID。
+- `GetCredits` 的 startDate 必须是过去 1 年内的日期，本应用取今天往前 364 天，endDate 取今天；只返回该范围内的赠金。
+- 每条赠金返回 `initialAmount` / `remainingAmount` / `estimatedAmount`：remaining 是截至上个账单周期的官方余额，estimated 是含未出账单的估算剩余，两者都是 AWS 返回的，不是本应用推算的。
+- **boto3 版本要求**：`boto3>=1.44.3`。旧版 boto3 1.35.86 的 billing 客户端只有 CreateBillingView / GetBillingView 等操作，没有 GetCredits，升级后才可用。
+- GetCredits 与费用查询相互独立：一方失败只影响自己那块展示，不会让整个账单页报错。
+
+### 本月费用（Cost Explorer）
+
+- 本月费用：`GetCostAndUsage`，MONTHLY，`UnblendedCost` + `NetUnblendedCost`，按 SERVICE 分组；已抵扣 = 总费用 − 净费用；Lightsail 费用为服务名含 Lightsail 的合计。
+- 本月预测：`GetCostForecast`（UNBLENDED_COST），预测失败时显示为“—”，不影响主汇总。
+
+### 手动赠金记录（补充）
+
+- 手动记录的剩余是**估算**：剩余估算 = 赠金总额 − 自开始日起 Cost Explorer 累计已抵扣额（Unblended − Net），与官方赠金分开显示，不要混用。
+- 手动记录不会自动插入：如需补充官方赠金之外的记录，请按官方 Credits 页在账单页手动添加（名称、总额、开始日期、到期日、Credit ID、备注）。
+
+使用前需要：
+
+1. 在 AWS 控制台启用 Cost Explorer（控制台 → Cost Explorer → 启用），启用后数据通常需要 24-48 小时才会出现；未启用或暂无数据时账单页显示 `unavailable` 提示，不会报 500。
+2. 给 IAM 用户/角色添加只读权限：`billing:GetCredits`、`sts:GetCallerIdentity`（官方赠金）、`ce:GetCostAndUsage`、`ce:GetCostForecast`（本月费用）；缺权限时账单页对应区域显示 `no_permission` 提示。不要用根账号 Access Key。
 
 ## 安全建议
 
