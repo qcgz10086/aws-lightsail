@@ -116,7 +116,7 @@ python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().d
 ```yaml
 services:
   backend:
-    build: ./backend
+    image: qcgz10086/aws-lightsail-backend:latest
     env_file: .env
     volumes:
       - ls_data:/data
@@ -137,7 +137,7 @@ services:
       start_period: 20s
 
   frontend:
-    build: ./frontend
+    image: qcgz10086/aws-lightsail-frontend:latest
     ports:
       - "8080:8080"
     depends_on:
@@ -149,12 +149,13 @@ volumes:
   ls_data:
 ```
 
-说明：`backend` 用 `./backend` 本地构建，读 `.env`，SQLite 数据存在 `ls_data` 卷的 `/data/app.db`；`frontend` 构建后由 nginx 提供，映射到本机 `8080` 端口，等 `backend` 健康检查通过后才启动。两个容器均以非 root 用户运行（后端 `appuser`、前端 `nginx-unprivileged`，前端容器内监听 `8080`）。**生产必须放在 TLS 反代之后**（见下方「安全建议」）：本应用不做 TLS 终止，浏览器到反代之间走 HTTPS，反代到容器之间走内网 HTTP；此时 `.env` 里把 `COOKIE_SECURE=true`，登录 Cookie 才带 Secure 标志。
+说明：`backend` 与 `frontend` 直接拉 Docker Hub 已发布镜像，不用拉源码、不用本地构建；`backend` 读 `.env`，SQLite 数据存在 `ls_data` 卷的 `/data/app.db`；`frontend` 由 nginx 提供，映射到本机 `8080` 端口，等 `backend` 健康检查通过后才启动。两个容器均以非 root 用户运行（后端 `appuser`、前端 `nginx-unprivileged`，前端容器内监听 `8080`）。镜像：`qcgz10086/aws-lightsail-backend:latest`、`qcgz10086/aws-lightsail-frontend:latest`（对应 `billing-getcredits` 分支提交 `433b0210`，2026-11-16；镜像摘要 backend `sha256:008a4a16e6f2bb33cc3343e6599226c30ef05b891a1222c5bfa0c8364fcce341`、frontend `sha256:676b49bbf21401dc22ceae9adf0bd7961f00d1e05a035ea78ba1539cd7340261`；想钉死版本可把 `latest` 改成标签 `237faa6`）。**生产必须放在 TLS 反代之后**（见下方「安全建议」）：本应用不做 TLS 终止，浏览器到反代之间走 HTTPS，反代到容器之间走内网 HTTP；此时 `.env` 里把 `COOKIE_SECURE=true`，登录 Cookie 才带 Secure 标志。
 
 ### 3. 启动
 
 ```bash
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 docker compose ps
 docker compose logs -f backend
 ```
@@ -166,19 +167,7 @@ docker compose logs -f backend
 - 用户名：`admin`（或 `.env` 中 `ADMIN_USERNAME` 配置）
 - 密码：`.env` 中配置的 `ADMIN_PASSWORD`（无默认值，禁止用 `admin123`）
 
-停止用 `docker compose down`（数据在 `ls_data` 卷里，不会丢）；更新代码后重新 `docker compose up -d --build` 即可。
-
-### 镜像版部署（不用本地构建）
-
-不想拉源码、不想在部署机上构建时，用仓库里的 `docker-compose.image.yml`，直接拉 Docker Hub 已发布镜像：
-
-```bash
-# 只要这两个文件在同一目录：docker-compose.image.yml、配好的 .env
-docker compose -f docker-compose.image.yml pull
-docker compose -f docker-compose.image.yml up -d
-```
-
-镜像：`qcgz10086/aws-lightsail-backend:latest`、`qcgz10086/aws-lightsail-frontend:latest`（对应 `billing-getcredits` 分支提交 `433b0210`，2026-11-16，含账单 GetCredits 功能与后续安全修复；镜像摘要 backend `sha256:008a4a16e6f2bb33cc3343e6599226c30ef05b891a1222c5bfa0c8364fcce341`、frontend `sha256:676b49bbf21401dc22ceae9adf0bd7961f00d1e05a035ea78ba1539cd7340261`；想钉死版本可把 `latest` 改成标签 `237faa6`）。其余配置（端口 `8080`、`ls_data` 卷、健康检查）与源码版一致。
+停止用 `docker compose down`（数据在 `ls_data` 卷里，不会丢）；更新镜像后 `docker compose pull` 再 `docker compose up -d` 即可。
 
 ### 4. 使用流程
 
