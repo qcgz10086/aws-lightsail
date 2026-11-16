@@ -168,6 +168,18 @@ docker compose logs -f backend
 
 首次登录后请立即改掉默认密码。停止用 `docker compose down`（数据在 `ls_data` 卷里，不会丢）；更新代码后重新 `docker compose up -d --build` 即可。
 
+### 镜像版部署（不用本地构建）
+
+不想拉源码、不想在部署机上构建时，用仓库里的 `docker-compose.image.yml`，直接拉 Docker Hub 已发布镜像：
+
+```bash
+# 只要这两个文件在同一目录：docker-compose.image.yml、配好的 .env
+docker compose -f docker-compose.image.yml pull
+docker compose -f docker-compose.image.yml up -d
+```
+
+镜像：`qcgz10086/aws-lightsail-backend:latest`、`qcgz10086/aws-lightsail-frontend:latest`（对应 `billing-getcredits` 分支提交 `6e3231a`，含账单 GetCredits 功能；想钉死版本可把 `latest` 改成 `6e3231a`）。其余配置（端口 `8080`、`ls_data` 卷、健康检查）与源码版一致。
+
 ### 4. 使用流程
 
 1. 使用管理员登录
