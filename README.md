@@ -18,12 +18,73 @@
 
 > 流量基于 Lightsail 指标估算，与官方账单可能存在差异。月份按 **UTC 自然月** 统计。
 
-## 快速开始
+## IAM 权限（最小权限策略）
 
-### 1. 准备环境变量
+先在 AWS 建一个专门给本面板用的 IAM 用户，**不要用根账号 Access Key**，再把下面这段 JSON 建成策略挂到该用户上。这是按本项目实际调的接口整理的最小权限，`Resource` 只能写 `*`（Lightsail、Cost Explorer、Billing 都不支持按资源限权）。
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "LightsailManage",
+      "Effect": "Allow",
+      "Action": [
+        "lightsail:GetRegions",
+        "lightsail:GetInstances",
+        "lightsail:GetInstance",
+        "lightsail:GetBlueprints",
+        "lightsail:GetBundles",
+        "lightsail:GetStaticIps",
+        "lightsail:GetInstanceMetricData",
+        "lightsail:CreateInstances",
+        "lightsail:StartInstance",
+        "lightsail:StopInstance",
+        "lightsail:RebootInstance",
+        "lightsail:DeleteInstance",
+        "lightsail:AllocateStaticIp",
+        "lightsail:AttachStaticIp",
+        "lightsail:DetachStaticIp",
+        "lightsail:ReleaseStaticIp",
+        "lightsail:PutInstancePublicPorts"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ServiceQuotasRead",
+      "Effect": "Allow",
+      "Action": [
+        "servicequotas:GetServiceQuota",
+        "servicequotas:ListServiceQuotas"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "BillingRead",
+      "Effect": "Allow",
+      "Action": [
+        "ce:GetCostAndUsage",
+        "ce:GetCostForecast",
+        "billing:GetCredits",
+        "sts:GetCallerIdentity"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+建策略路径：IAM → 策略 → 创建策略 → JSON → 粘贴上面这段 → 创建后附加到 IAM 用户。只想只读不建机时，把 `CreateInstances`、`Start/Stop/Reboot/DeleteInstance` 和静态 IP 那几项删掉即可。
+
+## 部署（Docker Compose）
+
+前置要求：已安装 Docker 和 Docker Compose（v2，`docker compose` 命令可用）；先按上一节建好 IAM 用户备用。
+
+### 1. 拉代码、准备环境变量
 
 ```bash
-cd lightsail-manager
+git clone -b billing-getcredits https://github.com/qcgz10086/aws-lightsail.git
+cd aws-lightsail
 cp .env.example .env
 ```
 
@@ -36,18 +97,66 @@ ADMIN_USERNAME=admin
 ADMIN_PASSWORD=请改成强密码
 ```
 
-生成 `ENCRYPTION_KEY`：
+生成密钥：
 
 ```bash
+# SECRET_KEY（任选一种）
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+
+# ENCRYPTION_KEY（Fernet 密钥）
 python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 ```
 
-> 更换 `ENCRYPTION_KEY` 后，已绑定的 AWS Key 将无法解密，需要用户重新绑定。
+> 更换 `ENCRYPTION_KEY` 后，已绑定的 AWS Key 将无法解密，需要用户重新绑定。`.env` 不要提交到仓库。
 
-### 2. 启动
+### 2. docker-compose.yml
+
+仓库根目录已自带 `docker-compose.yml`，内容如下；如果不在仓库目录内部署，直接复制这份文件保存为 `docker-compose.yml` 即可：
+
+```yaml
+services:
+  backend:
+    build: ./backend
+    env_file: .env
+    volumes:
+      - ls_data:/data
+    environment:
+      DATABASE_URL: sqlite:////data/app.db
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  ls_data:
+```
+
+说明：`backend` 用 `./backend` 本地构建，读 `.env`，SQLite 数据存在 `ls_data` 卷的 `/data/app.db`；`frontend` 构建后由 nginx 提供，映射到本机 `8080` 端口，等 `backend` 健康检查通过后才启动。
+
+### 3. 启动
 
 ```bash
 docker compose up -d --build
+docker compose ps
+docker compose logs -f backend
 ```
 
 浏览器打开：http://localhost:8080
@@ -57,7 +166,9 @@ docker compose up -d --build
 - 用户名：`admin`（或 `.env` 中配置）
 - 密码：`admin123`（或 `.env` 中配置）
 
-### 3. 使用流程
+首次登录后请立即改掉默认密码。停止用 `docker compose down`（数据在 `ls_data` 卷里，不会丢）；更新代码后重新 `docker compose up -d --build` 即可。
+
+### 4. 使用流程
 
 1. 使用管理员登录
 2. （可选）在「用户管理」创建普通用户
