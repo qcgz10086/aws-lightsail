@@ -17,7 +17,13 @@ os.environ.setdefault("ADMIN_PASSWORD", "TestAdminPass123!")
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from app.proxy_config import ProxyConfigError, mask_proxy_url, parse_proxy_url, proxy_config
+from app.proxy_config import (
+    ProxyConfigError,
+    _SOCKS_PATCH_APPLIED,
+    mask_proxy_url,
+    parse_proxy_url,
+    proxy_config,
+)
 from app.security import decrypt_secret, encrypt_secret
 from app.services import billing as b
 from app.services import lightsail as ls
@@ -29,18 +35,65 @@ PROXY_MASKED = "http://alice:***@proxy.example.com:8080"
 
 class TestParseProxyUrl(unittest.TestCase):
     def test_valid(self):
-        self.assertEqual(parse_proxy_url("http://127.0.0.1:8080"), "http://127.0.0.1:8080")
+        self.assertEqual(parse_proxy_url("http://8.8.8.8:8080"), "http://8.8.8.8:8080")
         self.assertEqual(
             parse_proxy_url("https://proxy.example.com:3128"), "https://proxy.example.com:3128"
         )
         self.assertEqual(parse_proxy_url(PROXY), PROXY)
         self.assertEqual(parse_proxy_url("http://proxy.example.com"), "http://proxy.example.com")
-        self.assertEqual(parse_proxy_url("socks5://127.0.0.1:1080"), "socks5://127.0.0.1:1080")
+        self.assertEqual(parse_proxy_url("socks5://8.8.8.8:1080"), "socks5://8.8.8.8:1080")
         self.assertEqual(
             parse_proxy_url("socks5h://alice:s3cret@proxy.example.com:1080"),
             "socks5h://alice:s3cret@proxy.example.com:1080",
         )
-        self.assertEqual(parse_proxy_url("  http://127.0.0.1:8080  "), "http://127.0.0.1:8080")
+        self.assertEqual(parse_proxy_url("  http://8.8.8.8:8080  "), "http://8.8.8.8:8080")
+
+    def test_normalizes_scheme_to_lowercase(self):
+        # T-1：大写 scheme 统一小写并重组，否则会绕过 botocore 补丁的
+        # 大小写敏感检查，畸形 URL 还会让代理密码明文进报错。
+        self.assertEqual(
+            parse_proxy_url("SOCKS5H://bob:s3cret@proxy.example.com:1080"),
+            "socks5h://bob:s3cret@proxy.example.com:1080",
+        )
+        self.assertEqual(
+            parse_proxy_url("HTTP://proxy.example.com:8080"), "http://proxy.example.com:8080"
+        )
+        self.assertEqual(
+            parse_proxy_url("Http://proxy.example.com:8080/ignored?x=1"),
+            "http://proxy.example.com:8080",
+        )
+
+    def test_rejects_internal_hosts(self):
+        # T-2：内网/保留地址不允许做代理主机，含 inet_aton 的简写/进制形式。
+        for bad in (
+            "http://127.0.0.1:8080",
+            "http://127.1:8080",
+            "http://0x7f.0.0.1:8080",
+            "http://0x7f000001:8080",
+            "http://0177.0.0.1:8080",
+            "http://2130706433:8080",
+            "http://10.0.0.5:1080",
+            "http://192.168.1.1:1080",
+            "http://172.16.0.1:1080",
+            "http://169.254.169.254:80",
+            "http://0.0.0.0:8080",
+            "socks5h://[::1]:1080",
+            "socks5://[fe80::1]:1080",
+            "http://localhost:8080",
+            "http://foo.local:8080",
+            "http://metadata.google.internal:80",
+        ):
+            with self.assertRaises(ProxyConfigError, msg=bad):
+                parse_proxy_url(bad)
+
+    def test_allows_public_hosts(self):
+        for ok in (
+            "http://8.8.8.8:8080",
+            "https://1.1.1.1:443",
+            "socks5h://proxy.example.com:1080",
+            "http://proxy.example.com:8080",
+        ):
+            self.assertEqual(parse_proxy_url(ok), ok, ok)
 
     def test_empty_means_direct(self):
         self.assertIsNone(parse_proxy_url(None))
@@ -53,8 +106,8 @@ class TestParseProxyUrl(unittest.TestCase):
             "proxy.example.com:8080",
             "http://",
             "http://:8080",
-            "http://127.0.0.1:0",
-            "http://127.0.0.1:99999",
+            "http://8.8.8.8:0",
+            "http://8.8.8.8:99999",
             "socks4://127.0.0.1:1080",
         ):
             with self.assertRaises(ProxyConfigError, msg=bad):
@@ -74,6 +127,29 @@ class TestMaskProxyUrl(unittest.TestCase):
     def test_none(self):
         self.assertIsNone(mask_proxy_url(None))
         self.assertIsNone(mask_proxy_url(""))
+
+
+class TestProxyConfigDegradation(unittest.TestCase):
+    def test_socks_fails_explicitly_when_patch_missing(self):
+        # T-4 降级：补丁没打上时 SOCKS 明确报错，不静默走直连或坏路径；
+        # http/https 不受影响。
+        with patch("app.proxy_config._SOCKS_PATCH_APPLIED", False):
+            with self.assertRaises(ProxyConfigError):
+                proxy_config("socks5h://proxy.example.com:1080")
+            cfg = proxy_config("http://proxy.example.com:8080")
+            self.assertIsNotNone(cfg)
+            self.assertEqual(
+                cfg.proxies,
+                {"http": "http://proxy.example.com:8080", "https": "http://proxy.example.com:8080"},
+            )
+
+    def test_normalizes_legacy_uppercase_scheme(self):
+        # 旧版本存下的大写代理地址，在进 boto3 前统一小写。
+        cfg = proxy_config("SOCKS5H://proxy.example.com:1080")
+        self.assertEqual(
+            cfg.proxies,
+            {"http": "socks5h://proxy.example.com:1080", "https": "socks5h://proxy.example.com:1080"},
+        )
 
 
 class TestProxyConfig(unittest.TestCase):
@@ -117,6 +193,11 @@ class TestBotocoreSocksPatch(unittest.TestCase):
             self._cfg("proxy:8080").proxy_url_for("https://lightsail.us-east-1.amazonaws.com"),
             "http://proxy:8080",
         )
+
+    def test_patch_applied_flag(self):
+        # T-4：当前环境补丁应成功打上；未来 botocore 改接口导致补丁
+        # 失效时，这个断言先失败，而不是等到线上才发现。
+        self.assertTrue(_SOCKS_PATCH_APPLIED)
 
     def test_socks_manager_uses_socks_pools(self):
         """_get_proxy_manager 对 socks 建 SOCKSProxyManager，且不被 AWS 池覆盖。"""
@@ -384,7 +465,7 @@ class TestCredentialProxyApi(_ClientCase):
         ):
             r = self.client.put(
                 f"/api/credentials/{cid}",
-                json={"proxy_url": "http://127.0.0.1:9"},
+                json={"proxy_url": "http://8.8.8.8:9"},
                 headers=self._auth(self.token),
             )
             self.assertEqual(r.status_code, 400, r.text)

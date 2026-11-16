@@ -140,6 +140,8 @@ def create_credential(
         ls.validate_credentials(ak, sk, proxy_url)
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=f"AWS 凭证校验失败: {exc.message}")
+    except ProxyConfigError as exc:
+        raise HTTPException(status_code=400, detail=f"代理不可用: {exc}")
 
     now = datetime.now(timezone.utc)
     make_default = body.is_default or not user.credentials
@@ -203,6 +205,8 @@ def update_credential(
             ls.validate_credentials(ak, sk, effective_proxy)
         except ls.LightsailError as exc:
             raise HTTPException(status_code=400, detail=f"AWS 凭证校验失败: {exc.message}")
+        except ProxyConfigError as exc:
+            raise HTTPException(status_code=400, detail=f"代理不可用: {exc}")
         if body.access_key_id:
             cred.access_key_id_enc = encrypt_secret(body.access_key_id.strip())
         if body.secret_access_key:

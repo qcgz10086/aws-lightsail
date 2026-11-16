@@ -287,9 +287,9 @@ export default function CredentialsPage() {
           <Form.Item
             name="proxy_url"
             label="代理（可选）"
-            extra="该账号的 AWS 请求走此代理；留空直连。支持 http://、https://、socks5://、socks5h://（socks5h 由代理解析域名），可带认证，如 http://user:pass@127.0.0.1:8080。保存时会用该代理校验凭证。"
+            extra="该账号的 AWS 请求走此代理；留空直连。支持 http://、https://、socks5://、socks5h://（socks5h 由代理解析域名），可带认证，如 http://user:pass@proxy.example.com:8080。只接受公网代理地址（不支持 127.0.0.1、192.168.x.x 等内网地址）。保存时会用该代理校验凭证。"
           >
-            <Input placeholder="http://127.0.0.1:8080" autoComplete="off" />
+            <Input.Password placeholder="http://proxy.example.com:8080" autoComplete="off" />
           </Form.Item>
           <Form.Item
             name="is_default"
@@ -342,14 +342,14 @@ export default function CredentialsPage() {
           <Typography.Text type="secondary">
             当前：{proxyModal?.masked || '直连'}
           </Typography.Text>
-          <Input
-            placeholder="http://user:pass@127.0.0.1:8080"
+          <Input.Password
+            placeholder="http://user:pass@proxy.example.com:8080"
             autoComplete="off"
             value={proxyInput}
             onChange={(e) => setProxyInput(e.target.value)}
           />
           <Typography.Text type="secondary">
-            留空保存即清除代理，恢复直连；支持 http://、https://、socks5://、socks5h://。保存时会用新代理重新校验凭证，不通会报错、旧代理保留。
+            留空保存即清除代理，恢复直连；支持 http://、https://、socks5://、socks5h://，只接受公网代理地址。保存时会用新代理重新校验凭证，不通会报错、旧代理保留。
           </Typography.Text>
         </Space>
       </Modal>
