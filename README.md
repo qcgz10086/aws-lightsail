@@ -7,7 +7,7 @@
 - 多用户登录（默认管理员可创建其他用户）
 - **每用户可绑定多组 AWS Access Key**（加密存储，可设默认、按凭证筛选实例）
 - 自动扫描各区域已有 Lightsail 实例（可跨多组 Key 汇总）
-- 开通实例：地区 / 套餐 / 系统镜像（Ubuntu、Debian、Windows 等）/ 名称 / **自定义密码** / **默认开放全部防火墙端口** / 自动静态 IP / 选择凭证
+- 开通实例：地区 / 套餐 / 系统镜像（Ubuntu、Debian、Windows 等）/ 名称 / **自定义密码**（至少 12 位，须含大小写字母、数字和符号；留空则走密钥登录）/ **默认不开放全部防火墙端口**（需明确勾选才放行）/ 自动静态 IP / 选择凭证
 - 开机、关机、重启
 - **一键换 IP**（分配新静态 IP → 解绑旧 IP → 绑定新 IP → 释放旧 IP）
 - **删除实例并释放关联静态 IP**（避免残留计费）
@@ -88,13 +88,13 @@ cd aws-lightsail
 cp .env.example .env
 ```
 
-编辑 `.env`，**务必修改**：
+编辑 `.env`，**三项均为必填、无默认值**：`SECRET_KEY`、`ENCRYPTION_KEY`、`ADMIN_PASSWORD` 缺失、为空或是默认值/占位值时，应用启动即拒绝，不会用弱值静默启动。`ADMIN_PASSWORD` 填好后，首次启动时若用户表为空才会创建管理员账号：
 
 ```env
-SECRET_KEY=随机长字符串
+SECRET_KEY=随机长字符串（至少 32 位）
 ENCRYPTION_KEY=用下面命令生成
 ADMIN_USERNAME=admin
-ADMIN_PASSWORD=请改成强密码
+ADMIN_PASSWORD=强管理员密码（禁止用默认密码 admin123）
 ```
 
 生成密钥：
@@ -161,12 +161,12 @@ docker compose logs -f backend
 
 浏览器打开：http://localhost:8080
 
-默认账号（若用户表为空时自动创建）：
+默认账号（首次启动时若用户表为空、且 `.env` 中已配置 `ADMIN_PASSWORD` 时创建）：
 
-- 用户名：`admin`（或 `.env` 中配置）
-- 密码：`admin123`（或 `.env` 中配置）
+- 用户名：`admin`（或 `.env` 中 `ADMIN_USERNAME` 配置）
+- 密码：`.env` 中配置的 `ADMIN_PASSWORD`（无默认值，禁止用 `admin123`）
 
-首次登录后请立即改掉默认密码。停止用 `docker compose down`（数据在 `ls_data` 卷里，不会丢）；更新代码后重新 `docker compose up -d --build` 即可。
+停止用 `docker compose down`（数据在 `ls_data` 卷里，不会丢）；更新代码后重新 `docker compose up -d --build` 即可。
 
 ### 镜像版部署（不用本地构建）
 
@@ -178,7 +178,7 @@ docker compose -f docker-compose.image.yml pull
 docker compose -f docker-compose.image.yml up -d
 ```
 
-镜像：`qcgz10086/aws-lightsail-backend:latest`、`qcgz10086/aws-lightsail-frontend:latest`（对应 `billing-getcredits` 分支提交 `6e3231a`，含账单 GetCredits 功能；想钉死版本可把 `latest` 改成 `6e3231a`）。其余配置（端口 `8080`、`ls_data` 卷、健康检查）与源码版一致。
+镜像：`qcgz10086/aws-lightsail-backend:latest`、`qcgz10086/aws-lightsail-frontend:latest`（对应 `billing-getcredits` 分支提交 `6f0f11b`，含账单 GetCredits 功能与 H-1/H-2/H-3 安全修复；想钉死版本可把 `latest` 改成 `6f0f11b`）。其余配置（端口 `8080`、`ls_data` 卷、健康检查）与源码版一致。
 
 ### 4. 使用流程
 
@@ -211,8 +211,11 @@ python -m venv .venv
 # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 set DATABASE_URL=sqlite:///./dev.db
-set SECRET_KEY=dev
+# SECRET_KEY / ENCRYPTION_KEY / ADMIN_PASSWORD 均为必填（见 .env.example），
+# 缺失或为默认值时应用拒绝启动；本地开发也须先配好这三项。
+set SECRET_KEY=（至少 32 位随机字符串）
 set ENCRYPTION_KEY=（Fernet key）
+set ADMIN_PASSWORD=（强管理员密码）
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -276,8 +279,8 @@ Vite 已将 `/api` 代理到 `http://127.0.0.1:8000`。
 
 ## 安全建议
 
-1. 修改默认管理员密码
-2. 使用强随机 `SECRET_KEY` 与 `ENCRYPTION_KEY`
+1. `SECRET_KEY`、`ENCRYPTION_KEY`、`ADMIN_PASSWORD` 均为必填且无默认值：缺失或为默认值/占位值时启动即拒绝；不要把 `.env` 提交到仓库
+2. 新建实例默认不开放全部端口（`open_all_ports` 默认关闭）；自定义实例密码至少 12 位且须含大小写字母、数字和符号，留空则走密钥登录、不开密码登录
 3. 生产环境建议置于反向代理 / HTTPS 之后
 4. 为 AWS IAM 用户最小化 Lightsail 权限
 5. 不要将 `.env` 提交到公开仓库

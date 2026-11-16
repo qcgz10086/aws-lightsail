@@ -134,7 +134,7 @@ export default function CreateInstancePage() {
         <Form
           form={form}
           layout="vertical"
-          initialValues={{ allocate_static_ip: true, open_all_ports: true }}
+          initialValues={{ allocate_static_ip: true, open_all_ports: false }}
           onFinish={async (values) => {
             setSubmitting(true)
             try {
@@ -244,11 +244,19 @@ export default function CreateInstancePage() {
               {
                 validator: async (_, value) => {
                   if (!value) return
-                  if (String(value).length < 8 || String(value).length > 64) {
-                    throw new Error('密码长度需为 8-64 位')
+                  if (String(value).length < 12 || String(value).length > 64) {
+                    throw new Error('密码长度需为 12-64 位')
                   }
                   if (String(value) !== String(value).trim()) {
                     throw new Error('密码不能包含首尾空格')
+                  }
+                  if (
+                    !/[a-z]/.test(String(value)) ||
+                    !/[A-Z]/.test(String(value)) ||
+                    !/[0-9]/.test(String(value)) ||
+                    !/[^A-Za-z0-9]/.test(String(value))
+                  ) {
+                    throw new Error('密码须同时包含小写字母、大写字母、数字和符号')
                   }
                 },
               },
@@ -278,7 +286,7 @@ export default function CreateInstancePage() {
             name="open_all_ports"
             label="开放全部防火墙端口"
             valuePropName="checked"
-            extra="默认开启。创建后自动放行所有协议 0-65535（任意 IPv4/IPv6），并保留 Lightsail 浏览器 SSH/RDP。"
+            extra="默认关闭。开启后创建后自动放行所有协议 0-65535（任意 IPv4/IPv6），并保留 Lightsail 浏览器 SSH/RDP。"
           >
             <Switch />
           </Form.Item>

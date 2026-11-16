@@ -105,11 +105,14 @@ class InstanceCreate(BaseModel):
     availability_zone: str | None = None
     credential_id: int | None = None
     # 自定义登录密码（通过 userData 注入；不落库）
-    password: str | None = Field(default=None, min_length=8, max_length=64)
+    # 不设 min_length：长度与复杂度统一由 services.lightsail._validate_instance_password
+    # 校验并以 LightsailError 返回 400；留空则不启用密码登录，走密钥登录。
+    password: str | None = Field(default=None, max_length=64)
     # 可选：LINUX_UNIX / WINDOWS，用于选择注入脚本
     platform: str | None = None
-    # 创建后开放全部防火墙端口（0-65535 / all / 任意 IPv4+IPv6）
-    open_all_ports: bool = True
+    # 创建后是否开放全部防火墙端口（0-65535 / all / 任意 IPv4+IPv6）
+    # 默认关闭（H-3 修复）：需用户明确勾选才放行。
+    open_all_ports: bool = False
 
 
 class InstanceSettingsUpdate(BaseModel):

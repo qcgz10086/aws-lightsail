@@ -11,6 +11,12 @@ import unittest
 from datetime import date, datetime, timezone
 from unittest.mock import Mock
 
+# H-1/H-2 fail-fast：SECRET_KEY / ENCRYPTION_KEY / ADMIN_PASSWORD 为必填，
+# 测试须先设置合法的测试值再导入 app 代码（以下均为测试专用值）。
+os.environ.setdefault("SECRET_KEY", "test-only-secret-key-0123456789abcdef")
+os.environ.setdefault("ENCRYPTION_KEY", "WWevy1rc32FPbz51VPopb5qw2SqEo-6VNp0jX1b4_EE=")
+os.environ.setdefault("ADMIN_PASSWORD", "TestAdminPass123!")
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from botocore.exceptions import ClientError

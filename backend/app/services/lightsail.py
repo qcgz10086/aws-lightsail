@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import logging
 import re
+import string
 import time
 from datetime import datetime, timezone
 from typing import Any
@@ -451,8 +452,19 @@ def _is_windows_platform(platform: str | None, blueprint_id: str | None = None) 
 
 
 def _validate_instance_password(password: str, *, windows: bool) -> None:
-    if not password or len(password) < 8 or len(password) > 64:
-        raise LightsailError("自定义密码长度需为 8-64 位", code="InvalidPassword")
+    # H-3 修复：自定义密码至少 12 位，且须同时包含大小写字母、数字和符号，
+    # 不满足时由调用方以 400 返回（LightsailError -> HTTPException 400）。
+    if not password or len(password) < 12 or len(password) > 64:
+        raise LightsailError("自定义密码长度需为 12-64 位", code="InvalidPassword")
+    if (
+        not re.search(r"[a-z]", password)
+        or not re.search(r"[A-Z]", password)
+        or not re.search(r"[0-9]", password)
+        or not any(ch in string.punctuation for ch in password)
+    ):
+        raise LightsailError(
+            "自定义密码须同时包含小写字母、大写字母、数字和符号", code="InvalidPassword"
+        )
     if password != password.strip() or re.search(r"[\x00-\x1f\x7f]", password):
         raise LightsailError("自定义密码不能包含首尾空格或控制字符", code="InvalidPassword")
     if windows and any(ch in password for ch in ['"', "'", "`"]):
@@ -566,7 +578,7 @@ def create_instance(
     allocate_static_ip: bool = True,
     password: str | None = None,
     platform: str | None = None,
-    open_all_ports: bool = True,
+    open_all_ports: bool = False,
 ) -> dict[str, Any]:
     try:
         client = make_client(access_key_id, secret_access_key, region)

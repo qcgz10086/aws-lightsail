@@ -1,3 +1,12 @@
+import os
+
+# H-1/H-2 fail-fast：SECRET_KEY / ENCRYPTION_KEY / ADMIN_PASSWORD 为必填，
+# 测试须先设置合法的测试值再导入 app 代码（以下均为测试专用值）。
+# 注意：app.database 在导入时即读取配置，所以这段必须在 app 导入之前。
+os.environ.setdefault("SECRET_KEY", "test-only-secret-key-0123456789abcdef")
+os.environ.setdefault("ENCRYPTION_KEY", "WWevy1rc32FPbz51VPopb5qw2SqEo-6VNp0jX1b4_EE=")
+os.environ.setdefault("ADMIN_PASSWORD", "TestAdminPass123!")
+
 from app.services.traffic import bytes_to_gb, build_traffic_summary
 from app.models import AwsCredential, TrafficUsage, User
 from app.database import Base
