@@ -25,6 +25,7 @@ from app.proxy_config import (
     mask_proxy_url,
     parse_proxy_url,
     proxy_config,
+    recheck_proxy_url,
     sanitize_error_message,
 )
 from app.security import decrypt_secret, encrypt_secret
@@ -520,6 +521,18 @@ class TestSanitizeErrorMessage(unittest.TestCase):
         self.assertNotIn("pw123", out)
         self.assertIn("socks5h://***:***@proxy:1080", out)
 
+    def test_masks_password_containing_at_sign(self):
+        # V-3：密码本身含 @ 时，旧正则在第一个 @ 截断、尾部明文残留。
+        out = sanitize_error_message(
+            "Failed to connect to proxy URL: http://user:p@ss@host.example.com:8080"
+        )
+        self.assertNotIn("p@ss", out)
+        self.assertNotIn("ss@host", out)
+        self.assertEqual(
+            out,
+            "Failed to connect to proxy URL: http://***:***@host.example.com:8080",
+        )
+
     def test_leaves_plain_text_alone(self):
         self.assertEqual(
             sanitize_error_message("AWS 错误 [X]: plain message"),
@@ -574,6 +587,14 @@ class TestProxyHostDnsCheck(unittest.TestCase):
             "http://[64:ff9b::808:808]:8080",
         )
 
+    def test_rejects_nat64_dns_resolution(self):
+        # V-1：域名解析到 NAT64 地址时同样要拦（只判 is_global 会放行）。
+        with patch(
+            "app.proxy_config._resolve_host_ips", return_value=["64:ff9b::a9fe:a9fe"]
+        ):
+            with self.assertRaises(ProxyConfigError):
+                parse_proxy_url("http://proxy.example.com:8080")
+
 
 class TestResolveHostIps(unittest.TestCase):
     def test_returns_all_addresses(self):
@@ -613,6 +634,59 @@ class TestResolveHostIps(unittest.TestCase):
             with self.assertRaises(ProxyConfigError) as ctx:
                 _orig_resolve_host_ips("slow.example.com")
             self.assertIn("解析超时", str(ctx.exception))
+
+
+class TestRecheckProxyUrl(unittest.TestCase):
+    """V-2：使用时重校验已存代理，堵 DNS 重绑定。"""
+
+    def test_passes_public_and_empty(self):
+        with patch(
+            "app.proxy_config._resolve_host_ips", return_value=["93.184.216.34"]
+        ):
+            self.assertEqual(
+                recheck_proxy_url("http://proxy.example.com:8080"),
+                "http://proxy.example.com:8080",
+            )
+        self.assertIsNone(recheck_proxy_url(None))
+        self.assertIsNone(recheck_proxy_url(""))
+
+    def test_rejects_private_resolution(self):
+        with patch(
+            "app.proxy_config._resolve_host_ips", return_value=["127.0.0.1"]
+        ):
+            with self.assertRaises(ProxyConfigError):
+                recheck_proxy_url("http://proxy.example.com:8080")
+
+    def test_rejects_nat64_resolution(self):
+        with patch(
+            "app.proxy_config._resolve_host_ips", return_value=["64:ff9b::a9fe:a9fe"]
+        ):
+            with self.assertRaises(ProxyConfigError):
+                recheck_proxy_url("http://proxy.example.com:8080")
+
+    def test_rejects_dns_rebinding(self):
+        # 保存时 DNS 返回公网 IP 能通过，之后 DNS 改回 127.0.0.1，
+        # 使用时重校验必须拦住（TOCTOU）。
+        from types import SimpleNamespace
+
+        from app.services.traffic import get_credential_proxy_url
+
+        cred = SimpleNamespace(
+            proxy_url_enc=encrypt_secret("http://proxy.example.com:8080")
+        )
+        pub = [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0))]
+        priv = [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("127.0.0.1", 0))]
+        with patch(
+            "app.proxy_config._resolve_host_ips", _orig_resolve_host_ips
+        ), patch("socket.getaddrinfo", return_value=pub):
+            self.assertEqual(
+                get_credential_proxy_url(cred), "http://proxy.example.com:8080"
+            )
+        with patch(
+            "app.proxy_config._resolve_host_ips", _orig_resolve_host_ips
+        ), patch("socket.getaddrinfo", return_value=priv):
+            with self.assertRaises(ProxyConfigError):
+                get_credential_proxy_url(cred)
 
 
 if __name__ == "__main__":

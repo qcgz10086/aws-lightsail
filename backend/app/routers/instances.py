@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.deps import get_current_user
 from app.models import InstanceSetting, OperationLog, User
+from app.proxy_config import ProxyConfigError
 from app.schemas import (
     ChangeIpResponse,
     CreateInstanceResponse,
@@ -52,6 +53,8 @@ def _keys(user: User, credential_id: int | None = None):
         return ak, sk, cred, get_credential_proxy_url(cred)
     except NoCredentialsError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except ProxyConfigError as exc:
+        raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -140,7 +143,7 @@ async def list_instances(
             ak, sk, _ = get_user_aws_keys_and_cred(user, cred.id)
             proxy_url = get_credential_proxy_url(cred)
             regions = await asyncio.to_thread(ls.get_regions, ak, sk, proxy_url=proxy_url)
-        except (NoCredentialsError, RuntimeError, ls.LightsailError) as exc:
+        except (NoCredentialsError, RuntimeError, ProxyConfigError, ls.LightsailError) as exc:
             msg = getattr(exc, "message", str(exc))
             return [], [f"凭证#{cred.id}: {msg}"]
         except Exception as exc:  # noqa: BLE001

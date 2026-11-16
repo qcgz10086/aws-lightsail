@@ -104,6 +104,10 @@ _BLOCKED_HOST_SUFFIXES = (".localhost", ".local", ".internal", ".lan", ".home", 
 # DNS 解析超时（秒）。测试里会调小它来覆盖超时分支。
 _DNS_TIMEOUT_SECONDS = 5
 
+# 使用时重校验的 DNS 解析超时（秒）：比保存时短，避免一次 DNS 卡顿
+# 拖慢整次 AWS 调用。
+_USE_TIME_DNS_TIMEOUT_SECONDS = 2
+
 
 def _parse_ip_literal(host: str) -> ipaddress.IPv4Address | ipaddress.IPv6Address | None:
     """把主机名按字面 IP 解析；支持标准形式与 inet_aton 的简写/进制形式
@@ -165,12 +169,14 @@ def _embedded_ipv4(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> ipaddre
     return None
 
 
-def _resolve_host_ips(host: str) -> list[str]:
+def _resolve_host_ips(host: str, timeout: float | None = None) -> list[str]:
     """解析主机名，返回全部解析到的 IP 字符串。
 
     解析失败或超时时抛 ProxyConfigError（fail-closed：解析不到就
     不让它做代理，避免把后端指向未知的地址）。解析用线程包一层，
     避免 getaddrinfo 长时间阻塞保存接口。"""
+    if timeout is None:
+        timeout = _DNS_TIMEOUT_SECONDS
     outcome: dict[str, object] = {}
 
     def _lookup() -> None:
@@ -182,7 +188,7 @@ def _resolve_host_ips(host: str) -> list[str]:
 
     thread = threading.Thread(target=_lookup, daemon=True)
     thread.start()
-    thread.join(timeout=_DNS_TIMEOUT_SECONDS)
+    thread.join(timeout=timeout)
     if thread.is_alive():
         raise ProxyConfigError(f"代理主机 {host} 解析超时，请检查代理地址")
     if "error" in outcome:
@@ -193,7 +199,7 @@ def _resolve_host_ips(host: str) -> list[str]:
     return ips
 
 
-def _check_proxy_host_allowed(host: str) -> None:
+def _check_proxy_host_allowed(host: str, dns_timeout: float | None = None) -> None:
     """内网/保留地址不允许做代理主机：登录用户否则能拿后端向任意内网
     地址建 TCP 连接做端口探测、投递握手字节。只接受公网地址。
     注意：只在新建/修改代理时校验；此前已存的旧代理不受影响。
@@ -214,7 +220,7 @@ def _check_proxy_host_allowed(host: str) -> None:
                 f"代理主机 {h} 内嵌的 IPv4 地址 {embedded} 是内网/保留地址，不允许作为代理"
             )
         return
-    for resolved in _resolve_host_ips(h):
+    for resolved in _resolve_host_ips(h, timeout=dns_timeout):
         try:
             rip = ipaddress.ip_address(resolved)
         except ValueError:
@@ -223,6 +229,31 @@ def _check_proxy_host_allowed(host: str) -> None:
             raise ProxyConfigError(
                 f"代理主机 {h} 解析到内网/保留地址 {resolved}，不允许作为代理，请使用公网代理地址"
             )
+        # V-1：解析结果同样复核 NAT64 内嵌 IPv4（只判 is_global 会
+        # 放行 64:ff9b::a9fe:a9fe 这类地址，它的 is_global 是 True）。
+        embedded = _embedded_ipv4(rip)
+        if embedded is not None and not embedded.is_global:
+            raise ProxyConfigError(
+                f"代理主机 {h} 解析到内嵌内网地址的 NAT64 地址 {resolved}，不允许作为代理"
+            )
+
+
+def recheck_proxy_url(url: str | None) -> str | None:
+    """使用时重校验已存代理（V-2）：保存后 DNS 可能被改回内网（重绑定），
+    只在保存时校验堵不住。每次取用已存代理都重新解析主机名，要求
+    全部解析结果为公网地址；不通过抛 ProxyConfigError，不静默回落直连。
+    返回原 URL（不改写）；未配置返回 None。"""
+    if not url:
+        return None
+    try:
+        parsed = urlparse(url)
+        hostname = parsed.hostname
+    except ValueError:
+        raise ProxyConfigError("已存代理地址格式无效，请重新保存") from None
+    if not hostname:
+        raise ProxyConfigError("已存代理地址缺少主机名，请重新保存")
+    _check_proxy_host_allowed(hostname, dns_timeout=_USE_TIME_DNS_TIMEOUT_SECONDS)
+    return url
 
 
 def parse_proxy_url(value: str | None) -> str | None:
@@ -274,7 +305,7 @@ def parse_proxy_url(value: str | None) -> str | None:
     return urlunparse((scheme, netloc, "", "", "", ""))
 
 
-_PROXY_AUTH_RE = re.compile(r"([a-zA-Z][a-zA-Z0-9+.-]*://)([^/\s:@]+:[^/\s@]*)@")
+_PROXY_AUTH_RE = re.compile(r"([a-zA-Z][a-zA-Z0-9+.-]*://)([^/\s]+)@")
 
 
 def sanitize_error_message(text: str | None) -> str:
@@ -282,7 +313,9 @@ def sanitize_error_message(text: str | None) -> str:
 
     urllib3/botocore 的异常串可能原样带上含密码的完整代理 URL
     （如 LocationParseError），直接回显会让密码进接口返回。
-    只遮 user:pass@ 这一段，其余内容不动；无认证信息的 URL 不受影响。"""
+    认证段用贪婪匹配到最后一个 @（V-3）：密码本身含 @ 时
+    （如 user:p@ss@host），非贪婪会在第一个 @ 截断、尾部明文残留。
+    只遮认证段，其余内容不动；无认证信息的 URL 不受影响。"""
     if not text:
         return ""
     return _PROXY_AUTH_RE.sub(r"\1***:***@", text)

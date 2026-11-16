@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from app.models import AwsCredential, InstanceSetting, TrafficUsage, User
+from app.proxy_config import recheck_proxy_url
 from app.security import decrypt_secret
 from app.services import lightsail as ls
 
@@ -38,10 +39,12 @@ def get_credential_proxy_url(cred: AwsCredential) -> str | None:
 
     解密失败时抛 RuntimeError（与密钥解密一致），不静默回落到直连，
     否则用户配好的代理会被悄悄绕过。
+    取出后做使用时重校验（V-2）：保存后 DNS 可能被改回内网（重绑定），
+    解析到内网/保留地址时抛 ProxyConfigError，调用方按 400 处理。
     """
     if not cred.proxy_url_enc:
         return None
-    return decrypt_secret(cred.proxy_url_enc)
+    return recheck_proxy_url(decrypt_secret(cred.proxy_url_enc))
 
 
 def get_user_aws_keys(user: User, credential_id: int | None = None) -> tuple[str, str]:

@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.deps import get_current_user
 from app.models import CreditRecord, User
+from app.proxy_config import ProxyConfigError
 from app.schemas import AwsCredit, BillingSummary, CreditCreate, CreditOut
 from app.services import billing as billing_svc
 from app.services.traffic import (
@@ -56,6 +57,8 @@ async def billing_summary(
         proxy_url = get_credential_proxy_url(cred)
     except NoCredentialsError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except ProxyConfigError as exc:
+        raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

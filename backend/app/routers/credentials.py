@@ -56,9 +56,12 @@ def _proxy_masked(cred: AwsCredential) -> str | None:
 
 
 def _stored_proxy(cred: AwsCredential) -> str | None:
-    """取已存代理；未配或解密失败返回 None（调用方按直连处理）。"""
+    """取已存代理；未配或解密失败返回 None（调用方按直连处理）。
+    使用时复核拦住时抛 ProxyConfigError，不静默回落直连。"""
     try:
         return get_credential_proxy_url(cred)
+    except ProxyConfigError:
+        raise
     except Exception:  # noqa: BLE001
         return None
 
@@ -207,7 +210,10 @@ def update_credential(
     # 换密钥或换代理都要用生效后的代理重新校验一次，不通当场报错。
     proxy_changed = "proxy_url" in body.model_fields_set
     new_proxy = _parse_proxy_or_400(body.proxy_url) if proxy_changed else None
-    effective_proxy = new_proxy if proxy_changed else _stored_proxy(cred)
+    try:
+        effective_proxy = new_proxy if proxy_changed else _stored_proxy(cred)
+    except ProxyConfigError as exc:
+        raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
     keys_updated = bool(body.access_key_id or body.secret_access_key)
     if keys_updated or proxy_changed:
         try:
@@ -296,13 +302,19 @@ def validate_one(
     try:
         ak = decrypt_secret(cred.access_key_id_enc)
         sk = decrypt_secret(cred.secret_access_key_enc)
-        ls.validate_credentials(ak, sk, get_credential_proxy_url(cred))
+        proxy_url = get_credential_proxy_url(cred)
+    except ProxyConfigError as exc:
+        raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=400, detail=f"解密凭证失败: {exc}") from exc
+    try:
+        ls.validate_credentials(ak, sk, proxy_url)
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=f"校验失败: {exc.message}")
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=400, detail=sanitize_error_message(str(exc)))
     cred.last_validated_at = datetime.now(timezone.utc)
-    _apply_quota_to_cred(cred, ak, sk, proxy_url=_stored_proxy(cred))
+    _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
     db.add(cred)
     db.commit()
     db.refresh(cred)
@@ -334,6 +346,8 @@ def _decrypt_cred_keys(cred: AwsCredential) -> tuple[str, str, str | None]:
         ak = decrypt_secret(cred.access_key_id_enc)
         sk = decrypt_secret(cred.secret_access_key_enc)
         return ak, sk, get_credential_proxy_url(cred)
+    except ProxyConfigError as exc:
+        raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=400, detail=f"解密凭证失败: {exc}") from exc
 
@@ -448,6 +462,8 @@ def refresh_quotas(
         ak = decrypt_secret(cred.access_key_id_enc)
         sk = decrypt_secret(cred.secret_access_key_enc)
         proxy_url = get_credential_proxy_url(cred)
+    except ProxyConfigError as exc:
+        raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=400, detail=f"解密凭证失败: {exc}")
     _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
@@ -518,13 +534,18 @@ def put_compat(
     now = datetime.now(timezone.utc)
     default = user.default_credential
     # 未传 proxy_url 时沿用默认凭证已存的代理；传了（哪怕空串）就按传的来。
-    proxy_url = req_proxy if body.proxy_url is not None else (
-        _stored_proxy(default) if default is not None else None
-    )
+    try:
+        proxy_url = req_proxy if body.proxy_url is not None else (
+            _stored_proxy(default) if default is not None else None
+        )
+    except ProxyConfigError as exc:
+        raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
     try:
         ls.validate_credentials(ak, sk, proxy_url)
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=f"AWS 凭证校验失败: {exc.message}")
+    except ProxyConfigError as exc:
+        raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
 
     if default is None:
         cred = AwsCredential(

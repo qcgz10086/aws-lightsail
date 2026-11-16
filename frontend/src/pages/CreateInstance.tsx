@@ -60,7 +60,12 @@ export default function CreateInstancePage() {
   // 区域启用轮询定时器：单例，换地区/重复触发时先停掉旧的，卸载时取消，
   // 避免多个 5 分钟循环叠加、旧 region 的成功回调覆盖当前表单（U-4）。
   const pollTimerRef = useRef<number | null>(null)
+  // 轮询代次：stopRegionPolling 时 +1，废止已在途的 tick（V-4）。
+  // 只清 timeout 不够：在途请求返回后还会重新 setTimeout 并继续
+  // 改状态，代次让它直接返回。
+  const pollSeqRef = useRef(0)
   const stopRegionPolling = () => {
+    pollSeqRef.current += 1
     if (pollTimerRef.current !== null) {
       window.clearTimeout(pollTimerRef.current)
       pollTimerRef.current = null
@@ -140,8 +145,10 @@ export default function CreateInstancePage() {
 
   const pollRegionStatus = (region: string, credentialId: number) => {
     stopRegionPolling()
+    const seq = pollSeqRef.current
     const deadline = Date.now() + 5 * 60 * 1000
     const tick = async () => {
+      if (seq !== pollSeqRef.current) return
       if (Date.now() > deadline) {
         pollTimerRef.current = null
         message.warning('区域启用超时，请稍后手动刷新重试')
@@ -151,6 +158,7 @@ export default function CreateInstancePage() {
         const res = await api.get<RegionOptStatus>(
           `/credentials/${credentialId}/regions/${region}/status`,
         )
+        if (seq !== pollSeqRef.current) return
         if (res.data.status === 'ENABLED') {
           pollTimerRef.current = null
           setRegionIssue(null)
@@ -168,9 +176,11 @@ export default function CreateInstancePage() {
         }
         // ENABLING / DISABLING / UNKNOWN：继续等
       } catch {
+        if (seq !== pollSeqRef.current) return
         pollTimerRef.current = null
         return
       }
+      if (seq !== pollSeqRef.current) return
       pollTimerRef.current = window.setTimeout(tick, 10000)
     }
     pollTimerRef.current = window.setTimeout(tick, 10000)

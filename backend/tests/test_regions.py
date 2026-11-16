@@ -468,6 +468,42 @@ class TestRegionEndpoints(_ClientCase):
         self.assertEqual(logs[0].status, "failed")
         self.assertEqual(logs[0].region, "ap-east-1")
 
+    def _set_stored_proxy(self, proxy_url: str) -> None:
+        cred = self.db.query(AwsCredential).filter_by(id=self.cid).first()
+        cred.proxy_url_enc = encrypt_secret(proxy_url)
+        self.db.add(cred)
+        self.db.commit()
+
+    def test_status_blocked_stored_proxy_400(self):
+        # V-2：已存代理使用时重校验拦住时返回 400，不是 500，
+        # 也不静默回落直连。
+        self._set_stored_proxy("http://proxy.example.com:8080")
+        with patch(
+            "app.proxy_config._resolve_host_ips", return_value=["127.0.0.1"]
+        ):
+            r = self.client.get(
+                f"/api/credentials/{self.cid}/regions/ap-east-1/status",
+                headers=self._auth(self.token),
+            )
+            self.assertEqual(r.status_code, 400, r.text)
+            self.assertIn("代理不可用", r.json()["detail"])
+
+    def test_status_stored_proxy_rechecked_and_passes(self):
+        # V-2 对照：解析结果是公网时正常放行，不影响好代理。
+        self._set_stored_proxy("http://proxy.example.com:8080")
+        with patch(
+            "app.proxy_config._resolve_host_ips", return_value=["93.184.216.34"]
+        ), patch(
+            "app.routers.credentials.acct.get_region_opt_status",
+            return_value="DISABLED",
+        ):
+            r = self.client.get(
+                f"/api/credentials/{self.cid}/regions/ap-east-1/status",
+                headers=self._auth(self.token),
+            )
+            self.assertEqual(r.status_code, 200, r.text)
+            self.assertEqual(r.json()["status"], "DISABLED")
+
 
 if __name__ == "__main__":
     unittest.main()
