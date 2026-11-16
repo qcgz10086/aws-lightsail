@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -11,9 +12,12 @@ from app.schemas import (
     CredentialItem,
     CredentialOut,
     CredentialUpdate,
+    RegionEnableOut,
+    RegionOptStatusOut,
 )
 from app.proxy_config import ProxyConfigError, mask_proxy_url, parse_proxy_url
 from app.security import decrypt_secret, encrypt_secret, mask_access_key
+from app.services import account as acct
 from app.services import lightsail as ls
 from app.services.traffic import get_credential_proxy_url
 
@@ -291,6 +295,79 @@ def validate_one(
     db.commit()
     db.refresh(cred)
     return _item(cred)
+
+
+_REGION_RE = re.compile(r"^[a-z]{2}-[a-z]+-[0-9]+$")
+
+
+def _check_region_or_400(region: str) -> str:
+    if not _REGION_RE.match(region):
+        raise HTTPException(status_code=400, detail="地区格式无效")
+    return region
+
+
+def _get_cred_or_404(db: Session, credential_id: int, user: User) -> AwsCredential:
+    cred = (
+        db.query(AwsCredential)
+        .filter(AwsCredential.id == credential_id, AwsCredential.user_id == user.id)
+        .first()
+    )
+    if not cred:
+        raise HTTPException(status_code=404, detail="凭证不存在")
+    return cred
+
+
+def _decrypt_cred_keys(cred: AwsCredential) -> tuple[str, str, str | None]:
+    try:
+        ak = decrypt_secret(cred.access_key_id_enc)
+        sk = decrypt_secret(cred.secret_access_key_enc)
+        return ak, sk, get_credential_proxy_url(cred)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=400, detail=f"解密凭证失败: {exc}") from exc
+
+
+@router.get("/{credential_id}/regions/{region}/status", response_model=RegionOptStatusOut)
+def region_opt_status(
+    credential_id: int,
+    region: str,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> RegionOptStatusOut:
+    """查询该账号下某区域的启用状态；凭证无效或缺权限时返回 UNKNOWN + 说明（200）。"""
+    _check_region_or_400(region)
+    cred = _get_cred_or_404(db, credential_id, user)
+    ak, sk, proxy_url = _decrypt_cred_keys(cred)
+    try:
+        status = acct.get_region_opt_status(ak, sk, region, proxy_url)
+    except acct.AccountError as exc:
+        return RegionOptStatusOut(region=region, status="UNKNOWN", message=exc.message)
+    except Exception as exc:  # noqa: BLE001
+        return RegionOptStatusOut(region=region, status="UNKNOWN", message=str(exc))
+    return RegionOptStatusOut(region=region, status=status)
+
+
+@router.post("/{credential_id}/regions/{region}/enable", response_model=RegionEnableOut)
+def region_enable(
+    credential_id: int,
+    region: str,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> RegionEnableOut:
+    """启用该账号下某区域（Account Management API）；返回启用后的即时状态。"""
+    _check_region_or_400(region)
+    cred = _get_cred_or_404(db, credential_id, user)
+    ak, sk, proxy_url = _decrypt_cred_keys(cred)
+    try:
+        status = acct.enable_region(ak, sk, region, proxy_url)
+    except acct.AccountError as exc:
+        raise HTTPException(status_code=400, detail=exc.message) from exc
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    if status == "ENABLED":
+        msg = f"区域 {region} 已启用"
+    else:
+        msg = f"区域 {region} 正在启用，生效需要几分钟，稍后重试"
+    return RegionEnableOut(region=region, status=status, message=msg)
 
 
 @router.post("/{credential_id}/quotas", response_model=CredentialItem)

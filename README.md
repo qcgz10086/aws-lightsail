@@ -15,6 +15,7 @@
 - 实例月流量限额 + **可选「超限自动关机」勾选**（默认关闭，仅告警）
 - **按地区汇总流量**：同区 2 台各 1024 GB → 显示 2048 GB
 - **账单与赠金**：AWS Billing GetCredits 查官方赠金真实余额（remaining / estimated），Cost Explorer 本月费用（总费用 / 净费用 / 已抵扣 / Lightsail 费用 / 本月预测 / 按服务明细），手动赠金记录作为补充看剩余估算与到期提醒
+- **区域启用**：选了未启用的区域（如香港 ap-east-1）时，页面提示并可一键启用（调 Account Management API，生效后自动重试）
 
 > 流量基于 Lightsail 指标估算，与官方账单可能存在差异。月份按 **UTC 自然月** 统计。
 
@@ -67,6 +68,15 @@
         "ce:GetCostForecast",
         "billing:GetCredits",
         "sts:GetCallerIdentity"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AccountRegionManage",
+      "Effect": "Allow",
+      "Action": [
+        "account:EnableRegion",
+        "account:GetRegionOptStatus"
       ],
       "Resource": "*"
     }
@@ -197,12 +207,21 @@ docker compose logs -f backend
 
 ## 代理配置
 
-每组 AWS 凭证可以配自己专用的代理，该凭证名下的全部 AWS 请求（Lightsail、Service Quotas、STS、Billing、Cost Explorer、流量采集）都走这个代理；不配就是直连。
+每组 AWS 凭证可以配自己专用的代理，该凭证名下的全部 AWS 请求（Lightsail、Service Quotas、STS、Billing、Cost Explorer、流量采集、账号管理）都走这个代理；不配就是直连。
 
 - 在「AWS 凭证」页添加凭证时填「代理（可选）」，或在已绑凭证的操作里点「代理」修改/清除。
 - 格式：`http://host:port`、`socks5://host:port`，均可带认证（如 `http://user:pass@host:port`）；支持 `http://`、`https://`、`socks5://`、`socks5h://`（SOCKS5 由 PySocks 提供；`socks5h` 由代理解析域名，不泄漏本地 DNS，建议优先用它）。
 - 代理地址用 Fernet 加密存在库里（与 Access Key 同等对待）；列表里只显示脱敏后的地址（`http://user:***@host:port`）。
 - 新建或改代理时，会立即用新代理校验一次凭证：代理不通当场报错、旧配置保留，不会静默回落到直连。
+
+## 区域启用
+
+香港（ap-east-1）等新区域在 AWS 账号里默认是关闭的（opt-in），没启用时调该区域接口会报 `UnrecognizedClientException`（跟密钥无关）。面板处理方式：
+
+- 在「开通实例」页选了未启用的区域、套餐/镜像加载失败时，页面会提示该区域未启用，并给出「启用该区域」按钮。
+- 点确认后，面板用当前凭证调 Account Management API（`account:EnableRegion`，固定走 us-east-1）启用该区域；启用不是立刻生效，面板会每 10 秒查一次状态（`account:GetRegionOptStatus`），最多等 5 分钟，变为可用后自动重载套餐/镜像。
+- 需要密钥有 `account:EnableRegion` 与 `account:GetRegionOptStatus` 权限（见上方 IAM 最小权限策略）；如果是组织成员账号，只能由管理账号启用该区域。
+- 不想启用也可以直接换个已启用的地区（如东京、新加坡、美东）。
 
 ## 架构
 

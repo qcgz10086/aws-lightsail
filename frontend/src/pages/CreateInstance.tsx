@@ -26,6 +26,11 @@ interface Blueprint {
   version?: string
   is_active: boolean
 }
+interface RegionOptStatus {
+  region: string
+  status: string
+  message?: string
+}
 
 /** 镜像下拉文案：必须带上版本，否则多个 Ubuntu/Debian 会显示成同一项 */
 function blueprintLabel(b: Blueprint): string {
@@ -50,6 +55,8 @@ export default function CreateInstancePage() {
   const [loadingMeta, setLoadingMeta] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [selectedPlatform, setSelectedPlatform] = useState<string | undefined>()
+  const [regionIssue, setRegionIssue] = useState<{ region: string; status: string } | null>(null)
+  const [enablingRegion, setEnablingRegion] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -86,6 +93,7 @@ export default function CreateInstancePage() {
 
   const loadCatalog = async (region: string, credentialId: number) => {
     setLoadingMeta(true)
+    setRegionIssue(null)
     form.setFieldsValue({ blueprint_id: undefined, bundle_id: undefined, password: undefined, password_confirm: undefined })
     setSelectedPlatform(undefined)
     try {
@@ -108,9 +116,92 @@ export default function CreateInstancePage() {
       })
       setBlueprints(bps)
     } catch (err) {
-      message.error(getErrorMessage(err))
+      const msg = getErrorMessage(err)
+      if (msg.includes('UnrecognizedClientException')) {
+        await checkRegionOptStatus(region, credentialId, msg)
+      } else {
+        message.error(msg)
+      }
     } finally {
       setLoadingMeta(false)
+    }
+  }
+
+  const pollRegionStatus = async (region: string, credentialId: number) => {
+    const deadline = Date.now() + 5 * 60 * 1000
+    for (;;) {
+      if (Date.now() > deadline) {
+        message.warning('区域启用超时，请稍后手动刷新重试')
+        return
+      }
+      await new Promise((resolve) => setTimeout(resolve, 10000))
+      try {
+        const res = await api.get<RegionOptStatus>(
+          `/credentials/${credentialId}/regions/${region}/status`,
+        )
+        if (res.data.status === 'ENABLED') {
+          setRegionIssue(null)
+          message.success(`区域 ${region} 已启用`)
+          await loadCatalog(region, credentialId)
+          return
+        }
+        if (res.data.status === 'DISABLED') {
+          setRegionIssue({ region, status: 'DISABLED' })
+          return
+        }
+        // ENABLING / DISABLING / UNKNOWN：继续等
+      } catch {
+        return
+      }
+    }
+  }
+
+  const checkRegionOptStatus = async (
+    region: string,
+    credentialId: number,
+    fallbackMsg: string,
+  ) => {
+    try {
+      const res = await api.get<RegionOptStatus>(
+        `/credentials/${credentialId}/regions/${region}/status`,
+      )
+      const status = res.data.status
+      if (status === 'DISABLED') {
+        setRegionIssue({ region, status })
+      } else if (status === 'ENABLING' || status === 'DISABLING') {
+        setRegionIssue({ region, status })
+        void pollRegionStatus(region, credentialId)
+      } else {
+        message.error(fallbackMsg)
+      }
+    } catch {
+      message.error(fallbackMsg)
+    }
+  }
+
+  const enableRegion = async () => {
+    if (!regionIssue) return
+    const credentialId = form.getFieldValue('credential_id') as number | undefined
+    if (!credentialId) return
+    const region = regionIssue.region
+    setEnablingRegion(true)
+    try {
+      const res = await api.post<RegionOptStatus>(
+        `/credentials/${credentialId}/regions/${region}/enable`,
+      )
+      if (res.data.status === 'ENABLED') {
+        setRegionIssue(null)
+        message.success(res.data.message || '区域已启用')
+        await loadCatalog(region, credentialId)
+      } else {
+        setRegionIssue({ region, status: 'ENABLING' })
+        message.info(res.data.message || '区域正在启用，生效需要几分钟')
+        void pollRegionStatus(region, credentialId)
+      }
+    } catch (err) {
+      message.error(getErrorMessage(err))
+    } finally {
+      setEnablingRegion(false)
     }
   }
 
@@ -181,6 +272,35 @@ export default function CreateInstancePage() {
               }}
             />
           </Form.Item>
+
+          {regionIssue && (
+            <Alert
+              type="warning"
+              showIcon
+              message={`地区 ${regionIssue.region} 未启用`}
+              description={
+                <Space direction="vertical">
+                  <span>
+                    该 AWS 账号尚未启用此区域（新区域默认关闭），所以调该区域接口会报
+                    UnrecognizedClientException。
+                    {regionIssue.status === 'ENABLING'
+                      ? '正在启用中，生效需要几分钟，稍后会自动重试。'
+                      : '点下面按钮可以启用它（需要密钥有 account:EnableRegion 权限）。'}
+                  </span>
+                  {regionIssue.status !== 'ENABLING' && (
+                    <Button
+                      type="primary"
+                      size="small"
+                      loading={enablingRegion}
+                      onClick={() => void enableRegion()}
+                    >
+                      启用该区域
+                    </Button>
+                  )}
+                </Space>
+              }
+            />
+          )}
 
           <Form.Item
             name="instance_name"

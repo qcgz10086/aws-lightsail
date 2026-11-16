@@ -220,6 +220,20 @@ class RegionOut(BaseModel):
     continent_code: str | None = None
 
 
+class RegionOptStatusOut(BaseModel):
+    region: str
+    # ENABLED / ENABLING / DISABLING / DISABLED / UNKNOWN
+    status: str
+    message: str | None = None
+
+
+class RegionEnableOut(BaseModel):
+    region: str
+    # ENABLED / ENABLING
+    status: str
+    message: str | None = None
+
+
 class BundleOut(BaseModel):
     bundle_id: str
     name: str
