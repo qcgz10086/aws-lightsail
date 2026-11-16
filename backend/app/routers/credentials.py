@@ -15,7 +15,19 @@ from app.schemas import (
     RegionEnableOut,
     RegionOptStatusOut,
 )
-from app.proxy_config import ProxyConfigError, mask_proxy_url, parse_proxy_url
+from app.proxy_config import (
+    ProxyConfigError,
+    mask_proxy_url,
+    parse_proxy_url,
+    sanitize_error_message,
+)
+from app.rate_limit import (
+    REGION_ENABLE_MAX_CALLS,
+    REGION_ENABLE_WINDOW_SECONDS,
+    REGION_STATUS_MAX_CALLS,
+    REGION_STATUS_WINDOW_SECONDS,
+    region_limiter,
+)
 from app.security import decrypt_secret, encrypt_secret, mask_access_key
 from app.services import account as acct
 from app.services import lightsail as ls
@@ -288,7 +300,7 @@ def validate_one(
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=f"校验失败: {exc.message}")
     except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=400, detail=str(exc))
+        raise HTTPException(status_code=400, detail=sanitize_error_message(str(exc)))
     cred.last_validated_at = datetime.now(timezone.utc)
     _apply_quota_to_cred(cred, ak, sk, proxy_url=_stored_proxy(cred))
     db.add(cred)
@@ -336,13 +348,21 @@ def region_opt_status(
     """查询该账号下某区域的启用状态；凭证无效或缺权限时返回 UNKNOWN + 说明（200）。"""
     _check_region_or_400(region)
     cred = _get_cred_or_404(db, credential_id, user)
+    if not region_limiter.allow(
+        f"region-status:{user.id}:{credential_id}",
+        REGION_STATUS_MAX_CALLS,
+        REGION_STATUS_WINDOW_SECONDS,
+    ):
+        raise HTTPException(status_code=429, detail="区域状态查询过于频繁，请稍后再试")
     ak, sk, proxy_url = _decrypt_cred_keys(cred)
     try:
         status = acct.get_region_opt_status(ak, sk, region, proxy_url)
     except acct.AccountError as exc:
         return RegionOptStatusOut(region=region, status="UNKNOWN", message=exc.message)
     except Exception as exc:  # noqa: BLE001
-        return RegionOptStatusOut(region=region, status="UNKNOWN", message=str(exc))
+        return RegionOptStatusOut(
+            region=region, status="UNKNOWN", message=sanitize_error_message(str(exc))
+        )
     return RegionOptStatusOut(region=region, status=status)
 
 
@@ -356,17 +376,57 @@ def region_enable(
     """启用该账号下某区域（Account Management API）；返回启用后的即时状态。"""
     _check_region_or_400(region)
     cred = _get_cred_or_404(db, credential_id, user)
+    if not region_limiter.allow(
+        f"region-enable:{user.id}:{credential_id}",
+        REGION_ENABLE_MAX_CALLS,
+        REGION_ENABLE_WINDOW_SECONDS,
+    ):
+        raise HTTPException(status_code=429, detail="区域启用请求过于频繁，请稍后再试")
     ak, sk, proxy_url = _decrypt_cred_keys(cred)
     try:
         status = acct.enable_region(ak, sk, region, proxy_url)
     except acct.AccountError as exc:
+        db.add(
+            OperationLog(
+                user_id=user.id,
+                action="enable_region",
+                status="failed",
+                region=region,
+                target=f"credential #{credential_id}",
+                message=exc.message,
+            )
+        )
+        db.commit()
         raise HTTPException(status_code=400, detail=exc.message) from exc
     except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        msg = sanitize_error_message(str(exc))
+        db.add(
+            OperationLog(
+                user_id=user.id,
+                action="enable_region",
+                status="failed",
+                region=region,
+                target=f"credential #{credential_id}",
+                message=msg,
+            )
+        )
+        db.commit()
+        raise HTTPException(status_code=400, detail=msg) from exc
     if status == "ENABLED":
         msg = f"区域 {region} 已启用"
     else:
         msg = f"区域 {region} 正在启用，生效需要几分钟，稍后重试"
+    db.add(
+        OperationLog(
+            user_id=user.id,
+            action="enable_region",
+            status="success",
+            region=region,
+            target=f"credential #{credential_id}",
+            message=msg,
+        )
+    )
+    db.commit()
     return RegionEnableOut(region=region, status=status, message=msg)
 
 

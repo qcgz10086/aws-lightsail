@@ -13,7 +13,7 @@ from __future__ import annotations
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 
-from app.proxy_config import proxy_config
+from app.proxy_config import proxy_config, sanitize_error_message
 
 ACCOUNT_REGION = "us-east-1"
 
@@ -47,7 +47,7 @@ def _raise_from_aws(exc: Exception) -> None:
     if isinstance(exc, ClientError):
         err = exc.response.get("Error", {})
         code = err.get("Code", "ClientError")
-        msg = err.get("Message", str(exc))
+        msg = err.get("Message") or sanitize_error_message(str(exc))
         if code == "AccessDeniedException":
             raise AccountError(
                 "权限不足：密钥需要 account:EnableRegion / account:GetRegionOptStatus 权限；"
@@ -59,10 +59,10 @@ def _raise_from_aws(exc: Exception) -> None:
                 "AWS 凭证无效：请检查 Access Key 与 Secret 是否正确、是否为长期 IAM 密钥",
                 code=code,
             ) from exc
-        raise AccountError(f"AWS 错误 [{code}]: {msg}", code=code) from exc
+        raise AccountError(f"AWS 错误 [{code}]: {sanitize_error_message(msg)}", code=code) from exc
     if isinstance(exc, BotoCoreError):
-        raise AccountError(f"AWS 连接错误: {exc}") from exc
-    raise AccountError(str(exc)) from exc
+        raise AccountError(f"AWS 连接错误: {sanitize_error_message(str(exc))}") from exc
+    raise AccountError(sanitize_error_message(str(exc))) from exc
 
 
 def get_region_opt_status(

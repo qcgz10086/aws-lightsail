@@ -79,3 +79,40 @@ login_limiter = LoginRateLimiter()
 
 def rate_limit_key(client_ip: str, username: str) -> str:
     return f"{client_ip or 'unknown'}|{username}"
+
+
+class SimpleRateLimiter:
+    """按 key 计数的固定窗口限流器（轻量接口限流用，如区域状态查询）。
+
+    allow() 在窗口内未超上限时返回 True 并计数，超限返回 False；
+    窗口滚动后自动放行。内存实现，后端单 worker 适用。"""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._entries: dict[str, deque] = {}
+
+    def allow(self, key: str, max_calls: int, window_seconds: int) -> bool:
+        now = time.monotonic()
+        with self._lock:
+            calls = self._entries.setdefault(key, deque())
+            while calls and calls[0] <= now - window_seconds:
+                calls.popleft()
+            if len(calls) >= max_calls:
+                return False
+            calls.append(now)
+            return True
+
+    def reset(self) -> None:
+        """清空全部计数（仅测试使用）。"""
+        with self._lock:
+            self._entries.clear()
+
+
+# 区域启用接口限流（U-4）：状态查询是 10 秒一次的轮询，10 次/分钟
+# 留有余量；启用是 deliberate 的点击，5 次/分钟足够。
+REGION_STATUS_MAX_CALLS = 10
+REGION_STATUS_WINDOW_SECONDS = 60
+REGION_ENABLE_MAX_CALLS = 5
+REGION_ENABLE_WINDOW_SECONDS = 60
+
+region_limiter = SimpleRateLimiter()

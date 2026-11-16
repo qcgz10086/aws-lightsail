@@ -12,7 +12,7 @@ import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 
 from app.password_strength import validate_strong_password
-from app.proxy_config import proxy_config
+from app.proxy_config import proxy_config, sanitize_error_message
 
 logger = logging.getLogger(__name__)
 
@@ -189,8 +189,8 @@ def get_lightsail_account_quotas(
             result["error"] = le.message
             result["message"] = f"配额查询失败: {le.message}"
             return result
-        result["error"] = str(exc)
-        result["message"] = f"配额查询失败: {exc}"
+        result["error"] = sanitize_error_message(str(exc))
+        result["message"] = f"配额查询失败: {sanitize_error_message(str(exc))}"
         return result
 
 
@@ -230,11 +230,11 @@ def _raise_from_aws(exc: Exception) -> None:
     if isinstance(exc, ClientError):
         err = exc.response.get("Error", {})
         code = err.get("Code", "ClientError")
-        msg = err.get("Message", str(exc))
-        raise LightsailError(f"AWS 错误 [{code}]: {msg}", code=code) from exc
+        msg = err.get("Message") or sanitize_error_message(str(exc))
+        raise LightsailError(f"AWS 错误 [{code}]: {sanitize_error_message(msg)}", code=code) from exc
     if isinstance(exc, BotoCoreError):
-        raise LightsailError(f"AWS 连接错误: {exc}") from exc
-    raise LightsailError(str(exc)) from exc
+        raise LightsailError(f"AWS 连接错误: {sanitize_error_message(str(exc))}") from exc
+    raise LightsailError(sanitize_error_message(str(exc))) from exc
 
 
 def validate_credentials(

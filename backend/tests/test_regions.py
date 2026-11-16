@@ -87,6 +87,51 @@ class TestGetRegionOptStatus(unittest.TestCase):
                 get_region_opt_status("AKID", "SK", "ap-east-1")
             self.assertIn("连接错误", ctx.exception.message)
 
+    def test_connection_error_masks_proxy_password(self):
+        # U-2：BotoCoreError 的异常串可能原样带上含密码的代理 URL，
+        # AccountError 里不能出现密码明文。
+        from botocore.exceptions import EndpointConnectionError
+
+        client = self._mock_client(
+            get_region_opt_status=EndpointConnectionError(
+                endpoint_url="http://alice:s3cret@proxy.example.com:8080"
+            )
+        )
+        with patch("app.services.account.make_account_client", return_value=client):
+            with self.assertRaises(AccountError) as ctx:
+                get_region_opt_status("AKID", "SK", "ap-east-1")
+            self.assertNotIn("s3cret", ctx.exception.message)
+            self.assertIn("***:***@", ctx.exception.message)
+
+    def test_client_error_message_masks_proxy_password(self):
+        client = self._mock_client(
+            get_region_opt_status=ClientError(
+                {
+                    "Error": {
+                        "Code": "SomeCode",
+                        "Message": "boom http://alice:s3cret@proxy.example.com:8080",
+                    }
+                },
+                "GetRegionOptStatus",
+            )
+        )
+        with patch("app.services.account.make_account_client", return_value=client):
+            with self.assertRaises(AccountError) as ctx:
+                get_region_opt_status("AKID", "SK", "ap-east-1")
+            self.assertNotIn("s3cret", ctx.exception.message)
+            self.assertIn("***:***@", ctx.exception.message)
+
+    def test_generic_error_masks_proxy_password(self):
+        client = self._mock_client(
+            get_region_opt_status=RuntimeError(
+                "boom http://alice:s3cret@proxy.example.com:8080"
+            )
+        )
+        with patch("app.services.account.make_account_client", return_value=client):
+            with self.assertRaises(AccountError) as ctx:
+                get_region_opt_status("AKID", "SK", "ap-east-1")
+            self.assertNotIn("s3cret", ctx.exception.message)
+
 
 class TestEnableRegion(unittest.TestCase):
     def test_already_enabled_returns_without_calling(self):
@@ -168,7 +213,8 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 from app.database import Base, get_db  # noqa: E402
 from app.main import app  # noqa: E402
-from app.models import AwsCredential, User  # noqa: E402
+from app.models import AwsCredential, OperationLog, User  # noqa: E402
+from app.rate_limit import region_limiter  # noqa: E402
 from app.security import encrypt_secret, hash_password  # noqa: E402
 
 
@@ -230,6 +276,7 @@ class _ClientCase(unittest.TestCase):
 class TestRegionEndpoints(_ClientCase):
     def setUp(self):
         super().setUp()
+        region_limiter.reset()
         user = User(username="regalice", password_hash=hash_password("AlicePass123!x"))
         self.db.add(user)
         self.db.commit()
@@ -319,6 +366,107 @@ class TestRegionEndpoints(_ClientCase):
             headers=self._auth(self.token),
         )
         self.assertEqual(r.status_code, 400, r.text)
+
+    def test_status_generic_error_is_sanitized(self):
+        # U-2：路由通用 except 原样回显异常串，含密码的代理 URL 会进
+        # 200 的 message；现在要脱敏。
+        with patch(
+            "app.routers.credentials.acct.get_region_opt_status",
+            side_effect=RuntimeError("boom http://alice:s3cret@proxy.example.com:8080"),
+        ):
+            r = self.client.get(
+                f"/api/credentials/{self.cid}/regions/ap-east-1/status",
+                headers=self._auth(self.token),
+            )
+            self.assertEqual(r.status_code, 200, r.text)
+            self.assertNotIn("s3cret", r.json()["message"])
+            self.assertIn("***:***@", r.json()["message"])
+
+    def test_enable_generic_error_is_sanitized(self):
+        with patch(
+            "app.routers.credentials.acct.enable_region",
+            side_effect=RuntimeError("boom http://alice:s3cret@proxy.example.com:8080"),
+        ):
+            r = self.client.post(
+                f"/api/credentials/{self.cid}/regions/ap-east-1/enable",
+                headers=self._auth(self.token),
+            )
+            self.assertEqual(r.status_code, 400, r.text)
+            self.assertNotIn("s3cret", r.json()["detail"])
+            self.assertIn("***:***@", r.json()["detail"])
+
+    def test_status_rate_limited(self):
+        # U-4：状态查询 10 次/分钟；第 11 次 429。
+        with patch(
+            "app.routers.credentials.acct.get_region_opt_status", return_value="DISABLED"
+        ):
+            for _ in range(10):
+                r = self.client.get(
+                    f"/api/credentials/{self.cid}/regions/ap-east-1/status",
+                    headers=self._auth(self.token),
+                )
+                self.assertEqual(r.status_code, 200, r.text)
+            r = self.client.get(
+                f"/api/credentials/{self.cid}/regions/ap-east-1/status",
+                headers=self._auth(self.token),
+            )
+            self.assertEqual(r.status_code, 429, r.text)
+
+    def test_enable_rate_limited(self):
+        # U-4：启用 5 次/分钟；第 6 次 429。
+        with patch(
+            "app.routers.credentials.acct.enable_region", return_value="ENABLING"
+        ):
+            for _ in range(5):
+                r = self.client.post(
+                    f"/api/credentials/{self.cid}/regions/ap-east-1/enable",
+                    headers=self._auth(self.token),
+                )
+                self.assertEqual(r.status_code, 200, r.text)
+            r = self.client.post(
+                f"/api/credentials/{self.cid}/regions/ap-east-1/enable",
+                headers=self._auth(self.token),
+            )
+            self.assertEqual(r.status_code, 429, r.text)
+
+    def test_enable_logs_operation(self):
+        # U-4：enable 成功记操作日志。
+        with patch(
+            "app.routers.credentials.acct.enable_region", return_value="ENABLING"
+        ):
+            r = self.client.post(
+                f"/api/credentials/{self.cid}/regions/ap-east-1/enable",
+                headers=self._auth(self.token),
+            )
+            self.assertEqual(r.status_code, 200, r.text)
+        logs = (
+            self.db.query(OperationLog)
+            .filter(OperationLog.action == "enable_region")
+            .all()
+        )
+        self.assertEqual(len(logs), 1)
+        self.assertEqual(logs[0].status, "success")
+        self.assertEqual(logs[0].region, "ap-east-1")
+
+    def test_enable_failure_logs_operation(self):
+        # U-4：enable 失败也记操作日志。
+        with patch(
+            "app.routers.credentials.acct.enable_region",
+            side_effect=AccountError("权限不足", code="AccessDeniedException"),
+        ):
+            r = self.client.post(
+                f"/api/credentials/{self.cid}/regions/ap-east-1/enable",
+                headers=self._auth(self.token),
+            )
+            self.assertEqual(r.status_code, 400, r.text)
+        logs = (
+            self.db.query(OperationLog)
+            .filter(OperationLog.action == "enable_region")
+            .all()
+        )
+        self.assertEqual(len(logs), 1)
+        self.assertEqual(logs[0].status, "failed")
+        self.assertEqual(logs[0].region, "ap-east-1")
 
 
 if __name__ == "__main__":

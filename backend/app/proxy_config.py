@@ -33,6 +33,8 @@ from __future__ import annotations
 
 import ipaddress
 import re
+import socket
+import threading
 from urllib.parse import urlparse, urlunparse
 
 from botocore.config import Config
@@ -99,6 +101,9 @@ class ProxyConfigError(ValueError):
 
 _BLOCKED_HOST_SUFFIXES = (".localhost", ".local", ".internal", ".lan", ".home", ".intranet")
 
+# DNS 解析超时（秒）。测试里会调小它来覆盖超时分支。
+_DNS_TIMEOUT_SECONDS = 5
+
 
 def _parse_ip_literal(host: str) -> ipaddress.IPv4Address | ipaddress.IPv6Address | None:
     """把主机名按字面 IP 解析；支持标准形式与 inet_aton 的简写/进制形式
@@ -150,18 +155,74 @@ def _parse_ip_literal(host: str) -> ipaddress.IPv4Address | ipaddress.IPv6Addres
         return None
 
 
+def _embedded_ipv4(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> ipaddress.IPv4Address | None:
+    """NAT64 前缀 64:ff9b::/96 内嵌的 IPv4（U-5）：is_global 对这类地址
+    返回 True，必须把内嵌的 IPv4 拿出来单独复核（内嵌 169.254.169.254
+    这类保留地址时拒绝）。IPv4-mapped（::ffff:0:0/96）不需要，is_global
+    本身已正确处理。"""
+    if isinstance(ip, ipaddress.IPv6Address) and ip in ipaddress.IPv6Network("64:ff9b::/96"):
+        return ipaddress.IPv4Address(int(ip) & 0xFFFFFFFF)
+    return None
+
+
+def _resolve_host_ips(host: str) -> list[str]:
+    """解析主机名，返回全部解析到的 IP 字符串。
+
+    解析失败或超时时抛 ProxyConfigError（fail-closed：解析不到就
+    不让它做代理，避免把后端指向未知的地址）。解析用线程包一层，
+    避免 getaddrinfo 长时间阻塞保存接口。"""
+    outcome: dict[str, object] = {}
+
+    def _lookup() -> None:
+        try:
+            infos = socket.getaddrinfo(host, None)
+            outcome["ips"] = [info[4][0] for info in infos]
+        except Exception as exc:  # noqa: BLE001
+            outcome["error"] = exc
+
+    thread = threading.Thread(target=_lookup, daemon=True)
+    thread.start()
+    thread.join(timeout=_DNS_TIMEOUT_SECONDS)
+    if thread.is_alive():
+        raise ProxyConfigError(f"代理主机 {host} 解析超时，请检查代理地址")
+    if "error" in outcome:
+        raise ProxyConfigError(f"代理主机 {host} 无法解析，请检查代理地址")
+    ips = outcome.get("ips")
+    if not isinstance(ips, list) or not ips:
+        raise ProxyConfigError(f"代理主机 {host} 无法解析，请检查代理地址")
+    return ips
+
+
 def _check_proxy_host_allowed(host: str) -> None:
     """内网/保留地址不允许做代理主机：登录用户否则能拿后端向任意内网
     地址建 TCP 连接做端口探测、投递握手字节。只接受公网地址。
-    注意：只在新建/修改代理时校验；此前已存的旧代理不受影响。"""
+    注意：只在新建/修改代理时校验；此前已存的旧代理不受影响。
+    域名要解析后复核（U-1）：只校验字面量会被 lvh.me、*.nip.io、
+    *.sslip.io 这类解析到内网的域名绕过。"""
     h = host.rstrip(".").lower()
     if h == "localhost" or h.endswith(_BLOCKED_HOST_SUFFIXES):
         raise ProxyConfigError("代理主机不能是 localhost 等内网域名，请使用公网代理地址")
     if "%" in h or any(ord(c) < 32 or c.isspace() for c in h):
         raise ProxyConfigError("代理主机名格式无效")
     ip = _parse_ip_literal(h)
-    if ip is not None and not ip.is_global:
-        raise ProxyConfigError(f"代理主机 {h} 是内网/保留地址，不允许作为代理，请使用公网代理地址")
+    if ip is not None:
+        if not ip.is_global:
+            raise ProxyConfigError(f"代理主机 {h} 是内网/保留地址，不允许作为代理，请使用公网代理地址")
+        embedded = _embedded_ipv4(ip)
+        if embedded is not None and not embedded.is_global:
+            raise ProxyConfigError(
+                f"代理主机 {h} 内嵌的 IPv4 地址 {embedded} 是内网/保留地址，不允许作为代理"
+            )
+        return
+    for resolved in _resolve_host_ips(h):
+        try:
+            rip = ipaddress.ip_address(resolved)
+        except ValueError:
+            raise ProxyConfigError(f"代理主机 {host} 解析结果无效") from None
+        if not rip.is_global:
+            raise ProxyConfigError(
+                f"代理主机 {h} 解析到内网/保留地址 {resolved}，不允许作为代理，请使用公网代理地址"
+            )
 
 
 def parse_proxy_url(value: str | None) -> str | None:
@@ -173,11 +234,20 @@ def parse_proxy_url(value: str | None) -> str | None:
     url = value.strip()
     if not url:
         return None
-    parsed = urlparse(url)
+    try:
+        parsed = urlparse(url)
+    except ValueError:
+        # U-3：代理密码含 [ 或 ] 等字符时 urlparse 直接抛 ValueError，
+        # 不接住会变成 500；转成 ProxyConfigError 走 400。
+        raise ProxyConfigError("代理地址格式无效") from None
     scheme = parsed.scheme.lower()
     if scheme not in ("http", "https", "socks5", "socks5h"):
         raise ProxyConfigError("代理只支持 http://、https://、socks5://、socks5h://")
-    if not parsed.hostname:
+    try:
+        hostname = parsed.hostname
+    except ValueError:
+        raise ProxyConfigError("代理地址格式无效") from None
+    if not hostname:
         raise ProxyConfigError("代理地址缺少主机名，例如 http://proxy.example.com:8080")
     try:
         port = parsed.port
@@ -186,7 +256,7 @@ def parse_proxy_url(value: str | None) -> str | None:
         raise ProxyConfigError("代理端口无效（1-65535）") from None
     if port is not None and not 1 <= port <= 65535:
         raise ProxyConfigError("代理端口无效（1-65535）")
-    _check_proxy_host_allowed(parsed.hostname)
+    _check_proxy_host_allowed(hostname)
     # 按解析结果重组：scheme 统一小写（大写 SOCKS5H:// 否则会绕过
     # botocore 补丁的大小写敏感检查，畸形 URL 还会让代理密码明文进报错）。
     auth = ""
@@ -195,13 +265,27 @@ def parse_proxy_url(value: str | None) -> str | None:
         if parsed.password is not None:
             auth += f":{parsed.password}"
         auth += "@"
-    host = parsed.hostname
+    host = hostname
     if ":" in host:  # IPv6 字面量补回方括号
         host = f"[{host}]"
     netloc = f"{auth}{host}"
     if port is not None:
         netloc += f":{port}"
     return urlunparse((scheme, netloc, "", "", "", ""))
+
+
+_PROXY_AUTH_RE = re.compile(r"([a-zA-Z][a-zA-Z0-9+.-]*://)([^/\s:@]+:[^/\s@]*)@")
+
+
+def sanitize_error_message(text: str | None) -> str:
+    """把异常串里可能夹带的代理 URL 认证信息脱敏（U-2）。
+
+    urllib3/botocore 的异常串可能原样带上含密码的完整代理 URL
+    （如 LocationParseError），直接回显会让密码进接口返回。
+    只遮 user:pass@ 这一段，其余内容不动；无认证信息的 URL 不受影响。"""
+    if not text:
+        return ""
+    return _PROXY_AUTH_RE.sub(r"\1***:***@", text)
 
 
 def mask_proxy_url(value: str | None) -> str | None:

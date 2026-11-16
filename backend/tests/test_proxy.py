@@ -6,6 +6,7 @@
     backend/.venv/bin/python -m unittest discover -s tests -v
 """
 import os
+import socket
 import sys
 import unittest
 from unittest.mock import Mock, patch
@@ -20,9 +21,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from app.proxy_config import (
     ProxyConfigError,
     _SOCKS_PATCH_APPLIED,
+    _resolve_host_ips,
     mask_proxy_url,
     parse_proxy_url,
     proxy_config,
+    sanitize_error_message,
 )
 from app.security import decrypt_secret, encrypt_secret
 from app.services import billing as b
@@ -31,6 +34,24 @@ from app.services.traffic import get_credential_proxy_url
 
 PROXY = "http://alice:s3cret@proxy.example.com:8080"
 PROXY_MASKED = "http://alice:***@proxy.example.com:8080"
+
+# U-1：parse_proxy_url 现在会对主机名做真实 DNS 解析；测试里默认
+# 把它 mock 成公网地址，避免测试依赖外网 DNS。需要控制解析结果
+# 的用例在自己的 with patch 里覆盖。
+_orig_resolve_host_ips = _resolve_host_ips
+_dns_patcher = None
+
+
+def setUpModule():
+    global _dns_patcher
+    _dns_patcher = patch(
+        "app.proxy_config._resolve_host_ips", return_value=["93.184.216.34"]
+    )
+    _dns_patcher.start()
+
+
+def tearDownModule():
+    _dns_patcher.stop()
 
 
 class TestParseProxyUrl(unittest.TestCase):
@@ -109,6 +130,16 @@ class TestParseProxyUrl(unittest.TestCase):
             "http://8.8.8.8:0",
             "http://8.8.8.8:99999",
             "socks4://127.0.0.1:1080",
+        ):
+            with self.assertRaises(ProxyConfigError, msg=bad):
+                parse_proxy_url(bad)
+
+    def test_invalid_url_value_error_becomes_proxy_error(self):
+        # U-3：代理密码含 [ 或 ] 时 urlparse 抛 ValueError，
+        # 应转成 ProxyConfigError（路由层 400），而不是 500。
+        for bad in (
+            "http://user:pa[ss@proxy.example.com:8080",
+            "http://user:pa]ss@proxy.example.com:8080",
         ):
             with self.assertRaises(ProxyConfigError, msg=bad):
                 parse_proxy_url(bad)
@@ -471,6 +502,117 @@ class TestCredentialProxyApi(_ClientCase):
             self.assertEqual(r.status_code, 400, r.text)
         cred = self.db.query(AwsCredential).first()
         self.assertEqual(decrypt_secret(cred.proxy_url_enc), PROXY)
+
+
+class TestSanitizeErrorMessage(unittest.TestCase):
+    """U-2：异常串里夹带的代理 URL 认证信息要脱敏。"""
+
+    def test_masks_proxy_password_in_error(self):
+        text = "Failed to connect to proxy URL: http://alice:s3cret@proxy.example.com:8080"
+        out = sanitize_error_message(text)
+        self.assertNotIn("s3cret", out)
+        self.assertIn("http://***:***@proxy.example.com:8080", out)
+
+    def test_masks_socks_url(self):
+        out = sanitize_error_message(
+            "LocationParseError: Failed to parse: socks5h://bob:pw123@proxy:1080"
+        )
+        self.assertNotIn("pw123", out)
+        self.assertIn("socks5h://***:***@proxy:1080", out)
+
+    def test_leaves_plain_text_alone(self):
+        self.assertEqual(
+            sanitize_error_message("AWS 错误 [X]: plain message"),
+            "AWS 错误 [X]: plain message",
+        )
+        self.assertEqual(sanitize_error_message("https://example.com/path"), "https://example.com/path")
+        self.assertEqual(sanitize_error_message(None), "")
+        self.assertEqual(sanitize_error_message(""), "")
+
+
+class TestProxyHostDnsCheck(unittest.TestCase):
+    """U-1：代理主机名要解析后复核，解析到内网地址的域名不能做代理。"""
+
+    def test_rejects_dns_resolving_to_private(self):
+        for host, ips in (
+            ("lvh.me", ["127.0.0.1"]),
+            ("127.0.0.1.nip.io", ["127.0.0.1"]),
+            ("127.0.0.1.sslip.io", ["127.0.0.1"]),
+            ("mixed.example.com", ["93.184.216.34", "10.0.0.5"]),
+        ):
+            with patch("app.proxy_config._resolve_host_ips", return_value=ips):
+                with self.assertRaises(ProxyConfigError, msg=host):
+                    parse_proxy_url(f"http://{host}:8080")
+
+    def test_allows_dns_resolving_to_public(self):
+        with patch(
+            "app.proxy_config._resolve_host_ips",
+            return_value=["93.184.216.34", "2606:2800:220:1:248:1893:25c8:1946"],
+        ):
+            self.assertEqual(
+                parse_proxy_url("http://proxy.example.com:8080"),
+                "http://proxy.example.com:8080",
+            )
+
+    def test_rejects_unresolvable_host(self):
+        with patch(
+            "app.proxy_config._resolve_host_ips",
+            side_effect=ProxyConfigError("代理主机 x 无法解析"),
+        ):
+            with self.assertRaises(ProxyConfigError):
+                parse_proxy_url("http://does-not-resolve.example.com:8080")
+
+    def test_rejects_nat64_embedding_private_ipv4(self):
+        # U-5：64:ff9b::/96 内嵌的 IPv4 是保留地址时拒绝；is_global
+        # 对这类地址本身返回 True，必须单独复核内嵌部分。
+        for bad in ("http://[64:ff9b::a9fe:a9fe]:8080", "http://[64:ff9b::7f00:1]:8080"):
+            with self.assertRaises(ProxyConfigError, msg=bad):
+                parse_proxy_url(bad)
+        # 内嵌公网 IPv4 的 NAT64 地址放行
+        self.assertEqual(
+            parse_proxy_url("http://[64:ff9b::808:808]:8080"),
+            "http://[64:ff9b::808:808]:8080",
+        )
+
+
+class TestResolveHostIps(unittest.TestCase):
+    def test_returns_all_addresses(self):
+        infos = [
+            (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0)),
+            (
+                socket.AF_INET6,
+                socket.SOCK_STREAM,
+                6,
+                "",
+                ("2606:2800:220:1:248:1893:25c8:1946", 0, 0, 0),
+            ),
+        ]
+        with patch("socket.getaddrinfo", return_value=infos):
+            self.assertEqual(
+                _orig_resolve_host_ips("proxy.example.com"),
+                ["93.184.216.34", "2606:2800:220:1:248:1893:25c8:1946"],
+            )
+
+    def test_unresolvable_raises(self):
+        with patch(
+            "socket.getaddrinfo", side_effect=socket.gaierror("Name or service not known")
+        ):
+            with self.assertRaises(ProxyConfigError):
+                _orig_resolve_host_ips("does-not-resolve.example.com")
+
+    def test_timeout_raises(self):
+        import time
+
+        def _slow(*args, **kwargs):
+            time.sleep(2)
+            return []
+
+        with patch("socket.getaddrinfo", side_effect=_slow), patch(
+            "app.proxy_config._DNS_TIMEOUT_SECONDS", 0.2
+        ):
+            with self.assertRaises(ProxyConfigError) as ctx:
+                _orig_resolve_host_ips("slow.example.com")
+            self.assertIn("解析超时", str(ctx.exception))
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 import { Alert, Button, Card, Form, Input, Select, Switch, Typography, message, Space } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import api, { CredentialItem, CredentialOut, getErrorMessage } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
@@ -57,6 +57,16 @@ export default function CreateInstancePage() {
   const [selectedPlatform, setSelectedPlatform] = useState<string | undefined>()
   const [regionIssue, setRegionIssue] = useState<{ region: string; status: string } | null>(null)
   const [enablingRegion, setEnablingRegion] = useState(false)
+  // 区域启用轮询定时器：单例，换地区/重复触发时先停掉旧的，卸载时取消，
+  // 避免多个 5 分钟循环叠加、旧 region 的成功回调覆盖当前表单（U-4）。
+  const pollTimerRef = useRef<number | null>(null)
+  const stopRegionPolling = () => {
+    if (pollTimerRef.current !== null) {
+      window.clearTimeout(pollTimerRef.current)
+      pollTimerRef.current = null
+    }
+  }
+  useEffect(() => () => stopRegionPolling(), [])
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -92,6 +102,7 @@ export default function CreateInstancePage() {
   }
 
   const loadCatalog = async (region: string, credentialId: number) => {
+    stopRegionPolling()
     setLoadingMeta(true)
     setRegionIssue(null)
     form.setFieldsValue({ blueprint_id: undefined, bundle_id: undefined, password: undefined, password_confirm: undefined })
@@ -127,33 +138,42 @@ export default function CreateInstancePage() {
     }
   }
 
-  const pollRegionStatus = async (region: string, credentialId: number) => {
+  const pollRegionStatus = (region: string, credentialId: number) => {
+    stopRegionPolling()
     const deadline = Date.now() + 5 * 60 * 1000
-    for (;;) {
+    const tick = async () => {
       if (Date.now() > deadline) {
+        pollTimerRef.current = null
         message.warning('区域启用超时，请稍后手动刷新重试')
         return
       }
-      await new Promise((resolve) => setTimeout(resolve, 10000))
       try {
         const res = await api.get<RegionOptStatus>(
           `/credentials/${credentialId}/regions/${region}/status`,
         )
         if (res.data.status === 'ENABLED') {
+          pollTimerRef.current = null
           setRegionIssue(null)
           message.success(`区域 ${region} 已启用`)
-          await loadCatalog(region, credentialId)
+          // 用户可能已经切了别的地区：只在当前选的还是这个地区时才重载
+          if (form.getFieldValue('region') === region) {
+            await loadCatalog(region, credentialId)
+          }
           return
         }
         if (res.data.status === 'DISABLED') {
+          pollTimerRef.current = null
           setRegionIssue({ region, status: 'DISABLED' })
           return
         }
         // ENABLING / DISABLING / UNKNOWN：继续等
       } catch {
+        pollTimerRef.current = null
         return
       }
+      pollTimerRef.current = window.setTimeout(tick, 10000)
     }
+    pollTimerRef.current = window.setTimeout(tick, 10000)
   }
 
   const checkRegionOptStatus = async (
