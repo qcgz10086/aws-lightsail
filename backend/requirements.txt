@@ -7,6 +7,7 @@ python-jose[cryptography]==3.5.0
 bcrypt==4.2.1
 cryptography==50.0.2
 boto3==1.44.3
+PySocks==1.7.1
 apscheduler==3.10.4
 python-multipart==0.0.33
 httpx==0.28.1

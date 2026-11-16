@@ -51,7 +51,7 @@ class CredentialCreate(BaseModel):
     access_key_id: str = Field(min_length=16, max_length=128)
     secret_access_key: str = Field(min_length=16, max_length=128)
     account_label: str | None = None
-    # 该账号单独的代理；空/缺省=直连，仅支持 http:// 或 https://
+    # 该账号单独的代理；空/缺省=直连，支持 http://、https://、socks5://、socks5h://
     proxy_url: str | None = None
     is_default: bool = False
 

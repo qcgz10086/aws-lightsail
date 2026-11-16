@@ -35,6 +35,11 @@ class TestParseProxyUrl(unittest.TestCase):
         )
         self.assertEqual(parse_proxy_url(PROXY), PROXY)
         self.assertEqual(parse_proxy_url("http://proxy.example.com"), "http://proxy.example.com")
+        self.assertEqual(parse_proxy_url("socks5://127.0.0.1:1080"), "socks5://127.0.0.1:1080")
+        self.assertEqual(
+            parse_proxy_url("socks5h://alice:s3cret@proxy.example.com:1080"),
+            "socks5h://alice:s3cret@proxy.example.com:1080",
+        )
         self.assertEqual(parse_proxy_url("  http://127.0.0.1:8080  "), "http://127.0.0.1:8080")
 
     def test_empty_means_direct(self):
@@ -42,16 +47,15 @@ class TestParseProxyUrl(unittest.TestCase):
         self.assertIsNone(parse_proxy_url(""))
         self.assertIsNone(parse_proxy_url("   "))
 
-    def test_rejects_non_http(self):
+    def test_rejects_unsupported(self):
         for bad in (
-            "socks5://127.0.0.1:1080",
-            "socks5h://127.0.0.1:1080",
             "ftp://proxy.example.com:21",
             "proxy.example.com:8080",
             "http://",
             "http://:8080",
             "http://127.0.0.1:0",
             "http://127.0.0.1:99999",
+            "socks4://127.0.0.1:1080",
         ):
             with self.assertRaises(ProxyConfigError, msg=bad):
                 parse_proxy_url(bad)
@@ -60,6 +64,10 @@ class TestParseProxyUrl(unittest.TestCase):
 class TestMaskProxyUrl(unittest.TestCase):
     def test_masks_password_only(self):
         self.assertEqual(mask_proxy_url(PROXY), PROXY_MASKED)
+        self.assertEqual(
+            mask_proxy_url("socks5h://alice:s3cret@proxy.example.com:1080"),
+            "socks5h://alice:***@proxy.example.com:1080",
+        )
         self.assertEqual(mask_proxy_url("http://127.0.0.1:8080"), "http://127.0.0.1:8080")
         self.assertEqual(mask_proxy_url("https://proxy.example.com"), "https://proxy.example.com")
 
@@ -77,6 +85,63 @@ class TestProxyConfig(unittest.TestCase):
         cfg = proxy_config(PROXY)
         self.assertIsNotNone(cfg)
         self.assertEqual(cfg.proxies, {"http": PROXY, "https": PROXY})
+        # SOCKS5 同样原样透传给 botocore（urllib3 靠 PySocks 走 SOCKS）
+        cfg = proxy_config("socks5h://127.0.0.1:1080")
+        self.assertEqual(
+            cfg.proxies, {"http": "socks5h://127.0.0.1:1080", "https": "socks5h://127.0.0.1:1080"}
+        )
+
+
+class TestBotocoreSocksPatch(unittest.TestCase):
+    """botocore 1.44.3 会把 socks5:// 前面拼上 http://；补丁只放行 socks 协议。"""
+
+    def _cfg(self, url):
+        from botocore.httpsession import ProxyConfiguration
+
+        return ProxyConfiguration(proxies={"http": url, "https": url})
+
+    def test_socks_url_passes_through_unchanged(self):
+        for url in ("socks5h://127.0.0.1:1080", "socks5://127.0.0.1:1080"):
+            self.assertEqual(
+                self._cfg(url).proxy_url_for("https://lightsail.us-east-1.amazonaws.com"),
+                url,
+            )
+
+    def test_http_behavior_unchanged(self):
+        self.assertEqual(
+            self._cfg("http://proxy:8080").proxy_url_for("https://lightsail.us-east-1.amazonaws.com"),
+            "http://proxy:8080",
+        )
+        # 原有行为保留：没写协议的地址仍补 http://
+        self.assertEqual(
+            self._cfg("proxy:8080").proxy_url_for("https://lightsail.us-east-1.amazonaws.com"),
+            "http://proxy:8080",
+        )
+
+    def test_socks_manager_uses_socks_pools(self):
+        """_get_proxy_manager 对 socks 建 SOCKSProxyManager，且不被 AWS 池覆盖。"""
+        from botocore.httpsession import URLLib3Session
+        from urllib3 import ProxyManager
+        from urllib3.contrib.socks import (
+            SOCKSHTTPConnectionPool,
+            SOCKSHTTPSConnectionPool,
+            SOCKSProxyManager,
+        )
+
+        session = URLLib3Session(
+            proxies={"http": "socks5h://127.0.0.1:1080", "https": "socks5h://127.0.0.1:1080"}
+        )
+        mgr = session._get_proxy_manager("socks5h://127.0.0.1:1080")
+        self.assertIsInstance(mgr, SOCKSProxyManager)
+        self.assertIs(mgr.pool_classes_by_scheme["http"], SOCKSHTTPConnectionPool)
+        self.assertIs(mgr.pool_classes_by_scheme["https"], SOCKSHTTPSConnectionPool)
+
+        http_session = URLLib3Session(
+            proxies={"http": "http://proxy:8080", "https": "http://proxy:8080"}
+        )
+        http_mgr = http_session._get_proxy_manager("http://proxy:8080")
+        self.assertIsInstance(http_mgr, ProxyManager)
+        self.assertNotIsInstance(http_mgr, SOCKSProxyManager)
 
 
 class TestFactoriesPassProxy(unittest.TestCase):
@@ -255,11 +320,18 @@ class TestCredentialProxyApi(_ClientCase):
         self.assertEqual(decrypt_secret(cred.proxy_url_enc), PROXY)
 
     def test_create_with_bad_proxy_400_and_not_saved(self):
-        for bad in ("socks5://127.0.0.1:1080", "ftp://x.example.com", "http://"):
+        for bad in ("ftp://x.example.com", "http://", "socks4://127.0.0.1:1080"):
             r = self._create(bad)
             self.assertEqual(r.status_code, 400, r.text)
             self.assertIn("代理", r.json()["detail"])
         self.assertEqual(self.db.query(AwsCredential).count(), 0)
+
+    def test_create_with_socks5_proxy(self):
+        r = self._create("socks5h://alice:s3cret@proxy.example.com:1080")
+        self.assertEqual(r.status_code, 201, r.text)
+        self.assertEqual(
+            r.json()["items"][0]["proxy_masked"], "socks5h://alice:***@proxy.example.com:1080"
+        )
 
     def test_create_without_proxy_is_direct(self):
         r = self._create()

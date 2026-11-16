@@ -200,7 +200,7 @@ docker compose logs -f backend
 每组 AWS 凭证可以配自己专用的代理，该凭证名下的全部 AWS 请求（Lightsail、Service Quotas、STS、Billing、Cost Explorer、流量采集）都走这个代理；不配就是直连。
 
 - 在「AWS 凭证」页添加凭证时填「代理（可选）」，或在已绑凭证的操作里点「代理」修改/清除。
-- 格式：`http://host:port` 或 `http://user:pass@host:port`；只支持 `http://` 与 `https://`，不支持 socks5。
+- 格式：`http://host:port`、`socks5://host:port`，均可带认证（如 `http://user:pass@host:port`）；支持 `http://`、`https://`、`socks5://`、`socks5h://`（SOCKS5 由 PySocks 提供；`socks5h` 由代理解析域名，不泄漏本地 DNS，建议优先用它）。
 - 代理地址用 Fernet 加密存在库里（与 Access Key 同等对待）；列表里只显示脱敏后的地址（`http://user:***@host:port`）。
 - 新建或改代理时，会立即用新代理校验一次凭证：代理不通当场报错、旧配置保留，不会静默回落到直连。
 
