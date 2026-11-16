@@ -18,7 +18,11 @@ from app.deps import get_current_user
 from app.models import CreditRecord, User
 from app.schemas import AwsCredit, BillingSummary, CreditCreate, CreditOut
 from app.services import billing as billing_svc
-from app.services.traffic import NoCredentialsError, get_user_aws_keys_and_cred
+from app.services.traffic import (
+    NoCredentialsError,
+    get_credential_proxy_url,
+    get_user_aws_keys_and_cred,
+)
 
 router = APIRouter(prefix="/billing", tags=["billing"])
 
@@ -48,13 +52,14 @@ async def billing_summary(
     db: Session = Depends(get_db),
 ) -> BillingSummary:
     try:
-        ak, sk, _cred = get_user_aws_keys_and_cred(user, credential_id)
+        ak, sk, cred = get_user_aws_keys_and_cred(user, credential_id)
+        proxy_url = get_credential_proxy_url(cred)
     except NoCredentialsError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    client = billing_svc.make_ce_client(ak, sk)
+    client = billing_svc.make_ce_client(ak, sk, proxy_url)
 
     # Cost Explorer 与 GetCredits 各自独立查询，一方失败不影响另一方。
     data: dict | None = None
@@ -79,7 +84,7 @@ async def billing_summary(
     aws_error: str | None = None
     aws_account_id: str | None = None
     try:
-        aws_res = await asyncio.to_thread(billing_svc.get_aws_credits, ak, sk)
+        aws_res = await asyncio.to_thread(billing_svc.get_aws_credits, ak, sk, proxy_url=proxy_url)
         aws_status = str(aws_res.get("status") or "ok")
         aws_account_id = aws_res.get("account_id")
         aws_credits = [AwsCredit(**c) for c in aws_res.get("credits") or []]

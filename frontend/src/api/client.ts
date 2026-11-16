@@ -47,6 +47,8 @@ export interface CredentialItem {
   id: number
   access_key_masked: string
   account_label?: string | null
+  /** 脱敏后的代理地址（http://user:***@host:port）；未配代理为 null（直连） */
+  proxy_masked?: string | null
   is_default: boolean
   last_validated_at?: string | null
   created_at?: string | null

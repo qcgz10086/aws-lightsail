@@ -12,6 +12,7 @@ import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 
 from app.password_strength import validate_strong_password
+from app.proxy_config import proxy_config
 
 logger = logging.getLogger(__name__)
 
@@ -23,23 +24,33 @@ class LightsailError(Exception):
         self.code = code
 
 
-def make_client(access_key_id: str, secret_access_key: str, region: str = "us-east-1"):
+def make_client(
+    access_key_id: str,
+    secret_access_key: str,
+    region: str = "us-east-1",
+    proxy_url: str | None = None,
+):
     return boto3.client(
         "lightsail",
         region_name=region,
         aws_access_key_id=access_key_id,
         aws_secret_access_key=secret_access_key,
+        config=proxy_config(proxy_url),
     )
 
 
 def make_service_quotas_client(
-    access_key_id: str, secret_access_key: str, region: str = "us-east-1"
+    access_key_id: str,
+    secret_access_key: str,
+    region: str = "us-east-1",
+    proxy_url: str | None = None,
 ):
     return boto3.client(
         "service-quotas",
         region_name=region,
         aws_access_key_id=access_key_id,
         aws_secret_access_key=secret_access_key,
+        config=proxy_config(proxy_url),
     )
 
 
@@ -69,6 +80,7 @@ def get_lightsail_account_quotas(
     secret_access_key: str,
     region: str = "us-east-1",
     include_usage: bool = True,
+    proxy_url: str | None = None,
 ) -> dict[str, Any]:
     """
     读取账号 Lightsail 配额（主要是每 Region 最大 vCPU，即常说的 5V/8V/32V）。
@@ -89,7 +101,7 @@ def get_lightsail_account_quotas(
         "error": None,
     }
     try:
-        sq = make_service_quotas_client(access_key_id, secret_access_key, region)
+        sq = make_service_quotas_client(access_key_id, secret_access_key, region, proxy_url)
 
         def _get_quota(code: str) -> float | None:
             try:
@@ -161,7 +173,7 @@ def get_lightsail_account_quotas(
 
         if include_usage:
             try:
-                usage = _sum_vcpu_usage_in_region(access_key_id, secret_access_key, region)
+                usage = _sum_vcpu_usage_in_region(access_key_id, secret_access_key, region, proxy_url)
                 result["used_vcpu"] = usage["used_vcpu"]
                 result["used_instance_count"] = usage["instance_count"]
                 if vcpu is not None:
@@ -183,10 +195,10 @@ def get_lightsail_account_quotas(
 
 
 def _sum_vcpu_usage_in_region(
-    access_key_id: str, secret_access_key: str, region: str
+    access_key_id: str, secret_access_key: str, region: str, proxy_url: str | None = None
 ) -> dict[str, Any]:
     """按当前 Region 已有实例估算占用的 vCPU（用 bundle 的 cpuCount）。"""
-    client = make_client(access_key_id, secret_access_key, region)
+    client = make_client(access_key_id, secret_access_key, region, proxy_url)
     instances = _paginate_instances(client)
     # bundle_id -> cpu
     cpu_by_bundle: dict[str, int] = {}
@@ -225,17 +237,21 @@ def _raise_from_aws(exc: Exception) -> None:
     raise LightsailError(str(exc)) from exc
 
 
-def validate_credentials(access_key_id: str, secret_access_key: str) -> None:
+def validate_credentials(
+    access_key_id: str, secret_access_key: str, proxy_url: str | None = None
+) -> None:
     try:
-        client = make_client(access_key_id, secret_access_key, "us-east-1")
+        client = make_client(access_key_id, secret_access_key, "us-east-1", proxy_url)
         client.get_regions(includeAvailabilityZones=False)
     except Exception as exc:  # noqa: BLE001
         _raise_from_aws(exc)
 
 
-def get_regions(access_key_id: str, secret_access_key: str) -> list[dict[str, Any]]:
+def get_regions(
+    access_key_id: str, secret_access_key: str, proxy_url: str | None = None
+) -> list[dict[str, Any]]:
     try:
-        client = make_client(access_key_id, secret_access_key, "us-east-1")
+        client = make_client(access_key_id, secret_access_key, "us-east-1", proxy_url)
         resp = client.get_regions(includeAvailabilityZones=True)
         regions = []
         for r in resp.get("regions", []):
@@ -259,9 +275,11 @@ def get_regions(access_key_id: str, secret_access_key: str) -> list[dict[str, An
         return []
 
 
-def get_blueprints(access_key_id: str, secret_access_key: str, region: str) -> list[dict[str, Any]]:
+def get_blueprints(
+    access_key_id: str, secret_access_key: str, region: str, proxy_url: str | None = None
+) -> list[dict[str, Any]]:
     try:
-        client = make_client(access_key_id, secret_access_key, region)
+        client = make_client(access_key_id, secret_access_key, region, proxy_url)
         items: list[dict[str, Any]] = []
         page_token = None
         while True:
@@ -299,9 +317,11 @@ def get_blueprints(access_key_id: str, secret_access_key: str, region: str) -> l
         return []
 
 
-def get_bundles(access_key_id: str, secret_access_key: str, region: str) -> list[dict[str, Any]]:
+def get_bundles(
+    access_key_id: str, secret_access_key: str, region: str, proxy_url: str | None = None
+) -> list[dict[str, Any]]:
     try:
-        client = make_client(access_key_id, secret_access_key, region)
+        client = make_client(access_key_id, secret_access_key, region, proxy_url)
         items: list[dict[str, Any]] = []
         page_token = None
         while True:
@@ -364,10 +384,10 @@ def _paginate_static_ips(client) -> list[dict[str, Any]]:
 
 
 def list_instances_in_region(
-    access_key_id: str, secret_access_key: str, region: str
+    access_key_id: str, secret_access_key: str, region: str, proxy_url: str | None = None
 ) -> list[dict[str, Any]]:
     try:
-        client = make_client(access_key_id, secret_access_key, region)
+        client = make_client(access_key_id, secret_access_key, region, proxy_url)
         instances = _paginate_instances(client)
         static_ips = _paginate_static_ips(client)
         attached_map: dict[str, dict[str, Any]] = {}
@@ -407,10 +427,10 @@ def list_instances_in_region(
 
 
 def get_instance(
-    access_key_id: str, secret_access_key: str, region: str, name: str
+    access_key_id: str, secret_access_key: str, region: str, name: str, proxy_url: str | None = None
 ) -> dict[str, Any]:
     try:
-        client = make_client(access_key_id, secret_access_key, region)
+        client = make_client(access_key_id, secret_access_key, region, proxy_url)
         inst = client.get_instance(instanceName=name).get("instance") or {}
         static_ips = _paginate_static_ips(client)
         sip = next(
@@ -570,9 +590,10 @@ def create_instance(
     password: str | None = None,
     platform: str | None = None,
     open_all_ports: bool = False,
+    proxy_url: str | None = None,
 ) -> dict[str, Any]:
     try:
-        client = make_client(access_key_id, secret_access_key, region)
+        client = make_client(access_key_id, secret_access_key, region, proxy_url)
         az = availability_zone
         if not az:
             regions = get_regions(access_key_id, secret_access_key)
@@ -661,35 +682,41 @@ def _wait_instance_not_pending(client, name: str, timeout: int = 120) -> None:
         time.sleep(3)
 
 
-def start_instance(access_key_id: str, secret_access_key: str, region: str, name: str) -> None:
+def start_instance(
+    access_key_id: str, secret_access_key: str, region: str, name: str, proxy_url: str | None = None
+) -> None:
     try:
-        client = make_client(access_key_id, secret_access_key, region)
+        client = make_client(access_key_id, secret_access_key, region, proxy_url)
         client.start_instance(instanceName=name)
     except Exception as exc:  # noqa: BLE001
         _raise_from_aws(exc)
 
 
-def stop_instance(access_key_id: str, secret_access_key: str, region: str, name: str) -> None:
+def stop_instance(
+    access_key_id: str, secret_access_key: str, region: str, name: str, proxy_url: str | None = None
+) -> None:
     try:
-        client = make_client(access_key_id, secret_access_key, region)
+        client = make_client(access_key_id, secret_access_key, region, proxy_url)
         client.stop_instance(instanceName=name)
     except Exception as exc:  # noqa: BLE001
         _raise_from_aws(exc)
 
 
-def reboot_instance(access_key_id: str, secret_access_key: str, region: str, name: str) -> None:
+def reboot_instance(
+    access_key_id: str, secret_access_key: str, region: str, name: str, proxy_url: str | None = None
+) -> None:
     try:
-        client = make_client(access_key_id, secret_access_key, region)
+        client = make_client(access_key_id, secret_access_key, region, proxy_url)
         client.reboot_instance(instanceName=name)
     except Exception as exc:  # noqa: BLE001
         _raise_from_aws(exc)
 
 
 def change_static_ip(
-    access_key_id: str, secret_access_key: str, region: str, name: str
+    access_key_id: str, secret_access_key: str, region: str, name: str, proxy_url: str | None = None
 ) -> dict[str, Any]:
     """分配新静态 IP → detach 旧 → attach 新 → release 旧。"""
-    client = make_client(access_key_id, secret_access_key, region)
+    client = make_client(access_key_id, secret_access_key, region, proxy_url)
     new_sip_name: str | None = None
     try:
         inst = client.get_instance(instanceName=name).get("instance") or {}
@@ -753,11 +780,11 @@ def change_static_ip(
 
 
 def delete_instance_and_static_ips(
-    access_key_id: str, secret_access_key: str, region: str, name: str
+    access_key_id: str, secret_access_key: str, region: str, name: str, proxy_url: str | None = None
 ) -> dict[str, Any]:
     """先记录关联静态 IP，删实例，再 release 静态 IP。"""
     try:
-        client = make_client(access_key_id, secret_access_key, region)
+        client = make_client(access_key_id, secret_access_key, region, proxy_url)
         static_ips = _paginate_static_ips(client)
         related = [
             s.get("name")
@@ -806,9 +833,10 @@ def get_metric_sum_bytes(
     start: datetime,
     end: datetime,
     period: int = 86400,
+    proxy_url: str | None = None,
 ) -> int:
     try:
-        client = make_client(access_key_id, secret_access_key, region)
+        client = make_client(access_key_id, secret_access_key, region, proxy_url)
         resp = client.get_instance_metric_data(
             instanceName=name,
             metricName=metric_name,
@@ -836,9 +864,10 @@ def get_metric_series(
     start: datetime,
     end: datetime,
     period: int,
+    proxy_url: str | None = None,
 ) -> list[dict[str, Any]]:
     try:
-        client = make_client(access_key_id, secret_access_key, region)
+        client = make_client(access_key_id, secret_access_key, region, proxy_url)
 
         def fetch(metric: str) -> dict[datetime, float]:
             resp = client.get_instance_metric_data(

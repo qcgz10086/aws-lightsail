@@ -6,15 +6,20 @@ from app.deps import get_current_user
 from app.models import User
 from app.schemas import BlueprintOut, BundleOut, RegionOut
 from app.services import lightsail as ls
-from app.services.traffic import NoCredentialsError, get_user_aws_keys_and_cred
+from app.services.traffic import (
+    NoCredentialsError,
+    get_credential_proxy_url,
+    get_user_aws_keys_and_cred,
+)
 
 router = APIRouter(prefix="/catalog", tags=["catalog"])
 
 
 def _keys(user: User, credential_id: int | None = None):
+    """返回 (ak, sk, proxy_url)；代理解密失败同样按 400 处理。"""
     try:
-        ak, sk, _ = get_user_aws_keys_and_cred(user, credential_id)
-        return ak, sk
+        ak, sk, cred = get_user_aws_keys_and_cred(user, credential_id)
+        return ak, sk, get_credential_proxy_url(cred)
     except NoCredentialsError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except RuntimeError as exc:
@@ -26,9 +31,9 @@ async def list_regions(
     credential_id: int | None = Query(None),
     user: User = Depends(get_current_user),
 ) -> list[RegionOut]:
-    ak, sk = _keys(user, credential_id)
+    ak, sk, proxy_url = _keys(user, credential_id)
     try:
-        regions = await asyncio.to_thread(ls.get_regions, ak, sk)
+        regions = await asyncio.to_thread(ls.get_regions, ak, sk, proxy_url=proxy_url)
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=exc.message)
     return [
@@ -47,9 +52,9 @@ async def list_bundles(
     credential_id: int | None = Query(None),
     user: User = Depends(get_current_user),
 ) -> list[BundleOut]:
-    ak, sk = _keys(user, credential_id)
+    ak, sk, proxy_url = _keys(user, credential_id)
     try:
-        items = await asyncio.to_thread(ls.get_bundles, ak, sk, region)
+        items = await asyncio.to_thread(ls.get_bundles, ak, sk, region, proxy_url=proxy_url)
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=exc.message)
     return [BundleOut(**b) for b in items if b.get("is_active", True)]
@@ -61,9 +66,9 @@ async def list_blueprints(
     credential_id: int | None = Query(None),
     user: User = Depends(get_current_user),
 ) -> list[BlueprintOut]:
-    ak, sk = _keys(user, credential_id)
+    ak, sk, proxy_url = _keys(user, credential_id)
     try:
-        items = await asyncio.to_thread(ls.get_blueprints, ak, sk, region)
+        items = await asyncio.to_thread(ls.get_blueprints, ak, sk, region, proxy_url=proxy_url)
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=exc.message)
     active = [b for b in items if b.get("is_active", True)]

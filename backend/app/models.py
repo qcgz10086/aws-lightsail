@@ -76,6 +76,9 @@ class AwsCredential(Base):
     )
     access_key_id_enc: Mapped[str] = mapped_column(Text, nullable=False)
     secret_access_key_enc: Mapped[str] = mapped_column(Text, nullable=False)
+    # 该账号单独的代理（Fernet 加密存；为空=直连）。代理 URL 可能含认证
+    # 信息（http://user:pass@host:port），与密钥同等对待，绝不明文存。
+    proxy_url_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
     account_label: Mapped[str | None] = mapped_column(String(128), nullable=True)
     is_default: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     last_validated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

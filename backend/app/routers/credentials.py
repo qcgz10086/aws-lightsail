@@ -12,8 +12,10 @@ from app.schemas import (
     CredentialOut,
     CredentialUpdate,
 )
+from app.proxy_config import ProxyConfigError, mask_proxy_url, parse_proxy_url
 from app.security import decrypt_secret, encrypt_secret, mask_access_key
 from app.services import lightsail as ls
+from app.services.traffic import get_credential_proxy_url
 
 router = APIRouter(prefix="/credentials", tags=["credentials"])
 
@@ -27,6 +29,31 @@ def _remaining_vcpu(cred: AwsCredential) -> float | None:
         return None
 
 
+def _proxy_masked(cred: AwsCredential) -> str | None:
+    """脱敏展示该凭证的代理；未配为 None，解密失败显示 ****。"""
+    if not cred.proxy_url_enc:
+        return None
+    try:
+        return mask_proxy_url(decrypt_secret(cred.proxy_url_enc))
+    except Exception:  # noqa: BLE001
+        return "****"
+
+
+def _stored_proxy(cred: AwsCredential) -> str | None:
+    """取已存代理；未配或解密失败返回 None（调用方按直连处理）。"""
+    try:
+        return get_credential_proxy_url(cred)
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _parse_proxy_or_400(value: str | None) -> str | None:
+    try:
+        return parse_proxy_url(value)
+    except ProxyConfigError as exc:
+        raise HTTPException(status_code=400, detail=f"代理地址无效: {exc}") from exc
+
+
 def _item(cred: AwsCredential) -> CredentialItem:
     try:
         ak = decrypt_secret(cred.access_key_id_enc)
@@ -37,6 +64,7 @@ def _item(cred: AwsCredential) -> CredentialItem:
         id=cred.id,
         access_key_masked=masked,
         account_label=cred.account_label,
+        proxy_masked=_proxy_masked(cred),
         is_default=bool(cred.is_default),
         last_validated_at=cred.last_validated_at,
         created_at=cred.created_at,
@@ -52,9 +80,11 @@ def _item(cred: AwsCredential) -> CredentialItem:
     )
 
 
-def _apply_quota_to_cred(cred: AwsCredential, ak: str, sk: str, region: str = "us-east-1") -> None:
+def _apply_quota_to_cred(
+    cred: AwsCredential, ak: str, sk: str, region: str = "us-east-1", proxy_url: str | None = None
+) -> None:
     """查询并写回 Lightsail 配额字段（失败不抛，写入 message）。"""
-    info = ls.get_lightsail_account_quotas(ak, sk, region=region, include_usage=True)
+    info = ls.get_lightsail_account_quotas(ak, sk, region=region, include_usage=True, proxy_url=proxy_url)
     cred.vcpu_quota = info.get("vcpu_quota")
     cred.vcpu_tier = info.get("vcpu_tier")
     cred.static_ip_quota = info.get("static_ip_quota")
@@ -104,8 +134,10 @@ def create_credential(
 ) -> CredentialOut:
     ak = body.access_key_id.strip()
     sk = body.secret_access_key.strip()
+    proxy_url = _parse_proxy_or_400(body.proxy_url)
     try:
-        ls.validate_credentials(ak, sk)
+        # 新建时就用该代理校验：代理不通当场报错，不等以后调用才发现。
+        ls.validate_credentials(ak, sk, proxy_url)
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=f"AWS 凭证校验失败: {exc.message}")
 
@@ -119,10 +151,11 @@ def create_credential(
         access_key_id_enc=encrypt_secret(ak),
         secret_access_key_enc=encrypt_secret(sk),
         account_label=body.account_label,
+        proxy_url_enc=encrypt_secret(proxy_url) if proxy_url else None,
         is_default=make_default,
         last_validated_at=now,
     )
-    _apply_quota_to_cred(cred, ak, sk)
+    _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
     db.add(cred)
     db.add(
         OperationLog(
@@ -152,8 +185,13 @@ def update_credential(
     if not cred:
         raise HTTPException(status_code=404, detail="凭证不存在")
 
-    # 若更新密钥则校验
-    if body.access_key_id or body.secret_access_key:
+    # 代理：字段未出现=保持；空串=清除（恢复直连）；有值=更新。
+    # 换密钥或换代理都要用生效后的代理重新校验一次，不通当场报错。
+    proxy_changed = "proxy_url" in body.model_fields_set
+    new_proxy = _parse_proxy_or_400(body.proxy_url) if proxy_changed else None
+    effective_proxy = new_proxy if proxy_changed else _stored_proxy(cred)
+    keys_updated = bool(body.access_key_id or body.secret_access_key)
+    if keys_updated or proxy_changed:
         try:
             old_ak = decrypt_secret(cred.access_key_id_enc)
             old_sk = decrypt_secret(cred.secret_access_key_enc)
@@ -162,15 +200,18 @@ def update_credential(
         ak = (body.access_key_id or old_ak).strip()
         sk = (body.secret_access_key or old_sk).strip()
         try:
-            ls.validate_credentials(ak, sk)
+            ls.validate_credentials(ak, sk, effective_proxy)
         except ls.LightsailError as exc:
             raise HTTPException(status_code=400, detail=f"AWS 凭证校验失败: {exc.message}")
         if body.access_key_id:
             cred.access_key_id_enc = encrypt_secret(body.access_key_id.strip())
         if body.secret_access_key:
             cred.secret_access_key_enc = encrypt_secret(body.secret_access_key.strip())
-        cred.last_validated_at = datetime.now(timezone.utc)
-        _apply_quota_to_cred(cred, ak, sk)
+        if keys_updated:
+            cred.last_validated_at = datetime.now(timezone.utc)
+            _apply_quota_to_cred(cred, ak, sk, proxy_url=effective_proxy)
+    if proxy_changed:
+        cred.proxy_url_enc = encrypt_secret(new_proxy) if new_proxy else None
 
     if body.account_label is not None:
         cred.account_label = body.account_label
@@ -235,13 +276,13 @@ def validate_one(
     try:
         ak = decrypt_secret(cred.access_key_id_enc)
         sk = decrypt_secret(cred.secret_access_key_enc)
-        ls.validate_credentials(ak, sk)
+        ls.validate_credentials(ak, sk, get_credential_proxy_url(cred))
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=f"校验失败: {exc.message}")
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=400, detail=str(exc))
     cred.last_validated_at = datetime.now(timezone.utc)
-    _apply_quota_to_cred(cred, ak, sk)
+    _apply_quota_to_cred(cred, ak, sk, proxy_url=_stored_proxy(cred))
     db.add(cred)
     db.commit()
     db.refresh(cred)
@@ -265,9 +306,10 @@ def refresh_quotas(
     try:
         ak = decrypt_secret(cred.access_key_id_enc)
         sk = decrypt_secret(cred.secret_access_key_enc)
+        proxy_url = get_credential_proxy_url(cred)
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=400, detail=f"解密凭证失败: {exc}")
-    _apply_quota_to_cred(cred, ak, sk)
+    _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
     db.add(cred)
     db.add(
         OperationLog(
@@ -330,23 +372,30 @@ def put_compat(
     """兼容：若无凭证则新增；若有默认凭证则更新默认那一组。"""
     ak = body.access_key_id.strip()
     sk = body.secret_access_key.strip()
-    try:
-        ls.validate_credentials(ak, sk)
-    except ls.LightsailError as exc:
-        raise HTTPException(status_code=400, detail=f"AWS 凭证校验失败: {exc.message}")
+    req_proxy = _parse_proxy_or_400(body.proxy_url)
 
     now = datetime.now(timezone.utc)
     default = user.default_credential
+    # 未传 proxy_url 时沿用默认凭证已存的代理；传了（哪怕空串）就按传的来。
+    proxy_url = req_proxy if body.proxy_url is not None else (
+        _stored_proxy(default) if default is not None else None
+    )
+    try:
+        ls.validate_credentials(ak, sk, proxy_url)
+    except ls.LightsailError as exc:
+        raise HTTPException(status_code=400, detail=f"AWS 凭证校验失败: {exc.message}")
+
     if default is None:
         cred = AwsCredential(
             user_id=user.id,
             access_key_id_enc=encrypt_secret(ak),
             secret_access_key_enc=encrypt_secret(sk),
             account_label=body.account_label,
+            proxy_url_enc=encrypt_secret(proxy_url) if proxy_url else None,
             is_default=True,
             last_validated_at=now,
         )
-        _apply_quota_to_cred(cred, ak, sk)
+        _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
         db.add(cred)
         action = "add_credentials"
     else:
@@ -354,8 +403,10 @@ def put_compat(
         default.secret_access_key_enc = encrypt_secret(sk)
         if body.account_label is not None:
             default.account_label = body.account_label
+        if body.proxy_url is not None:
+            default.proxy_url_enc = encrypt_secret(proxy_url) if proxy_url else None
         default.last_validated_at = now
-        _apply_quota_to_cred(default, ak, sk)
+        _apply_quota_to_cred(default, ak, sk, proxy_url=proxy_url)
         db.add(default)
         action = "update_credentials"
     db.add(

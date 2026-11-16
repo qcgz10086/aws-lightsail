@@ -12,14 +12,21 @@ from app.models import User
 from app.schemas import MetricPoint, MetricsSeries, TrafficSummary
 from app.services import lightsail as ls
 from app.services.collector import sync_user_traffic
-from app.services.traffic import NoCredentialsError, build_traffic_summary, get_user_aws_keys_and_cred
+from app.services.traffic import (
+    NoCredentialsError,
+    build_traffic_summary,
+    get_credential_proxy_url,
+    get_user_aws_keys_and_cred,
+)
 
 router = APIRouter(tags=["metrics"])
 
 
 def _keys(user: User, credential_id: int | None = None):
+    """返回 (ak, sk, cred, proxy_url)；代理解密失败同样按 400 处理。"""
     try:
-        return get_user_aws_keys_and_cred(user, credential_id)
+        ak, sk, cred = get_user_aws_keys_and_cred(user, credential_id)
+        return ak, sk, cred, get_credential_proxy_url(cred)
     except NoCredentialsError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except RuntimeError as exc:
@@ -56,7 +63,7 @@ async def metrics(
     credential_id: int | None = Query(None),
     user: User = Depends(get_current_user),
 ) -> MetricsSeries:
-    ak, sk, _cred = _keys(user, credential_id)
+    ak, sk, _cred, proxy_url = _keys(user, credential_id)
     now = datetime.now(timezone.utc)
     if period == "day":
         start = now - timedelta(hours=24)
@@ -69,7 +76,7 @@ async def metrics(
         p = 86400
     try:
         points = await asyncio.to_thread(
-            ls.get_metric_series, ak, sk, region, name, start, now, p
+            ls.get_metric_series, ak, sk, region, name, start, now, p, proxy_url=proxy_url
         )
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=exc.message)

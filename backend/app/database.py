@@ -84,6 +84,7 @@ def migrate_schema() -> None:
         _add_column_if_missing("aws_credentials", "quota_region VARCHAR(32)")
         _add_column_if_missing("aws_credentials", "quota_message TEXT")
         _add_column_if_missing("aws_credentials", "quota_checked_at DATETIME")
+        _add_column_if_missing("aws_credentials", "proxy_url_enc TEXT")
         # 检测旧 unique(user_id)：通过索引名粗判，或直接尝试插入逻辑依赖 is_default
         # 若缺少多 Key 支持所需结构，重建表并迁移数据
         with engine.begin() as conn:

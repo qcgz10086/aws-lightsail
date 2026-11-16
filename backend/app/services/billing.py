@@ -29,6 +29,8 @@ from datetime import date, datetime, timedelta, timezone
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 
+from app.proxy_config import proxy_config
+
 logger = logging.getLogger(__name__)
 
 CE_REGION = "us-east-1"
@@ -66,33 +68,36 @@ class BillingValidationError(Exception):
     """
 
 
-def make_sts_client(access_key_id: str, secret_access_key: str):
+def make_sts_client(access_key_id: str, secret_access_key: str, proxy_url: str | None = None):
     """STS 客户端（固定 us-east-1，仅用于 GetCallerIdentity 取账号 ID）。"""
     return boto3.client(
         "sts",
         region_name=BILLING_REGION,
         aws_access_key_id=access_key_id,
         aws_secret_access_key=secret_access_key,
+        config=proxy_config(proxy_url),
     )
 
 
-def make_billing_client(access_key_id: str, secret_access_key: str):
+def make_billing_client(access_key_id: str, secret_access_key: str, proxy_url: str | None = None):
     """AWS Billing 客户端（固定 us-east-1；需 boto3 >= 1.44.3 才有 GetCredits）。"""
     return boto3.client(
         "billing",
         region_name=BILLING_REGION,
         aws_access_key_id=access_key_id,
         aws_secret_access_key=secret_access_key,
+        config=proxy_config(proxy_url),
     )
 
 
-def make_ce_client(access_key_id: str, secret_access_key: str):
+def make_ce_client(access_key_id: str, secret_access_key: str, proxy_url: str | None = None):
     """Cost Explorer 客户端（固定 us-east-1）。"""
     return boto3.client(
         "ce",
         region_name=CE_REGION,
         aws_access_key_id=access_key_id,
         aws_secret_access_key=secret_access_key,
+        config=proxy_config(proxy_url),
     )
 
 
@@ -246,6 +251,7 @@ def get_aws_credits(
     now: datetime | None = None,
     sts_client=None,
     billing_client=None,
+    proxy_url: str | None = None,
 ) -> dict:
     """用 AWS Billing GetCredits 查官方赠金（真实余额，非估算）。
 
@@ -256,7 +262,7 @@ def get_aws_credits(
     BillingValidationError / BillingUnavailableError，调用方映射为状态。
     """
     today = _today_utc(now)
-    sts = sts_client or make_sts_client(access_key_id, secret_access_key)
+    sts = sts_client or make_sts_client(access_key_id, secret_access_key, proxy_url)
     try:
         identity = sts.get_caller_identity()
     except ClientError as exc:
@@ -272,7 +278,7 @@ def get_aws_credits(
     start = today - timedelta(days=CREDITS_LOOKBACK_DAYS)
     start_dt = datetime(start.year, start.month, start.day, tzinfo=timezone.utc)
     end_dt = datetime(today.year, today.month, today.day, tzinfo=timezone.utc)
-    billing = billing_client or make_billing_client(access_key_id, secret_access_key)
+    billing = billing_client or make_billing_client(access_key_id, secret_access_key, proxy_url)
     try:
         resp = billing.get_credits(
             accountId=account_id,

@@ -33,6 +33,17 @@ def get_credential_keys(cred: AwsCredential) -> tuple[str, str]:
     return ak, sk
 
 
+def get_credential_proxy_url(cred: AwsCredential) -> str | None:
+    """解密凭证绑定的代理地址；未配置返回 None。
+
+    解密失败时抛 RuntimeError（与密钥解密一致），不静默回落到直连，
+    否则用户配好的代理会被悄悄绕过。
+    """
+    if not cred.proxy_url_enc:
+        return None
+    return decrypt_secret(cred.proxy_url_enc)
+
+
 def get_user_aws_keys(user: User, credential_id: int | None = None) -> tuple[str, str]:
     """返回 (access_key, secret_key)。兼容旧调用；多 Key 时默认用 is_default。"""
     cred = get_credential(user, credential_id)

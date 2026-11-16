@@ -24,6 +24,7 @@ from app.services.traffic import (
     NoCredentialsError,
     effective_auto_stop,
     effective_limit_gb,
+    get_credential_proxy_url,
     get_setting,
     get_user_aws_keys_and_cred,
     traffic_for_instance,
@@ -45,8 +46,10 @@ def _lock_for(user_id: int, credential_id: int, region: str, name: str) -> Lock:
 
 
 def _keys(user: User, credential_id: int | None = None):
+    """返回 (ak, sk, cred, proxy_url)；代理解密失败同样按 400 处理。"""
     try:
-        return get_user_aws_keys_and_cred(user, credential_id)
+        ak, sk, cred = get_user_aws_keys_and_cred(user, credential_id)
+        return ak, sk, cred, get_credential_proxy_url(cred)
     except NoCredentialsError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except RuntimeError as exc:
@@ -135,7 +138,8 @@ async def list_instances(
         local_errors: list[str] = []
         try:
             ak, sk, _ = get_user_aws_keys_and_cred(user, cred.id)
-            regions = await asyncio.to_thread(ls.get_regions, ak, sk)
+            proxy_url = get_credential_proxy_url(cred)
+            regions = await asyncio.to_thread(ls.get_regions, ak, sk, proxy_url=proxy_url)
         except (NoCredentialsError, RuntimeError, ls.LightsailError) as exc:
             msg = getattr(exc, "message", str(exc))
             return [], [f"凭证#{cred.id}: {msg}"]
@@ -146,7 +150,7 @@ async def list_instances(
             async with sem:
                 try:
                     items = await asyncio.to_thread(
-                        ls.list_instances_in_region, ak, sk, region_name
+                        ls.list_instances_in_region, ak, sk, region_name, proxy_url=proxy_url
                     )
                     return region_name, items
                 except ls.LightsailError as exc:
@@ -184,9 +188,9 @@ async def get_instance(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> InstanceOut:
-    ak, sk, cred = _keys(user, credential_id)
+    ak, sk, cred, proxy_url = _keys(user, credential_id)
     try:
-        raw = await asyncio.to_thread(ls.get_instance, ak, sk, region, name)
+        raw = await asyncio.to_thread(ls.get_instance, ak, sk, region, name, proxy_url=proxy_url)
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=exc.message)
     return _to_out(db, user, raw, cred.id, cred.account_label)
@@ -198,7 +202,7 @@ async def create_instance(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> CreateInstanceResponse:
-    ak, sk, cred = _keys(user, body.credential_id)
+    ak, sk, cred, proxy_url = _keys(user, body.credential_id)
     lock = _lock_for(user.id, cred.id, body.region, body.instance_name)
     if not lock.acquire(blocking=False):
         raise HTTPException(status_code=409, detail="该实例正在执行其他操作，请稍后")
@@ -216,6 +220,7 @@ async def create_instance(
             body.password,
             body.platform,
             body.open_all_ports,
+            proxy_url=proxy_url,
         )
         # 写入默认设置（含用户级 auto_stop 默认）
         setting = get_setting(db, user.id, body.region, body.instance_name, cred.id)
@@ -295,13 +300,13 @@ async def _simple_op(
     fn,
     credential_id: int | None,
 ) -> OperationResult:
-    ak, sk, cred = _keys(user, credential_id)
+    ak, sk, cred, proxy_url = _keys(user, credential_id)
     lock = _lock_for(user.id, cred.id, region, name)
     if not lock.acquire(blocking=False):
         raise HTTPException(status_code=409, detail="该实例正在执行其他操作，请稍后")
     labels = {"start": "开机", "stop": "关机", "reboot": "重启"}
     try:
-        await asyncio.to_thread(fn, ak, sk, region, name)
+        await asyncio.to_thread(fn, ak, sk, region, name, proxy_url=proxy_url)
         msg = f"{labels.get(action, action)}请求已提交，状态稍后刷新"
         _log(db, user.id, action, region, name, "success", msg)
         db.commit()
@@ -322,12 +327,12 @@ async def change_ip(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> ChangeIpResponse:
-    ak, sk, cred = _keys(user, credential_id)
+    ak, sk, cred, proxy_url = _keys(user, credential_id)
     lock = _lock_for(user.id, cred.id, region, name)
     if not lock.acquire(blocking=False):
         raise HTTPException(status_code=409, detail="该实例正在执行其他操作，请稍后")
     try:
-        result = await asyncio.to_thread(ls.change_static_ip, ak, sk, region, name)
+        result = await asyncio.to_thread(ls.change_static_ip, ak, sk, region, name, proxy_url=proxy_url)
         _log(
             db,
             user.id,
@@ -356,13 +361,13 @@ async def delete_instance(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> OperationResult:
-    ak, sk, cred = _keys(user, credential_id)
+    ak, sk, cred, proxy_url = _keys(user, credential_id)
     lock = _lock_for(user.id, cred.id, region, name)
     if not lock.acquire(blocking=False):
         raise HTTPException(status_code=409, detail="该实例正在执行其他操作，请稍后")
     try:
         result = await asyncio.to_thread(
-            ls.delete_instance_and_static_ips, ak, sk, region, name
+            ls.delete_instance_and_static_ips, ak, sk, region, name, proxy_url=proxy_url
         )
         setting = get_setting(db, user.id, region, name, cred.id)
         if setting:
@@ -387,7 +392,7 @@ async def update_settings(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> InstanceOut:
-    ak, sk, cred = _keys(user, credential_id)
+    ak, sk, cred, proxy_url = _keys(user, credential_id)
     setting = get_setting(db, user.id, region, name, cred.id)
     if setting is None:
         setting = InstanceSetting(
@@ -408,7 +413,7 @@ async def update_settings(
     db.commit()
 
     try:
-        raw = await asyncio.to_thread(ls.get_instance, ak, sk, region, name)
+        raw = await asyncio.to_thread(ls.get_instance, ak, sk, region, name, proxy_url=proxy_url)
         return _to_out(db, user, raw, cred.id, cred.account_label)
     except ls.LightsailError:
         traffic = traffic_for_instance(db, user, region, name, cred.id)

@@ -18,6 +18,7 @@ from app.services.traffic import (
     effective_auto_stop,
     effective_limit_gb,
     get_credential_keys,
+    get_credential_proxy_url,
     get_setting,
     month_start_utc,
     upsert_traffic,
@@ -31,12 +32,13 @@ _scheduler: BackgroundScheduler | None = None
 def _sync_credential(db: Session, user: User, cred: AwsCredential) -> int:
     try:
         ak, sk = get_credential_keys(cred)
+        proxy_url = get_credential_proxy_url(cred)
     except Exception as exc:  # noqa: BLE001
         logger.warning("用户 %s 凭证 #%s 解密失败: %s", user.username, cred.id, exc)
         return 0
 
     try:
-        regions = ls.get_regions(ak, sk)
+        regions = ls.get_regions(ak, sk, proxy_url=proxy_url)
     except ls.LightsailError as exc:
         logger.warning(
             "用户 %s 凭证 #%s 获取区域失败: %s", user.username, cred.id, exc.message
@@ -51,7 +53,7 @@ def _sync_credential(db: Session, user: User, cred: AwsCredential) -> int:
     for r in regions:
         region = r["name"]
         try:
-            instances = ls.list_instances_in_region(ak, sk, region)
+            instances = ls.list_instances_in_region(ak, sk, region, proxy_url=proxy_url)
         except ls.LightsailError as exc:
             logger.warning(
                 "用户 %s 凭证 #%s 区域 %s 列实例失败: %s",
@@ -68,10 +70,10 @@ def _sync_credential(db: Session, user: User, cred: AwsCredential) -> int:
                 continue
             try:
                 inn = ls.get_metric_sum_bytes(
-                    ak, sk, region, name, "NetworkIn", start, now, 86400
+                    ak, sk, region, name, "NetworkIn", start, now, 86400, proxy_url=proxy_url
                 )
                 out = ls.get_metric_sum_bytes(
-                    ak, sk, region, name, "NetworkOut", start, now, 86400
+                    ak, sk, region, name, "NetworkOut", start, now, 86400, proxy_url=proxy_url
                 )
                 upsert_traffic(db, user.id, cred.id, region, name, ym, inn, out)
                 count += 1
@@ -89,7 +91,7 @@ def _sync_credential(db: Session, user: User, cred: AwsCredential) -> int:
                     and state == "running"
                 ):
                     try:
-                        ls.stop_instance(ak, sk, region, name)
+                        ls.stop_instance(ak, sk, region, name, proxy_url=proxy_url)
                         db.add(
                             OperationLog(
                                 user_id=user.id,

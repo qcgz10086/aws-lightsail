@@ -51,6 +51,8 @@ class CredentialCreate(BaseModel):
     access_key_id: str = Field(min_length=16, max_length=128)
     secret_access_key: str = Field(min_length=16, max_length=128)
     account_label: str | None = None
+    # 该账号单独的代理；空/缺省=直连，仅支持 http:// 或 https://
+    proxy_url: str | None = None
     is_default: bool = False
 
 
@@ -58,6 +60,8 @@ class CredentialUpdate(BaseModel):
     access_key_id: str | None = Field(default=None, min_length=16, max_length=128)
     secret_access_key: str | None = Field(default=None, min_length=16, max_length=128)
     account_label: str | None = None
+    # 代理：字段未出现=保持；空串=清除（恢复直连）；有值=更新
+    proxy_url: str | None = None
     is_default: bool | None = None
 
 
@@ -65,6 +69,8 @@ class CredentialItem(BaseModel):
     id: int
     access_key_masked: str
     account_label: str | None = None
+    # 脱敏后的代理地址（http://user:***@host:port）；未配代理为 None（直连）
+    proxy_masked: str | None = None
     is_default: bool = False
     last_validated_at: datetime | None = None
     created_at: datetime | None = None

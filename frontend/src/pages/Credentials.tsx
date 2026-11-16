@@ -4,6 +4,7 @@ import {
   Card,
   Form,
   Input,
+  Modal,
   Popconfirm,
   Space,
   Switch,
@@ -36,6 +37,9 @@ export default function CredentialsPage() {
   const [saving, setSaving] = useState(false)
   const [quotaLoadingId, setQuotaLoadingId] = useState<number | null>(null)
   const [form] = Form.useForm()
+  const [proxyModal, setProxyModal] = useState<{ id: number; masked?: string | null } | null>(null)
+  const [proxyInput, setProxyInput] = useState('')
+  const [proxySaving, setProxySaving] = useState(false)
 
   const load = async () => {
     setLoading(true)
@@ -100,6 +104,15 @@ export default function CredentialsPage() {
               ),
             },
             { title: 'Access Key', dataIndex: 'access_key_masked' },
+            {
+              title: '代理',
+              render: (_, row) =>
+                row.proxy_masked ? (
+                  <Typography.Text>{row.proxy_masked}</Typography.Text>
+                ) : (
+                  <Typography.Text type="secondary">直连</Typography.Text>
+                ),
+            },
             {
               title: 'Lightsail 配额',
               key: 'quota',
@@ -174,6 +187,15 @@ export default function CredentialsPage() {
                       设为默认
                     </Button>
                   )}
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      setProxyModal({ id: row.id, masked: row.proxy_masked })
+                      setProxyInput('')
+                    }}
+                  >
+                    代理
+                  </Button>
                   <Button
                     size="small"
                     onClick={async () => {
@@ -263,6 +285,13 @@ export default function CredentialsPage() {
             <Input placeholder="例如：主账号 / 美国小号 / 测试号" />
           </Form.Item>
           <Form.Item
+            name="proxy_url"
+            label="代理（可选）"
+            extra="该账号的 AWS 请求走此代理；留空直连。仅支持 http:// 或 https://，可带认证，如 http://user:pass@127.0.0.1:8080。保存时会用该代理校验凭证。"
+          >
+            <Input placeholder="http://127.0.0.1:8080" autoComplete="off" />
+          </Form.Item>
+          <Form.Item
             name="is_default"
             label="设为默认凭证"
             valuePropName="checked"
@@ -275,6 +304,55 @@ export default function CredentialsPage() {
           </Button>
         </Form>
       </Card>
+
+      <Modal
+        title={proxyModal ? `设置代理 - 凭证 #${proxyModal.id}` : '设置代理'}
+        open={proxyModal !== null}
+        onCancel={() => setProxyModal(null)}
+        footer={[
+          <Button key="cancel" onClick={() => setProxyModal(null)}>
+            取消
+          </Button>,
+          <Button
+            key="save"
+            type="primary"
+            loading={proxySaving}
+            onClick={async () => {
+              if (!proxyModal) return
+              setProxySaving(true)
+              try {
+                const res = await api.put<CredentialOut>(`/credentials/${proxyModal.id}`, {
+                  proxy_url: proxyInput,
+                })
+                setItems(res.data.items || [])
+                message.success(proxyInput ? '代理已更新（已用新代理校验通过）' : '代理已清除，恢复直连')
+                setProxyModal(null)
+              } catch (err) {
+                message.error(getErrorMessage(err))
+              } finally {
+                setProxySaving(false)
+              }
+            }}
+          >
+            保存
+          </Button>,
+        ]}
+      >
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <Typography.Text type="secondary">
+            当前：{proxyModal?.masked || '直连'}
+          </Typography.Text>
+          <Input
+            placeholder="http://user:pass@127.0.0.1:8080"
+            autoComplete="off"
+            value={proxyInput}
+            onChange={(e) => setProxyInput(e.target.value)}
+          />
+          <Typography.Text type="secondary">
+            留空保存即清除代理，恢复直连；仅支持 http:// 或 https://。保存时会用新代理重新校验凭证，不通会报错、旧代理保留。
+          </Typography.Text>
+        </Space>
+      </Modal>
     </Space>
   )
 }
