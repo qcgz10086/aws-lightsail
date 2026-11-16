@@ -77,6 +77,8 @@ def update_user(
     if body.password is not None:
         _validate_user_password(body.password)
         user.password_hash = hash_password(body.password)
+        # R-3：管理员重置密码后，该用户此前签发的全部 token 同样失效。
+        user.token_version += 1
     if body.is_admin is not None:
         user.is_admin = body.is_admin
     if "monthly_limit_gb" in body.model_fields_set:

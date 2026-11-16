@@ -4,12 +4,12 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { getErrorMessage, useAuth } from '../auth/AuthContext'
 
 export default function LoginPage() {
-  const { login, token, loading } = useAuth()
+  const { login, user, loading } = useAuth()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
-  if (!loading && token) return <Navigate to="/" replace />
+  if (!loading && user) return <Navigate to="/" replace />
 
   const onFinish = async (values: { username: string; password: string }) => {
     setSubmitting(true)

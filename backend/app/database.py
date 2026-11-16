@@ -70,6 +70,7 @@ def migrate_schema() -> None:
     # users 新列
     if "users" in tables:
         _add_column_if_missing("users", "auto_stop_on_limit_default BOOLEAN DEFAULT 0 NOT NULL")
+        _add_column_if_missing("users", "token_version INTEGER DEFAULT 0 NOT NULL")
 
     # aws_credentials：若仍有 user_id 唯一约束（旧版一对一），重建为多对一
     if "aws_credentials" in tables:

@@ -28,6 +28,8 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # R-3：JWT 吊销版本；改密/登出时 +1，使此前签发的所有 token 失效。
+    token_version: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     monthly_limit_gb: Mapped[float | None] = mapped_column(Float, nullable=True)
     # 用户级默认：新建实例设置时的默认勾选，不强制所有实例
     auto_stop_on_limit_default: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

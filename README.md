@@ -139,7 +139,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "8080:80"
+      - "8080:8080"
     depends_on:
       backend:
         condition: service_healthy
@@ -149,7 +149,7 @@ volumes:
   ls_data:
 ```
 
-说明：`backend` 用 `./backend` 本地构建，读 `.env`，SQLite 数据存在 `ls_data` 卷的 `/data/app.db`；`frontend` 构建后由 nginx 提供，映射到本机 `8080` 端口，等 `backend` 健康检查通过后才启动。
+说明：`backend` 用 `./backend` 本地构建，读 `.env`，SQLite 数据存在 `ls_data` 卷的 `/data/app.db`；`frontend` 构建后由 nginx 提供，映射到本机 `8080` 端口，等 `backend` 健康检查通过后才启动。两个容器均以非 root 用户运行（后端 `appuser`、前端 `nginx-unprivileged`，前端容器内监听 `8080`）。**生产必须放在 TLS 反代之后**（见下方「安全建议」）：本应用不做 TLS 终止，浏览器到反代之间走 HTTPS，反代到容器之间走内网 HTTP；此时 `.env` 里把 `COOKIE_SECURE=true`，登录 Cookie 才带 Secure 标志。
 
 ### 3. 启动
 
@@ -178,7 +178,7 @@ docker compose -f docker-compose.image.yml pull
 docker compose -f docker-compose.image.yml up -d
 ```
 
-镜像：`qcgz10086/aws-lightsail-backend:latest`、`qcgz10086/aws-lightsail-frontend:latest`（对应 `billing-getcredits` 分支提交 `6f0f11b`，含账单 GetCredits 功能与 H-1/H-2/H-3 安全修复；想钉死版本可把 `latest` 改成 `6f0f11b`）。其余配置（端口 `8080`、`ls_data` 卷、健康检查）与源码版一致。
+镜像：`qcgz10086/aws-lightsail-backend:latest`、`qcgz10086/aws-lightsail-frontend:latest`（对应 `billing-getcredits` 分支最新提交，含账单 GetCredits 功能与 H-1/H-2/H-3 及后续安全修复；想钉死版本可把 `latest` 改成对应提交的短 SHA）。其余配置（端口 `8080`、`ls_data` 卷、健康检查）与源码版一致。
 
 ### 4. 使用流程
 
@@ -281,9 +281,13 @@ Vite 已将 `/api` 代理到 `http://127.0.0.1:8000`。
 
 1. `SECRET_KEY`、`ENCRYPTION_KEY`、`ADMIN_PASSWORD` 均为必填且无默认值：缺失或为默认值/占位值时启动即拒绝；不要把 `.env` 提交到仓库。其中 `SECRET_KEY` 至少 32 位且须有足够熵（大小写字母、数字、符号中至少 3 类、至少 8 个不同字符），`ADMIN_PASSWORD` 12-64 位且须同时含大小写字母、数字、符号
 2. 新建实例默认不开放全部端口（`open_all_ports` 默认关闭）；自定义实例密码至少 12 位且须含大小写字母、数字和符号，留空则走密钥登录、不开密码登录；新建/修改用户密码与改密同样要求 12 位加复杂度；同一 IP+用户名 15 分钟内累计登录失败 5 次后锁定 15 分钟（返回 429）
-3. 生产环境建议置于反向代理 / HTTPS 之后
-4. 为 AWS IAM 用户最小化 Lightsail 权限
-5. 不要将 `.env` 提交到公开仓库
+3. **生产必须放在 TLS 反代之后**：本应用不做 TLS 终止，不要把 8000 或 8080 端口直接裸露公网。部署形态：浏览器 --HTTPS--> 反代（Caddy / nginx / Traefik，配好证书）--HTTP 内网--> 本应用的 8080 端口。走 HTTPS 时 `.env` 里设 `COOKIE_SECURE=true`，登录 Cookie 带 Secure 标志；纯 HTTP 内网部署保持 `false` 即可
+4. 登录态走 HttpOnly Cookie（`SameSite=Lax`），token 不再存 localStorage；改密或登出后此前签发的全部 token 立即失效（token 版本机制），token 本身仍 7 天过期
+5. CORS 默认不放行任何跨域来源，只有 `.env` 里 `CORS_ORIGINS` 明确列出的来源才放行；`/docs`、`/redoc`、`/openapi.json` 默认关闭，仅 `ENABLE_DOCS=true` 时开启；后端与前端容器均以非 root 用户运行，并统一返回安全响应头（`X-Content-Type-Options`、`X-Frame-Options`、`Content-Security-Policy` 等，不含 HSTS）
+6. 为 AWS IAM 用户最小化 Lightsail 权限
+7. 不要将 `.env` 提交到公开仓库
+
+> 依赖审计说明：`pip-audit` 在最新依赖下仍报 3 项无修复版本的告警，均已逐项核对不可达——`python-jose` PYSEC-2026-4298（需攻击者持有服务的非对称公钥且算法不限定；本应用只有 HS256 对称密钥且解码显式限定算法）；`ecdsa` PYSEC-2026-1325（Minerva 时序攻击，需调用 ecdsa 签名；本应用只用 HS256，从不调 ecdsa，且 0.19.2 已是最新版、无修复版本）。`npm audit` 0 漏洞。
 
 ## 目录结构
 

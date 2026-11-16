@@ -14,7 +14,7 @@ import BillingPage from './pages/Billing'
 import UsersPage from './pages/Users'
 
 function PrivateRoute({ children, adminOnly = false }: { children: ReactNode; adminOnly?: boolean }) {
-  const { token, user, loading } = useAuth()
+  const { user, loading } = useAuth()
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -22,7 +22,7 @@ function PrivateRoute({ children, adminOnly = false }: { children: ReactNode; ad
       </div>
     )
   }
-  if (!token) return <Navigate to="/login" replace />
+  if (!user) return <Navigate to="/login" replace />
   if (adminOnly && !user?.is_admin) return <Navigate to="/" replace />
   return <>{children}</>
 }

@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     cors_origins: str = ""
     access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
     jwt_algorithm: str = "HS256"
+    # R-5：登录 Cookie 的 Secure 标志；生产走 HTTPS 时设 true（默认 False，纯 HTTP 可用）。
+    cookie_secure: bool = False
+    # R-9：默认关闭 /docs、/redoc、/openapi.json；仅 ENABLE_DOCS=true 时开启。
+    enable_docs: bool = False
 
     @model_validator(mode="after")
     def _reject_weak_or_placeholder_secrets(self) -> "Settings":
@@ -90,14 +94,10 @@ class Settings(BaseSettings):
 
     @property
     def cors_origin_list(self) -> list[str]:
+        # R-8：默认不放行任何跨域来源；只有 CORS_ORIGINS 里明确列出的才放行。
+        # 生产由 nginx 同源反代，不依赖 CORS；本地开发需要时在 .env 里显式写明来源。
         if not self.cors_origins.strip():
-            # 默认覆盖本地开发与 Docker 访问来源；生产同源反代不依赖 CORS
-            return [
-                "http://localhost:5173",
-                "http://127.0.0.1:5173",
-                "http://localhost:8080",
-                "http://127.0.0.1:8080",
-            ]
+            return []
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
 

@@ -1,13 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.database import get_db
-from app.deps import get_current_user
+from app.deps import COOKIE_NAME, get_current_user
 from app.models import User
 from app.password_strength import validate_strong_password
 from app.rate_limit import login_limiter, rate_limit_key
 from app.schemas import ChangePasswordRequest, LoginRequest, TokenResponse, UserOut
-from app.security import create_access_token, hash_password, verify_password
+from app.security import check_dummy_password, create_access_token, hash_password, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -22,6 +23,32 @@ def _user_out(user: User) -> UserOut:
         created_at=user.created_at,
         has_credentials=bool(user.credentials),
         credential_count=len(user.credentials or []),
+    )
+
+
+def _set_auth_cookie(response: Response, token: str) -> None:
+    """R-5：登录成功后用 HttpOnly Cookie 下发 token。"""
+    settings = get_settings()
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=token,
+        max_age=settings.access_token_expire_minutes * 60,
+        path="/",
+        httponly=True,
+        secure=settings.cookie_secure,
+        samesite="lax",
+    )
+
+
+def _clear_auth_cookie(response: Response) -> None:
+    """R-5：登出时清除登录 Cookie。"""
+    settings = get_settings()
+    response.delete_cookie(
+        key=COOKIE_NAME,
+        path="/",
+        httponly=True,
+        secure=settings.cookie_secure,
+        samesite="lax",
     )
 
 
@@ -44,17 +71,42 @@ def _check_not_locked(request: Request, username: str) -> str:
 
 @router.post("/login", response_model=TokenResponse)
 def login(
-    body: LoginRequest, request: Request, db: Session = Depends(get_db)
+    body: LoginRequest, request: Request, response: Response, db: Session = Depends(get_db)
 ) -> TokenResponse:
     # R-2：同一 IP+用户名 15 分钟内累计失败 5 次后锁定 15 分钟，锁定期间返回 429。
     key = _check_not_locked(request, body.username)
     user = db.query(User).filter(User.username == body.username).first()
-    if not user or not verify_password(body.password, user.password_hash):
+    if not user:
+        # R-10：用户不存在也做一次 bcrypt 校验，避免时序侧信道泄露用户是否存在。
+        check_dummy_password(body.password)
+        login_limiter.record_failure(key)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="用户名或密码错误")
+    if not verify_password(body.password, user.password_hash):
         login_limiter.record_failure(key)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="用户名或密码错误")
     login_limiter.record_success(key)
-    token = create_access_token(user.username, extra={"uid": user.id, "adm": user.is_admin})
+    token = create_access_token(
+        user.username,
+        extra={"uid": user.id, "adm": user.is_admin},
+        token_version=user.token_version,
+    )
+    # R-5：token 同时经 HttpOnly Cookie 下发；响应体里仍返回 access_token 供 API 客户端使用。
+    _set_auth_cookie(response, token)
     return TokenResponse(access_token=token, user=_user_out(user))
+
+
+@router.post("/logout")
+def logout(
+    response: Response,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    # R-3/R-5：登出即递增 token_version（此前签发的全部 token 失效），并清除 Cookie。
+    user.token_version += 1
+    db.add(user)
+    db.commit()
+    _clear_auth_cookie(response)
+    return {"message": "已登出"}
 
 
 @router.get("/me", response_model=UserOut)
@@ -80,6 +132,8 @@ def change_password(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     login_limiter.record_success(key)
     user.password_hash = hash_password(body.new_password)
+    # R-3：改密后此前签发的全部 token 失效，须重新登录。
+    user.token_version += 1
     db.add(user)
     db.commit()
     return {"message": "密码已修改"}

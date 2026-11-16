@@ -3,14 +3,9 @@ import axios, { AxiosError } from 'axios'
 const api = axios.create({
   baseURL: '/api',
   timeout: 120000,
-})
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
+  // R-5：登录态改走 HttpOnly Cookie，不再把 token 放 localStorage；
+  // 同源请求自动带上 Cookie。
+  withCredentials: true,
 })
 
 api.interceptors.response.use(
@@ -19,8 +14,6 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       const path = window.location.pathname
       if (path !== '/login') {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
         window.location.href = '/login'
       }
     }

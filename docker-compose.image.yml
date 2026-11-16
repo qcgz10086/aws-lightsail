@@ -3,7 +3,7 @@
 #   docker compose -f docker-compose.image.yml pull
 #   docker compose -f docker-compose.image.yml up -d
 # 镜像：qcgz10086/aws-lightsail-backend:latest、qcgz10086/aws-lightsail-frontend:latest
-#   （对应 billing-getcredits 分支提交 6f0f11b；想钉死版本可把 latest 改成 6f0f11b）
+#   （对应 billing-getcredits 分支最新提交；想钉死版本可把 latest 改成对应提交的短 SHA）
 services:
   backend:
     image: qcgz10086/aws-lightsail-backend:latest
@@ -29,7 +29,7 @@ services:
   frontend:
     image: qcgz10086/aws-lightsail-frontend:latest
     ports:
-      - "8080:80"
+      - "8080:8080"
     depends_on:
       backend:
         condition: service_healthy
