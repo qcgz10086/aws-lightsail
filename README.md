@@ -175,7 +175,7 @@ volumes:
   ls_data:
 ```
 
-说明：`backend` 与 `frontend` 直接拉 Docker Hub 已发布镜像，不用拉源码、不用本地构建；`backend` 读 `.env`，SQLite 数据存在 `ls_data` 卷的 `/data/app.db`；`frontend` 由 nginx 提供，映射到本机 `8080` 端口，等 `backend` 健康检查通过后才启动。两个容器均以非 root 用户运行（后端 `appuser`、前端 `nginx-unprivileged`，前端容器内监听 `8080`）。镜像：`qcgz10086/aws-lightsail-backend:latest`、`qcgz10086/aws-lightsail-frontend:latest`（对应 `billing-getcredits` 分支提交 `433b0210`，2026-11-16；镜像摘要 backend `sha256:008a4a16e6f2bb33cc3343e6599226c30ef05b891a1222c5bfa0c8364fcce341`、frontend `sha256:676b49bbf21401dc22ceae9adf0bd7961f00d1e05a035ea78ba1539cd7340261`；想钉死版本可把 `latest` 改成标签 `237faa6`）。**生产必须放在 TLS 反代之后**（见下方「安全建议」）：本应用不做 TLS 终止，浏览器到反代之间走 HTTPS，反代到容器之间走内网 HTTP；此时 `.env` 里把 `COOKIE_SECURE=true`，登录 Cookie 才带 Secure 标志。
+说明：`backend` 与 `frontend` 直接拉 Docker Hub 已发布镜像，不用拉源码、不用本地构建；`backend` 读 `.env`，SQLite 数据存在 `ls_data` 卷的 `/data/app.db`；`frontend` 由 nginx 提供，映射到本机 `8080` 端口，等 `backend` 健康检查通过后才启动。两个容器均以非 root 用户运行（后端 `appuser`、前端 `nginx-unprivileged`，前端容器内监听 `8080`）。镜像：`qcgz10086/aws-lightsail-backend:latest`、`qcgz10086/aws-lightsail-frontend:latest`（对应 `billing-getcredits` 分支提交 `d2ae4d1`，2026-11-16；镜像摘要 backend `sha256:850097c59074d027646c4b263be8c7d11e78ac3833fbf2a73ff3a7590901fd61`、frontend `sha256:a2808a5d0f8c35ca731f7ca3d7dc249ca7e636285555e96c1bdef7093310c580`；想钉死版本可把 `latest` 改成标签 `4732edf`）。**生产必须放在 TLS 反代之后**（见下方「安全建议」）：本应用不做 TLS 终止，浏览器到反代之间走 HTTPS，反代到容器之间走内网 HTTP；此时 `.env` 里把 `COOKIE_SECURE=true`，登录 Cookie 才带 Secure 标志。
 
 ### 3. 启动
 
@@ -213,6 +213,8 @@ docker compose logs -f backend
 - 格式：`http://host:port`、`socks5://host:port`，均可带认证（如 `http://user:pass@host:port`）；支持 `http://`、`https://`、`socks5://`、`socks5h://`（SOCKS5 由 PySocks 提供；`socks5h` 由代理解析域名，不泄漏本地 DNS，建议优先用它）。
 - 代理地址用 Fernet 加密存在库里（与 Access Key 同等对待）；列表里只显示脱敏后的地址（`http://user:***@host:port`）。
 - 新建或改代理时，会立即用新代理校验一次凭证：代理不通当场报错、旧配置保留，不会静默回落到直连。
+- 使用时也会重新校验：每次用已存代理发 AWS 请求前，后端都会重新解析代理主机名，要求全部解析结果是公网地址；如果代理域名后来被改到内网地址（如 DNS 重绑定），对应接口会返回 400「代理不可用」，不会静默改走直连。代理域名解析失败或超时（2 秒）时同样拒绝。
+- 代理主机只接受公网地址：内网/保留地址（127.0.0.1、10.x、192.168.x、169.254.x 等）、localhost 及 `.local` / `.internal` / `.lan` 等后缀、解析到内网的域名（如 lvh.me、*.nip.io、*.sslip.io）以及 NAT64 内嵌内网地址的域名都会被拒绝。
 
 ## 区域启用
 
@@ -221,6 +223,7 @@ docker compose logs -f backend
 - 在「开通实例」页选了未启用的区域、套餐/镜像加载失败时，页面会提示该区域未启用，并给出「启用该区域」按钮。
 - 点确认后，面板用当前凭证调 Account Management API（`account:EnableRegion`，固定走 us-east-1）启用该区域；启用不是立刻生效，面板会每 10 秒查一次状态（`account:GetRegionOptStatus`），最多等 5 分钟，变为可用后自动重载套餐/镜像。
 - 需要密钥有 `account:EnableRegion` 与 `account:GetRegionOptStatus` 权限（见上方 IAM 最小权限策略）；如果是组织成员账号，只能由管理账号启用该区域。
+- 区域状态查询与启用接口有限流：状态查询每分钟 10 次、启用每分钟 5 次，超限返回 429，请稍后再试；启用成功与失败都会记操作日志。
 - 不想启用也可以直接换个已启用的地区（如东京、新加坡、美东）。
 
 ## 架构
@@ -272,6 +275,8 @@ Vite 已将 `/api` 代理到 `http://127.0.0.1:8000`。
 | GET/POST | `/api/credentials` | 列出 / 新增 AWS 凭证（可多组） |
 | PUT/DELETE | `/api/credentials/{id}` | 更新 / 删除指定凭证 |
 | POST | `/api/credentials/{id}/default` | 设为默认凭证 |
+| GET | `/api/credentials/{id}/regions/{region}/status` | 查询某区域的启用状态（每分钟 10 次限流） |
+| POST | `/api/credentials/{id}/regions/{region}/enable` | 启用某区域（opt-in 区域，每分钟 5 次限流） |
 | GET | `/api/catalog/regions?credential_id=` | 区域（可指定凭证） |
 | GET | `/api/instances?credential_id=` | 跨区实例列表（空=全部凭证） |
 | POST | `/api/instances` | 创建（body 可带 credential_id） |
