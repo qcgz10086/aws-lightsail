@@ -109,6 +109,22 @@ python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().d
 
 > 更换 `ENCRYPTION_KEY` 后，已绑定的 AWS Key 将无法解密，需要用户重新绑定。`.env` 不要提交到仓库。
 
+### 环境变量一览
+
+| 变量 | 必填 | 默认值 | 说明 |
+|------|------|--------|------|
+| `SECRET_KEY` | 是 | 无 | JWT 签名密钥；至少 32 位，且须含大小写字母、数字、符号中至少 3 类、至少 8 个不同字符；缺失、为空或弱值时启动即拒绝 |
+| `ENCRYPTION_KEY` | 是 | 无 | Fernet 密钥，加密存储 AWS Access Key；更换后已绑定的 Key 无法解密，需重新绑定 |
+| `ADMIN_PASSWORD` | 是 | 无 | 管理员密码；12-64 位，须同时含大小写字母、数字、符号；禁止用默认密码 `admin123`；首次启动且用户表为空时创建管理员 |
+| `ADMIN_USERNAME` | 否 | `admin` | 管理员用户名 |
+| `DATABASE_URL` | 否 | `sqlite:////data/app.db` | SQLite 路径；`docker-compose.yml` 里已配好，一般不用改 |
+| `COLLECT_INTERVAL_MINUTES` | 否 | `60` | 流量自动采集间隔（分钟） |
+| `CORS_ORIGINS` | 否 | 空（不放行任何来源） | 允许跨域的来源，逗号分隔；生产走 nginx 同源反代不用填，本地开发需要时显式写明 |
+| `COOKIE_SECURE` | 否 | `false` | 登录 Cookie 是否带 Secure 标志；走 HTTPS 反代时设 `true` |
+| `ENABLE_DOCS` | 否 | `false` | 是否开启 `/docs`、`/redoc`、`/openapi.json`；仅调试时设 `true` |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | 否 | `10080`（7 天） | token 有效期（分钟）；未写进 `.env.example`，一般不用改 |
+| `JWT_ALGORITHM` | 否 | `HS256` | JWT 签名算法；未写进 `.env.example`，一般不用改 |
+
 ### 2. docker-compose.yml
 
 仓库根目录已自带 `docker-compose.yml`，内容如下；如果不在仓库目录内部署，直接复制这份文件保存为 `docker-compose.yml` 即可：
