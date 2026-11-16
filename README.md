@@ -2,6 +2,8 @@
 
 通过 Docker 一键部署的多用户 Lightsail 管理网站。
 
+> 当前分支：`billing-getcredits`。最新已验证提交 `433b0210`（2026-11-16）：除分支历史遗留问题 H-4 外无高危；H-1/H-2/H-3 与 R-1~R-10 已修复并经独立复查实测确认；R-11/R-12 为低危有意保留项。详情见[安全审计状态](#安全审计状态)。
+
 ## 功能
 
 - 多用户登录（默认管理员可创建其他用户）
@@ -178,7 +180,7 @@ docker compose -f docker-compose.image.yml pull
 docker compose -f docker-compose.image.yml up -d
 ```
 
-镜像：`qcgz10086/aws-lightsail-backend:latest`、`qcgz10086/aws-lightsail-frontend:latest`（对应 `billing-getcredits` 分支最新提交，含账单 GetCredits 功能与 H-1/H-2/H-3 及后续安全修复；想钉死版本可把 `latest` 改成对应提交的短 SHA）。其余配置（端口 `8080`、`ls_data` 卷、健康检查）与源码版一致。
+镜像：`qcgz10086/aws-lightsail-backend:latest`、`qcgz10086/aws-lightsail-frontend:latest`（对应 `billing-getcredits` 分支提交 `433b0210`，2026-11-16，含账单 GetCredits 功能与 H-1/H-2/H-3、R-1~R-10 全部安全修复；镜像摘要 backend `sha256:008a4a16e6f2bb33cc3343e6599226c30ef05b891a1222c5bfa0c8364fcce341`、frontend `sha256:676b49bbf21401dc22ceae9adf0bd7961f00d1e05a035ea78ba1539cd7340261`；想钉死版本可把 `latest` 改成标签 `237faa6`）。其余配置（端口 `8080`、`ls_data` 卷、健康检查）与源码版一致。
 
 ### 4. 使用流程
 
@@ -234,6 +236,7 @@ Vite 已将 `/api` 代理到 `http://127.0.0.1:8000`。
 | 方法 | 路径 | 说明 |
 |------|------|------|
 | POST | `/api/auth/login` | 登录 |
+| POST | `/api/auth/logout` | 登出（清除 Cookie 并使当前 token 失效） |
 | GET | `/api/auth/me` | 当前用户 |
 | GET/POST | `/api/credentials` | 列出 / 新增 AWS 凭证（可多组） |
 | PUT/DELETE | `/api/credentials/{id}` | 更新 / 删除指定凭证 |
@@ -277,17 +280,43 @@ Vite 已将 `/api` 代理到 `http://127.0.0.1:8000`。
 1. 在 AWS 控制台启用 Cost Explorer（控制台 → Cost Explorer → 启用），启用后数据通常需要 24-48 小时才会出现；未启用或暂无数据时账单页显示 `unavailable` 提示，不会报 500。
 2. 给 IAM 用户/角色添加只读权限：`billing:GetCredits`、`sts:GetCallerIdentity`（官方赠金）、`ce:GetCostAndUsage`、`ce:GetCostForecast`（本月费用）；缺权限时账单页对应区域显示 `no_permission` 提示。不要用根账号 Access Key。
 
+## 安全审计状态
+
+2026-11-16 对分支提交 `433b0210` 的独立复查结论（远端核对、逐项实测、回退复核、全仓库扫描，未连真实 AWS）：**除 H-4 外无高危，可以部署用**。后端测试 59 个全过，前端构建通过，`bandit` 仅 1 条 Low（`security.py` 里 dummy bcrypt 哈希常量被当成口令的误报）。
+
+已修复（均经实测确认）：
+
+- **H-1/H-2/H-3**：`SECRET_KEY`、`ENCRYPTION_KEY`、`ADMIN_PASSWORD` 必填、无默认值，缺失或弱值启动即拒绝；新建实例默认不开放全部端口；实例密码 12 位加复杂度，留空走密钥登录
+- **R-1**：启动时校验密钥强度，`ADMIN_PASSWORD` 12-64 位含四类字符，`SECRET_KEY` 32 位以上加熵校验，`"a"*32` 之类低熵值拒绝启动
+- **R-2**：登录与改密限流，同一 IP+用户名 15 分钟内累计失败 5 次后锁定 15 分钟，返回 429（带 `Retry-After`）
+- **R-3**：JWT 加 `token_version` 与 `jti`，改密或登出后此前签发的全部 token 立即失效；token 本身仍 7 天过期
+- **R-4**：新建/修改用户密码与改密统一要求 12 位加复杂度（与实例密码同一标准）
+- **R-5**：登录态走 HttpOnly Cookie（`SameSite=Lax`），token 不再存 localStorage；登录响应体仍会返回 `access_token`，供 API 客户端直接调用时使用（有意保留的兼容设计）
+- **R-6**：依赖升级到已修复版本：`fastapi==0.163.1`、`starlette==1.10.0`、`python-jose==3.5.0`、`cryptography==50.0.2`、`python-multipart==0.0.33`、`react-router-dom==7.18.5`
+- **R-7**：后端与前端容器均以非 root 用户运行（后端 `appuser`、前端 `nginx` 用户）；前后端统一返回安全响应头（`X-Content-Type-Options`、`X-Frame-Options`、`Content-Security-Policy` 等，纯 HTTP 下不含 HSTS）
+- **R-8**：CORS 默认不放行任何跨域来源，只有 `.env` 里 `CORS_ORIGINS` 明确列出的来源才放行
+- **R-9**：`/docs`、`/redoc`、`/openapi.json` 默认关闭，仅 `ENABLE_DOCS=true` 时开启
+- **R-10**：登录时查无此人也会跑一次 dummy bcrypt 校验再返回 401，避免用户枚举时序侧信道
+
+有意保留（低危，经评估不改）：
+
+- **R-11**：建实例填密码仍会开 root SSH 密码登录（现为 opt-in，且密码 12 位加复杂度）
+- **R-12**：删实例释放静态 IP 时按 `name-sip-` 前缀匹配，极端命名下可能释放同凭证下另一实例的 IP
+
+未处理：
+
+- **H-4**：分支历史提交 `2c1736c` 里仍有一份旧 `.env`，其中的 `SECRET_KEY` / `ENCRYPTION_KEY` / `ADMIN_PASSWORD` 已全部轮换作废，对当前部署不直接有效；但旧 `ENCRYPTION_KEY` 仍能解密用它加密过的旧备份，不要复用旧备份。清历史需要 force push，待定。
+
+> 依赖审计说明：`pip-audit` 在最新依赖下仍报 3 项无修复版本的告警，均已逐项核对不可达——`python-jose` PYSEC-2026-4298（需攻击者持有服务的非对称公钥且算法不限定；本应用只有 HS256 对称密钥且解码显式限定算法）；`ecdsa` PYSEC-2026-1325（Minerva 时序攻击，需调用 ecdsa 签名；本应用只用 HS256，从不调 ecdsa，且 0.19.2 已是最新版、无修复版本）。`npm audit` 0 漏洞。
+
 ## 安全建议
 
 1. `SECRET_KEY`、`ENCRYPTION_KEY`、`ADMIN_PASSWORD` 均为必填且无默认值：缺失或为默认值/占位值时启动即拒绝；不要把 `.env` 提交到仓库。其中 `SECRET_KEY` 至少 32 位且须有足够熵（大小写字母、数字、符号中至少 3 类、至少 8 个不同字符），`ADMIN_PASSWORD` 12-64 位且须同时含大小写字母、数字、符号
 2. 新建实例默认不开放全部端口（`open_all_ports` 默认关闭）；自定义实例密码至少 12 位且须含大小写字母、数字和符号，留空则走密钥登录、不开密码登录；新建/修改用户密码与改密同样要求 12 位加复杂度；同一 IP+用户名 15 分钟内累计登录失败 5 次后锁定 15 分钟（返回 429）
 3. **生产必须放在 TLS 反代之后**：本应用不做 TLS 终止，不要把 8000 或 8080 端口直接裸露公网。部署形态：浏览器 --HTTPS--> 反代（Caddy / nginx / Traefik，配好证书）--HTTP 内网--> 本应用的 8080 端口。走 HTTPS 时 `.env` 里设 `COOKIE_SECURE=true`，登录 Cookie 带 Secure 标志；纯 HTTP 内网部署保持 `false` 即可
-4. 登录态走 HttpOnly Cookie（`SameSite=Lax`），token 不再存 localStorage；改密或登出后此前签发的全部 token 立即失效（token 版本机制），token 本身仍 7 天过期
-5. CORS 默认不放行任何跨域来源，只有 `.env` 里 `CORS_ORIGINS` 明确列出的来源才放行；`/docs`、`/redoc`、`/openapi.json` 默认关闭，仅 `ENABLE_DOCS=true` 时开启；后端与前端容器均以非 root 用户运行，并统一返回安全响应头（`X-Content-Type-Options`、`X-Frame-Options`、`Content-Security-Policy` 等，不含 HSTS）
-6. 为 AWS IAM 用户最小化 Lightsail 权限
-7. 不要将 `.env` 提交到公开仓库
-
-> 依赖审计说明：`pip-audit` 在最新依赖下仍报 3 项无修复版本的告警，均已逐项核对不可达——`python-jose` PYSEC-2026-4298（需攻击者持有服务的非对称公钥且算法不限定；本应用只有 HS256 对称密钥且解码显式限定算法）；`ecdsa` PYSEC-2026-1325（Minerva 时序攻击，需调用 ecdsa 签名；本应用只用 HS256，从不调 ecdsa，且 0.19.2 已是最新版、无修复版本）。`npm audit` 0 漏洞。
+4. 升级后旧 token 会失效：R-3 的 token 版本机制下，升级到含该修复的版本后，此前签发的 token 全部失效，部署完重新登录一次即可
+5. 为 AWS IAM 用户最小化 Lightsail 权限
+6. 不要将 `.env` 提交到公开仓库
 
 ## 目录结构
 
