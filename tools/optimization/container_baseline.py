@@ -94,7 +94,7 @@ def export_source(commit, source):
     hashes = {}
     for service in ("backend", "frontend"):
         archive = source / f"{service}-source.tar"
-        subprocess.run(["git", "archive", "--format=tar", "--prefix=" + service + "/",
+        subprocess.run(["git", "-c", "core.autocrlf=false", "archive", "--format=tar", "--prefix=" + service + "/",
                         "-o", str(archive), commit + ":" + service], cwd=ROOT, check=True)
         hashes[service] = hashlib.sha256(archive.read_bytes()).hexdigest()
         with tarfile.open(archive) as bundle:
