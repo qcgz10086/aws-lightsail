@@ -1,0 +1,10 @@
+{
+  "machine": "m_agqymokr64sggvjgxypiphnoke",
+  "state": "suspended",
+  "operation": "op_agq6vjuwlvtcnbkrp4ad4bdd74",
+  "updated_at_utc": "2026-11-17T17:55:48.770043Z",
+  "storage_synced": false,
+  "pre_suspend_archive_and_log_hashes_verified": true,
+  "running_containers_before_suspend": [],
+  "note": "No claim of completed platform disk synchronization; full logs remain on the remote persistent disk, local delivery receipt has matching bytes."
+}

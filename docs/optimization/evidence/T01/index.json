@@ -1,5 +1,9 @@
 {
   "local_files": {
+    ".gitattributes": {
+      "bytes": 29,
+      "sha256": "730a35ae3d558080083c3103d9ac8100c3f6561678092abe341701dfa331eb1d"
+    },
     "author-review.md": {
       "bytes": 5152,
       "sha256": "d7aa6b73746d16e479091fd50575b59ebabb48bdd623b9e1defc3dba6f3150a0"
@@ -23,6 +27,10 @@
     "git-source-manifest.json": {
       "bytes": 3730,
       "sha256": "62d35ad24b42219cfaf1b3240903da87e1dfb27f0a72d923518ef54614433087"
+    },
+    "machine-final-state.json": {
+      "bytes": 453,
+      "sha256": "0f551ae6e3ae058b0b325879e25c38bfd9eaf5f283a628e5bde5d82f30882fd6"
     },
     "migration-recovery-tests.txt": {
       "bytes": 5205,
@@ -69,5 +77,6 @@
       "sha256": "5df098fead5264481a4255bc4f7e7f79c742caaea22f937ca581d570b0ed9f16"
     }
   },
-  "remote_full_evidence": "See remote-receipt.json; local receipt is a projection, not the complete remote logs."
+  "remote_full_evidence": "See remote-receipt.json; local receipt is a projection, not the complete remote logs.",
+  "line_endings": "T01 .gitattributes preserves original evidence bytes. Native source and canonical Git source have separate manifests."
 }
