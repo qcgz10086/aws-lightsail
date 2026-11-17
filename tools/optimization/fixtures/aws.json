@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "date": "2026-11-17T00:00:00+00:00",
+  "delay_ms": 80,
+  "samples": 20,
+  "regions": ["us-east-1", "ap-northeast-1"],
+  "instances_per_region": 6,
+  "page_size": 2,
+  "keys": {
+    "T00_ALPHA_PRIMARY": "111111111111",
+    "T00_ALPHA_DUPLICATE": "111111111111",
+    "T00_BETA_PRIMARY": "222222222222"
+  },
+  "billing": {"total": "30.00", "net": "22.00", "forecast": "45.00"},
+  "credit": {"initial": "100.00", "remaining": "80.00", "estimated": "72.00"},
+  "manual_credits_per_user": 2
+}

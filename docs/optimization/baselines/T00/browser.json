@@ -1,0 +1,6341 @@
+{
+  "browser": "157.0.8103.52",
+  "executable": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  "viewport": [
+    1440,
+    1000
+  ],
+  "locale": "zh-CN",
+  "timezone": "UTC",
+  "samples_per_case_phase": 20,
+  "http_cache": "normal browser cache; request routing is not enabled",
+  "egress_guard": "loopback proxy allows only the exact fixture origin, including CONNECT",
+  "fixture_sha256": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c",
+  "first_visit_definition": "fresh browser context and a distinct panel user for each case/sample",
+  "repeat_visit_definition": "same context and user, full document navigation; no cache guarantee",
+  "first_data_definition": "fixture business-data locator visible (not auth metadata), followed by two animation frames; see manifest ready_text",
+  "complete_definition": "all observed API requests finished, followed by two animation frames",
+  "results": [
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 0,
+      "first_data_ms": 1406.1222,
+      "complete_ms": 1437.9356,
+      "first_api_ms": 580.8068000000001,
+      "complete_api_ms": 1367.0071999999998,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 435.2792999999999
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 580.8068000000001
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1367.0071999999998
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114511872,
+      "peak_rss_bytes": 114511872,
+      "cpu_seconds": 0.28125,
+      "wall_seconds": 1.449349100003019,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 0,
+      "first_data_ms": 966.9351000000001,
+      "complete_ms": 1000.1961999999999,
+      "first_api_ms": 143.1023,
+      "complete_api_ms": 925.2856000000002,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 67.31539999999995
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 143.1023
+        },
+        {
+          "path": "/api/instances",
+          "ms": 925.2856000000002
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114532352,
+      "peak_rss_bytes": 114532352,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 1.0078008000273257,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 0,
+      "first_data_ms": 918.2635999999998,
+      "complete_ms": 951.8979999999997,
+      "first_api_ms": 80.04559999999992,
+      "complete_api_ms": 888.1322999999998,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 80.04559999999992
+        },
+        {
+          "path": "/api/instances",
+          "ms": 888.1322999999998
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114548736,
+      "peak_rss_bytes": 114548736,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 0.9597853999584913,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 1,
+      "first_data_ms": 1198.0451000000003,
+      "complete_ms": 1231.0067,
+      "first_api_ms": 356.96230000000014,
+      "complete_api_ms": 1148.1859000000004,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 225.79660000000058
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 356.96230000000014
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1148.1859000000004
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114647040,
+      "peak_rss_bytes": 114647040,
+      "cpu_seconds": 0.140625,
+      "wall_seconds": 1.2392249000258744,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 1,
+      "first_data_ms": 968.1973000000007,
+      "complete_ms": 1001.317,
+      "first_api_ms": 141.95910000000003,
+      "complete_api_ms": 927.2000000000007,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 63.77190000000064
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 141.95910000000003
+        },
+        {
+          "path": "/api/instances",
+          "ms": 927.2000000000007
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114651136,
+      "peak_rss_bytes": 114651136,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.0091063999570906,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 1,
+      "first_data_ms": 903.0165999999999,
+      "complete_ms": 936.2079999999996,
+      "first_api_ms": 81.75619999999981,
+      "complete_api_ms": 873.4098000000004,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 81.75619999999981
+        },
+        {
+          "path": "/api/instances",
+          "ms": 873.4098000000004
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114716672,
+      "peak_rss_bytes": 114716672,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 0.9435235001146793,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 2,
+      "first_data_ms": 1182.4598999999998,
+      "complete_ms": 1215.4766,
+      "first_api_ms": 363.52989999999954,
+      "complete_api_ms": 1146.1697999999997,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 228.55469999999877
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 363.52989999999954
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1146.1697999999997
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114728960,
+      "peak_rss_bytes": 114728960,
+      "cpu_seconds": 0.125,
+      "wall_seconds": 1.224227000027895,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 2,
+      "first_data_ms": 951.751400000001,
+      "complete_ms": 984.5786000000007,
+      "first_api_ms": 128.8181999999997,
+      "complete_api_ms": 914.3732,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 59.66330000000016
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 128.8181999999997
+        },
+        {
+          "path": "/api/instances",
+          "ms": 914.3732
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114728960,
+      "peak_rss_bytes": 114728960,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 0.9912580999080092,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 2,
+      "first_data_ms": 903.4580000000005,
+      "complete_ms": 936.8309000000008,
+      "first_api_ms": 82.18449999999939,
+      "complete_api_ms": 865.8811000000005,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 82.18449999999939
+        },
+        {
+          "path": "/api/instances",
+          "ms": 865.8811000000005
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114728960,
+      "peak_rss_bytes": 114728960,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 0.943993299966678,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 3,
+      "first_data_ms": 1180.1067000000003,
+      "complete_ms": 1212.75,
+      "first_api_ms": 355.91070000000036,
+      "complete_api_ms": 1141.1445999999996,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 225.4405999999999
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 355.91070000000036
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1141.1445999999996
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114728960,
+      "peak_rss_bytes": 114728960,
+      "cpu_seconds": 0.140625,
+      "wall_seconds": 1.2199516000691801,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 3,
+      "first_data_ms": 968.9215999999997,
+      "complete_ms": 1001.9585000000006,
+      "first_api_ms": 131.58380000000034,
+      "complete_api_ms": 920.1568000000007,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 59.26809999999932
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 131.58380000000034
+        },
+        {
+          "path": "/api/instances",
+          "ms": 920.1568000000007
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114728960,
+      "peak_rss_bytes": 114728960,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.0092460000887513,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 3,
+      "first_data_ms": 901.6855000000014,
+      "complete_ms": 934.8986000000004,
+      "first_api_ms": 80.81230000000141,
+      "complete_api_ms": 862.885400000001,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 80.81230000000141
+        },
+        {
+          "path": "/api/instances",
+          "ms": 862.885400000001
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114728960,
+      "peak_rss_bytes": 114728960,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 0.9421765999868512,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 4,
+      "first_data_ms": 1164.0442999999996,
+      "complete_ms": 1197.2564999999977,
+      "first_api_ms": 344.0804999999982,
+      "complete_api_ms": 1130.4742999999999,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 219.0085999999992
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 344.0804999999982
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1130.4742999999999
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114794496,
+      "peak_rss_bytes": 114794496,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.2040347000584006,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 4,
+      "first_data_ms": 952.6187000000027,
+      "complete_ms": 985.7597999999998,
+      "first_api_ms": 132.26880000000165,
+      "complete_api_ms": 916.7364000000016,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 60.55340000000069
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 132.26880000000165
+        },
+        {
+          "path": "/api/instances",
+          "ms": 916.7364000000016
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114794496,
+      "peak_rss_bytes": 114794496,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 0.9925830001011491,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 4,
+      "first_data_ms": 903.2472999999991,
+      "complete_ms": 936.8978999999999,
+      "first_api_ms": 81.73609999999826,
+      "complete_api_ms": 866.2332999999999,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 81.73609999999826
+        },
+        {
+          "path": "/api/instances",
+          "ms": 866.2332999999999
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114794496,
+      "peak_rss_bytes": 114794496,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 0.9436343000270426,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 5,
+      "first_data_ms": 1212.3719999999994,
+      "complete_ms": 1245.0085,
+      "first_api_ms": 394.099000000002,
+      "complete_api_ms": 1178.3631999999998,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 242.3060000000005
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 394.099000000002
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1178.3631999999998
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114794496,
+      "peak_rss_bytes": 114794496,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.2529638998676091,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 5,
+      "first_data_ms": 952.6695,
+      "complete_ms": 985.8472999999976,
+      "first_api_ms": 128.5715999999993,
+      "complete_api_ms": 917.4544999999998,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 59.51440000000002
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 128.5715999999993
+        },
+        {
+          "path": "/api/instances",
+          "ms": 917.4544999999998
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114794496,
+      "peak_rss_bytes": 114794496,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 0.9927956000901759,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 5,
+      "first_data_ms": 903.3427999999985,
+      "complete_ms": 936.3567000000003,
+      "first_api_ms": 81.1926999999996,
+      "complete_api_ms": 867.9527999999991,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 81.1926999999996
+        },
+        {
+          "path": "/api/instances",
+          "ms": 867.9527999999991
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114794496,
+      "peak_rss_bytes": 114794496,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 0.9426125998143107,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 6,
+      "first_data_ms": 1179.5489000000016,
+      "complete_ms": 1212.0911000000015,
+      "first_api_ms": 360.4831000000013,
+      "complete_api_ms": 1144.4865000000027,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 223.97300000000178
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 360.4831000000013
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1144.4865000000027
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114794496,
+      "peak_rss_bytes": 114794496,
+      "cpu_seconds": 0.125,
+      "wall_seconds": 1.218491799896583,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 6,
+      "first_data_ms": 971.2403000000013,
+      "complete_ms": 1004.6715000000004,
+      "first_api_ms": 136.79209999999875,
+      "complete_api_ms": 929.1182000000008,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 61.258200000000215
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 136.79209999999875
+        },
+        {
+          "path": "/api/instances",
+          "ms": 929.1182000000008
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114794496,
+      "peak_rss_bytes": 114794496,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.0115340000484139,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 6,
+      "first_data_ms": 919.1638999999996,
+      "complete_ms": 952.4421000000002,
+      "first_api_ms": 82.51139999999941,
+      "complete_api_ms": 879.7387000000017,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 82.51139999999941
+        },
+        {
+          "path": "/api/instances",
+          "ms": 879.7387000000017
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114794496,
+      "peak_rss_bytes": 114794496,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 0.9589074999094009,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 7,
+      "first_data_ms": 1248.0054999999993,
+      "complete_ms": 1280.9951,
+      "first_api_ms": 424.4804000000004,
+      "complete_api_ms": 1212.0593999999983,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 272.03180000000066
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 424.4804000000004
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1212.0593999999983
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114794496,
+      "peak_rss_bytes": 114794496,
+      "cpu_seconds": 0.125,
+      "wall_seconds": 1.288986099883914,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 7,
+      "first_data_ms": 949.0030000000006,
+      "complete_ms": 981.6787000000004,
+      "first_api_ms": 128.98479999999836,
+      "complete_api_ms": 915.4749999999985,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 58.26080000000002
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 128.98479999999836
+        },
+        {
+          "path": "/api/instances",
+          "ms": 915.4749999999985
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114794496,
+      "peak_rss_bytes": 114794496,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 0.992065800121054,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 7,
+      "first_data_ms": 902.5992000000006,
+      "complete_ms": 936.6516999999985,
+      "first_api_ms": 82.02249999999913,
+      "complete_api_ms": 871.6424999999981,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 82.02249999999913
+        },
+        {
+          "path": "/api/instances",
+          "ms": 871.6424999999981
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114794496,
+      "peak_rss_bytes": 114794496,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 0.9428059998899698,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 8,
+      "first_data_ms": 1245.9471000000012,
+      "complete_ms": 1278.8711000000003,
+      "first_api_ms": 420.65190000000075,
+      "complete_api_ms": 1206.7138999999988,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 261.29769999999917
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 420.65190000000075
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1206.7138999999988
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.125,
+      "wall_seconds": 1.2865155001636595,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 8,
+      "first_data_ms": 986.1157999999996,
+      "complete_ms": 1019.5332999999955,
+      "first_api_ms": 131.49239999999918,
+      "complete_api_ms": 939.4171999999962,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 59.563899999997375
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 131.49239999999918
+        },
+        {
+          "path": "/api/instances",
+          "ms": 939.4171999999962
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.0271773000713438,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 8,
+      "first_data_ms": 901.6506999999983,
+      "complete_ms": 934.856200000002,
+      "first_api_ms": 81.64839999999822,
+      "complete_api_ms": 865.6635999999999,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 81.64839999999822
+        },
+        {
+          "path": "/api/instances",
+          "ms": 865.6635999999999
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 0.9413137999363244,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 9,
+      "first_data_ms": 1207.9167000000016,
+      "complete_ms": 1240.9438999999984,
+      "first_api_ms": 369.3943999999974,
+      "complete_api_ms": 1160.339,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 225.024599999997
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 369.3943999999974
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1160.339
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.140625,
+      "wall_seconds": 1.2482982000801712,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 9,
+      "first_data_ms": 968.3945999999996,
+      "complete_ms": 1001.9375,
+      "first_api_ms": 134.4409999999989,
+      "complete_api_ms": 921.770199999999,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 62.63779999999679
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 134.4409999999989
+        },
+        {
+          "path": "/api/instances",
+          "ms": 921.770199999999
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.0084073999896646,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 9,
+      "first_data_ms": 902.4611000000004,
+      "complete_ms": 935.9040000000023,
+      "first_api_ms": 82.52739999999903,
+      "complete_api_ms": 864.3438000000024,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 82.52739999999903
+        },
+        {
+          "path": "/api/instances",
+          "ms": 864.3438000000024
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 0.9425260999705642,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 10,
+      "first_data_ms": 1217.4717999999993,
+      "complete_ms": 1249.6512999999977,
+      "first_api_ms": 389.6477999999988,
+      "complete_api_ms": 1181.3073000000004,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 240.85039999999572
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 389.6477999999988
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1181.3073000000004
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.2579224000219256,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 10,
+      "first_data_ms": 970.168700000002,
+      "complete_ms": 1002.7514999999985,
+      "first_api_ms": 142.1209000000017,
+      "complete_api_ms": 927.2387000000017,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 65.17109999999957
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 142.1209000000017
+        },
+        {
+          "path": "/api/instances",
+          "ms": 927.2387000000017
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.0103941999841481,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 10,
+      "first_data_ms": 904.0378999999957,
+      "complete_ms": 936.2407000000021,
+      "first_api_ms": 81.84760000000097,
+      "complete_api_ms": 864.9583999999959,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 81.84760000000097
+        },
+        {
+          "path": "/api/instances",
+          "ms": 864.9583999999959
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 0.9427036999259144,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 11,
+      "first_data_ms": 1225.859900000003,
+      "complete_ms": 1258.932200000003,
+      "first_api_ms": 381.8652000000002,
+      "complete_api_ms": 1177.6488000000027,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 242.1713000000018
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 381.8652000000002
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1177.6488000000027
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.140625,
+      "wall_seconds": 1.26744779990986,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 11,
+      "first_data_ms": 985.162900000003,
+      "complete_ms": 1018.3113999999987,
+      "first_api_ms": 154.08430000000226,
+      "complete_api_ms": 941.1524999999965,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 73.04939999999624
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 154.08430000000226
+        },
+        {
+          "path": "/api/instances",
+          "ms": 941.1524999999965
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.0248467999044806,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 11,
+      "first_data_ms": 903.3633000000045,
+      "complete_ms": 936.879399999998,
+      "first_api_ms": 82.00179999999818,
+      "complete_api_ms": 864.2333999999973,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 82.00179999999818
+        },
+        {
+          "path": "/api/instances",
+          "ms": 864.2333999999973
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 0.9435618999414146,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 12,
+      "first_data_ms": 1200.0123000000021,
+      "complete_ms": 1232.6224000000002,
+      "first_api_ms": 366.29469999999856,
+      "complete_api_ms": 1153.818800000001,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 228.7992000000013
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 366.29469999999856
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1153.818800000001
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.241187599953264,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 12,
+      "first_data_ms": 984.9784999999974,
+      "complete_ms": 1018.7456999999995,
+      "first_api_ms": 155.48449999999866,
+      "complete_api_ms": 949.5320999999967,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 67.6987999999983
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 155.48449999999866
+        },
+        {
+          "path": "/api/instances",
+          "ms": 949.5320999999967
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.0251375001389533,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 12,
+      "first_data_ms": 902.9959000000017,
+      "complete_ms": 935.9028000000035,
+      "first_api_ms": 82.20120000000315,
+      "complete_api_ms": 869.5897000000041,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 82.20120000000315
+        },
+        {
+          "path": "/api/instances",
+          "ms": 869.5897000000041
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 0.9425496000330895,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 13,
+      "first_data_ms": 1222.0795999999973,
+      "complete_ms": 1255.1916999999958,
+      "first_api_ms": 399.28949999999895,
+      "complete_api_ms": 1183.314999999995,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 246.29869999999937
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 399.28949999999895
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1183.314999999995
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.15625,
+      "wall_seconds": 1.2629567000549287,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 13,
+      "first_data_ms": 969.1094000000012,
+      "complete_ms": 1002.4231999999975,
+      "first_api_ms": 146.2922000000035,
+      "complete_api_ms": 929.0884000000005,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 64.98410000000149
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 146.2922000000035
+        },
+        {
+          "path": "/api/instances",
+          "ms": 929.0884000000005
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114802688,
+      "peak_rss_bytes": 114802688,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.0084743001498282,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 13,
+      "first_data_ms": 903.7862000000023,
+      "complete_ms": 937.4962000000014,
+      "first_api_ms": 84.35550000000512,
+      "complete_api_ms": 868.6042999999991,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 84.35550000000512
+        },
+        {
+          "path": "/api/instances",
+          "ms": 868.6042999999991
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114806784,
+      "peak_rss_bytes": 114806784,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 0.9444046001881361,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 14,
+      "first_data_ms": 1200.6503999999986,
+      "complete_ms": 1233.8285000000033,
+      "first_api_ms": 367.2606999999989,
+      "complete_api_ms": 1153.438000000002,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 237.01370000000315
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 367.2606999999989
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1153.438000000002
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114806784,
+      "peak_rss_bytes": 114806784,
+      "cpu_seconds": 0.125,
+      "wall_seconds": 1.2405999000184238,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 14,
+      "first_data_ms": 970.9320999999982,
+      "complete_ms": 1003.9052999999985,
+      "first_api_ms": 146.5986000000048,
+      "complete_api_ms": 933.9219999999987,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 62.1024000000034
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 146.5986000000048
+        },
+        {
+          "path": "/api/instances",
+          "ms": 933.9219999999987
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114806784,
+      "peak_rss_bytes": 114806784,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.0107578001916409,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 14,
+      "first_data_ms": 903.0303000000058,
+      "complete_ms": 936.2119000000021,
+      "first_api_ms": 82.73960000000079,
+      "complete_api_ms": 870.0813000000053,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 82.73960000000079
+        },
+        {
+          "path": "/api/instances",
+          "ms": 870.0813000000053
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114806784,
+      "peak_rss_bytes": 114806784,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 0.943486399948597,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 15,
+      "first_data_ms": 1231.460199999994,
+      "complete_ms": 1265.3320999999996,
+      "first_api_ms": 402.861699999994,
+      "complete_api_ms": 1184.306899999996,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 247.5844999999972
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 402.861699999994
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1184.306899999996
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114806784,
+      "peak_rss_bytes": 114806784,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.2734604000579566,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 15,
+      "first_data_ms": 984.940499999997,
+      "complete_ms": 1018.7126999999964,
+      "first_api_ms": 154.16679999999906,
+      "complete_api_ms": 936.1958999999988,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 68.52659999999742
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 154.16679999999906
+        },
+        {
+          "path": "/api/instances",
+          "ms": 936.1958999999988
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114806784,
+      "peak_rss_bytes": 114806784,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.024714299943298,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 15,
+      "first_data_ms": 903.4704000000056,
+      "complete_ms": 937.2205000000031,
+      "first_api_ms": 83.41050000000541,
+      "complete_api_ms": 869.0027000000046,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 83.41050000000541
+        },
+        {
+          "path": "/api/instances",
+          "ms": 869.0027000000046
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114806784,
+      "peak_rss_bytes": 114806784,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 0.9432765999808908,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 16,
+      "first_data_ms": 1207.126599999996,
+      "complete_ms": 1240.243899999994,
+      "first_api_ms": 381.53029999999853,
+      "complete_api_ms": 1165.4450999999972,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 246.60570000000007
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 381.53029999999853
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1165.4450999999972
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114814976,
+      "peak_rss_bytes": 114814976,
+      "cpu_seconds": 0.140625,
+      "wall_seconds": 1.2465100002009422,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 16,
+      "first_data_ms": 971.0067999999956,
+      "complete_ms": 1003.7353000000003,
+      "first_api_ms": 137.15669999999955,
+      "complete_api_ms": 924.6331999999966,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 61.640800000001036
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 137.15669999999955
+        },
+        {
+          "path": "/api/instances",
+          "ms": 924.6331999999966
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114814976,
+      "peak_rss_bytes": 114814976,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 1.009928199928254,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 16,
+      "first_data_ms": 905.092899999996,
+      "complete_ms": 938.3733999999968,
+      "first_api_ms": 84.14129999999568,
+      "complete_api_ms": 872.6189000000013,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 84.14129999999568
+        },
+        {
+          "path": "/api/instances",
+          "ms": 872.6189000000013
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114814976,
+      "peak_rss_bytes": 114814976,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 0.946462000021711,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 17,
+      "first_data_ms": 1202.7267999999967,
+      "complete_ms": 1235.960699999996,
+      "first_api_ms": 372.29559999999765,
+      "complete_api_ms": 1168.832199999997,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 237.3362999999954
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 372.29559999999765
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1168.832199999997
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114814976,
+      "peak_rss_bytes": 114814976,
+      "cpu_seconds": 0.125,
+      "wall_seconds": 1.2427211999893188,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 17,
+      "first_data_ms": 955.2281000000003,
+      "complete_ms": 987.1719999999987,
+      "first_api_ms": 138.8289999999979,
+      "complete_api_ms": 919.0945999999894,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 61.3891999999978
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 138.8289999999979
+        },
+        {
+          "path": "/api/instances",
+          "ms": 919.0945999999894
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114814976,
+      "peak_rss_bytes": 114814976,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 0.9945090999826789,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 17,
+      "first_data_ms": 898.8099999999977,
+      "complete_ms": 932.2051999999967,
+      "first_api_ms": 82.63940000000002,
+      "complete_api_ms": 869.3567999999941,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 82.63940000000002
+        },
+        {
+          "path": "/api/instances",
+          "ms": 869.3567999999941
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114814976,
+      "peak_rss_bytes": 114814976,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 0.9405055998358876,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 18,
+      "first_data_ms": 1195.0677999999898,
+      "complete_ms": 1227.8572999999888,
+      "first_api_ms": 371.73619999999937,
+      "complete_api_ms": 1157.05799999999,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 226.52489999998943
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 371.73619999999937
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1157.05799999999
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114819072,
+      "peak_rss_bytes": 114819072,
+      "cpu_seconds": 0.125,
+      "wall_seconds": 1.235187399899587,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 18,
+      "first_data_ms": 952.948000000004,
+      "complete_ms": 985.2734999999957,
+      "first_api_ms": 132.25780000000668,
+      "complete_api_ms": 916.2073000000091,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 60.595000000001164
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 132.25780000000668
+        },
+        {
+          "path": "/api/instances",
+          "ms": 916.2073000000091
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114819072,
+      "peak_rss_bytes": 114819072,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 0.992100500036031,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 18,
+      "first_data_ms": 904.7611000000034,
+      "complete_ms": 937.4398999999976,
+      "first_api_ms": 83.24809999999707,
+      "complete_api_ms": 865.5883000000031,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 83.24809999999707
+        },
+        {
+          "path": "/api/instances",
+          "ms": 865.5883000000031
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114819072,
+      "peak_rss_bytes": 114819072,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 0.9437688000034541,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 19,
+      "first_data_ms": 1250.865300000005,
+      "complete_ms": 1283.5388999999996,
+      "first_api_ms": 425.859300000011,
+      "complete_api_ms": 1212.630600000004,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 255.07700000000477
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 425.859300000011
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1212.630600000004
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114819072,
+      "peak_rss_bytes": 114819072,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.2918336999136955,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "repeat_visit",
+      "sample": 19,
+      "first_data_ms": 953.192200000005,
+      "complete_ms": 986.4509000000107,
+      "first_api_ms": 131.93060000000696,
+      "complete_api_ms": 917.1009000000049,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 60.10360000000219
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 131.93060000000696
+        },
+        {
+          "path": "/api/instances",
+          "ms": 917.1009000000049
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 114819072,
+      "peak_rss_bytes": 114819072,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 0.9933826001361012,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "dashboard",
+      "phase": "refresh_button",
+      "sample": 19,
+      "first_data_ms": 920.306500000006,
+      "complete_ms": 953.0529999999999,
+      "first_api_ms": 81.96340000000782,
+      "complete_api_ms": 885.2403000000049,
+      "api_requests": [
+        {
+          "path": "/api/traffic/summary",
+          "ms": 81.96340000000782
+        },
+        {
+          "path": "/api/instances",
+          "ms": 885.2403000000049
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114819072,
+      "peak_rss_bytes": 114819072,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 0.9598248000256717,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 0,
+      "first_data_ms": 1416.9867000000086,
+      "complete_ms": 1446.2142000000022,
+      "first_api_ms": 1290.4887000000017,
+      "complete_api_ms": 1290.4887000000017,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 260.66960000000836
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 457.88270000000193
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1290.4887000000017
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114892800,
+      "peak_rss_bytes": 114892800,
+      "cpu_seconds": 0.171875,
+      "wall_seconds": 1.459866899996996,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 0,
+      "first_data_ms": 1145.8950999999943,
+      "complete_ms": 1169.8147999999928,
+      "first_api_ms": 1037.0819999999949,
+      "complete_api_ms": 1037.0819999999949,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 87.37290000000212
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 191.66569999999774
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1037.0819999999949
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114896896,
+      "peak_rss_bytes": 114896896,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.1778384998906404,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 0,
+      "first_data_ms": 1214.251900000003,
+      "complete_ms": 1248.0100999999995,
+      "first_api_ms": 1163.3643999999913,
+      "complete_api_ms": 1163.3643999999913,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1163.3643999999913
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114896896,
+      "peak_rss_bytes": 114896896,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.2562575000338256,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 1,
+      "first_data_ms": 1418.3406000000105,
+      "complete_ms": 1451.0875000000087,
+      "first_api_ms": 1315.670900000012,
+      "complete_api_ms": 1315.670900000012,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 315.6935000000085
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 495.8862000000081
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1315.670900000012
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114900992,
+      "peak_rss_bytes": 114900992,
+      "cpu_seconds": 0.203125,
+      "wall_seconds": 1.459432999836281,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 1,
+      "first_data_ms": 1033.0586999999941,
+      "complete_ms": 1066.3926999999967,
+      "first_api_ms": 965.6166999999987,
+      "complete_api_ms": 965.6166999999987,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 79.42250000000058
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 172.403999999995
+        },
+        {
+          "path": "/api/instances",
+          "ms": 965.6166999999987
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114905088,
+      "peak_rss_bytes": 114905088,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.0742582001257688,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 1,
+      "first_data_ms": 1253.4425000000047,
+      "complete_ms": 1287.1198000000004,
+      "first_api_ms": 1197.9291999999987,
+      "complete_api_ms": 1197.9291999999987,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1197.9291999999987
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114909184,
+      "peak_rss_bytes": 114909184,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.2945989000145346,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 2,
+      "first_data_ms": 1257.3077000000048,
+      "complete_ms": 1290.1306999999942,
+      "first_api_ms": 1171.1175999999978,
+      "complete_api_ms": 1171.1175999999978,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 226.80019999999786
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 378.347299999994
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1171.1175999999978
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114909184,
+      "peak_rss_bytes": 114909184,
+      "cpu_seconds": 0.140625,
+      "wall_seconds": 1.2969724000431597,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 2,
+      "first_data_ms": 1007.1828999999998,
+      "complete_ms": 1038.0035999999964,
+      "first_api_ms": 943.6840999999986,
+      "complete_api_ms": 943.6840999999986,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 65.7271999999939
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 141.29329999999027
+        },
+        {
+          "path": "/api/instances",
+          "ms": 943.6840999999986
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114909184,
+      "peak_rss_bytes": 114909184,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.0450629000551999,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 2,
+      "first_data_ms": 1218.8501000000106,
+      "complete_ms": 1251.817200000005,
+      "first_api_ms": 1175.6655000000028,
+      "complete_api_ms": 1175.6655000000028,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1175.6655000000028
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.2585181000176817,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 3,
+      "first_data_ms": 1314.5109000000084,
+      "complete_ms": 1343.5694000000076,
+      "first_api_ms": 1232.9128000000055,
+      "complete_api_ms": 1232.9128000000055,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 276.9916999999987
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 436.0850999999966
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1232.9128000000055
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.3517976000439376,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 3,
+      "first_data_ms": 1025.7158999999956,
+      "complete_ms": 1053.3845000000001,
+      "first_api_ms": 961.0237000000052,
+      "complete_api_ms": 961.0237000000052,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 78.03340000000026
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 164.39029999999912
+        },
+        {
+          "path": "/api/instances",
+          "ms": 961.0237000000052
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.0598665000870824,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 3,
+      "first_data_ms": 1236.885699999999,
+      "complete_ms": 1270.361699999994,
+      "first_api_ms": 1188.8172999999952,
+      "complete_api_ms": 1188.8172999999952,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1188.8172999999952
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.2771748001687229,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 4,
+      "first_data_ms": 1261.0102000000043,
+      "complete_ms": 1289.9986999999965,
+      "first_api_ms": 1180.6141999999963,
+      "complete_api_ms": 1180.6141999999963,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 236.24049999999988
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 385.70930000000226
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1180.6141999999963
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.2974310999270529,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 4,
+      "first_data_ms": 1004.3945000000094,
+      "complete_ms": 1036.3098000000027,
+      "first_api_ms": 937.3225999999995,
+      "complete_api_ms": 937.3225999999995,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 64.86669999999867
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 145.16330000000016
+        },
+        {
+          "path": "/api/instances",
+          "ms": 937.3225999999995
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.0426029998343438,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 4,
+      "first_data_ms": 1270.9300000000076,
+      "complete_ms": 1305.3059000000067,
+      "first_api_ms": 1204.3928000000014,
+      "complete_api_ms": 1204.3928000000014,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1204.3928000000014
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.311538300011307,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 5,
+      "first_data_ms": 1253.1976999999897,
+      "complete_ms": 1281.979999999996,
+      "first_api_ms": 1168.1285999999964,
+      "complete_api_ms": 1168.1285999999964,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 231.94179999998596
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 374.5195999999996
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1168.1285999999964
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.140625,
+      "wall_seconds": 1.2904097998980433,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 5,
+      "first_data_ms": 1003.2888999999996,
+      "complete_ms": 1035.611899999989,
+      "first_api_ms": 938.0483999999997,
+      "complete_api_ms": 938.0483999999997,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 63.99910000000091
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 147.10269999998854
+        },
+        {
+          "path": "/api/instances",
+          "ms": 938.0483999999997
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.0423486998770386,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 5,
+      "first_data_ms": 1255.623700000011,
+      "complete_ms": 1289.3259000000107,
+      "first_api_ms": 1202.5861000000004,
+      "complete_api_ms": 1202.5861000000004,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1202.5861000000004
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.296581800095737,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 6,
+      "first_data_ms": 1276.3851999999897,
+      "complete_ms": 1309.208999999988,
+      "first_api_ms": 1194.3219999999856,
+      "complete_api_ms": 1194.3219999999856,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 248.2784999999858
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 397.49779999999737
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1194.3219999999856
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.3176309999544173,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 6,
+      "first_data_ms": 1024.9465999999957,
+      "complete_ms": 1053.5204999999987,
+      "first_api_ms": 950.6103000000003,
+      "complete_api_ms": 950.6103000000003,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 74.37489999999525
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 157.1432000000059
+        },
+        {
+          "path": "/api/instances",
+          "ms": 950.6103000000003
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.0598768999334425,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 6,
+      "first_data_ms": 1236.3417000000045,
+      "complete_ms": 1269.8845000000001,
+      "first_api_ms": 1193.2958000000071,
+      "complete_api_ms": 1193.2958000000071,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1193.2958000000071
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114913280,
+      "peak_rss_bytes": 114913280,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.2769464999437332,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 7,
+      "first_data_ms": 1265.5774000000092,
+      "complete_ms": 1298.7451,
+      "first_api_ms": 1174.4449000000022,
+      "complete_api_ms": 1174.4449000000022,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 225.9502000000066
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 374.42540000000736
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1174.4449000000022
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114917376,
+      "peak_rss_bytes": 114917376,
+      "cpu_seconds": 0.140625,
+      "wall_seconds": 1.3057085999753326,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 7,
+      "first_data_ms": 1020.4616999999998,
+      "complete_ms": 1053.7109999999957,
+      "first_api_ms": 947.530700000003,
+      "complete_api_ms": 947.530700000003,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 68.94999999999709
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 153.32420000000275
+        },
+        {
+          "path": "/api/instances",
+          "ms": 947.530700000003
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114917376,
+      "peak_rss_bytes": 114917376,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.06008159997873,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 7,
+      "first_data_ms": 1254.0265999999974,
+      "complete_ms": 1288.3125,
+      "first_api_ms": 1202.7485999999917,
+      "complete_api_ms": 1202.7485999999917,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1202.7485999999917
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114917376,
+      "peak_rss_bytes": 114917376,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.2958599000703543,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 8,
+      "first_data_ms": 1276.0127999999968,
+      "complete_ms": 1306.2277999999933,
+      "first_api_ms": 1184.0748999999923,
+      "complete_api_ms": 1184.0748999999923,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 232.91749999999593
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 386.15409999999974
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1184.0748999999923
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.3126199000980705,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 8,
+      "first_data_ms": 1020.3757000000041,
+      "complete_ms": 1053.7534000000014,
+      "first_api_ms": 939.3234000000084,
+      "complete_api_ms": 939.3234000000084,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 67.10940000000119
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 148.6886000000086
+        },
+        {
+          "path": "/api/instances",
+          "ms": 939.3234000000084
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.0604846999049187,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 8,
+      "first_data_ms": 1252.4179000000004,
+      "complete_ms": 1285.4091999999946,
+      "first_api_ms": 1214.1435000000056,
+      "complete_api_ms": 1214.1435000000056,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1214.1435000000056
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.292662600055337,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 9,
+      "first_data_ms": 1285.5576999999903,
+      "complete_ms": 1318.5383999999904,
+      "first_api_ms": 1195.5774999999994,
+      "complete_api_ms": 1195.5774999999994,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 247.6576999999961
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 401.06419999999343
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1195.5774999999994
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.140625,
+      "wall_seconds": 1.3250125001650304,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 9,
+      "first_data_ms": 1008.2127000000037,
+      "complete_ms": 1037.6371999999974,
+      "first_api_ms": 944.3984999999957,
+      "complete_api_ms": 944.3984999999957,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 68.01009999999951
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 150.9939999999915
+        },
+        {
+          "path": "/api/instances",
+          "ms": 944.3984999999957
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.0438413999509066,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 9,
+      "first_data_ms": 1253.989499999996,
+      "complete_ms": 1287.0528999999951,
+      "first_api_ms": 1206.542300000001,
+      "complete_api_ms": 1206.542300000001,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1206.542300000001
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 1.2935609000269324,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 10,
+      "first_data_ms": 1285.445200000002,
+      "complete_ms": 1318.809699999998,
+      "first_api_ms": 1185.1196000000054,
+      "complete_api_ms": 1185.1196000000054,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 233.64070000000356
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 380.94710000000487
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1185.1196000000054
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.326359200058505,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 10,
+      "first_data_ms": 1003.1015000000043,
+      "complete_ms": 1036.2266999999993,
+      "first_api_ms": 935.6934000000037,
+      "complete_api_ms": 935.6934000000037,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 66.09940000000643
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 143.1191000000108
+        },
+        {
+          "path": "/api/instances",
+          "ms": 935.6934000000037
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.0427164998836815,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 10,
+      "first_data_ms": 1270.6857000000018,
+      "complete_ms": 1303.986699999994,
+      "first_api_ms": 1215.800700000007,
+      "complete_api_ms": 1215.800700000007,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1215.800700000007
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.310311899986118,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 11,
+      "first_data_ms": 1290.3583000000071,
+      "complete_ms": 1323.6788000000088,
+      "first_api_ms": 1199.2024000000092,
+      "complete_api_ms": 1199.2024000000092,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 250.94120000000112
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 401.13120000000345
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1199.2024000000092
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.330803900025785,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 11,
+      "first_data_ms": 1024.7065000000002,
+      "complete_ms": 1052.3061000000016,
+      "first_api_ms": 959.0586000000039,
+      "complete_api_ms": 959.0586000000039,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 77.23129999999946
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 163.8536000000022
+        },
+        {
+          "path": "/api/instances",
+          "ms": 959.0586000000039
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.059269499965012,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 11,
+      "first_data_ms": 1238.366000000009,
+      "complete_ms": 1271.3691000000108,
+      "first_api_ms": 1194.8294000000024,
+      "complete_api_ms": 1194.8294000000024,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1194.8294000000024
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.2783717000856996,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 12,
+      "first_data_ms": 1298.655899999998,
+      "complete_ms": 1328.4160999999876,
+      "first_api_ms": 1206.0795999999973,
+      "complete_api_ms": 1206.0795999999973,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 244.06089999999676
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 399.9534999999887
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1206.0795999999973
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.140625,
+      "wall_seconds": 1.3363727000541985,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 12,
+      "first_data_ms": 1004.0699999999924,
+      "complete_ms": 1037.1390999999858,
+      "first_api_ms": 935.3984999999957,
+      "complete_api_ms": 935.3984999999957,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 65.8351999999868
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 142.30579999998736
+        },
+        {
+          "path": "/api/instances",
+          "ms": 935.3984999999957
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.140625,
+      "wall_seconds": 1.0438703999388963,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 12,
+      "first_data_ms": 1254.0852000000014,
+      "complete_ms": 1286.5714000000007,
+      "first_api_ms": 1209.7905000000028,
+      "complete_api_ms": 1209.7905000000028,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1209.7905000000028
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.2931888999883085,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 13,
+      "first_data_ms": 1261.6103999999905,
+      "complete_ms": 1290.8447999999917,
+      "first_api_ms": 1174.191399999996,
+      "complete_api_ms": 1174.191399999996,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 231.7616999999882
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 380.38489999999
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1174.191399999996
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.2985250998754054,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 13,
+      "first_data_ms": 1005.6889999999985,
+      "complete_ms": 1035.816399999996,
+      "first_api_ms": 939.7002999999968,
+      "complete_api_ms": 939.7002999999968,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 63.30529999999271
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 143.4320999999909
+        },
+        {
+          "path": "/api/instances",
+          "ms": 939.7002999999968
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.0428136000409722,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 13,
+      "first_data_ms": 1220.1530000000057,
+      "complete_ms": 1253.3332000000082,
+      "first_api_ms": 1178.2470999999932,
+      "complete_api_ms": 1178.2470999999932,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1178.2470999999932
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.2599611000623554,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 14,
+      "first_data_ms": 1255.929999999993,
+      "complete_ms": 1285.9489999999932,
+      "first_api_ms": 1173.8091999999888,
+      "complete_api_ms": 1173.8091999999888,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 228.18580000000657
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 380.1935999999987
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1173.8091999999888
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.2925780999939889,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 14,
+      "first_data_ms": 994.4578000000038,
+      "complete_ms": 1020.7079000000085,
+      "first_api_ms": 931.4412000000011,
+      "complete_api_ms": 931.4412000000011,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 62.04970000000321
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 136.02330000000075
+        },
+        {
+          "path": "/api/instances",
+          "ms": 931.4412000000011
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.0277197000104934,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 14,
+      "first_data_ms": 1254.0315000000119,
+      "complete_ms": 1287.6494999999995,
+      "first_api_ms": 1210.0610999999917,
+      "complete_api_ms": 1210.0610999999917,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1210.0610999999917
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.2942355000413954,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 15,
+      "first_data_ms": 1265.7562000000034,
+      "complete_ms": 1298.8373000000138,
+      "first_api_ms": 1176.1518000000215,
+      "complete_api_ms": 1176.1518000000215,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 237.67960000000312
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 379.62060000002384
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1176.1518000000215
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.140625,
+      "wall_seconds": 1.3073406999465078,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 15,
+      "first_data_ms": 1003.9921000000031,
+      "complete_ms": 1036.4023999999918,
+      "first_api_ms": 937.5630999999994,
+      "complete_api_ms": 937.5630999999994,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 63.55179999998654
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 138.6591999999946
+        },
+        {
+          "path": "/api/instances",
+          "ms": 937.5630999999994
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.0425545999314636,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 15,
+      "first_data_ms": 1237.9595000000263,
+      "complete_ms": 1270.8977000000014,
+      "first_api_ms": 1185.4624000000185,
+      "complete_api_ms": 1185.4624000000185,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1185.4624000000185
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.2776600001379848,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 16,
+      "first_data_ms": 1256.9420999999857,
+      "complete_ms": 1290.029499999975,
+      "first_api_ms": 1172.5644999999786,
+      "complete_api_ms": 1172.5644999999786,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 231.65059999999357
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 375.8855999999796
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1172.5644999999786
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.296321100089699,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 16,
+      "first_data_ms": 1003.9788999999873,
+      "complete_ms": 1037.631299999979,
+      "first_api_ms": 941.0420999999915,
+      "complete_api_ms": 941.0420999999915,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 64.94060000000172
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 146.2558999999892
+        },
+        {
+          "path": "/api/instances",
+          "ms": 941.0420999999915
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114921472,
+      "peak_rss_bytes": 114921472,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.0437922000419348,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 16,
+      "first_data_ms": 1253.7563999999838,
+      "complete_ms": 1286.7419999999984,
+      "first_api_ms": 1212.2801999999792,
+      "complete_api_ms": 1212.2801999999792,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1212.2801999999792
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114966528,
+      "peak_rss_bytes": 114966528,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.2932146999519318,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 17,
+      "first_data_ms": 1258.2272999999986,
+      "complete_ms": 1291.1271000000124,
+      "first_api_ms": 1172.5641999999934,
+      "complete_api_ms": 1172.5641999999934,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 227.8968000000168
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 376.20900000000256
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1172.5641999999934
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114966528,
+      "peak_rss_bytes": 114966528,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.2977489000186324,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 17,
+      "first_data_ms": 1011.4452000000165,
+      "complete_ms": 1036.9377000000095,
+      "first_api_ms": 939.726800000004,
+      "complete_api_ms": 939.726800000004,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 63.97770000001765
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 146.88099999999395
+        },
+        {
+          "path": "/api/instances",
+          "ms": 939.726800000004
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114966528,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.0439717001281679,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 17,
+      "first_data_ms": 1252.9158999999927,
+      "complete_ms": 1286.4317999999912,
+      "first_api_ms": 1211.122000000003,
+      "complete_api_ms": 1211.122000000003,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1211.122000000003
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.293464200105518,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 18,
+      "first_data_ms": 1307.2680999999866,
+      "complete_ms": 1339.066199999972,
+      "first_api_ms": 1213.3042999999889,
+      "complete_api_ms": 1213.3042999999889,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 247.03669999999693
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 408.5349999999744
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1213.3042999999889
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.15625,
+      "wall_seconds": 1.3462837999686599,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 18,
+      "first_data_ms": 1036.3679999999877,
+      "complete_ms": 1069.8399999999965,
+      "first_api_ms": 960.386599999998,
+      "complete_api_ms": 960.386599999998,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 72.14629999999306
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 153.6350000000093
+        },
+        {
+          "path": "/api/instances",
+          "ms": 960.386599999998
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.0779102998785675,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 18,
+      "first_data_ms": 1234.6492000000144,
+      "complete_ms": 1267.4507000000158,
+      "first_api_ms": 1189.234300000011,
+      "complete_api_ms": 1189.234300000011,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1189.234300000011
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.2745777000673115,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_visit",
+      "sample": 19,
+      "first_data_ms": 1294.3789999999863,
+      "complete_ms": 1327.647799999977,
+      "first_api_ms": 1196.2577999999921,
+      "complete_api_ms": 1196.2577999999921,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 247.9673999999941
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 403.54609999997774
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1196.2577999999921
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.109375,
+      "wall_seconds": 1.335638200165704,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_visit",
+      "sample": 19,
+      "first_data_ms": 1043.4140999999945,
+      "complete_ms": 1077.2825999999768,
+      "first_api_ms": 964.4847999999765,
+      "complete_api_ms": 964.4847999999765,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 85.04149999999208
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 167.14139999999315
+        },
+        {
+          "path": "/api/instances",
+          "ms": 964.4847999999765
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 114,
+      "peak_concurrency": 5,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.0861860001459718,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "instances",
+      "phase": "refresh_button",
+      "sample": 19,
+      "first_data_ms": 1253.7183999999834,
+      "complete_ms": 1286.8435999999929,
+      "first_api_ms": 1211.2119999999995,
+      "complete_api_ms": 1211.2119999999995,
+      "api_requests": [
+        {
+          "path": "/api/instances",
+          "ms": 1211.2119999999995
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 110,
+      "peak_concurrency": 5,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.2929601999931037,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 0,
+      "first_data_ms": 1077.944600000017,
+      "complete_ms": 1110.6863000000012,
+      "first_api_ms": 1012.2225000000035,
+      "complete_api_ms": 1012.2225000000035,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 241.3405999999959
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 520.1998000000021
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1012.2225000000035
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.1178712998516858,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 0,
+      "first_data_ms": 753.8816999999981,
+      "complete_ms": 788.392200000002,
+      "first_api_ms": 704.6882000000041,
+      "complete_api_ms": 704.6882000000041,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 63.69169999999576
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 210.2283999999927
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 704.6882000000041
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.7961572001222521,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 0,
+      "first_data_ms": 931.324099999998,
+      "complete_ms": 964.0625,
+      "first_api_ms": 888.8200999999826,
+      "complete_api_ms": 888.8200999999826,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 888.8200999999826
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.9739326001144946,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 1,
+      "first_data_ms": 1089.1859000000113,
+      "complete_ms": 1122.1108999999997,
+      "first_api_ms": 1025.1750000000175,
+      "complete_api_ms": 1025.1750000000175,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 251.68350000001374
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 535.3355999999912
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1025.1750000000175
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.1313209000509232,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 1,
+      "first_data_ms": 958.098399999988,
+      "complete_ms": 991.6362000000081,
+      "first_api_ms": 825.445000000007,
+      "complete_api_ms": 825.445000000007,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 89.04360000000452
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 287.95799999998417
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 825.445000000007
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 1.0203714999370277,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 1,
+      "first_data_ms": 871.0127999999968,
+      "complete_ms": 903.5047999999952,
+      "first_api_ms": 816.4375,
+      "complete_api_ms": 816.4375,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 816.4375
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.03125,
+      "wall_seconds": 0.9121702001430094,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 2,
+      "first_data_ms": 1134.8808999999892,
+      "complete_ms": 1163.7187999999733,
+      "first_api_ms": 1067.751499999984,
+      "complete_api_ms": 1067.751499999984,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 274.5991999999969
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 571.3128999999899
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1067.751499999984
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 1.172260600142181,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 2,
+      "first_data_ms": 804.2472000000125,
+      "complete_ms": 838.5939000000071,
+      "first_api_ms": 750.5927000000083,
+      "complete_api_ms": 750.5927000000083,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 72.89110000000801
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 255.8127000000095
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 750.5927000000083
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.8484801999293268,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 2,
+      "first_data_ms": 958.988400000002,
+      "complete_ms": 992.1240999999864,
+      "first_api_ms": 905.6349999999802,
+      "complete_api_ms": 905.6349999999802,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 905.6349999999802
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 1.0004271999932826,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 3,
+      "first_data_ms": 1228.2562000000034,
+      "complete_ms": 1258.7920999999915,
+      "first_api_ms": 1152.7707999999984,
+      "complete_api_ms": 1152.7707999999984,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 316.27210000000196
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 659.7875000000058
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1152.7707999999984
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.2665294001344591,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 3,
+      "first_data_ms": 932.7829999999958,
+      "complete_ms": 965.5619000000006,
+      "first_api_ms": 882.9273000000103,
+      "complete_api_ms": 882.9273000000103,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 135.41500000000815
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 394.71830000000773
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 882.9273000000103
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 0.9742584000341594,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 3,
+      "first_data_ms": 936.7091000000073,
+      "complete_ms": 969.3495999999868,
+      "first_api_ms": 895.7991000000038,
+      "complete_api_ms": 895.7991000000038,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 895.7991000000038
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.9759597000665963,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 4,
+      "first_data_ms": 1138.422900000005,
+      "complete_ms": 1171.1719000000157,
+      "first_api_ms": 1074.724600000016,
+      "complete_api_ms": 1074.724600000016,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 272.47930000000633
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 581.4774000000034
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1074.724600000016
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.178394200047478,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 4,
+      "first_data_ms": 768.8601999999955,
+      "complete_ms": 802.4091999999946,
+      "first_api_ms": 729.8205000000016,
+      "complete_api_ms": 729.8205000000016,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 77.48780000000261
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 238.31440000000293
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 729.8205000000016
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.8093103000428528,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 4,
+      "first_data_ms": 919.7505000000237,
+      "complete_ms": 952.5690000000177,
+      "first_api_ms": 873.2318000000087,
+      "complete_api_ms": 873.2318000000087,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 873.2318000000087
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.03125,
+      "wall_seconds": 0.9598028999753296,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 5,
+      "first_data_ms": 1083.1621999999916,
+      "complete_ms": 1114.9698999999964,
+      "first_api_ms": 1028.4297000000079,
+      "complete_api_ms": 1028.4297000000079,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 248.1246000000101
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 536.6358000000182
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1028.4297000000079
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.125,
+      "wall_seconds": 1.1238523998763412,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 5,
+      "first_data_ms": 769.6616999999969,
+      "complete_ms": 802.6927999999898,
+      "first_api_ms": 729.4408999999869,
+      "complete_api_ms": 729.4408999999869,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 79.95689999999013
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 235.6247999999905
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 729.4408999999869
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.8095515999011695,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 5,
+      "first_data_ms": 920.6847000000125,
+      "complete_ms": 953.5877000000037,
+      "first_api_ms": 872.5598000000173,
+      "complete_api_ms": 872.5598000000173,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 872.5598000000173
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.960792499827221,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 6,
+      "first_data_ms": 1093.820000000007,
+      "complete_ms": 1126.6671999999962,
+      "first_api_ms": 1036.3083000000042,
+      "complete_api_ms": 1036.3083000000042,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 248.05910000001313
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 545.0093000000052
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1036.3083000000042
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.1346244001761079,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 6,
+      "first_data_ms": 753.6297999999952,
+      "complete_ms": 786.7185999999929,
+      "first_api_ms": 700.7838999999803,
+      "complete_api_ms": 700.7838999999803,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 66.45410000000265
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 208.32089999999152
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 700.7838999999803
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.7935824999585748,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 6,
+      "first_data_ms": 936.5780999999843,
+      "complete_ms": 970.1212999999989,
+      "first_api_ms": 889.4512999999861,
+      "complete_api_ms": 889.4512999999861,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 889.4512999999861
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.9771281001158059,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 7,
+      "first_data_ms": 1204.2484000000113,
+      "complete_ms": 1236.0474000000104,
+      "first_api_ms": 1117.8401000000013,
+      "complete_api_ms": 1117.8401000000013,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 285.3469000000041
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 622.4425000000047
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1117.8401000000013
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.2448369998019189,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 7,
+      "first_data_ms": 799.0671999999904,
+      "complete_ms": 831.9386999999988,
+      "first_api_ms": 751.7856999999785,
+      "complete_api_ms": 751.7856999999785,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 86.71889999997802
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 256.82600000000093
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 751.7856999999785
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 0.8400225001387298,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 7,
+      "first_data_ms": 938.0457999999926,
+      "complete_ms": 970.8261999999813,
+      "first_api_ms": 895.9162999999826,
+      "complete_api_ms": 895.9162999999826,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 895.9162999999826
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.9780884999781847,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 8,
+      "first_data_ms": 1093.5728000000236,
+      "complete_ms": 1121.8164000000106,
+      "first_api_ms": 1035.8860000000277,
+      "complete_api_ms": 1035.8860000000277,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 252.48660000000382
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 541.9693000000261
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1035.8860000000277
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.1328023001551628,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 8,
+      "first_data_ms": 761.6067000000039,
+      "complete_ms": 794.6401999999944,
+      "first_api_ms": 715.1185000000114,
+      "complete_api_ms": 715.1185000000114,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 70.02999999999884
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 222.3457000000053
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 715.1185000000114
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.8012453000992537,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 8,
+      "first_data_ms": 937.5452000000223,
+      "complete_ms": 970.3365000000049,
+      "first_api_ms": 891.4968999999983,
+      "complete_api_ms": 891.4968999999983,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 891.4968999999983
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.9778795000165701,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 9,
+      "first_data_ms": 1149.877999999997,
+      "complete_ms": 1182.6375000000116,
+      "first_api_ms": 1085.8501000000106,
+      "complete_api_ms": 1085.8501000000106,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 287.10639999998966
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 591.5046000000148
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1085.8501000000106
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.03125,
+      "wall_seconds": 1.190005499869585,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 9,
+      "first_data_ms": 754.3874999999825,
+      "complete_ms": 787.7154999999912,
+      "first_api_ms": 708.1171999999788,
+      "complete_api_ms": 708.1171999999788,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 68.26579999999376
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 215.39539999997942
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 708.1171999999788
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.03125,
+      "wall_seconds": 0.7939512999728322,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 9,
+      "first_data_ms": 921.5820999999996,
+      "complete_ms": 954.5333000000101,
+      "first_api_ms": 874.8048000000126,
+      "complete_api_ms": 874.8048000000126,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 874.8048000000126
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.9619689001701772,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 10,
+      "first_data_ms": 1092.3336000000127,
+      "complete_ms": 1121.431200000021,
+      "first_api_ms": 1032.0253000000084,
+      "complete_api_ms": 1032.0253000000084,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 242.3353000000061
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 539.2932000000146
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1032.0253000000084
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.128866400104016,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 10,
+      "first_data_ms": 771.1010999999999,
+      "complete_ms": 804.0678000000189,
+      "first_api_ms": 729.5904000000155,
+      "complete_api_ms": 729.5904000000155,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 69.18009999999776
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 237.68540000001667
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 729.5904000000155
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.8101552999578416,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 10,
+      "first_data_ms": 938.3337999999931,
+      "complete_ms": 971.2839999999851,
+      "first_api_ms": 890.6197999999858,
+      "complete_api_ms": 890.6197999999858,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 890.6197999999858
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.9786124001257122,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 11,
+      "first_data_ms": 1107.4780000000028,
+      "complete_ms": 1139.2674000000115,
+      "first_api_ms": 1049.6840000000084,
+      "complete_api_ms": 1049.6840000000084,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 265.9939000000013
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 558.2828999999911
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1049.6840000000084
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.1468946000095457,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 11,
+      "first_data_ms": 786.2073000000091,
+      "complete_ms": 818.9960000000137,
+      "first_api_ms": 737.6800000000221,
+      "complete_api_ms": 737.6800000000221,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 75.0010000000184
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 246.3640000000014
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 737.6800000000221
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.8255576000083238,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 11,
+      "first_data_ms": 922.9198000000033,
+      "complete_ms": 954.1271999999881,
+      "first_api_ms": 873.9265000000014,
+      "complete_api_ms": 873.9265000000014,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 873.9265000000014
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.9626178999897093,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 12,
+      "first_data_ms": 1172.7087000000174,
+      "complete_ms": 1201.8759000000136,
+      "first_api_ms": 1115.5933000000077,
+      "complete_api_ms": 1115.5933000000077,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 323.7870000000112
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 624.2464000000036
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1115.5933000000077
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 1.2082096999511123,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 12,
+      "first_data_ms": 770.2710999999836,
+      "complete_ms": 803.1337000000058,
+      "first_api_ms": 725.1857000000018,
+      "complete_api_ms": 725.1857000000018,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 81.3073999999906
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 232.75750000000698
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 725.1857000000018
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.03125,
+      "wall_seconds": 0.8097233998123556,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 12,
+      "first_data_ms": 988.2244000000064,
+      "complete_ms": 1021.1391000000003,
+      "first_api_ms": 946.7866999999969,
+      "complete_api_ms": 946.7866999999969,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 946.7866999999969
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 1.0274694999679923,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 13,
+      "first_data_ms": 1114.5057000000088,
+      "complete_ms": 1147.2948000000033,
+      "first_api_ms": 1049.5254000000132,
+      "complete_api_ms": 1049.5254000000132,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 247.14260000002105
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 553.3234999999986
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1049.5254000000132
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.156571100000292,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 13,
+      "first_data_ms": 776.6988999999885,
+      "complete_ms": 804.4863999999943,
+      "first_api_ms": 724.3646000000008,
+      "complete_api_ms": 724.3646000000008,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 69.13490000000456
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 228.87739999999758
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 724.3646000000008
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.8122352999635041,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 13,
+      "first_data_ms": 932.0541999999841,
+      "complete_ms": 965.0207999999984,
+      "first_api_ms": 884.6050999999861,
+      "complete_api_ms": 884.6050999999861,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 884.6050999999861
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.973085799952969,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 14,
+      "first_data_ms": 1068.474199999997,
+      "complete_ms": 1098.8367000000144,
+      "first_api_ms": 1011.8128000000142,
+      "complete_api_ms": 1011.8128000000142,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 239.85349999999744
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 519.7031000000134
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1011.8128000000142
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 1.1065939001273364,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 14,
+      "first_data_ms": 741.8537000000069,
+      "complete_ms": 770.5504000000074,
+      "first_api_ms": 702.1736999999848,
+      "complete_api_ms": 702.1736999999848,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 65.39120000001276
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 210.50330000001122
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 702.1736999999848
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.7769094998948276,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 14,
+      "first_data_ms": 921.2259000000195,
+      "complete_ms": 954.2085000000079,
+      "first_api_ms": 874.4826000000176,
+      "complete_api_ms": 874.4826000000176,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 874.4826000000176
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.03125,
+      "wall_seconds": 0.9609066999983042,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 15,
+      "first_data_ms": 1122.4922000000079,
+      "complete_ms": 1155.3338999999978,
+      "first_api_ms": 1058.4382000000041,
+      "complete_api_ms": 1058.4382000000041,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 266.863400000002
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 565.7017000000051
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1058.4382000000041
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.1624755000229925,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 15,
+      "first_data_ms": 770.5762000000104,
+      "complete_ms": 802.5847999999824,
+      "first_api_ms": 731.1651999999885,
+      "complete_api_ms": 731.1651999999885,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 75.56109999999171
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 238.4033000000054
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 731.1651999999885
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.03125,
+      "wall_seconds": 0.8095378999132663,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 15,
+      "first_data_ms": 937.3877999999968,
+      "complete_ms": 970.2695999999996,
+      "first_api_ms": 891.9691000000166,
+      "complete_api_ms": 891.9691000000166,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 891.9691000000166
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.9767423998564482,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 16,
+      "first_data_ms": 1200.029600000009,
+      "complete_ms": 1232.7955000000075,
+      "first_api_ms": 1137.7681000000157,
+      "complete_api_ms": 1137.7681000000157,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 253.48810000001686
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 664.3228999999992
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1137.7681000000157
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 1.241375699872151,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 16,
+      "first_data_ms": 773.1259000000136,
+      "complete_ms": 802.1351999999897,
+      "first_api_ms": 730.318100000004,
+      "complete_api_ms": 730.318100000004,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 80.27929999999469
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 236.85130000000936
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 730.318100000004
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.8090299000032246,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 16,
+      "first_data_ms": 936.9779999999737,
+      "complete_ms": 970.6734999999753,
+      "first_api_ms": 891.1624000000011,
+      "complete_api_ms": 891.1624000000011,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 891.1624000000011
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 0.9782167999073863,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 17,
+      "first_data_ms": 1120.9732000000076,
+      "complete_ms": 1153.862599999993,
+      "first_api_ms": 1049.142200000002,
+      "complete_api_ms": 1049.142200000002,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 246.00440000000526
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 554.7330000000075
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1049.142200000002
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.09375,
+      "wall_seconds": 1.1615224000997841,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 17,
+      "first_data_ms": 804.5310000000172,
+      "complete_ms": 837.1781999999948,
+      "first_api_ms": 739.7421000000031,
+      "complete_api_ms": 739.7421000000031,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 83.18110000001616
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 239.77270000000135
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 739.7421000000031
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 0.844137700041756,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 17,
+      "first_data_ms": 936.8139999999839,
+      "complete_ms": 969.4646000000066,
+      "first_api_ms": 889.3862000000081,
+      "complete_api_ms": 889.3862000000081,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 889.3862000000081
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.9759664998855442,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 18,
+      "first_data_ms": 1105.7762999999977,
+      "complete_ms": 1138.3851999999897,
+      "first_api_ms": 1047.5266999999876,
+      "complete_api_ms": 1047.5266999999876,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 258.9205999999831
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 553.674800000008
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1047.5266999999876
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 1.1480121000204235,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 18,
+      "first_data_ms": 782.1198999999906,
+      "complete_ms": 815.4397999999928,
+      "first_api_ms": 731.1815999999817,
+      "complete_api_ms": 731.1815999999817,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 74.13519999998971
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 239.42109999997774
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 731.1815999999817
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.8232486001215875,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 18,
+      "first_data_ms": 937.5305999999982,
+      "complete_ms": 970.3769999999786,
+      "first_api_ms": 891.0645999999833,
+      "complete_api_ms": 891.0645999999833,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 891.0645999999833
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.9776061999145895,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_visit",
+      "sample": 19,
+      "first_data_ms": 1201.6106000000145,
+      "complete_ms": 1231.052400000015,
+      "first_api_ms": 1146.4005999999936,
+      "complete_api_ms": 1146.4005999999936,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 360.2725999999966
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 653.110400000005
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 1146.4005999999936
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0.046875,
+      "wall_seconds": 1.2382493000477552,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_visit",
+      "sample": 19,
+      "first_data_ms": 770.299800000008,
+      "complete_ms": 803.5241999999853,
+      "first_api_ms": 721.5070000000123,
+      "complete_api_ms": 721.5070000000123,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 70.06369999999879
+        },
+        {
+          "path": "/api/credentials",
+          "ms": 227.64400000000023
+        },
+        {
+          "path": "/api/billing/summary",
+          "ms": 721.5070000000123
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 7,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.810091600054875,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    },
+    {
+      "case": "billing",
+      "phase": "refresh_button",
+      "sample": 19,
+      "first_data_ms": 937.6694999999891,
+      "complete_ms": 970.6939999999886,
+      "first_api_ms": 892.6994999999879,
+      "complete_api_ms": 892.6994999999879,
+      "api_requests": [
+        {
+          "path": "/api/billing/summary",
+          "ms": 892.6994999999879
+        }
+      ],
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "sql_queries": 3,
+      "peak_concurrency": 1,
+      "rss_bytes": 114954240,
+      "peak_rss_bytes": 114954240,
+      "cpu_seconds": 0,
+      "wall_seconds": 0.9768103000242263,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    }
+  ],
+  "errors": []
+}

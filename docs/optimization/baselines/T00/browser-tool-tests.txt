@@ -1,0 +1,20 @@
+TAP version 13
+# Subtest: offline proxy forwards only the exact fixture origin
+ok 1 - offline proxy forwards only the exact fixture origin
+  ---
+  duration_ms: 90.5729
+  ...
+# Subtest: credential count cannot finish the dashboard business-data timer
+ok 2 - credential count cannot finish the dashboard business-data timer
+  ---
+  duration_ms: 1405.1891
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2379.2279

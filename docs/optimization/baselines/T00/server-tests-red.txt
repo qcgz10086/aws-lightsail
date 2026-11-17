@@ -1,0 +1,15 @@
+setUpClass (test_server.OfflineHostTests) ... ERROR
+
+======================================================================
+ERROR: setUpClass (test_server.OfflineHostTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\tools\optimization\tests\test_server.py", line 40, in setUpClass
+    raise AssertionError((Path(cls.temp.name) / "server.log").read_text())
+AssertionError: C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Scripts\python.exe: No module named tools.optimization.benchmark_server
+
+
+----------------------------------------------------------------------
+Ran 0 tests in 0.964s
+
+FAILED (errors=1)

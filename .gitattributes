@@ -1,0 +1,3 @@
+tools/optimization/** text eol=lf
+docs/optimization/** text eol=lf
+docs/optimization/baselines/T00/*.txt -whitespace

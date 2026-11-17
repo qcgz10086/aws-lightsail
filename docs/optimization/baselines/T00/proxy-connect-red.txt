@@ -1,0 +1,36 @@
+TAP version 13
+# Subtest: offline proxy forwards only the exact fixture origin
+not ok 1 - offline proxy forwards only the exact fixture origin
+  ---
+  duration_ms: 52.272
+  location: 'file:///C:/Users/liyang/.codex/worktrees/lightsail-t00-baseline/aws-lightsail/tools/optimization/offline_proxy.test.mjs:22:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /fixture:\/tunnel/. Input:
+    
+    'HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    HTTP/1.1 403 Forbidden
+    Connection: close
+    
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/liyang/.codex/worktrees/lightsail-t00-baseline/aws-lightsail/tools/optimization/offline_proxy.test.mjs:58:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    async Test.run (node:internal/test_runner/test:632:9)
+    async startSubtest (node:internal/test_runner/harness:216:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 193.9934

@@ -1,0 +1,31 @@
+test_complete_current_report_is_retained (test_reports.ReportValidationTests.test_complete_current_report_is_retained) ... ok
+test_failed_browser_cannot_reuse_an_existing_report (test_reports.ReportValidationTests.test_failed_browser_cannot_reuse_an_existing_report) ... FAIL
+test_incomplete_success_cannot_be_reported_as_complete (test_reports.ReportValidationTests.test_incomplete_success_cannot_be_reported_as_complete) ... FAIL
+
+======================================================================
+FAIL: test_failed_browser_cannot_reuse_an_existing_report (test_reports.ReportValidationTests.test_failed_browser_cannot_reuse_an_existing_report)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\tools\optimization\tests\test_reports.py", line 18, in test_failed_browser_cannot_reuse_an_existing_report
+    self.assertEqual(report["results"], [])
+AssertionError: Lists differ: [{'first_data_ms': 123}] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+{'first_data_ms': 123}
+
+- [{'first_data_ms': 123}]
++ []
+
+======================================================================
+FAIL: test_incomplete_success_cannot_be_reported_as_complete (test_reports.ReportValidationTests.test_incomplete_success_cannot_be_reported_as_complete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\tools\optimization\tests\test_reports.py", line 25, in test_incomplete_success_cannot_be_reported_as_complete
+    self.assertTrue(report["errors"])
+AssertionError: [] is not true
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.010s
+
+FAILED (failures=2)
