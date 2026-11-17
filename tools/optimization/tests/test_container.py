@@ -1,14 +1,37 @@
 import tempfile
 from pathlib import Path
+import subprocess
 import unittest
+from unittest.mock import patch
 import httpx
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 
-from tools.optimization.container_baseline import read_cgroup, resource_window, loopback_bridge
+from tools.optimization.container_baseline import read_cgroup, resource_window, loopback_bridge, export_source
 
 
 class ContainerResourceTests(unittest.TestCase):
+    def test_scoped_export_does_not_read_unrelated_missing_doc_objects(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            subprocess.run(["git", "init", "--quiet", str(root)], check=True)
+
+            def git(*args, content=None):
+                return subprocess.check_output(["git", *args], cwd=root, input=content).decode().strip()
+
+            blob = git("hash-object", "-w", "--stdin", content=b"FROM scratch\n")
+            tree = git("mktree", content=f"100644 blob {blob}\tDockerfile\n".encode())
+            docs = git("mktree", "--missing", content=("100644 blob " + "1" * 40 + "\tmissing.md\n").encode())
+            parent = git("mktree", "--missing", content=f"040000 tree {tree}\tbackend\n040000 tree {tree}\tfrontend\n040000 tree {docs}\tdocs\n".encode())
+            commit = git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit-tree", parent, "-m", "fixture")
+            destination = root / "export"
+            destination.mkdir()
+            with patch("tools.optimization.container_baseline.ROOT", root):
+                hashes = export_source(commit, destination)
+            self.assertEqual(set(hashes), {"backend", "frontend"})
+            self.assertEqual((destination / "backend/Dockerfile").read_bytes(), b"FROM scratch\n")
+            self.assertEqual((destination / "frontend/Dockerfile").read_bytes(), b"FROM scratch\n")
+
     def test_loopback_bridge_preserves_post_cookies_and_binary_response(self):
         class Upstream(BaseHTTPRequestHandler):
             def do_POST(self):

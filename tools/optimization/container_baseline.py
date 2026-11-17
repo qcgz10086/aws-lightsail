@@ -90,6 +90,18 @@ def resource_window(samples):
             "samples": len(samples)}
 
 
+def export_source(commit, source):
+    hashes = {}
+    for service in ("backend", "frontend"):
+        archive = source / f"{service}-source.tar"
+        subprocess.run(["git", "archive", "--format=tar", "--prefix=" + service + "/",
+                        "-o", str(archive), commit + ":" + service], cwd=ROOT, check=True)
+        hashes[service] = hashlib.sha256(archive.read_bytes()).hexdigest()
+        with tarfile.open(archive) as bundle:
+            bundle.extractall(source, filter="data")
+    return hashes
+
+
 class DockerRun:
     def __init__(self, output):
         self.output = output
@@ -332,11 +344,7 @@ def run(args):
         base_images = json.loads(args.base_images.read_text()) if args.base_images else {}
         with tempfile.TemporaryDirectory(prefix="t00-container-", dir=scratch) as directory:
             source = Path(directory)
-            archive = source / "source.tar"
-            subprocess.run(["git", "archive", "--format=tar", "-o", str(archive), commit, "backend", "frontend"], cwd=ROOT, check=True)
-            archive_hash = hashlib.sha256(archive.read_bytes()).hexdigest()
-            with tarfile.open(archive) as bundle:
-                bundle.extractall(source, filter="data")
+            archive_hash = export_source(commit, source)
             save_json(output / "environment.json", {
                 "source_commit": commit, "source_archive_sha256": archive_hash, "run_id": run_id,
                 "platform": platform.platform(), "python": sys.version,
