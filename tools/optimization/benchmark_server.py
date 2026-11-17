@@ -200,7 +200,7 @@ def serve(args):
             "boto3.session.Session.client", lambda _self, service_name, **kw: aws.client(service_name, **kw)
         ), patch("botocore.client.BaseClient._make_api_call",
                  lambda *_a, **_kw: aws.reject("unexpected real botocore client")), block_external_connections():
-            uvicorn.run(app, host="127.0.0.1", port=args.port, workers=1,
+            uvicorn.run(app, host=getattr(args, "host", "127.0.0.1"), port=args.port, workers=1,
                         access_log=False, log_level="warning")
     finally:
         stopped.set()
@@ -212,6 +212,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", type=Path, required=True)
     parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--host", choices=("127.0.0.1", "0.0.0.0"), default="127.0.0.1")
     parser.add_argument("--samples", type=int, default=20)
     parser.add_argument("--delay-ms", type=int)
     options = parser.parse_args()

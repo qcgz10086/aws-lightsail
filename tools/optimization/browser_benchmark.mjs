@@ -1,10 +1,12 @@
 import { chromium } from 'playwright';
-import { writeFile } from 'node:fs/promises';
+import { checkpoint } from './progress_report.mjs';
+import { randomUUID } from 'node:crypto';
 import { startOfflineProxy } from './offline_proxy.mjs';
 import { waitForWorkloadData } from './readiness.mjs';
 import { performance } from 'node:perf_hooks';
 
-const [baseUrl, outputPath, executablePath] = process.argv.slice(2);
+const [baseUrl, outputPath, executablePath, requestedRunId] = process.argv.slice(2);
+const runId = requestedRunId || randomUUID();
 if (!baseUrl || !outputPath || !executablePath) {
   throw new Error('usage: node browser_benchmark.mjs URL OUTPUT CHROME_EXECUTABLE');
 }
@@ -13,6 +15,11 @@ const offlineProxy = await startOfflineProxy(baseUrl);
 const browser = await chromium.launch({ executablePath, headless: true, proxy: { server: offlineProxy.url } });
 const results = [];
 const errors = [];
+const browserStarted = performance.now();
+async function progress(stage) {
+  await checkpoint(outputPath, { run_id: runId, status: 'running', results, errors },
+    { ...stage, elapsed_seconds: (performance.now() - browserStarted) / 1000 });
+}
 
 async function stats(context, reset = false) {
   const response = reset
@@ -35,6 +42,7 @@ async function settle(page, pending, timeoutMs = 15000) {
 try {
   for (const [name, scenario] of Object.entries(manifest.page_cases)) {
     for (let sample = 0; sample < manifest.samples; sample++) {
+      await progress({ case: name, sample, stage: 'context_begin' });
       const context = await browser.newContext({
         viewport: { width: 1440, height: 1000 }, locale: 'zh-CN', timezoneId: 'UTC',
       });
@@ -43,6 +51,7 @@ try {
         password: manifest.password,
       }});
       if (!login.ok()) throw new Error('login failed: ' + login.status());
+      await progress({ case: name, sample, stage: 'login_completed' });
       const page = await context.newPage();
       const pending = new Set();
       let completed = [];
@@ -68,6 +77,7 @@ try {
       });
       page.on('pageerror', error => pageErrors.push(error.message));
       for (const phase of ['first_visit', 'repeat_visit', 'refresh_button']) {
+        await progress({ case: name, phase, sample, stage: 'phase_begin' });
         const before = await stats(context, true);
         completed = []; failures = []; pageErrors = [];
         started = performance.now();
@@ -119,13 +129,20 @@ try {
           results.push({ case: name, phase, sample, first_data_ms: firstDataMs,
                          error: error.message });
         }
+        await progress({ case: name, phase, sample, stage: 'phase_end',
+          phase_wall_seconds: (performance.now() - started) / 1000 });
       }
+      await progress({ case: name, sample, stage: 'context_close_begin' });
       await context.close();
+      await progress({ case: name, sample, stage: 'context_close_end' });
     }
     console.log('browser completed: ' + name);
   }
 } finally {
   const report = {
+    run_id: runId,
+    status: !errors.length && results.length === Object.keys(manifest.page_cases).length * manifest.samples * 3
+      ? 'completed' : 'failed',
     browser: browser.version(), executable: executablePath, viewport: [1440, 1000],
     locale: 'zh-CN', timezone: 'UTC', samples_per_case_phase: manifest.samples,
     http_cache: 'normal browser cache; request routing is not enabled',
@@ -137,7 +154,8 @@ try {
     complete_definition: 'all observed API requests finished, followed by two animation frames',
     results, errors,
   };
-  await writeFile(outputPath, JSON.stringify(report, null, 2) + '\n');
+  await checkpoint(outputPath, report, { stage: 'browser_end',
+    elapsed_seconds: (performance.now() - browserStarted) / 1000 });
   await browser.close();
   await offlineProxy.close();
 }

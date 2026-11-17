@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import hashlib
 import importlib.metadata
 import json
+import os
 from pathlib import Path
 import platform
 import shutil
@@ -13,6 +14,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from uuid import uuid4
 
 import httpx
 import psutil
@@ -24,7 +26,20 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def save_json(path, value):
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    os.replace(temporary, path)
+
+
+def start_run(output):
+    output.mkdir(parents=True, exist_ok=True)
+    for name in ("run.json", "api.json", "browser.json", "summary.json", "environment.json"):
+        if (output / name).exists():
+            raise FileExistsError(f"existing evidence in {output}; use a new output directory")
+    run_id = str(uuid4())
+    save_json(output / "run.json", {"run_id": run_id, "status": "running",
+                                   "started_at_utc": datetime.now(timezone.utc).isoformat()})
+    return run_id
 
 
 def environment(output, node):
@@ -57,7 +72,7 @@ def environment(output, node):
                       "status": "unmeasured",
                       "reason": "Docker unavailable on PATH; no image/container measurements"}
     if data["docker"]["available"]:
-        data["docker"]["reason"] = "Container measurements require a separate local fixture run."
+        data["docker"]["reason"] = "Use tools.optimization.container_baseline on a Linux Docker/cgroup-v2 host; see tools/optimization/README.md."
         data["docker"]["version"] = command(["docker", "version", "--format", "{{json .}}"])
     data["input_sha256"] = {
         str(path.relative_to(ROOT)).replace("\\", "/"): hashlib.sha256(path.read_bytes()).hexdigest()
@@ -85,7 +100,7 @@ def summarize_rows(rows, key):
     ]
 
 
-def read_browser_report(path, exit_code, expected_count):
+def read_browser_report(path, exit_code, expected_count, run_id=None):
     def failed(message):
         return {"results": [], "errors": [{"browser_report_error": message,
                                           "browser_exit_code": exit_code}]}
@@ -97,16 +112,20 @@ def read_browser_report(path, exit_code, expected_count):
         return failed(str(exc))
     if not isinstance(report, dict) or expected_count < 1:
         return failed("invalid browser report")
+    if run_id and (report.get("run_id") != run_id or report.get("status") != "completed"):
+        return failed("browser report belongs to another run or is not completed")
     if len(report.get("results", [])) != expected_count:
         return failed("incomplete browser sample count")
     return report
 
 
-def run(args):
+def run_workload(args, run_id):
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     subprocess.run([args.node, "--check", str(ROOT / "tools/optimization/browser_benchmark.mjs")], check=True)
     env = environment(output, args.node)
+    env["run_id"] = run_id
+    save_json(output / "environment.json", env)
     scratch = ROOT / ".baseline-runs"
     scratch.mkdir(exist_ok=True)
     errors, rows = [], []
@@ -176,22 +195,38 @@ def run(args):
                                     rows.append(row)
                         print(f"API completed: {case}", flush=True)
                     save_json(output / "api.json", {
+                        "run_id": run_id, "status": "completed" if not errors else "failed",
                         "samples_per_case_phase": args.samples, "idle": idle,
                         "results": rows, "errors": errors})
-                    (output / "browser.json").unlink(missing_ok=True)
-                    browser_result = subprocess.run(
-                        [args.node, str(ROOT / "tools/optimization/browser_benchmark.mjs"),
-                         url, str(output / "browser.json"), args.chrome], cwd=ROOT,
-                        timeout=900, check=False,
-                    )
-                    if browser_result.returncode:
-                        errors.append({"browser_exit_code": browser_result.returncode})
+                    with (output / "browser-process.log").open("w", encoding="utf-8") as browser_log:
+                        browser_proc = subprocess.Popen(
+                            [args.node, str(ROOT / "tools/optimization/browser_benchmark.mjs"),
+                             url, str(output / "browser.json"), args.chrome, run_id], cwd=ROOT,
+                            stdout=browser_log, stderr=subprocess.STDOUT)
+                        try:
+                            browser_exit = browser_proc.wait(timeout=args.browser_timeout)
+                        except subprocess.TimeoutExpired:
+                            errors.append({"browser_timeout_seconds": args.browser_timeout})
+                            stop_process_tree(browser_proc)
+                            browser_exit = 124
+                            partial_path = output / "browser.json"
+                            if partial_path.exists():
+                                partial = json.loads(partial_path.read_text(encoding="utf-8"))
+                                partial["status"] = "failed"
+                                partial["errors"].append({"error": "browser process timeout"})
+                                save_json(partial_path, partial)
+                        finally:
+                            if browser_proc.poll() is None:
+                                stop_process_tree(browser_proc)
+                    if browser_exit:
+                        errors.append({"browser_exit_code": browser_exit})
                     final = admin.get("/__baseline__/stats").json()
                     save_json(output / "final-stats.json", final)
-                    browser = read_browser_report(output / "browser.json", browser_result.returncode,
-                                                  len(manifest["page_cases"]) * args.samples * 3)
+                    browser = read_browser_report(output / "browser.json", browser_exit,
+                                                  len(manifest["page_cases"]) * args.samples * 3, run_id)
                     errors.extend(browser["errors"])
                     summary = {
+                        "run_id": run_id, "status": "failed" if errors else "completed",
                         "measured_source_commit": env["git_head"]["stdout"],
                         "fixture_sha256": manifest["fixture_sha256"],
                         "api": summarize_rows(rows, "elapsed_ms"),
@@ -216,13 +251,30 @@ def run(args):
     return 1 if errors else 0
 
 
+def run(args):
+    output = args.output.resolve()
+    run_id = start_run(output)
+    status = json.loads((output / "run.json").read_text(encoding="utf-8"))
+    try:
+        exit_code = run_workload(args, run_id)
+        status.update(status="completed" if exit_code == 0 else "failed", exit_code=exit_code)
+        return exit_code
+    except BaseException as exc:
+        status.update(status="failed", error=f"{type(exc).__name__}: {exc}")
+        raise
+    finally:
+        status["finished_at_utc"] = datetime.now(timezone.utc).isoformat()
+        save_json(output / "run.json", status)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--samples", type=int, default=20)
+    parser.add_argument("--browser-timeout", type=int, default=900)
     parser.add_argument("--node", default=shutil.which("node"))
     parser.add_argument("--chrome", default="C:/Program Files/Google/Chrome/Application/chrome.exe")
     args = parser.parse_args()
-    if not 1 <= args.samples <= 100 or not args.node:
-        parser.error("samples must be 1..100 and Node must be available")
+    if not 1 <= args.samples <= 100 or not args.node or args.browser_timeout < 1:
+        parser.error("samples must be 1..100, timeout positive and Node available")
     sys.exit(run(args))

@@ -9,7 +9,7 @@
 - fixtures/aws.json 固定 UTC 日期、80 ms/次的模拟 AWS 延迟、两个 AWS 账号、同账号两组 Key、另一账号一组 Key、两个区域、每区域六实例、分页大小二。
 - 每个场景/样本使用独立面板用户，避免前一场景为后一场景预热账号缓存。正式运行生成 180 个面板用户，每用户三组凭证及两条手动赠金记录。
 - 使用真实登录 Cookie、用户归属检查、路由、服务、SQLAlchemy、SQLite 和生产构建前端；仅 AWS 客户端被替换。后台定时采集在工具进程中禁用。
-- 工具进程拒绝非本机 socket 连接；未支持的 AWS 服务、凭证和操作直接失败。浏览器使用只转发精确本机来源的代理，外部 HTTP/CONNECT 均拒绝。未开启 Playwright request routing，浏览器 HTTP 缓存保持正常。
+- Python guard 拦截非本机 TCP connect/connect_ex；DNS 与未连接 UDP sendto 不在此 guard 的覆盖范围。未支持的 AWS 服务、凭证和操作直接失败。浏览器代理只转发精确本机来源的 HTTP/CONNECT。这些措施不等于整个进程所有协议均断网。未开启 Playwright request routing，浏览器 HTTP 缓存保持正常。
 - SQLite 使用每次运行独有的临时目录；已有数据库不会被覆盖。进程树及临时库在结束时清理，结果目录保留。
 - 原生 Python 内存读数包括工具、采样线程和静态文件托管，不等同于生产容器。资源变更、后台恢复和迁移验收属于后续任务。
 
@@ -35,7 +35,7 @@ node --check tools/optimization/browser_benchmark.mjs
 & backend/.venv/Scripts/python.exe -m tools.optimization.run_baseline --samples 20 --output .baseline-runs/recheck --chrome 'C:/Program Files/Google/Chrome/Application/chrome.exe'
 ~~~
 
-run_baseline 会先检查浏览器入口语法；浏览器退出失败、报告缺失或样本数不足都会返回失败，不能沿用旧报告。数据和源码指纹位于 environment.json、manifest.json。临时前端锁文件只是 T00 环境输入，正式前端锁文件与 CI 仍归 T07。
+run_baseline 会先检查浏览器入口语法；结果目录已有 run/environment/api/browser/summary 时拒绝覆盖，必须选择新目录。run.json 记录 running/failed/completed 与唯一 run_id。浏览器每个上下文、登录、页面阶段和关闭步骤立即保存 browser.json 检查点及 browser.json.progress.jsonl，browser-process.log 保存阶段耗时。超时默认 900 秒，返回失败并保留部分样本；只有对应 run_id、completed 状态、退出 0 和完整样本数的报告可进入成功汇总。数据和源码指纹位于 environment.json、manifest.json。临时前端锁文件只是 T00 环境输入，正式前端锁文件与 CI 仍归 T07。
 
 原有后端测试需另行执行，函数式流量测试不会被 unittest discovery 收集：
 
@@ -54,10 +54,42 @@ Pop-Location
 
 ## 计时与资源口径
 
+## Linux / Instabox 容器补测
+
+使用独立 Linux Docker 主机，要求 cgroup v2 的 memory.current、memory.stat、cpu.stat 可读，Python 3.12、Node、Chrome/Chromium 和 Git 可用。从 T00 交付提交的独立 Worktree 执行；不要挂载真实数据库、.env 或 AWS 凭证目录。
+
+~~~bash
+python3.12 -m venv .baseline-runs/container-driver
+.baseline-runs/container-driver/bin/python -m pip install -r tools/optimization/requirements.txt httpx==0.28.1
+npm --prefix tools/optimization ci
+.baseline-runs/container-driver/bin/python -m tools.optimization.container_baseline \
+  --source-ref 024d9d5664fa60a49c4710d129de504bfffbce2c \
+  --samples 20 --chrome /usr/bin/chromium \
+  --output .baseline-runs/container-base
+.baseline-runs/container-driver/bin/python -m tools.optimization.container_baseline \
+  --source-ref ca23f465843a327539d3f1360c39bb7975db03bd \
+  --base-images .baseline-runs/container-base/base-images.json \
+  --samples 20 --chrome /usr/bin/chromium \
+  --output .baseline-runs/container-candidate
+~~~
+
+第二次 source-ref 为本轮审计绑定的产品候选提交。后续任务应换为对应完整 HEAD；同一机器成对测量，保持工具指纹、浏览器、模拟数据、依赖和样本量一致。容器数值与 Windows 原生数值分列。
+
+驱动从 source-ref 导出 backend/frontend 构建上下文；保留原 Dockerfile 命令，仅在临时副本将外部 FROM 固定为解析后的 RepoDigest。base-images.json 供同环境后续构建复用；images.json 包含两种镜像 ID、逻辑字节数、层和固定 Dockerfile。environment.json 记录完整源码提交、archive SHA256、产品文件和工具指纹。原构建没有前端锁文件，空白机器的传递依赖解析仍可能变化；精确制品以镜像 ID 为准，T07 才处理正式锁文件。Docker 构建和 psutil 安装属于测量前准备。
+
+测量期只运行两个容器：实际后端镜像和实际 Nginx 前端镜像。后端从镜像 /app 加载产品代码，挂载只读模拟工具与 psutil==7.1.3；SQLite 位于一次性目录，后台采集只在 fixture 主机中禁用。Nginx 临时增加 /__baseline__/ 统计位置。两容器处于 --internal 网络，无对外映射端口；宿主机的本机 HTTP 转发连接 Nginx 容器 IP，浏览器继续用精确来源代理。fixture 只替换 AWS 边界，不调用真实 AWS。
+
+启动就绪后采样 10 秒空闲窗，随后执行六种 API 的首次/重复请求共 240 样本，以及三个页面三阶段共 180 样本。CPU 是 cgroup usage_usec 差除以窗长的单核百分比；全工作负载窗包括 fixture 登录和页面阶段。内存每 100 ms 读取 memory.current、inactive_file 与 anon；工作集为 memory.current-inactive_file，空闲报告窗口均值及峰值，刷新报告整个工作负载的采样峰值。原始 cgroup-samples.jsonl 和窗口边界均保留，采样峰值不等于绝对峰值。镜像总体积是两个未压缩 Size 相加，共享层按每镜像计入，不能解读为宿主机额外磁盘占用。
+
+输出包含 run.json、environment.json、base-images.json、images.json、containers.json、api.json、browser.json、browser.json.progress.jsonl、cgroup-samples.jsonl、summary.json、final-stats.json、构建日志、依赖清单与 cleanup.json。任一步失败不得当作通过；只使用 completed 的对应批次和完整样本数。结束时只清理本次创建的容器、内部网络及临时库，镜像和输出证据保留。
+
+## 原生测量定义
+
 - API：六种查询，每种 20 个首次请求和 20 个同用户重复请求，共 240 个样本。登录在计时窗外，HTTP 响应体接收完成即停止 API 计时。
 - 页面：总览、实例、账单；每页 20 个用户，分别执行首访、同上下文完整导航重访、点击刷新，共 180 个样本。重访不代表已经存在应用缓存，也不是 SPA 切页场景。
 - 首批业务数据：从导航/刷新开始，逐帧观察实例总数、实例行或本月总费用等固定业务元素，随后跨两帧；不会用登录凭证数量或加载标题代替数据。
 - 完整阶段：在首批就绪之后，等待当前观察到的 API 请求全部结束，再跨两帧。原始文件同时保存每条 API 的完成时刻，便于独立复算和识别保守帧等待。
+- 当前首批条件只适用于固定 fixture 的现有页面：非零业务值和布局矩形不证明本轮数据版本或首屏可见；网络完成加两帧也不证明任意延迟 UI 提交完成。后续快照、分批结果与 v2 接口必须另加数据版本和业务就绪条件，保留此次定义及请求时刻，不能沿用此条件宣告缓存验收。
 - P95 使用 nearest-rank：20 个样本取排序后的第 19 个；中位数取第 10、11 个的平均值。缺失样本不能记为零。
 - SQL 计数只覆盖测量窗口内真实 SQLAlchemy 查询。AWS 调用按实际模拟客户端操作逐次计数，包括分页。
 - 原生 RSS 峰值以 10 ms 间隔采样；CPU 为进程 CPU 时间差除以测量窗时长的单核占比，可能超过 100%。空闲采样窗为 1 秒。
