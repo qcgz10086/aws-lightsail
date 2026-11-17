@@ -1,0 +1,45 @@
+test_ambiguous_legacy_owner_stops_instead_of_choosing_a_key (test_migrations.MigrationTests.test_ambiguous_legacy_owner_stops_instead_of_choosing_a_key) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpjndhwkon\backups\app.db.pre-v1-a49011387e744d198d998ccba20d7e1c.db
+ok
+test_backup_failure_prevents_any_schema_change (test_migrations.MigrationTests.test_backup_failure_prevents_any_schema_change) ... Database migration failed; startup stopped. Backup: none
+ok
+test_current_multi_key_data_is_unchanged (test_migrations.MigrationTests.test_current_multi_key_data_is_unchanged) ... ok
+test_future_version_and_versioned_schema_drift_stop_startup (test_migrations.MigrationTests.test_future_version_and_versioned_schema_drift_stop_startup) ... Database migration failed; startup stopped. Backup: none
+Database migration failed; startup stopped. Backup: none
+ok
+test_integrity_or_fk_error_is_not_versioned (test_migrations.MigrationTests.test_integrity_or_fk_error_is_not_versioned) ... Database migration failed; startup stopped. Backup: none
+ok
+test_legacy_binding_stays_with_each_panel_user (test_migrations.MigrationTests.test_legacy_binding_stays_with_each_panel_user) ... ok
+test_legacy_rebuild_preserves_all_credential_fields_and_children (test_migrations.MigrationTests.test_legacy_rebuild_preserves_all_credential_fields_and_children) ... ok
+test_migration_crash_during_ddl_rolls_back_on_next_connection (test_migrations.MigrationTests.test_migration_crash_during_ddl_rolls_back_on_next_connection) ... ok
+test_migration_failure_rolls_back_ddl_and_keeps_verified_original_backup (test_migrations.MigrationTests.test_migration_failure_rolls_back_ddl_and_keeps_verified_original_backup) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpt8yp82go\backups\app.db.pre-v1-539ba27d2dfe42d2ab2197e89a403aa5.db
+ok
+test_minimal_legacy_preserves_auto_stop_and_assigns_only_owner_key (test_migrations.MigrationTests.test_minimal_legacy_preserves_auto_stop_and_assigns_only_owner_key) ... ok
+test_new_database_has_version_and_repeated_start_is_idempotent (test_migrations.MigrationTests.test_new_database_has_version_and_repeated_start_is_idempotent) ... ok
+test_rebuild_preserves_explicit_indexes_triggers_and_delete_rules (test_migrations.MigrationTests.test_rebuild_preserves_explicit_indexes_triggers_and_delete_rules) ... ok
+test_rebuild_refuses_unknown_inline_unique_constraints_without_loss (test_migrations.MigrationTests.test_rebuild_refuses_unknown_inline_unique_constraints_without_loss) ... FAIL
+test_restart_does_not_create_more_backups_or_change_version_time (test_migrations.MigrationTests.test_restart_does_not_create_more_backups_or_change_version_time) ... ok
+test_roundtrip_backup_upgrade_restore_for_three_database_generations (test_migrations.MigrationTests.test_roundtrip_backup_upgrade_restore_for_three_database_generations) ... ok
+test_startup_failure_does_not_seed_or_start_scheduler (test_migrations.MigrationTests.test_startup_failure_does_not_seed_or_start_scheduler) ... ok
+test_unowned_legacy_records_abort_instead_of_being_dropped (test_migrations.MigrationTests.test_unowned_legacy_records_abort_instead_of_being_dropped) ... 2026-11-18 00:51:19,475 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmppxoifuoa\backups\app.db.pre-v1-9f160d336628440fb6994e304746ce2d.db SHA256=173670660c81218a15087196c5745009bcb02e214cf0dd642363da6a4fbceaf1
+2026-11-18 00:51:19,478 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmppxoifuoa\backups\app.db.pre-v1-9f160d336628440fb6994e304746ce2d.db
+ok
+test_upgrade_snapshot_includes_uncheckpointed_wal (test_migrations.MigrationTests.test_upgrade_snapshot_includes_uncheckpointed_wal) ... 2026-11-18 00:51:19,559 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpz525tko0\backups\app.db.pre-v1-710cb52d1f2142dd93e2f912fe1df81b.db SHA256=0521be1de813bbf8e0a291d5dd78e6996c9bab1a77073f7cab70380f874c10c3
+ok
+test_backup_includes_committed_wal_excludes_uncommitted_and_does_not_overwrite (test_migrations.RecoveryTests.test_backup_includes_committed_wal_excludes_uncommitted_and_does_not_overwrite) ... ok
+test_restore_rejects_active_wal_reader_without_removing_sidecars (test_migrations.RecoveryTests.test_restore_rejects_active_wal_reader_without_removing_sidecars) ... ok
+test_restore_rejects_hash_mismatch_corruption_and_same_path (test_migrations.RecoveryTests.test_restore_rejects_hash_mismatch_corruption_and_same_path) ... ok
+test_restore_reverts_data_preserves_safety_backup_and_requires_offline (test_migrations.RecoveryTests.test_restore_reverts_data_preserves_safety_backup_and_requires_offline) ... ok
+test_restore_to_new_database_and_wal_destination (test_migrations.RecoveryTests.test_restore_to_new_database_and_wal_destination) ... ok
+
+======================================================================
+FAIL: test_rebuild_refuses_unknown_inline_unique_constraints_without_loss (test_migrations.MigrationTests.test_rebuild_refuses_unknown_inline_unique_constraints_without_loss)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migrations.py", line 254, in test_rebuild_refuses_unknown_inline_unique_constraints_without_loss
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+----------------------------------------------------------------------
+Ran 23 tests in 5.224s
+
+FAILED (failures=1)

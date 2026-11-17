@@ -1,0 +1,11 @@
+test_current_multi_key_data_is_unchanged (test_migrations.MigrationTests.test_current_multi_key_data_is_unchanged) ... ok
+test_legacy_rebuild_preserves_all_credential_fields_and_children (test_migrations.MigrationTests.test_legacy_rebuild_preserves_all_credential_fields_and_children) ... ok
+test_minimal_legacy_preserves_auto_stop_and_assigns_only_owner_key (test_migrations.MigrationTests.test_minimal_legacy_preserves_auto_stop_and_assigns_only_owner_key) ... ok
+test_new_database_has_version_and_repeated_start_is_idempotent (test_migrations.MigrationTests.test_new_database_has_version_and_repeated_start_is_idempotent) ... ok
+test_unowned_legacy_records_abort_instead_of_being_dropped (test_migrations.MigrationTests.test_unowned_legacy_records_abort_instead_of_being_dropped) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpvk94si5t\backups\app.db.pre-v1-325cd354f4a34dcab0ddd9e1aeb4f5ea.db
+ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.385s
+
+OK

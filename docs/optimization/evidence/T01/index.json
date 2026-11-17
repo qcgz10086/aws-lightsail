@@ -1,0 +1,73 @@
+{
+  "local_files": {
+    "author-review.md": {
+      "bytes": 5152,
+      "sha256": "d7aa6b73746d16e479091fd50575b59ebabb48bdd623b9e1defc3dba6f3150a0"
+    },
+    "backend-tests-final.exit": {
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    "backend-tests-final.txt": {
+      "bytes": 39226,
+      "sha256": "9233ef9cbfc8ec5987b99cabafcc2b9ea93564b68f255d235954b01f55f8a2a9"
+    },
+    "backend-tests.txt": {
+      "bytes": 39226,
+      "sha256": "19db42a0dd0e8a4960f43de21ed5c3dc2605c73b0a757a4678db9bfbd3548587"
+    },
+    "git-source-manifest-final.json": {
+      "bytes": 3730,
+      "sha256": "89fc5b3d2dce39eeef75cbb723770f49c7dc61cad96c36e204136fe29f90dda1"
+    },
+    "git-source-manifest.json": {
+      "bytes": 3730,
+      "sha256": "62d35ad24b42219cfaf1b3240903da87e1dfb27f0a72d923518ef54614433087"
+    },
+    "migration-recovery-tests.txt": {
+      "bytes": 5205,
+      "sha256": "a760e364fafd2bb73828ae92734e1345330a04fa6dbaa4b53ae6e1df3047c39e"
+    },
+    "migrations-green-initial.txt": {
+      "bytes": 1056,
+      "sha256": "788f61f44907dfb62ecda7da6603362563f2b210a867e8826c00a67ed96c9c45"
+    },
+    "migrations-red.txt": {
+      "bytes": 5537,
+      "sha256": "83bb5233987665410e4ea4a9c2bd75bd579014ac3ac4e01766ed06980789476a"
+    },
+    "remote-receipt.json": {
+      "bytes": 2218,
+      "sha256": "dd030aa591405d34851bb86546f8a76680694286eec3f5e476207aa2dd9d1223"
+    },
+    "self-review-tests-red.txt": {
+      "bytes": 5712,
+      "sha256": "a44895ea2309710a552c78bd1bc303b7b2b874432e5fed55891929d2d12444d2"
+    },
+    "source-manifest-final.json": {
+      "bytes": 3730,
+      "sha256": "ee1a88f9a44fe7742f73b161cd22a390989b6cd0cee548627027e0f9a68f6d78"
+    },
+    "source-manifest.json": {
+      "bytes": 3728,
+      "sha256": "1dd2bdc2ce3708f51506b42a10c99ce9f5c7d299d3adf758f34e53edff3be03e"
+    },
+    "validate_cli.py": {
+      "bytes": 6707,
+      "sha256": "2b4ec054cec7eb3aa640c0d275026a083753210b85dc348edcc9c908e3eb03a5"
+    },
+    "windows-cli-startup-final.json": {
+      "bytes": 14548,
+      "sha256": "0686f12cb7ce717ca97d76e9d3b58b64099b7be756442b51bed1b0b3e09711af"
+    },
+    "windows-cli-startup.json": {
+      "bytes": 14534,
+      "sha256": "fbaf184477f1a9b5763874a9162d13399a32af584ada16fc32d503c0f7eb6945"
+    },
+    "windows-validation.json": {
+      "bytes": 2474,
+      "sha256": "5df098fead5264481a4255bc4f7e7f79c742caaea22f937ca581d570b0ed9f16"
+    }
+  },
+  "remote_full_evidence": "See remote-receipt.json; local receipt is a projection, not the complete remote logs."
+}

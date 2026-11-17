@@ -1,0 +1,394 @@
+{
+  "status": "passed",
+  "created_at_utc": "2026-11-17T17:32:04.964192+00:00",
+  "command": [
+    "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+    "docs/optimization/evidence/T01/validate_cli.py",
+    "--output",
+    "docs/optimization/evidence/T01/windows-cli-startup.json"
+  ],
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "sqlite": "3.43.1",
+  "sqlalchemy": "2.0.36",
+  "cli_smoke": {
+    "commands": [
+      {
+        "argv": [
+          "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+          "-m",
+          "app.sqlite_backup",
+          "backup",
+          "--database",
+          "C:\\Users\\liyang\\AppData\\Local\\Temp\\tmp8_1jomkc\\source.db",
+          "--output",
+          "C:\\Users\\liyang\\AppData\\Local\\Temp\\tmp8_1jomkc\\snapshot.db"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "stdout": "{\"path\": \"C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmp8_1jomkc\\\\snapshot.db\", \"sha256\": \"907301107d3ec51caf7010a6836c4ecbc4fc74a81abf48a29bc3006158a2a813\", \"created_at_utc\": \"2026-11-17T17:32:00.837232+00:00\"}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+          "-m",
+          "app.sqlite_backup",
+          "verify",
+          "--backup",
+          "C:\\Users\\liyang\\AppData\\Local\\Temp\\tmp8_1jomkc\\snapshot.db",
+          "--sha256",
+          "907301107D3EC51CAF7010A6836C4ECBC4FC74A81ABF48A29BC3006158A2A813"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "stdout": "{\"path\": \"C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmp8_1jomkc\\\\snapshot.db\", \"sha256\": \"907301107d3ec51caf7010a6836c4ecbc4fc74a81abf48a29bc3006158a2a813\", \"integrity\": \"ok\"}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+          "-m",
+          "app.sqlite_backup",
+          "restore",
+          "--backup",
+          "C:\\Users\\liyang\\AppData\\Local\\Temp\\tmp8_1jomkc\\snapshot.db",
+          "--database",
+          "C:\\Users\\liyang\\AppData\\Local\\Temp\\tmp8_1jomkc\\source.db",
+          "--sha256",
+          "907301107d3ec51caf7010a6836c4ecbc4fc74a81abf48a29bc3006158a2a813"
+        ],
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "stdout": "{\"status\": \"failed\", \"error\": \"Stop all database users and explicitly select offline recovery\"}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+          "-m",
+          "app.sqlite_backup",
+          "restore",
+          "--backup",
+          "C:\\Users\\liyang\\AppData\\Local\\Temp\\tmp8_1jomkc\\snapshot.db",
+          "--database",
+          "C:\\Users\\liyang\\AppData\\Local\\Temp\\tmp8_1jomkc\\source.db",
+          "--sha256",
+          "0000000000000000000000000000000000000000000000000000000000000000",
+          "--offline"
+        ],
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "stdout": "{\"status\": \"failed\", \"error\": \"Backup SHA256 mismatch\"}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+          "-m",
+          "app.sqlite_backup",
+          "restore",
+          "--backup",
+          "C:\\Users\\liyang\\AppData\\Local\\Temp\\tmp8_1jomkc\\snapshot.db",
+          "--database",
+          "C:\\Users\\liyang\\AppData\\Local\\Temp\\tmp8_1jomkc\\source.db",
+          "--sha256",
+          "907301107d3ec51caf7010a6836c4ecbc4fc74a81abf48a29bc3006158a2a813",
+          "--offline"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "stdout": "{\"path\": \"C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmp8_1jomkc\\\\source.db\", \"restored_from\": \"C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmp8_1jomkc\\\\snapshot.db\", \"sha256\": \"907301107d3ec51caf7010a6836c4ecbc4fc74a81abf48a29bc3006158a2a813\", \"safety_backup\": {\"path\": \"C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmp8_1jomkc\\\\source.db.pre-restore-ab6881eacb50426aa3e3432b7772f774.db\", \"sha256\": \"9cf73dbab9c5fadbb947ca87f46f69b9f5985f7d442e170115f4251e1cc7ec24\", \"created_at_utc\": \"2026-11-17T17:32:01.428455+00:00\"}, \"requires_paired_images_and_task_reconciliation\": true}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+          "-m",
+          "app.sqlite_backup",
+          "verify",
+          "--backup",
+          "C:\\Users\\liyang\\AppData\\Local\\Temp\\tmp8_1jomkc\\snapshot.db",
+          "--sha256",
+          "907301107d3ec51caf7010a6836c4ecbc4fc74a81abf48a29bc3006158a2a813"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "stdout": "{\"path\": \"C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmp8_1jomkc\\\\snapshot.db\", \"sha256\": \"907301107d3ec51caf7010a6836c4ecbc4fc74a81abf48a29bc3006158a2a813\", \"integrity\": \"ok\"}\n",
+        "stderr": ""
+      }
+    ],
+    "restored_committed_wal": true,
+    "preserved_pre_restore_data": true,
+    "snapshot_bytes": 8192,
+    "snapshot_permission_mode": "0o666",
+    "application_secret_variables_removed": true
+  },
+  "small_fixture_observations": [
+    {
+      "fixture": "new",
+      "samples": [
+        {
+          "upgrade_ms": 12.030000099912286,
+          "restart_ms": 0.9604000952094793,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 11.032000184059143,
+          "restart_ms": 1.0441001504659653,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 9.989199927076697,
+          "restart_ms": 0.780800124630332,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 11.219199979677796,
+          "restart_ms": 0.7723001763224602,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 12.866100063547492,
+          "restart_ms": 0.8161000441759825,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 12.633099919185042,
+          "restart_ms": 1.2372999917715788,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 12.761400081217289,
+          "restart_ms": 0.8143999148160219,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 11.283300118520856,
+          "restart_ms": 0.8167000487446785,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 10.57590008713305,
+          "restart_ms": 0.7770999800413847,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 11.727599892765284,
+          "restart_ms": 0.7683997973799706,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        }
+      ],
+      "upgrade_median_ms": 11.50545000564307,
+      "upgrade_p95_ms": 12.866100063547492,
+      "restart_median_ms": 0.8152499794960022
+    },
+    {
+      "fixture": "single",
+      "samples": [
+        {
+          "upgrade_ms": 26.13999997265637,
+          "restart_ms": 0.7666000165045261,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 30.35530005581677,
+          "restart_ms": 1.147399889305234,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 29.06620013527572,
+          "restart_ms": 0.7821000181138515,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 27.23589981906116,
+          "restart_ms": 0.9313998743891716,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 28.897299896925688,
+          "restart_ms": 0.7709998171776533,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 39.29059999063611,
+          "restart_ms": 0.8354000747203827,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 45.727499993517995,
+          "restart_ms": 0.7569999434053898,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 58.61019995063543,
+          "restart_ms": 1.3931000139564276,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 40.53110000677407,
+          "restart_ms": 1.124100061133504,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 65.28410012833774,
+          "restart_ms": 1.0488000698387623,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        }
+      ],
+      "upgrade_median_ms": 34.82295002322644,
+      "upgrade_p95_ms": 65.28410012833774,
+      "restart_median_ms": 0.8833999745547771
+    },
+    {
+      "fixture": "multi",
+      "samples": [
+        {
+          "upgrade_ms": 23.82100000977516,
+          "restart_ms": 0.7612998597323895,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 26.896600145846605,
+          "restart_ms": 1.0507002007216215,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 22.104899864643812,
+          "restart_ms": 0.8082999847829342,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 21.990700159221888,
+          "restart_ms": 0.8952000644057989,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 26.242199819535017,
+          "restart_ms": 1.265999861061573,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 34.39310006797314,
+          "restart_ms": 0.9816000238060951,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 25.180599885061383,
+          "restart_ms": 1.1201000306755304,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 27.505199890583754,
+          "restart_ms": 1.0196000803261995,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 27.17270003631711,
+          "restart_ms": 1.100699882954359,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 34.91590009070933,
+          "restart_ms": 1.1245999485254288,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        }
+      ],
+      "upgrade_median_ms": 26.56939998269081,
+      "upgrade_p95_ms": 34.91590009070933,
+      "restart_median_ms": 1.0351501405239105
+    }
+  ],
+  "limits": "10 small temporary fixtures per generation; startup and disk observations only. No page, AWS, image-size, CPU, peak-memory, production-volume or power-loss acceptance claim."
+}

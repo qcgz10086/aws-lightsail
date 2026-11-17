@@ -1,0 +1,77 @@
+{
+  "python_executable": "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "sqlite": "3.43.1",
+  "sqlalchemy": "2.0.36",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t01-db-migration\\aws-lightsail",
+  "source_manifest": "source-manifest-final.json",
+  "git_source_manifest": "git-source-manifest-final.json",
+  "migration_command": [
+    "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_migrations.py",
+    "-v"
+  ],
+  "migration_result": {
+    "exit_code": 0,
+    "tests": 23,
+    "seconds": 5.428,
+    "log": "migration-recovery-tests.txt"
+  },
+  "regression_command": [
+    "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-v"
+  ],
+  "regression_cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t01-db-migration\\aws-lightsail\\backend",
+  "regression_result": {
+    "exit_code": 0,
+    "tests": 158,
+    "seconds": 27.649,
+    "log": "backend-tests-final.txt"
+  },
+  "cli_command": [
+    "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+    "docs/optimization/evidence/T01/validate_cli.py",
+    "--output",
+    "docs/optimization/evidence/T01/windows-cli-startup-final.json"
+  ],
+  "cli_result": {
+    "exit_code": 0,
+    "commands": 6,
+    "fixture_observations": 30,
+    "log": "windows-cli-startup-final.json"
+  },
+  "red_result": {
+    "tests": 5,
+    "failures": 3,
+    "errors": 2,
+    "log": "migrations-red.txt"
+  },
+  "self_review_red_result": {
+    "tests": 23,
+    "failures": 1,
+    "log": "self-review-tests-red.txt"
+  },
+  "notes": [
+    "Windows runtime reused from clean T00 venv; no new dependency install.",
+    "Native CRLF bytes and canonical Git LF bytes are recorded separately.",
+    "No real AWS or production deployment.",
+    "Final formatting self-check removed a trailing blank line; final source hashes, full regression and CLI checks were refreshed."
+  ],
+  "historical_logs": [
+    "backend-tests.txt",
+    "migration-recovery-tests.txt",
+    "windows-cli-startup.json"
+  ]
+}
