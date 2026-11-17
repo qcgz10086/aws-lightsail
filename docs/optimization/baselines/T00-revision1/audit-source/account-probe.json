@@ -1,0 +1,173 @@
+{
+  "owner_credentials": [
+    {
+      "id": 1,
+      "access_key_masked": "T00_****MARY",
+      "account_label": "api-billing-00-T00_ALPHA_PRIMARY",
+      "proxy_masked": null,
+      "is_default": true,
+      "last_validated_at": null,
+      "created_at": "2026-11-17T00:00:00",
+      "vcpu_quota": null,
+      "vcpu_tier": null,
+      "static_ip_quota": null,
+      "used_vcpu": null,
+      "used_instance_count": null,
+      "remaining_vcpu": null,
+      "quota_region": null,
+      "quota_message": null,
+      "quota_checked_at": null
+    },
+    {
+      "id": 2,
+      "access_key_masked": "T00_****CATE",
+      "account_label": "api-billing-00-T00_ALPHA_DUPLICATE",
+      "proxy_masked": null,
+      "is_default": false,
+      "last_validated_at": null,
+      "created_at": "2026-11-17T00:00:00",
+      "vcpu_quota": null,
+      "vcpu_tier": null,
+      "static_ip_quota": null,
+      "used_vcpu": null,
+      "used_instance_count": null,
+      "remaining_vcpu": null,
+      "quota_region": null,
+      "quota_message": null,
+      "quota_checked_at": null
+    },
+    {
+      "id": 3,
+      "access_key_masked": "T00_****MARY",
+      "account_label": "api-billing-00-T00_BETA_PRIMARY",
+      "proxy_masked": null,
+      "is_default": false,
+      "last_validated_at": null,
+      "created_at": "2026-11-17T00:00:00",
+      "vcpu_quota": null,
+      "vcpu_tier": null,
+      "static_ip_quota": null,
+      "used_vcpu": null,
+      "used_instance_count": null,
+      "remaining_vcpu": null,
+      "quota_region": null,
+      "quota_message": null,
+      "quota_checked_at": null
+    }
+  ],
+  "billing_account": "111111111111",
+  "manual_credits": [
+    {
+      "id": 2,
+      "name": "T00 manual 1",
+      "credit_id": "T00-MANUAL-1-1",
+      "total_amount": 100.0,
+      "currency": "USD",
+      "start_date": "2026-01-01",
+      "expires_at": "2027-01-01",
+      "note": null,
+      "credential_id": 3,
+      "created_at": "2026-11-17T00:00:00",
+      "remaining_estimate": 92.0,
+      "credits_applied_since_start": 8.0
+    },
+    {
+      "id": 1,
+      "name": "T00 manual 0",
+      "credit_id": "T00-MANUAL-1-0",
+      "total_amount": 100.0,
+      "currency": "USD",
+      "start_date": "2026-01-01",
+      "expires_at": "2027-01-01",
+      "note": null,
+      "credential_id": 1,
+      "created_at": "2026-11-17T00:00:00",
+      "remaining_estimate": 92.0,
+      "credits_applied_since_start": 8.0
+    }
+  ],
+  "cost_query_events": [
+    {
+      "service": "ce",
+      "operation": "get_cost_and_usage",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "TimePeriod": {
+          "Start": "2026-11-01",
+          "End": "2026-11-18"
+        },
+        "Granularity": "MONTHLY",
+        "Metrics": [
+          "UnblendedCost",
+          "NetUnblendedCost"
+        ],
+        "GroupBy": [
+          {
+            "Type": "DIMENSION",
+            "Key": "SERVICE"
+          }
+        ]
+      }
+    },
+    {
+      "service": "ce",
+      "operation": "get_cost_and_usage",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "TimePeriod": {
+          "Start": "2026-01-01",
+          "End": "2026-11-18"
+        },
+        "Granularity": "MONTHLY",
+        "Metrics": [
+          "UnblendedCost",
+          "NetUnblendedCost"
+        ]
+      }
+    },
+    {
+      "service": "ce",
+      "operation": "get_cost_and_usage",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "TimePeriod": {
+          "Start": "2026-01-01",
+          "End": "2026-11-18"
+        },
+        "Granularity": "MONTHLY",
+        "Metrics": [
+          "UnblendedCost",
+          "NetUnblendedCost"
+        ]
+      }
+    }
+  ],
+  "foreign_credential_probes": [
+    {
+      "route": "/api/instances",
+      "status": 404,
+      "aws_calls": {}
+    },
+    {
+      "route": "/api/billing/summary",
+      "status": 400,
+      "aws_calls": {}
+    },
+    {
+      "route": "/api/catalog/bundles",
+      "status": 400,
+      "aws_calls": {}
+    },
+    {
+      "route": "/api/catalog/blueprints",
+      "status": 400,
+      "aws_calls": {}
+    }
+  ]
+}

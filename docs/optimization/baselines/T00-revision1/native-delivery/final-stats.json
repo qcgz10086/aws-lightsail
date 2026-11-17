@@ -1,0 +1,121 @@
+{
+  "calls": {
+    "ce.get_cost_and_usage": 3,
+    "ce.get_cost_forecast": 1,
+    "sts.get_caller_identity": 1,
+    "billing.get_credits": 1
+  },
+  "events": [
+    {
+      "service": "ce",
+      "operation": "get_cost_and_usage",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "TimePeriod": {
+          "Start": "2026-11-01",
+          "End": "2026-11-18"
+        },
+        "Granularity": "MONTHLY",
+        "Metrics": [
+          "UnblendedCost",
+          "NetUnblendedCost"
+        ],
+        "GroupBy": [
+          {
+            "Type": "DIMENSION",
+            "Key": "SERVICE"
+          }
+        ]
+      }
+    },
+    {
+      "service": "ce",
+      "operation": "get_cost_forecast",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "TimePeriod": {
+          "Start": "2026-11-01",
+          "End": "2026-12-01"
+        },
+        "Granularity": "MONTHLY",
+        "Metric": "UNBLENDED_COST"
+      }
+    },
+    {
+      "service": "sts",
+      "operation": "get_caller_identity",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {}
+    },
+    {
+      "service": "billing",
+      "operation": "get_credits",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "accountId": "111111111111",
+        "startDate": "2025-11-18T00:00:00+00:00",
+        "endDate": "2026-11-17T00:00:00+00:00"
+      }
+    },
+    {
+      "service": "ce",
+      "operation": "get_cost_and_usage",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "TimePeriod": {
+          "Start": "2026-01-01",
+          "End": "2026-11-18"
+        },
+        "Granularity": "MONTHLY",
+        "Metrics": [
+          "UnblendedCost",
+          "NetUnblendedCost"
+        ]
+      }
+    },
+    {
+      "service": "ce",
+      "operation": "get_cost_and_usage",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "TimePeriod": {
+          "Start": "2026-01-01",
+          "End": "2026-11-18"
+        },
+        "Granularity": "MONTHLY",
+        "Metrics": [
+          "UnblendedCost",
+          "NetUnblendedCost"
+        ]
+      }
+    }
+  ],
+  "violations": [],
+  "active": 0,
+  "peak_concurrency": 1,
+  "fixture_sha256": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c",
+  "sql_queries": 3,
+  "peak_rss_bytes": 85483520,
+  "rss_bytes": 85483520,
+  "cpu_seconds": 68.4375,
+  "clock_seconds": 1723243.8609596,
+  "database_bytes": {
+    "main": 1867776,
+    "-wal": 0,
+    "-shm": 0
+  },
+  "journal_mode": "delete",
+  "resource_scope": "native Python benchmark host, including static asset serving"
+}

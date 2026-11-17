@@ -1,0 +1,33 @@
+{
+  "base": "024d9d5664fa60a49c4710d129de504bfffbce2c",
+  "audited_head": "ca23f465843a327539d3f1360c39bb7975db03bd",
+  "tool_head": "79d46dfbceff86fefec89c12db357ee03bfe1701",
+  "native_run": {
+    "run_id": "99ad4193-4d8a-473c-a8aa-654cb54581fc",
+    "status": "completed",
+    "started_at_utc": "2026-11-17T14:42:05.526955+00:00",
+    "exit_code": 0,
+    "finished_at_utc": "2026-11-17T14:48:50.033858+00:00"
+  },
+  "native_input_fingerprints_checked": 59,
+  "native_input_mismatches": [],
+  "statistics_groups_checked": 30,
+  "native_api_samples": 240,
+  "native_page_samples": 180,
+  "timeout_probe_run": {
+    "run_id": "9c9b8ab0-10af-4f7e-8a94-3c0441acb4bb",
+    "status": "failed",
+    "started_at_utc": "2026-11-17T14:02:49.838107+00:00",
+    "exit_code": 1,
+    "finished_at_utc": "2026-11-17T14:03:18.186420+00:00"
+  },
+  "timeout_completed_samples_preserved": 1,
+  "timeout_tested_core_fingerprints_match": [
+    "tools/optimization/run_baseline.py",
+    "tools/optimization/processes.py",
+    "tools/optimization/browser_benchmark.mjs",
+    "tools/optimization/progress_report.mjs"
+  ],
+  "timeout_probe_tool_fingerprint": "296681d20bde1a849235294e5ab07150329e2cf988079a200ec1a7e2c6028c1d",
+  "native_docker_metrics": "unmeasured; Linux evidence is recorded separately"
+}

@@ -1,3 +1,5 @@
+.gitattributes text eol=lf
 tools/optimization/** text eol=lf
 docs/optimization/** text eol=lf
 docs/optimization/baselines/T00/*.txt -whitespace
+docs/optimization/baselines/T00-revision1/** -text whitespace=cr-at-eol

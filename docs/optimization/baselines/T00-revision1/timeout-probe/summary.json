@@ -1,0 +1,242 @@
+{
+  "run_id": "9c9b8ab0-10af-4f7e-8a94-3c0441acb4bb",
+  "status": "failed",
+  "measured_source_commit": "ca23f465843a327539d3f1360c39bb7975db03bd",
+  "fixture_sha256": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c",
+  "api": [
+    {
+      "case": "billing",
+      "phase": "first_request",
+      "count": 2,
+      "median_ms": 493.404,
+      "p95_ms": 496.568,
+      "max_ms": 496.568,
+      "errors": 0,
+      "one_core_cpu_percent": 3.144,
+      "aws_calls_per_sample": [
+        6,
+        6
+      ],
+      "peak_rss_bytes": 109096960
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_request",
+      "count": 2,
+      "median_ms": 491.258,
+      "p95_ms": 492.851,
+      "max_ms": 492.851,
+      "errors": 0,
+      "one_core_cpu_percent": 0.0,
+      "aws_calls_per_sample": [
+        6,
+        6
+      ],
+      "peak_rss_bytes": 109129728
+    },
+    {
+      "case": "instances",
+      "phase": "first_request",
+      "count": 2,
+      "median_ms": 801.598,
+      "p95_ms": 805.478,
+      "max_ms": 805.478,
+      "errors": 0,
+      "one_core_cpu_percent": 8.734,
+      "aws_calls_per_sample": [
+        27,
+        27
+      ],
+      "peak_rss_bytes": 109707264
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_request",
+      "count": 2,
+      "median_ms": 793.551,
+      "p95_ms": 796.927,
+      "max_ms": 796.927,
+      "errors": 0,
+      "one_core_cpu_percent": 7.843,
+      "aws_calls_per_sample": [
+        27,
+        27
+      ],
+      "peak_rss_bytes": 109780992
+    },
+    {
+      "case": "regions",
+      "phase": "first_request",
+      "count": 2,
+      "median_ms": 85.306,
+      "p95_ms": 85.476,
+      "max_ms": 85.476,
+      "errors": 0,
+      "one_core_cpu_percent": 8.748,
+      "aws_calls_per_sample": [
+        1,
+        1
+      ],
+      "peak_rss_bytes": 109928448
+    },
+    {
+      "case": "regions",
+      "phase": "repeat_request",
+      "count": 2,
+      "median_ms": 84.885,
+      "p95_ms": 85.484,
+      "max_ms": 85.484,
+      "errors": 0,
+      "one_core_cpu_percent": 0.0,
+      "aws_calls_per_sample": [
+        1,
+        1
+      ],
+      "peak_rss_bytes": 109928448
+    },
+    {
+      "case": "bundles",
+      "phase": "first_request",
+      "count": 2,
+      "median_ms": 166.883,
+      "p95_ms": 168.365,
+      "max_ms": 168.365,
+      "errors": 0,
+      "one_core_cpu_percent": 9.152,
+      "aws_calls_per_sample": [
+        2,
+        2
+      ],
+      "peak_rss_bytes": 110002176
+    },
+    {
+      "case": "bundles",
+      "phase": "repeat_request",
+      "count": 2,
+      "median_ms": 165.598,
+      "p95_ms": 165.712,
+      "max_ms": 165.712,
+      "errors": 0,
+      "one_core_cpu_percent": 0.0,
+      "aws_calls_per_sample": [
+        2,
+        2
+      ],
+      "peak_rss_bytes": 110002176
+    },
+    {
+      "case": "blueprints",
+      "phase": "first_request",
+      "count": 2,
+      "median_ms": 165.698,
+      "p95_ms": 166.328,
+      "max_ms": 166.328,
+      "errors": 0,
+      "one_core_cpu_percent": 4.612,
+      "aws_calls_per_sample": [
+        2,
+        2
+      ],
+      "peak_rss_bytes": 110002176
+    },
+    {
+      "case": "blueprints",
+      "phase": "repeat_request",
+      "count": 2,
+      "median_ms": 166.492,
+      "p95_ms": 167.133,
+      "max_ms": 167.133,
+      "errors": 0,
+      "one_core_cpu_percent": 4.591,
+      "aws_calls_per_sample": [
+        2,
+        2
+      ],
+      "peak_rss_bytes": 110002176
+    },
+    {
+      "case": "traffic",
+      "phase": "first_request",
+      "count": 2,
+      "median_ms": 8.782,
+      "p95_ms": 10.267,
+      "max_ms": 10.267,
+      "errors": 0,
+      "one_core_cpu_percent": 113.958,
+      "aws_calls_per_sample": [
+        0,
+        0
+      ],
+      "peak_rss_bytes": 110170112
+    },
+    {
+      "case": "traffic",
+      "phase": "repeat_request",
+      "count": 2,
+      "median_ms": 6.045,
+      "p95_ms": 6.109,
+      "max_ms": 6.109,
+      "errors": 0,
+      "one_core_cpu_percent": 150.955,
+      "aws_calls_per_sample": [
+        0,
+        0
+      ],
+      "peak_rss_bytes": 110174208
+    }
+  ],
+  "pages_first_data": [],
+  "pages_complete": [],
+  "idle_native_process": {
+    "calls": {},
+    "events": [],
+    "violations": [],
+    "active": 0,
+    "peak_concurrency": 0,
+    "fixture_sha256": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c",
+    "sql_queries": 0,
+    "peak_rss_bytes": 108027904,
+    "rss_bytes": 108036096,
+    "cpu_seconds": 2.875,
+    "clock_seconds": 1720492.0881824,
+    "database_bytes": {
+      "main": 258048,
+      "-wal": 0,
+      "-shm": 0
+    },
+    "journal_mode": "delete",
+    "resource_scope": "native Python benchmark host, including static asset serving",
+    "one_core_cpu_percent": 0.0
+  },
+  "database": {
+    "main": 258048,
+    "-wal": 0,
+    "-shm": 0
+  },
+  "docker": {
+    "available": false,
+    "image_total_bytes": null,
+    "container_memory_bytes": null,
+    "container_cpu_percent": null,
+    "status": "unmeasured",
+    "reason": "Docker unavailable on PATH; no image/container measurements"
+  },
+  "errors": [
+    {
+      "browser_timeout_seconds": 4
+    },
+    {
+      "browser_exit_code": 124
+    },
+    {
+      "browser_report_error": "browser process failed; existing reports are not trusted",
+      "browser_exit_code": 124
+    }
+  ],
+  "limits": [
+    "Local Windows native host; production Nginx/TLS and containers are unmeasured.",
+    "Fixed AWS latency is synthetic and is not a prediction of AWS latency.",
+    "First/repeat phases describe workload state; they do not assert cache existence.",
+    "No fault-injection, task-recovery or migration acceptance is claimed by T00."
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "tool_head": "79d46dfbceff86fefec89c12db357ee03bfe1701",
+  "checks": [
+    {
+      "command": "backend/.venv/Scripts/python.exe -m unittest discover -s tools/optimization/tests -v",
+      "exit_code": 0,
+      "passed": 20,
+      "log": "tool-tests.txt",
+      "log_sha256": "f5618f422884c99af603a02feda6483b6c288e1ef3fa062cd7fd08f1a1e65764",
+      "log_modified_at": "2026-11-17T14:40:53.685Z"
+    },
+    {
+      "command": "node --test tools/optimization/offline_proxy.test.mjs tools/optimization/readiness.test.mjs tools/optimization/progress_report.test.mjs",
+      "exit_code": 0,
+      "passed": 3,
+      "log": "browser-tool-tests.txt",
+      "log_sha256": "c53b880f8535c52d4e617f92144cdec4e4649107019b5a12c2e380d3dc800b25",
+      "log_modified_at": "2026-11-17T14:50:04.541Z"
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m unittest discover -s tests -v",
+      "cwd": "backend",
+      "exit_code": 0,
+      "passed": 135,
+      "log": "backend-tests.txt",
+      "log_sha256": "d654f5dcdcd9879f3b02e2f40d98b51b1464b7e5a1f03b9bac4e96ae1b356261",
+      "log_modified_at": "2026-11-17T14:50:30.354Z"
+    },
+    {
+      "command": ".venv/Scripts/python.exe tests/test_traffic_sum.py",
+      "cwd": "backend",
+      "exit_code": 0,
+      "log": "traffic-test.txt",
+      "log_sha256": "bcfe96eb0336f3cd8d98a1ce9e3ac1b7fddd094c043d3c74f36a731e434952dd",
+      "log_modified_at": "2026-11-17T14:50:31.872Z"
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc --noEmit",
+      "cwd": "frontend",
+      "exit_code": 0,
+      "log": "frontend-types.txt",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_modified_at": "2026-11-17T14:54:59.957Z"
+    }
+  ],
+  "baseline_branch": {
+    "provider": "GitHub plugin GET",
+    "url": "https://api.github.com/repos/qcgz10086/aws-lightsail/branches/billing-getcredits",
+    "sha": "024d9d5664fa60a49c4710d129de504bfffbce2c",
+    "matches_base": true
+  },
+  "products_unchanged": {
+    "backend_tree": "6bca8cdd12638d2fa40c9491a049d085ac7e3e7f",
+    "frontend_tree": "7e24809cfc10a172ae8e56b2d164dc4e25f2d2ab",
+    "verification": "git diff --exit-code BASE HEAD -- backend frontend docker-compose.yml compose.yml returned 0"
+  }
+}

@@ -1,0 +1,288 @@
+{
+  "tool_head": "79d46dfbceff86fefec89c12db357ee03bfe1701",
+  "base": "024d9d5664fa60a49c4710d129de504bfffbce2c",
+  "audited_head": "ca23f465843a327539d3f1360c39bb7975db03bd",
+  "scope": "Current local delivery files; manifest excludes itself. Complete remote artifacts are indexed separately in CONTAINER-EVIDENCE.md and container-verification.json.",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 216,
+      "sha256": "2b7fef46e43d0b56d8629a0b6e84b3e4ea1c62388153f531bf7d3b7ff18c4132"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/audit-source/account-probe.json",
+      "bytes": 4415,
+      "sha256": "3d6f80def550a14ed9db986ca4eeefce5a21621cef2b37bafac417fe228c8546"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/audit-source/audit-verification.json",
+      "bytes": 1356,
+      "sha256": "90a70c700b97aa929fe4a3c0e13041900c0d5e93222b87d933e2c82d0ed1b9bc"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/audit-source/AUDIT.md",
+      "bytes": 11918,
+      "sha256": "b95f6e49451c42b5ad9659493d5709f520e2095b877852dcff4625ce2e9b11c2"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/audit-source/failure-probe.json",
+      "bytes": 535,
+      "sha256": "91da8f9ab00723e724669c5ef233691bfea13cb6a2b3e5022011c4c569c02787"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/backend-tests.txt",
+      "bytes": 30679,
+      "sha256": "d654f5dcdcd9879f3b02e2f40d98b51b1464b7e5a1f03b9bac4e96ae1b356261"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/browser-tool-tests.txt",
+      "bytes": 898,
+      "sha256": "c53b880f8535c52d4e617f92144cdec4e4649107019b5a12c2e380d3dc800b25"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/container-bridge-green.txt",
+      "bytes": 684,
+      "sha256": "d4205a9c0f24542ec4eda419b1863a48943ce09a85d1ed49915ab9a1072428a2"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/container-bridge-red.txt",
+      "bytes": 1150,
+      "sha256": "127ed54e93684b6d7373de34a41ec83921e8bd21018214ffac5106ffb1806f79"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/CONTAINER-EVIDENCE.md",
+      "bytes": 4997,
+      "sha256": "7ae23c6ca66a6c3943e4d7b87e12fe5338048b2205914a8aaa06f255bc8c5468"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/container-verification.json",
+      "bytes": 10079,
+      "sha256": "7dad58c9e9028e5facc1c8a54b81332ed3236afc51b49b705b843114b2a54d70"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/evidence-check.txt",
+      "bytes": 1318,
+      "sha256": "f73fc39d6a9e95168bd31362013a91f8f91dce2b63fe922cd502d442b841b6ca"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/frontend-types.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/instabox-retention.json",
+      "bytes": 1026,
+      "sha256": "c3f204c97a48ac878d182f8f03b6ac23ced9bf80ce939b9dc3069eb1ea460683"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery-run.txt",
+      "bytes": 360,
+      "sha256": "ba568b3afe111ea0be296f3ea223ae7c41106af1e625b77687b80851add6e76f"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery/api.json",
+      "bytes": 602079,
+      "sha256": "0fccba3798972b445096fa629f6757599bf7124ea3732c229b833e3023c8d106"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery/browser-process.log",
+      "bytes": 138978,
+      "sha256": "c2831f4539d0faf22a5915efdde79c6a396e77529bc591d22f1643e1413e8a8d"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery/browser.json",
+      "bytes": 168356,
+      "sha256": "be7d5b84f2e0047bca32bce5c0d17374a83780748e95bea8a1c9214cac76fdfc"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery/browser.json.progress.jsonl",
+      "bytes": 138893,
+      "sha256": "f32c0d7bc7a6f5bc6efbf862cc51af5511927ac781fde3132c14b99f0e44e814"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery/environment.json",
+      "bytes": 11281,
+      "sha256": "1a80e4ea6d32a55da4af0868932f9530faa4c486b712aace38f5f5a6b4806011"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery/final-stats.json",
+      "bytes": 3040,
+      "sha256": "4b000a36be064ae9e240b6cb44baa7fe1256734a18581fe706171529971fe1ff"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery/manifest.json",
+      "bytes": 1936,
+      "sha256": "65ca29bb88dde2235efe9b63f6d1d82ede0d8b6101bfbdf78433f9692f4fceb3"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery/python-freeze.txt",
+      "bytes": 893,
+      "sha256": "2b4380346396372b21fa74c573df654a9564166a9dc9168a8bd9eab8462d209b"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery/run.json",
+      "bytes": 218,
+      "sha256": "6c2597fb09f9c40f16532b306ec2cdd88c2dfc483bda706125173e24db77089b"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery/server.log",
+      "bytes": 70,
+      "sha256": "9c296fd0db2cc2826eb1acb2e98c972d90e434dd3abfa217908c960749484b97"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery/summary.json",
+      "bytes": 18476,
+      "sha256": "070eb71852c037f9d24e1ab86aefa948a0811b169452ca38b1f2c642108bae56"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-delivery/tools-optimization-package-lock.json",
+      "bytes": 1577,
+      "sha256": "d96fb0371e2ee0bf51b2488df05225ddbabb6d4d003a49fe83fda7a83261357e"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-final-run.txt",
+      "bytes": 357,
+      "sha256": "c6fa6fe711d1d324cfb794c809ac2b9ae861069ed335a8f8e9b5d981d2e61df6"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-run.txt",
+      "bytes": 351,
+      "sha256": "b79539a9eb752f4a60d925a3aac4bd75addcaa30e1d8b6664367a0615299e817"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/native-verified-run.txt",
+      "bytes": 360,
+      "sha256": "0677012f5587397e0439223bfb889bb60b526fdb66ab9b659a75c04fd6b60de1"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/progress-tests-red.txt",
+      "bytes": 1851,
+      "sha256": "ebc69a1df761530768a1c953602e4348833f98d664ec33afdc65a0906de861bc"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/REPORT.md",
+      "bytes": 16850,
+      "sha256": "823b8786760cf4784d03af71c3ea3d287bed1b56138b53b8e95cd54bfa56dead"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/scoped-export-red.txt",
+      "bytes": 1164,
+      "sha256": "c1356520d64a362d0c90404e6e1dba2e73e238cd76d9ddb03219f366e94adfeb"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/test-verification.json",
+      "bytes": 2251,
+      "sha256": "1fa6479629ee4652eef889b13efb545543c82f4a90a9c49bad491c18e79e7efd"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-probe/api.json",
+      "bytes": 60865,
+      "sha256": "bdb6fc509617acec2c677f822ff8000ffaa8dd7241968ea71935b8f78bf7b0db"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-probe/browser-process.log",
+      "bytes": 1127,
+      "sha256": "c230c91733d07470c00aa1534cc159f5491509231f0d306d6ad8eb97d5a5a4ca"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-probe/browser.json",
+      "bytes": 1482,
+      "sha256": "b8ac1bb878aa60249b2bfed9f2f94cd1a4905ae1f4ef75c071688b7094b280f7"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-probe/browser.json.progress.jsonl",
+      "bytes": 1127,
+      "sha256": "c230c91733d07470c00aa1534cc159f5491509231f0d306d6ad8eb97d5a5a4ca"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-probe/environment.json",
+      "bytes": 11281,
+      "sha256": "8eae6aa77ab621a52935eb92a4e8a0c69337eb048b7796df2425cfc6cc9ee06f"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-probe/final-stats.json",
+      "bytes": 6801,
+      "sha256": "903ca313c159fc42a21c87ea424ce6a0dcfa8e4fb7471815f569b2cd4c646089"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-probe/manifest.json",
+      "bytes": 1934,
+      "sha256": "7489ca8e2528b73ca1b4594008fa563d4d7de63ea83417da3060146d09b43c51"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-probe/python-freeze.txt",
+      "bytes": 893,
+      "sha256": "2b4380346396372b21fa74c573df654a9564166a9dc9168a8bd9eab8462d209b"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-probe/run.json",
+      "bytes": 215,
+      "sha256": "1876ea51630b1aaaa5bcfe9edb1340d0d592944532f38ecdbd6107af7e04cf52"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-probe/server.log",
+      "bytes": 70,
+      "sha256": "d8a765b688c7d7ff9e201657e158e33c72a9d98a9826a559e7b41208a14eede2"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-probe/summary.json",
+      "bytes": 5883,
+      "sha256": "b4ac204966c9499ebd9eab8d9c7bd78cd90c5b579a5ad372f94a545134001a7b"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-probe/tools-optimization-package-lock.json",
+      "bytes": 1577,
+      "sha256": "d96fb0371e2ee0bf51b2488df05225ddbabb6d4d003a49fe83fda7a83261357e"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/timeout-run.txt",
+      "bytes": 355,
+      "sha256": "44dd3ae79bffe8e959823d83a69a3f2f9a0be3c238ce51a04b9913e6587748dc"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/tool-tests-red.txt",
+      "bytes": 1985,
+      "sha256": "26b15f4221552adf763ef9828cc308eaba06e4847306d8bb2e4885a6a379e1cf"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/tool-tests.txt",
+      "bytes": 2994,
+      "sha256": "f5618f422884c99af603a02feda6483b6c288e1ef3fa062cd7fd08f1a1e65764"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/traffic-test.txt",
+      "bytes": 28,
+      "sha256": "bcfe96eb0336f3cd8d98a1ce9e3ac1b7fddd094c043d3c74f36a731e434952dd"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/verification.json",
+      "bytes": 1318,
+      "sha256": "f73fc39d6a9e95168bd31362013a91f8f91dce2b63fe922cd502d442b841b6ca"
+    },
+    {
+      "path": "docs/optimization/baselines/T00-revision1/verify_evidence.py",
+      "bytes": 8574,
+      "sha256": "0a1661b3f8a6510839bdab7b4d696a6103f38fd04e37344c466e5c43f4202d33"
+    },
+    {
+      "path": "docs/optimization/handoffs/T00.md",
+      "bytes": 8741,
+      "sha256": "f3f8cbaf897c03f95892f65d3f045e77035b60646d28181656056ceff56cd513"
+    },
+    {
+      "path": "docs/optimization/plans/T00-revision1.md",
+      "bytes": 1443,
+      "sha256": "029e22428bb18ccec08367c53704b3ef9ebb32063d6d60f122484bdbf66840a7"
+    },
+    {
+      "path": "docs/optimization/plans/V1.0.md",
+      "bytes": 6893,
+      "sha256": "080e341bc572ab89fb061c772c60b366e37e66b64470972515475211f96e5d9a"
+    },
+    {
+      "path": "tools/optimization/README.md",
+      "bytes": 10607,
+      "sha256": "a27e0987ce00a9b81c7b791c66ef66ca07a65df9a73b06a15c4950fac38693f1"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+API completed: billing
+API completed: instances
+API completed: regions
+API completed: bundles
+API completed: blueprints
+API completed: traffic
+{"errors": 0, "api_samples": 240, "browser_samples": 180, "output": "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\docs\\optimization\\baselines\\T00-revision1\\native-delivery"}

@@ -1,0 +1,40 @@
+{
+  "audited_base": "024d9d5664fa60a49c4710d129de504bfffbce2c",
+  "audited_head": "ca23f465843a327539d3f1360c39bb7975db03bd",
+  "implementation_head": "a111e853eec4b8a565b604ff295ea24e6ad88178",
+  "archive_sha256": "5eb26c8ff2ff0079d742c3586682368b0904e0edd0cc25f107c9e1a69ddbb2db",
+  "original_input_fingerprints_checked": 56,
+  "original_input_fingerprint_mismatches": [],
+  "exported_copy_differences_beyond_line_endings": [],
+  "original_statistics_groups_recalculated": 30,
+  "original_statistics_mismatches": [],
+  "original_api_samples": 240,
+  "original_browser_samples": 180,
+  "original_report_errors": [],
+  "independent_tests": {
+    "backend": 135,
+    "tool_python": 13,
+    "tool_browser": 2,
+    "traffic": "passed",
+    "frontend_build": "passed",
+    "typescript": "passed",
+    "rebuilt_assets_match": true
+  },
+  "independent_full_replay": {
+    "samples_per_case_phase": 20,
+    "api_samples": 240,
+    "api_errors": [],
+    "browser_report_complete": false,
+    "exit_code": 1,
+    "failure": "browser subprocess exceeded 900 seconds"
+  },
+  "independent_smoke_replay": {
+    "samples_per_case_phase": 2,
+    "api_samples": 24,
+    "browser_samples": 18,
+    "errors": [],
+    "browser": "157.0.8103.52"
+  },
+  "container_resource_evidence": "unmeasured",
+  "scope": "T00; no product-source changes or project integration approval"
+}

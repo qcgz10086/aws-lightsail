@@ -1,0 +1,2185 @@
+{
+  "run_id": "9c9b8ab0-10af-4f7e-8a94-3c0441acb4bb",
+  "status": "completed",
+  "samples_per_case_phase": 2,
+  "idle": {
+    "calls": {},
+    "events": [],
+    "violations": [],
+    "active": 0,
+    "peak_concurrency": 0,
+    "fixture_sha256": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c",
+    "sql_queries": 0,
+    "peak_rss_bytes": 108027904,
+    "rss_bytes": 108036096,
+    "cpu_seconds": 2.875,
+    "clock_seconds": 1720492.0881824,
+    "database_bytes": {
+      "main": 258048,
+      "-wal": 0,
+      "-shm": 0
+    },
+    "journal_mode": "delete",
+    "resource_scope": "native Python benchmark host, including static asset serving",
+    "one_core_cpu_percent": 0.0
+  },
+  "results": [
+    {
+      "case": "billing",
+      "phase": "first_request",
+      "sample": 0,
+      "elapsed_ms": 496.56779994256794,
+      "status_code": 200,
+      "response_bytes": 1287,
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "events": [
+        {
+          "service": "ce",
+          "operation": "get_cost_and_usage",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-11-18"
+            },
+            "Granularity": "MONTHLY",
+            "Metrics": [
+              "UnblendedCost",
+              "NetUnblendedCost"
+            ],
+            "GroupBy": [
+              {
+                "Type": "DIMENSION",
+                "Key": "SERVICE"
+              }
+            ]
+          }
+        },
+        {
+          "service": "ce",
+          "operation": "get_cost_forecast",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-12-01"
+            },
+            "Granularity": "MONTHLY",
+            "Metric": "UNBLENDED_COST"
+          }
+        },
+        {
+          "service": "sts",
+          "operation": "get_caller_identity",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "billing",
+          "operation": "get_credits",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "accountId": "111111111111",
+            "startDate": "2025-11-18T00:00:00+00:00",
+            "endDate": "2026-11-17T00:00:00+00:00"
+          }
+        },
+        {
+          "service": "ce",
+          "operation": "get_cost_and_usage",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-01-01",
+              "End": "2026-11-18"
+            },
+            "Granularity": "MONTHLY",
+            "Metrics": [
+              "UnblendedCost",
+              "NetUnblendedCost"
+            ]
+          }
+        },
+        {
+          "service": "ce",
+          "operation": "get_cost_and_usage",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-01-01",
+              "End": "2026-11-18"
+            },
+            "Granularity": "MONTHLY",
+            "Metrics": [
+              "UnblendedCost",
+              "NetUnblendedCost"
+            ]
+          }
+        }
+      ],
+      "sql_queries": 3,
+      "rss_bytes": 109006848,
+      "peak_rss_bytes": 108974080,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.03125,
+      "wall_seconds": 0.5002776999026537,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_request",
+      "sample": 0,
+      "elapsed_ms": 489.6645999979228,
+      "status_code": 200,
+      "response_bytes": 1287,
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "events": [
+        {
+          "service": "ce",
+          "operation": "get_cost_and_usage",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-11-18"
+            },
+            "Granularity": "MONTHLY",
+            "Metrics": [
+              "UnblendedCost",
+              "NetUnblendedCost"
+            ],
+            "GroupBy": [
+              {
+                "Type": "DIMENSION",
+                "Key": "SERVICE"
+              }
+            ]
+          }
+        },
+        {
+          "service": "ce",
+          "operation": "get_cost_forecast",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-12-01"
+            },
+            "Granularity": "MONTHLY",
+            "Metric": "UNBLENDED_COST"
+          }
+        },
+        {
+          "service": "sts",
+          "operation": "get_caller_identity",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "billing",
+          "operation": "get_credits",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "accountId": "111111111111",
+            "startDate": "2025-11-18T00:00:00+00:00",
+            "endDate": "2026-11-17T00:00:00+00:00"
+          }
+        },
+        {
+          "service": "ce",
+          "operation": "get_cost_and_usage",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-01-01",
+              "End": "2026-11-18"
+            },
+            "Granularity": "MONTHLY",
+            "Metrics": [
+              "UnblendedCost",
+              "NetUnblendedCost"
+            ]
+          }
+        },
+        {
+          "service": "ce",
+          "operation": "get_cost_and_usage",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-01-01",
+              "End": "2026-11-18"
+            },
+            "Granularity": "MONTHLY",
+            "Metrics": [
+              "UnblendedCost",
+              "NetUnblendedCost"
+            ]
+          }
+        }
+      ],
+      "sql_queries": 3,
+      "rss_bytes": 109015040,
+      "peak_rss_bytes": 109015040,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.0,
+      "wall_seconds": 0.4931435000617057,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "billing",
+      "phase": "first_request",
+      "sample": 1,
+      "elapsed_ms": 490.24019995704293,
+      "status_code": 200,
+      "response_bytes": 1287,
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "events": [
+        {
+          "service": "ce",
+          "operation": "get_cost_and_usage",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-11-18"
+            },
+            "Granularity": "MONTHLY",
+            "Metrics": [
+              "UnblendedCost",
+              "NetUnblendedCost"
+            ],
+            "GroupBy": [
+              {
+                "Type": "DIMENSION",
+                "Key": "SERVICE"
+              }
+            ]
+          }
+        },
+        {
+          "service": "ce",
+          "operation": "get_cost_forecast",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-12-01"
+            },
+            "Granularity": "MONTHLY",
+            "Metric": "UNBLENDED_COST"
+          }
+        },
+        {
+          "service": "sts",
+          "operation": "get_caller_identity",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "billing",
+          "operation": "get_credits",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "accountId": "111111111111",
+            "startDate": "2025-11-18T00:00:00+00:00",
+            "endDate": "2026-11-17T00:00:00+00:00"
+          }
+        },
+        {
+          "service": "ce",
+          "operation": "get_cost_and_usage",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-01-01",
+              "End": "2026-11-18"
+            },
+            "Granularity": "MONTHLY",
+            "Metrics": [
+              "UnblendedCost",
+              "NetUnblendedCost"
+            ]
+          }
+        },
+        {
+          "service": "ce",
+          "operation": "get_cost_and_usage",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-01-01",
+              "End": "2026-11-18"
+            },
+            "Granularity": "MONTHLY",
+            "Metrics": [
+              "UnblendedCost",
+              "NetUnblendedCost"
+            ]
+          }
+        }
+      ],
+      "sql_queries": 3,
+      "rss_bytes": 109101056,
+      "peak_rss_bytes": 109096960,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.0,
+      "wall_seconds": 0.4937293999828398,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "billing",
+      "phase": "repeat_request",
+      "sample": 1,
+      "elapsed_ms": 492.8506000433117,
+      "status_code": 200,
+      "response_bytes": 1287,
+      "aws_calls": {
+        "ce.get_cost_and_usage": 3,
+        "ce.get_cost_forecast": 1,
+        "sts.get_caller_identity": 1,
+        "billing.get_credits": 1
+      },
+      "events": [
+        {
+          "service": "ce",
+          "operation": "get_cost_and_usage",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-11-18"
+            },
+            "Granularity": "MONTHLY",
+            "Metrics": [
+              "UnblendedCost",
+              "NetUnblendedCost"
+            ],
+            "GroupBy": [
+              {
+                "Type": "DIMENSION",
+                "Key": "SERVICE"
+              }
+            ]
+          }
+        },
+        {
+          "service": "ce",
+          "operation": "get_cost_forecast",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-12-01"
+            },
+            "Granularity": "MONTHLY",
+            "Metric": "UNBLENDED_COST"
+          }
+        },
+        {
+          "service": "sts",
+          "operation": "get_caller_identity",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "billing",
+          "operation": "get_credits",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "accountId": "111111111111",
+            "startDate": "2025-11-18T00:00:00+00:00",
+            "endDate": "2026-11-17T00:00:00+00:00"
+          }
+        },
+        {
+          "service": "ce",
+          "operation": "get_cost_and_usage",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-01-01",
+              "End": "2026-11-18"
+            },
+            "Granularity": "MONTHLY",
+            "Metrics": [
+              "UnblendedCost",
+              "NetUnblendedCost"
+            ]
+          }
+        },
+        {
+          "service": "ce",
+          "operation": "get_cost_and_usage",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "TimePeriod": {
+              "Start": "2026-01-01",
+              "End": "2026-11-18"
+            },
+            "Granularity": "MONTHLY",
+            "Metrics": [
+              "UnblendedCost",
+              "NetUnblendedCost"
+            ]
+          }
+        }
+      ],
+      "sql_queries": 3,
+      "rss_bytes": 109129728,
+      "peak_rss_bytes": 109129728,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.0,
+      "wall_seconds": 0.49789480003528297,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_request",
+      "sample": 0,
+      "elapsed_ms": 805.4784000851214,
+      "status_code": 200,
+      "response_bytes": 20851,
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        }
+      ],
+      "sql_queries": 110,
+      "rss_bytes": 109592576,
+      "peak_rss_bytes": 109580288,
+      "peak_concurrency": 5,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 0.8089303998276591,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_request",
+      "sample": 0,
+      "elapsed_ms": 790.1752998586744,
+      "status_code": 200,
+      "response_bytes": 20851,
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        }
+      ],
+      "sql_queries": 110,
+      "rss_bytes": 109645824,
+      "peak_rss_bytes": 109641728,
+      "peak_concurrency": 5,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 0.7935988998506218,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "instances",
+      "phase": "first_request",
+      "sample": 1,
+      "elapsed_ms": 797.7183000184596,
+      "status_code": 200,
+      "response_bytes": 20887,
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {}
+        }
+      ],
+      "sql_queries": 110,
+      "rss_bytes": 109727744,
+      "peak_rss_bytes": 109707264,
+      "peak_concurrency": 5,
+      "cpu_seconds": 0.078125,
+      "wall_seconds": 0.8011861999984831,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "instances",
+      "phase": "repeat_request",
+      "sample": 1,
+      "elapsed_ms": 796.927000163123,
+      "status_code": 200,
+      "response_bytes": 20887,
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_ALPHA_DUPLICATE",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "2"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_instances",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {
+            "pageToken": "4"
+          }
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_static_ips",
+          "key": "T00_BETA_PRIMARY",
+          "account_id": "222222222222",
+          "region": "ap-northeast-1",
+          "params": {}
+        }
+      ],
+      "sql_queries": 110,
+      "rss_bytes": 109780992,
+      "peak_rss_bytes": 109780992,
+      "peak_concurrency": 5,
+      "cpu_seconds": 0.0625,
+      "wall_seconds": 0.8001715000718832,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "regions",
+      "phase": "first_request",
+      "sample": 0,
+      "elapsed_ms": 85.47619986347854,
+      "status_code": 200,
+      "response_bytes": 151,
+      "aws_calls": {
+        "lightsail.get_regions": 1
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        }
+      ],
+      "sql_queries": 2,
+      "rss_bytes": 109842432,
+      "peak_rss_bytes": 109842432,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.08858789992518723,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "regions",
+      "phase": "repeat_request",
+      "sample": 0,
+      "elapsed_ms": 84.28589999675751,
+      "status_code": 200,
+      "response_bytes": 151,
+      "aws_calls": {
+        "lightsail.get_regions": 1
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        }
+      ],
+      "sql_queries": 2,
+      "rss_bytes": 109842432,
+      "peak_rss_bytes": 109842432,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.0,
+      "wall_seconds": 0.0873488001525402,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "regions",
+      "phase": "first_request",
+      "sample": 1,
+      "elapsed_ms": 85.13600006699562,
+      "status_code": 200,
+      "response_bytes": 151,
+      "aws_calls": {
+        "lightsail.get_regions": 1
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        }
+      ],
+      "sql_queries": 2,
+      "rss_bytes": 109928448,
+      "peak_rss_bytes": 109928448,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.0,
+      "wall_seconds": 0.09001759998500347,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "regions",
+      "phase": "repeat_request",
+      "sample": 1,
+      "elapsed_ms": 85.48440015874803,
+      "status_code": 200,
+      "response_bytes": 151,
+      "aws_calls": {
+        "lightsail.get_regions": 1
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_regions",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "includeAvailabilityZones": true
+          }
+        }
+      ],
+      "sql_queries": 2,
+      "rss_bytes": 109928448,
+      "peak_rss_bytes": 109928448,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.0,
+      "wall_seconds": 0.08917390019632876,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "bundles",
+      "phase": "first_request",
+      "sample": 0,
+      "elapsed_ms": 168.36509993299842,
+      "status_code": 200,
+      "response_bytes": 833,
+      "aws_calls": {
+        "lightsail.get_bundles": 2
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_bundles",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_bundles",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        }
+      ],
+      "sql_queries": 2,
+      "rss_bytes": 109936640,
+      "peak_rss_bytes": 109936640,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.17299259989522398,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "bundles",
+      "phase": "repeat_request",
+      "sample": 0,
+      "elapsed_ms": 165.48449988476932,
+      "status_code": 200,
+      "response_bytes": 833,
+      "aws_calls": {
+        "lightsail.get_bundles": 2
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_bundles",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_bundles",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        }
+      ],
+      "sql_queries": 2,
+      "rss_bytes": 109936640,
+      "peak_rss_bytes": 109936640,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.0,
+      "wall_seconds": 0.16867330018430948,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "bundles",
+      "phase": "first_request",
+      "sample": 1,
+      "elapsed_ms": 165.4010999482125,
+      "status_code": 200,
+      "response_bytes": 833,
+      "aws_calls": {
+        "lightsail.get_bundles": 2
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_bundles",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_bundles",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        }
+      ],
+      "sql_queries": 2,
+      "rss_bytes": 110002176,
+      "peak_rss_bytes": 110002176,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.1684733999427408,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "bundles",
+      "phase": "repeat_request",
+      "sample": 1,
+      "elapsed_ms": 165.71199987083673,
+      "status_code": 200,
+      "response_bytes": 833,
+      "aws_calls": {
+        "lightsail.get_bundles": 2
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_bundles",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_bundles",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        }
+      ],
+      "sql_queries": 2,
+      "rss_bytes": 110002176,
+      "peak_rss_bytes": 110002176,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.0,
+      "wall_seconds": 0.1688171001151204,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "blueprints",
+      "phase": "first_request",
+      "sample": 0,
+      "elapsed_ms": 166.32840014062822,
+      "status_code": 200,
+      "response_bytes": 593,
+      "aws_calls": {
+        "lightsail.get_blueprints": 2
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_blueprints",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_blueprints",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        }
+      ],
+      "sql_queries": 2,
+      "rss_bytes": 110002176,
+      "peak_rss_bytes": 110002176,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.0,
+      "wall_seconds": 0.1701272998470813,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "blueprints",
+      "phase": "repeat_request",
+      "sample": 0,
+      "elapsed_ms": 167.1331999823451,
+      "status_code": 200,
+      "response_bytes": 593,
+      "aws_calls": {
+        "lightsail.get_blueprints": 2
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_blueprints",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_blueprints",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        }
+      ],
+      "sql_queries": 2,
+      "rss_bytes": 110002176,
+      "peak_rss_bytes": 110002176,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.17100289999507368,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "blueprints",
+      "phase": "first_request",
+      "sample": 1,
+      "elapsed_ms": 165.0680999737233,
+      "status_code": 200,
+      "response_bytes": 593,
+      "aws_calls": {
+        "lightsail.get_blueprints": 2
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_blueprints",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_blueprints",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        }
+      ],
+      "sql_queries": 2,
+      "rss_bytes": 110002176,
+      "peak_rss_bytes": 110002176,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.16867329995147884,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "blueprints",
+      "phase": "repeat_request",
+      "sample": 1,
+      "elapsed_ms": 165.84999999031425,
+      "status_code": 200,
+      "response_bytes": 593,
+      "aws_calls": {
+        "lightsail.get_blueprints": 2
+      },
+      "events": [
+        {
+          "service": "lightsail",
+          "operation": "get_blueprints",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {}
+        },
+        {
+          "service": "lightsail",
+          "operation": "get_blueprints",
+          "key": "T00_ALPHA_PRIMARY",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "params": {
+            "pageToken": "2"
+          }
+        }
+      ],
+      "sql_queries": 2,
+      "rss_bytes": 110002176,
+      "peak_rss_bytes": 110002176,
+      "peak_concurrency": 1,
+      "cpu_seconds": 0.0,
+      "wall_seconds": 0.16932579991407692,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "traffic",
+      "phase": "first_request",
+      "sample": 0,
+      "elapsed_ms": 10.267300065606833,
+      "status_code": 200,
+      "response_bytes": 9935,
+      "aws_calls": {},
+      "events": [],
+      "sql_queries": 4,
+      "rss_bytes": 110080000,
+      "peak_rss_bytes": 110080000,
+      "peak_concurrency": 0,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.01716490020044148,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "traffic",
+      "phase": "repeat_request",
+      "sample": 0,
+      "elapsed_ms": 5.981500027701259,
+      "status_code": 200,
+      "response_bytes": 9935,
+      "aws_calls": {},
+      "events": [],
+      "sql_queries": 4,
+      "rss_bytes": 110084096,
+      "peak_rss_bytes": 110084096,
+      "peak_concurrency": 0,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.01105430000461638,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "traffic",
+      "phase": "first_request",
+      "sample": 1,
+      "elapsed_ms": 7.297699805349112,
+      "status_code": 200,
+      "response_bytes": 9935,
+      "aws_calls": {},
+      "events": [],
+      "sql_queries": 4,
+      "rss_bytes": 110170112,
+      "peak_rss_bytes": 110170112,
+      "peak_concurrency": 0,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.010257499990984797,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    },
+    {
+      "case": "traffic",
+      "phase": "repeat_request",
+      "sample": 1,
+      "elapsed_ms": 6.109199952334166,
+      "status_code": 200,
+      "response_bytes": 9935,
+      "aws_calls": {},
+      "events": [],
+      "sql_queries": 4,
+      "rss_bytes": 110174208,
+      "peak_rss_bytes": 110174208,
+      "peak_concurrency": 0,
+      "cpu_seconds": 0.015625,
+      "wall_seconds": 0.009647300001233816,
+      "database_bytes": {
+        "main": 258048,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "violations": []
+    }
+  ],
+  "errors": []
+}

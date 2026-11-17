@@ -1,0 +1,8 @@
+test_loopback_bridge_preserves_post_cookies_and_binary_response (tools.optimization.tests.test_container.ContainerResourceTests.test_loopback_bridge_preserves_post_cookies_and_binary_response) ... ok
+test_memory_excludes_only_inactive_file_and_cpu_uses_window (tools.optimization.tests.test_container.ContainerResourceTests.test_memory_excludes_only_inactive_file_and_cpu_uses_window) ... ok
+test_missing_cgroup_files_fail_instead_of_reporting_zero (tools.optimization.tests.test_container.ContainerResourceTests.test_missing_cgroup_files_fail_instead_of_reporting_zero) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.146s
+
+OK

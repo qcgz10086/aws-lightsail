@@ -1,0 +1,264 @@
+{
+  "machine_id": "m_agqymokr64sggvjgxypiphnoke",
+  "remote_root": "/data/lightsail-t00-revision1",
+  "tool_head": "79d46dfbceff86fefec89c12db357ee03bfe1701",
+  "runs": {
+    "base": {
+      "run": {
+        "run_id": "8cc5dfcd-2b69-4dc6-a45f-fbd787faa7ab",
+        "status": "completed",
+        "started_at_utc": "2026-11-17T14:45:24.978319+00:00",
+        "exit_code": 0,
+        "source_commit": "024d9d5664fa60a49c4710d129de504bfffbce2c",
+        "finished_at_utc": "2026-11-17T14:52:07.325964+00:00"
+      },
+      "statistics_groups_checked": 30,
+      "resource_windows_checked": 4,
+      "raw_cgroup_samples": 3806,
+      "resources": {
+        "backend": {
+          "idle": {
+            "wall_seconds": 10.000700782999047,
+            "one_core_cpu_percent": 2.493625250981811,
+            "peak_working_set_bytes": 90529792,
+            "mean_working_set_bytes": 90209689.6
+          },
+          "workload": {
+            "wall_seconds": 379.6999455089972,
+            "one_core_cpu_percent": 17.57712446087737,
+            "peak_working_set_bytes": 94498816,
+            "mean_working_set_bytes": 93364966.11701266
+          }
+        },
+        "frontend": {
+          "idle": {
+            "wall_seconds": 10.000717453003745,
+            "one_core_cpu_percent": 0,
+            "peak_working_set_bytes": 5111808,
+            "mean_working_set_bytes": 5041766.4
+          },
+          "workload": {
+            "wall_seconds": 379.6999737189981,
+            "one_core_cpu_percent": 0.45278881195613285,
+            "peak_working_set_bytes": 6574080,
+            "mean_working_set_bytes": 5624131.571852251
+          }
+        }
+      },
+      "image_total_bytes": 677126001,
+      "pages_first_data": [
+        {
+          "case": "dashboard",
+          "phase": "first_visit",
+          "count": 20,
+          "median_ms": 1423.644,
+          "p95_ms": 2463.737
+        },
+        {
+          "case": "instances",
+          "phase": "first_visit",
+          "count": 20,
+          "median_ms": 1454.938,
+          "p95_ms": 1578.699
+        },
+        {
+          "case": "billing",
+          "phase": "first_visit",
+          "count": 20,
+          "median_ms": 1244.168,
+          "p95_ms": 1487.765
+        }
+      ],
+      "database": {
+        "main": 1867776,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "raw_cgroup_sha256": "9b0852201b78d3fa9f00087f2592f9d54ac23e68f51f91f7ffb2091dc6ab9146",
+      "api_samples": 240,
+      "browser_samples": 180
+    },
+    "candidate": {
+      "run": {
+        "run_id": "963b5736-2736-4a15-b44b-2e65fc5c5d34",
+        "status": "completed",
+        "started_at_utc": "2026-11-17T14:52:07.721408+00:00",
+        "exit_code": 0,
+        "source_commit": "ca23f465843a327539d3f1360c39bb7975db03bd",
+        "finished_at_utc": "2026-11-17T14:58:34.702357+00:00"
+      },
+      "statistics_groups_checked": 30,
+      "resource_windows_checked": 4,
+      "raw_cgroup_samples": 3669,
+      "resources": {
+        "backend": {
+          "idle": {
+            "wall_seconds": 10.000674743998388,
+            "one_core_cpu_percent": 2.5407285658648666,
+            "peak_working_set_bytes": 91672576,
+            "mean_working_set_bytes": 91368985.34653465
+          },
+          "workload": {
+            "wall_seconds": 363.06325957900117,
+            "one_core_cpu_percent": 18.237858624632295,
+            "peak_working_set_bytes": 95191040,
+            "mean_working_set_bytes": 94201681.07980958
+          }
+        },
+        "frontend": {
+          "idle": {
+            "wall_seconds": 10.000669793997076,
+            "one_core_cpu_percent": 0,
+            "peak_working_set_bytes": 5304320,
+            "mean_working_set_bytes": 5300345.663366336
+          },
+          "workload": {
+            "wall_seconds": 363.06329641900084,
+            "one_core_cpu_percent": 0.4166463575139934,
+            "peak_working_set_bytes": 5898240,
+            "mean_working_set_bytes": 5426738.898907869
+          }
+        }
+      },
+      "image_total_bytes": 677126001,
+      "pages_first_data": [
+        {
+          "case": "dashboard",
+          "phase": "first_visit",
+          "count": 20,
+          "median_ms": 1363.271,
+          "p95_ms": 1530.8
+        },
+        {
+          "case": "instances",
+          "phase": "first_visit",
+          "count": 20,
+          "median_ms": 1536.416,
+          "p95_ms": 1733.276
+        },
+        {
+          "case": "billing",
+          "phase": "first_visit",
+          "count": 20,
+          "median_ms": 1303.978,
+          "p95_ms": 1559.532
+        }
+      ],
+      "database": {
+        "main": 1867776,
+        "-wal": 0,
+        "-shm": 0
+      },
+      "raw_cgroup_sha256": "8e3a7b7dc616b1295ff6aa6e1f490af74a83003ce0ee9543b44083bf234d4557",
+      "api_samples": 240,
+      "browser_samples": 180
+    }
+  },
+  "paired_same_production_files": 58,
+  "paired_same_tool_files": 14,
+  "paired_equal_image_runtime_fields": [
+    "Architecture",
+    "Os",
+    "Config",
+    "RootFS",
+    "Size",
+    "Created"
+  ],
+  "source_archives": {
+    "base": {
+      "backend": "2ab0c21b45689eba337dcf80be59f74c513d11a4ffcdb941b3c8709971c34f1c",
+      "frontend": "46c921287b4d6cf2fcebb1e3187b2d6080006b4d0f09bcf419d0b54b9b8dbd0d"
+    },
+    "candidate": {
+      "backend": "b6b1a3f976c15d99d95a93bb6ea3fa907426ac419ab56f1d2f792e6d4a3956a1",
+      "frontend": "ce2f7babe187b7ce4474723079d8b6c6babd7e770647c547242904b430fbe846"
+    }
+  },
+  "environment": {
+    "platform": "Linux-6.18.54-instabox-x86_64-with-glibc2.41",
+    "logical_cpu_count": 4,
+    "system_memory_bytes": 8351297536,
+    "configured_memory_mib": 8192,
+    "node": "v22.23.3",
+    "browser": "154.0.8037.57",
+    "docker": "29.8.2",
+    "cgroup_version": 2,
+    "driver_python": "3.12.2 (main, Feb 25 2024, 04:38:01) [Clang 17.0.6 ]",
+    "backend_image_python": "3.12.16",
+    "frontend_image_nginx": "1.27.5"
+  },
+  "images": {
+    "base": {
+      "backend": {
+        "tag": "lightsail-t00-backend:024d9d5664fa",
+        "id": "sha256:17427a9b392cb0ead93036ca488cbb71aa2dadc089568a1058d64cb5004857bc",
+        "size_bytes": 601138554
+      },
+      "frontend": {
+        "tag": "lightsail-t00-frontend:024d9d5664fa",
+        "id": "sha256:0db10cf46ed775db6cad220b101a1f5be62be2201b02622a5525a9f78f2ccd5a",
+        "size_bytes": 75987447
+      }
+    },
+    "candidate": {
+      "backend": {
+        "tag": "lightsail-t00-backend:ca23f465843a",
+        "id": "sha256:b15660664c13e949f6ccdf151eac6523a7d6682375e8805604be935b73192f9f",
+        "size_bytes": 601138554
+      },
+      "frontend": {
+        "tag": "lightsail-t00-frontend:ca23f465843a",
+        "id": "sha256:703cc94b96f52fadc5b2901a40e67c2b3315cc8ae4ab0cc5fbe7918bd82e37d7",
+        "size_bytes": 75987447
+      }
+    }
+  },
+  "full_receipt": {
+    "path": "/data/lightsail-t00-revision1/container-verification.json",
+    "sha256": "72b99ad749a7ecd8c00deb420ebf708d941f834f164b7338ebe392e8e469f267",
+    "bytes": 30225
+  },
+  "raw_archive": {
+    "path": "/data/lightsail-t00-revision1/container-evidence-delivery.tar.xz",
+    "sha256": "8d1b0a38d49bbe03217c06b334202c883c9ba88c65627d1c202be507f902f5aa",
+    "bytes": 270572
+  },
+  "image_archive": {
+    "path": "/data/lightsail-t00-revision1/production-images-delivery.tar",
+    "sha256": "ba0c678b597c1845a5bea299de5e9ccf047c456ae43ec6bbdc49ce188f83583b",
+    "bytes": 177861120
+  },
+  "projection": "Local summary only. Full input/file hashes, every page phase, precise windows, image inspect, raw samples and Docker environment are retained in full_receipt/raw_archive.",
+  "local_runtime_fingerprints_checked": 14,
+  "local_runtime_fingerprint_mismatches": [],
+  "runtime_sha256": {
+    "tools/optimization/progress_report.mjs": "2a7e80f390274c518826ff2b48f74e2c213931c9e6e9675a2a55d0f863f85e09",
+    "tools/optimization/requirements.txt": "12776e575c334bdb14af784a300455147abdd15c94e9ee3d22c742e31a7c37f5",
+    "tools/optimization/browser_benchmark.mjs": "cf9ce28e24df87f2dd30bc25786c4a3da8106446b6b5c34d991703efe287fd42",
+    "tools/optimization/fake_aws.py": "52b995ef67346e66fd672c031cfed2bd8dd9a8bbacef86668da38c90726260f9",
+    "tools/optimization/measure.py": "e5eb3feb6e229387750351db3e83e9268469243d77ad39d65e64f103a96f8831",
+    "tools/optimization/package.json": "89dde57af030a09e9e767e100c4207917295f3ab9acae091a6dc3614ffaf330d",
+    "tools/optimization/benchmark_server.py": "89f0dd8511f574747eb48b0504e0308bf284222a227d52f2a55dac539e315250",
+    "tools/optimization/readiness.mjs": "6901a3af330c155edace1e2450d91f85ed07155f966009bb75c6a1639b6bb7a6",
+    "tools/optimization/offline_proxy.mjs": "9ed44b7749f8e95f95cb00747a04372981ebb07f80a180532609077c71f3bf1b",
+    "tools/optimization/package-lock.json": "d96fb0371e2ee0bf51b2488df05225ddbabb6d4d003a49fe83fda7a83261357e",
+    "tools/optimization/processes.py": "e4718c5e28cc8724953ad9d919ac788f30da135268dd89cba22c32fb758b33c6",
+    "tools/optimization/run_baseline.py": "296681d20bde1a849235294e5ab07150329e2cf988079a200ec1a7e2c6028c1d",
+    "tools/optimization/container_baseline.py": "c52686673fb8eda4acf32daa81bd876ded7798ca546ec8f545ca08b46b7bcc9f",
+    "tools/optimization/fixtures/aws.json": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c"
+  },
+  "local_projection_note": "Derived from verified summary transfer SHA256 ae60ab6d68037ace962ee0b183147e38e9568a2c6305145367108aa8eb03fd79; environment corrected from original environment.json and runtime hashes independently matched against the local worktree.",
+  "image_runtime_probe": {
+    "commands": [
+      "docker run --rm --network none --read-only lightsail-t00-backend:024d9d5664fa python --version",
+      "docker run --rm --network none --read-only lightsail-t00-backend:ca23f465843a python --version",
+      "docker run --rm --network none --read-only lightsail-t00-frontend:024d9d5664fa nginx -v"
+    ],
+    "backend_outputs": [
+      "Python 3.12.16",
+      "Python 3.12.16"
+    ],
+    "frontend_output": "nginx version: nginx/1.27.5",
+    "scope": "post-measurement runtime version probes; not included in original raw archive"
+  }
+}

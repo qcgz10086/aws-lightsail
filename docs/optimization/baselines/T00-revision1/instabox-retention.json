@@ -1,0 +1,21 @@
+{
+  "machine_id": "m_agqymokr64sggvjgxypiphnoke",
+  "name": "instabox",
+  "state": "suspended",
+  "operation_state": "succeeded",
+  "updated_at_utc": "2026-11-17T15:19:53.250336Z",
+  "persistent_mount": "/data",
+  "persistent_disk_gib": 20,
+  "storage_synced_at_suspend": false,
+  "note": "Actual suspend/resume retained all three remote artifacts with identical SHA256. Resume storage receipt was synced=true; final suspension returned synced=false and its latest sync is not yet confirmed. Resume to read/copy artifacts.",
+  "raw_directory": "/data/lightsail-t00-revision1",
+  "snapshot_sequence": 10,
+  "resume_check": {
+    "at_utc": "2026-11-17T15:19:19.727129Z",
+    "storage_synced": true,
+    "raw_evidence_sha256": "8d1b0a38d49bbe03217c06b334202c883c9ba88c65627d1c202be507f902f5aa",
+    "images_sha256": "ba0c678b597c1845a5bea299de5e9ccf047c456ae43ec6bbdc49ce188f83583b",
+    "full_receipt_sha256": "72b99ad749a7ecd8c00deb420ebf708d941f834f164b7338ebe392e8e469f267",
+    "all_hashes_match_before_suspend": true
+  }
+}

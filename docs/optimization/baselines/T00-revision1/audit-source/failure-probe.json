@@ -1,0 +1,25 @@
+{
+  "network": {
+    "unguarded_operations": [
+      {
+        "operation": "sendto",
+        "destination": [
+          "192.0.2.10",
+          443
+        ]
+      },
+      {
+        "operation": "getaddrinfo",
+        "host": "audit-no-real-resolution.invalid"
+      }
+    ],
+    "real_external_io": false
+  },
+  "outcome": {
+    "exception": "TimeoutExpired",
+    "timeout_seconds": 4.0
+  },
+  "observed_chrome_processes": 8,
+  "surviving_chrome_after_driver_timeout": [],
+  "probe_cleanup_requested": true
+}

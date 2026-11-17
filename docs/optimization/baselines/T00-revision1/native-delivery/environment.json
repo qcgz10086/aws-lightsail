@@ -1,0 +1,308 @@
+{
+  "captured_at_utc": "2026-11-17T14:42:05.621571+00:00",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "python_executable": "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+  "worktree": "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail",
+  "logical_cpu_count": 8,
+  "physical_cpu_count": 4,
+  "system_memory_bytes": 17048571904,
+  "git_head": {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout": "79d46dfbceff86fefec89c12db357ee03bfe1701",
+    "stderr": ""
+  },
+  "node": {
+    "command": [
+      "C:\\Program Files\\nodejs\\node.EXE",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "v20.11.1",
+    "stderr": ""
+  },
+  "pip_check": {
+    "command": [
+      "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+      "-m",
+      "pip",
+      "check"
+    ],
+    "exit_code": 0,
+    "stdout": "No broken requirements found.",
+    "stderr": ""
+  },
+  "packages": [
+    {
+      "name": "annotated-doc",
+      "version": "0.0.6"
+    },
+    {
+      "name": "annotated-types",
+      "version": "0.8.0"
+    },
+    {
+      "name": "anyio",
+      "version": "4.16.0"
+    },
+    {
+      "name": "APScheduler",
+      "version": "3.10.4"
+    },
+    {
+      "name": "bcrypt",
+      "version": "4.2.1"
+    },
+    {
+      "name": "boto3",
+      "version": "1.44.3"
+    },
+    {
+      "name": "botocore",
+      "version": "1.44.4"
+    },
+    {
+      "name": "certifi",
+      "version": "2026.10.23"
+    },
+    {
+      "name": "cffi",
+      "version": "2.1.1"
+    },
+    {
+      "name": "click",
+      "version": "8.5.1"
+    },
+    {
+      "name": "colorama",
+      "version": "0.4.6"
+    },
+    {
+      "name": "cryptography",
+      "version": "50.0.2"
+    },
+    {
+      "name": "ecdsa",
+      "version": "0.19.2"
+    },
+    {
+      "name": "fastapi",
+      "version": "0.163.1"
+    },
+    {
+      "name": "greenlet",
+      "version": "3.5.6"
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0"
+    },
+    {
+      "name": "httpcore",
+      "version": "1.0.9"
+    },
+    {
+      "name": "httptools",
+      "version": "0.9.0"
+    },
+    {
+      "name": "httpx",
+      "version": "0.28.1"
+    },
+    {
+      "name": "idna",
+      "version": "3.20"
+    },
+    {
+      "name": "jmespath",
+      "version": "1.1.0"
+    },
+    {
+      "name": "opentelemetry-api",
+      "version": "1.45.2"
+    },
+    {
+      "name": "pip",
+      "version": "24.0"
+    },
+    {
+      "name": "psutil",
+      "version": "7.1.3"
+    },
+    {
+      "name": "pyasn1",
+      "version": "0.6.5"
+    },
+    {
+      "name": "pycparser",
+      "version": "3.12"
+    },
+    {
+      "name": "pydantic",
+      "version": "2.10.4"
+    },
+    {
+      "name": "pydantic-settings",
+      "version": "2.7.0"
+    },
+    {
+      "name": "pydantic_core",
+      "version": "2.27.2"
+    },
+    {
+      "name": "PySocks",
+      "version": "1.7.1"
+    },
+    {
+      "name": "python-dateutil",
+      "version": "2.9.0.post0"
+    },
+    {
+      "name": "python-dotenv",
+      "version": "1.2.4"
+    },
+    {
+      "name": "python-jose",
+      "version": "3.5.0"
+    },
+    {
+      "name": "python-multipart",
+      "version": "0.0.33"
+    },
+    {
+      "name": "pytz",
+      "version": "2026.6"
+    },
+    {
+      "name": "PyYAML",
+      "version": "6.0.3"
+    },
+    {
+      "name": "rsa",
+      "version": "4.9.1"
+    },
+    {
+      "name": "s3transfer",
+      "version": "0.19.3"
+    },
+    {
+      "name": "six",
+      "version": "1.17.0"
+    },
+    {
+      "name": "SQLAlchemy",
+      "version": "2.0.36"
+    },
+    {
+      "name": "starlette",
+      "version": "1.10.0"
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.4.5"
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.16.0"
+    },
+    {
+      "name": "tzdata",
+      "version": "2026.6"
+    },
+    {
+      "name": "tzlocal",
+      "version": "5.4.5"
+    },
+    {
+      "name": "urllib3",
+      "version": "2.8.0"
+    },
+    {
+      "name": "uvicorn",
+      "version": "0.34.0"
+    },
+    {
+      "name": "watchfiles",
+      "version": "1.3.0"
+    },
+    {
+      "name": "websockets",
+      "version": "17.4"
+    }
+  ],
+  "docker": {
+    "available": false,
+    "image_total_bytes": null,
+    "container_memory_bytes": null,
+    "container_cpu_percent": null,
+    "status": "unmeasured",
+    "reason": "Docker unavailable on PATH; no image/container measurements"
+  },
+  "input_sha256": {
+    "backend/app/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend/app/config.py": "86be9b706b9f4eda373908805fbb278475654d317609ca2d4cf7a60e8b426e13",
+    "backend/app/database.py": "aa526ffcddd88650d6d11047f42e72893fe169418de4b0874b327761af0dd6cf",
+    "backend/app/deps.py": "5122475e761c40dc03d9a5f5c142a31017e06398499aa7e9d9635caf9c143dac",
+    "backend/app/main.py": "7dd159dfebce3003498855b08c359858fd48daaa72e630952980433bd742670a",
+    "backend/app/models.py": "718e529ddd5d27aed7fd5445d37145dba29643c192d182419924860e70c27f90",
+    "backend/app/password_strength.py": "9ed02a62e32cdcf74a273c1fdb963b088cacf897afbfe67a1fb204c17da24067",
+    "backend/app/proxy_config.py": "bdc75fc79ce74941d737deff1bd81c55aebe76a432cf84bca94e6eaf3b9e1c27",
+    "backend/app/rate_limit.py": "5dfb987c2424ea73c719904ea08524edd2dece439a46412e7f42852d0f4a327e",
+    "backend/app/routers/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend/app/routers/auth.py": "e08abddd736e37c562dc8d6e5a0dcc84eb6160e5ea1376c58da05db2283e15cc",
+    "backend/app/routers/billing.py": "d5fab322abfd3d34818ffeff44901b49dbc5e53566c59057bc221b4dc3f571d8",
+    "backend/app/routers/catalog.py": "d521d2bc450ba8eefcd7e5dc984f4437b6370a67f8266812e13c8870f2f7817c",
+    "backend/app/routers/credentials.py": "9b052c5c3d8ef59bbd412579c3a9550ced0c19bdd50ac0ae397ec30e22d3d9bf",
+    "backend/app/routers/instances.py": "01763fd7c9dc3570873696f434620125c7cd7e522b9d436cb00cdb34329dd34e",
+    "backend/app/routers/metrics.py": "b5241d0b0fa01d87de711d632d6181f5157c4120305640e20112641426ea60f4",
+    "backend/app/routers/users.py": "0abe777811319f24a1fe44607e7f4652ea728abeb36d95df2922531020b3e55e",
+    "backend/app/schemas.py": "b44c8008324d9e9bc0c2fc8287ac51e3b690ea22fe0ef675e2ebeb384ffd19a1",
+    "backend/app/security.py": "38debebf45ad4b6697b538366da2cbe269184c780b04c08a5cecb097e2926e3d",
+    "backend/app/seed.py": "ca9c46ef738bca6a294c18de111829894e361a8ae38e4ac3a86fddd829abef02",
+    "backend/app/services/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend/app/services/account.py": "182d95090e6997b9846842fb51e84aa4cec7a3b99a40e2029966dcb633c595b5",
+    "backend/app/services/billing.py": "f5007115475e64be025a114dda4821eeaaa1593081afd1f33e56f2b3a61bd5ee",
+    "backend/app/services/collector.py": "082d8f3485d8ded0542c7babdb476543f5a0335c97040ebff8aff24d636c642d",
+    "backend/app/services/lightsail.py": "be09efed24664af3c0051c3a6151dfbc014d8b857aca1cf65466427325f3505b",
+    "backend/app/services/traffic.py": "5b92fdbfadac6e71a3c7536d247a483b6624efcfbd4007fd3da26743a988bc46",
+    "frontend/src/api/client.ts": "f9ff8fef2b215c30096449355f09d7ee1a132886e2bafa95c8d7eed65beb0d00",
+    "frontend/src/App.tsx": "a70a3f8a30d8088eb2d5f7c4960bad99482b9ac93dab529de539743711a4535e",
+    "frontend/src/auth/AuthContext.tsx": "d35c0fdccd9f486c290a5072cf17c5da971fde08b3579be2d14f6937efa666b2",
+    "frontend/src/components/Layout.tsx": "c9d7c741fe6d40ee25f54aea7273fac63883383d8cb04a6253f4f00383506dfc",
+    "frontend/src/index.css": "acb402f436209e2db06888677bf3f28710e7b6be3f6734e4da4a90d5451f4462",
+    "frontend/src/main.tsx": "89995fdad40b248031bcd7ee1370377ed32dcab0bef646bc923b92f32e9eaa7e",
+    "frontend/src/pages/Billing.tsx": "8f5dc3db0669e2dc8df8be08dde27a0e10c33fc8055c856c8bb161c691da424c",
+    "frontend/src/pages/CreateInstance.tsx": "0482cc54f5054495a8a80cd994f1d7ad8526021ce588a590ed43ad62cbfc4821",
+    "frontend/src/pages/Credentials.tsx": "bbd9583caad42e63b9a31348b68e0b5470a520f95c8cff53596d0ca1ac8f76a3",
+    "frontend/src/pages/Dashboard.tsx": "f8bf1ad1960514049d5407e71e1334e47a28ae65fc19bcde7ba762c50f9ed794",
+    "frontend/src/pages/InstanceDetail.tsx": "ffa1d81742ed0b4bf77ee9ac48228908c47643033b7b35e55ccec55cd2e486de",
+    "frontend/src/pages/Instances.tsx": "f44c891e954b232631fc4cc7936984aa64f608ae1256055ecbb59e9f576deccb",
+    "frontend/src/pages/Login.tsx": "3ffe621bdb301a50e15d3dc7cc0dc6300d1d05462fe00cd207949b8ba13be758",
+    "frontend/src/pages/Traffic.tsx": "1ca073ed43e7ee7600d6ad38a2719ac89367568ff2077229b3f8fd0cee551107",
+    "frontend/src/pages/Users.tsx": "33e99752319c39b40dbe1462bd8331fd99322ff492d5056f05f26c74bbe2e7a2",
+    "frontend/src/vite-env.d.ts": "424faf9241dd699dda995b367ed36665732da1e6ec1f33b2fd40394488ecac92",
+    "tools/optimization/benchmark_server.py": "89f0dd8511f574747eb48b0504e0308bf284222a227d52f2a55dac539e315250",
+    "tools/optimization/container_baseline.py": "c52686673fb8eda4acf32daa81bd876ded7798ca546ec8f545ca08b46b7bcc9f",
+    "tools/optimization/fake_aws.py": "52b995ef67346e66fd672c031cfed2bd8dd9a8bbacef86668da38c90726260f9",
+    "tools/optimization/measure.py": "e5eb3feb6e229387750351db3e83e9268469243d77ad39d65e64f103a96f8831",
+    "tools/optimization/processes.py": "e4718c5e28cc8724953ad9d919ac788f30da135268dd89cba22c32fb758b33c6",
+    "tools/optimization/run_baseline.py": "296681d20bde1a849235294e5ab07150329e2cf988079a200ec1a7e2c6028c1d",
+    "tools/optimization/browser_benchmark.mjs": "cf9ce28e24df87f2dd30bc25786c4a3da8106446b6b5c34d991703efe287fd42",
+    "tools/optimization/offline_proxy.mjs": "9ed44b7749f8e95f95cb00747a04372981ebb07f80a180532609077c71f3bf1b",
+    "tools/optimization/offline_proxy.test.mjs": "cd46c329d09c778313732bb71d9f9e9a878b316bb56338ba498561ac8ed444c8",
+    "tools/optimization/progress_report.mjs": "2a7e80f390274c518826ff2b48f74e2c213931c9e6e9675a2a55d0f863f85e09",
+    "tools/optimization/progress_report.test.mjs": "b2889222138fbdea1b4b4eb6614712394a07814caabfad0ac3f4668a4c383718",
+    "tools/optimization/readiness.mjs": "6901a3af330c155edace1e2450d91f85ed07155f966009bb75c6a1639b6bb7a6",
+    "tools/optimization/readiness.test.mjs": "52c591547281b2016b8f9b27122dc7c5187eadd0ed52e13f859949a763ae7465",
+    "tools/optimization/fixtures/aws.json": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c",
+    "frontend/dist/assets/index-BbmYNEiO.js": "d88e994d3ada8867fbcc915a9ef7ba312ec86e54743fc51e1726681117a76b07",
+    "frontend/dist/assets/index-Ccfr7oNe.css": "9cd9b75980fe12ebcfe541d3e86a407fbe18d892619e7dc3188f9ee05194ab93",
+    "frontend/dist/index.html": "521eda60f05ac0c031829fe8835b48267d8f43de6ae607ccb21bd8ff99cb8158"
+  },
+  "run_id": "99ad4193-4d8a-473c-a8aa-654cb54581fc"
+}

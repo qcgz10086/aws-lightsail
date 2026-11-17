@@ -1,0 +1,271 @@
+{
+  "calls": {
+    "lightsail.get_regions": 3,
+    "lightsail.get_instances": 18,
+    "lightsail.get_static_ips": 6
+  },
+  "events": [
+    {
+      "service": "lightsail",
+      "operation": "get_regions",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "includeAvailabilityZones": true
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_regions",
+      "key": "T00_ALPHA_DUPLICATE",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "includeAvailabilityZones": true
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_regions",
+      "key": "T00_BETA_PRIMARY",
+      "account_id": "222222222222",
+      "region": "us-east-1",
+      "params": {
+        "includeAvailabilityZones": true
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_ALPHA_DUPLICATE",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {}
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_ALPHA_DUPLICATE",
+      "account_id": "111111111111",
+      "region": "ap-northeast-1",
+      "params": {}
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {}
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "ap-northeast-1",
+      "params": {}
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_BETA_PRIMARY",
+      "account_id": "222222222222",
+      "region": "us-east-1",
+      "params": {}
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_BETA_PRIMARY",
+      "account_id": "222222222222",
+      "region": "us-east-1",
+      "params": {
+        "pageToken": "2"
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "ap-northeast-1",
+      "params": {
+        "pageToken": "2"
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_ALPHA_DUPLICATE",
+      "account_id": "111111111111",
+      "region": "ap-northeast-1",
+      "params": {
+        "pageToken": "2"
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_ALPHA_DUPLICATE",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "pageToken": "2"
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "pageToken": "2"
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_BETA_PRIMARY",
+      "account_id": "222222222222",
+      "region": "us-east-1",
+      "params": {
+        "pageToken": "4"
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_ALPHA_DUPLICATE",
+      "account_id": "111111111111",
+      "region": "ap-northeast-1",
+      "params": {
+        "pageToken": "4"
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "ap-northeast-1",
+      "params": {
+        "pageToken": "4"
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_ALPHA_DUPLICATE",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "pageToken": "4"
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {
+        "pageToken": "4"
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_static_ips",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "ap-northeast-1",
+      "params": {}
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_static_ips",
+      "key": "T00_ALPHA_DUPLICATE",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {}
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_static_ips",
+      "key": "T00_ALPHA_DUPLICATE",
+      "account_id": "111111111111",
+      "region": "ap-northeast-1",
+      "params": {}
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_static_ips",
+      "key": "T00_BETA_PRIMARY",
+      "account_id": "222222222222",
+      "region": "us-east-1",
+      "params": {}
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_static_ips",
+      "key": "T00_ALPHA_PRIMARY",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "params": {}
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_BETA_PRIMARY",
+      "account_id": "222222222222",
+      "region": "ap-northeast-1",
+      "params": {}
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_BETA_PRIMARY",
+      "account_id": "222222222222",
+      "region": "ap-northeast-1",
+      "params": {
+        "pageToken": "2"
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_instances",
+      "key": "T00_BETA_PRIMARY",
+      "account_id": "222222222222",
+      "region": "ap-northeast-1",
+      "params": {
+        "pageToken": "4"
+      }
+    },
+    {
+      "service": "lightsail",
+      "operation": "get_static_ips",
+      "key": "T00_BETA_PRIMARY",
+      "account_id": "222222222222",
+      "region": "ap-northeast-1",
+      "params": {}
+    }
+  ],
+  "violations": [],
+  "active": 1,
+  "peak_concurrency": 5,
+  "fixture_sha256": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c",
+  "sql_queries": 8,
+  "peak_rss_bytes": 111058944,
+  "rss_bytes": 111058944,
+  "cpu_seconds": 6.84375,
+  "clock_seconds": 1720511.977724,
+  "database_bytes": {
+    "main": 258048,
+    "-wal": 0,
+    "-shm": 0
+  },
+  "journal_mode": "delete",
+  "resource_scope": "native Python benchmark host, including static asset serving"
+}

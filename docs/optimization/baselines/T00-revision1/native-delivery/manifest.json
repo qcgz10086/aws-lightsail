@@ -1,0 +1,75 @@
+{
+  "fixture_sha256": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c",
+  "fixture": {
+    "version": 1,
+    "date": "2026-11-17T00:00:00+00:00",
+    "delay_ms": 80,
+    "samples": 20,
+    "regions": [
+      "us-east-1",
+      "ap-northeast-1"
+    ],
+    "instances_per_region": 6,
+    "page_size": 2,
+    "keys": {
+      "T00_ALPHA_PRIMARY": "111111111111",
+      "T00_ALPHA_DUPLICATE": "111111111111",
+      "T00_BETA_PRIMARY": "222222222222"
+    },
+    "billing": {
+      "total": "30.00",
+      "net": "22.00",
+      "forecast": "45.00"
+    },
+    "credit": {
+      "initial": "100.00",
+      "remaining": "80.00",
+      "estimated": "72.00"
+    },
+    "manual_credits_per_user": 2
+  },
+  "samples": 20,
+  "api_cases": {
+    "billing": "/api/billing/summary",
+    "instances": "/api/instances",
+    "regions": "/api/catalog/regions",
+    "bundles": "/api/catalog/bundles?region=us-east-1",
+    "blueprints": "/api/catalog/blueprints?region=us-east-1",
+    "traffic": "/api/traffic/summary"
+  },
+  "page_cases": {
+    "dashboard": {
+      "path": "/",
+      "api": [
+        "/api/instances",
+        "/api/traffic/summary"
+      ],
+      "ready": ".ant-statistic-content-value",
+      "ready_text": "实例总数"
+    },
+    "instances": {
+      "path": "/instances",
+      "api": [
+        "/api/instances"
+      ],
+      "ready": ".ant-table-tbody .ant-table-row"
+    },
+    "billing": {
+      "path": "/billing",
+      "api": [
+        "/api/billing/summary"
+      ],
+      "ready": ".ant-statistic-content-value",
+      "ready_text": "本月总费用"
+    }
+  },
+  "dataset": {
+    "panel_users": 180,
+    "credentials_per_user": 3,
+    "distinct_aws_accounts_per_user": 2,
+    "regions_per_account": 2,
+    "instances_per_region": 6
+  },
+  "username_pattern": "t00-{api|page}-{case}-{sample:02}",
+  "password": "T00FixturePass123!"
+}

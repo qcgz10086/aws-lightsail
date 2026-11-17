@@ -1,0 +1,5 @@
+{"run_id":"9c9b8ab0-10af-4f7e-8a94-3c0441acb4bb","at_utc":"2026-11-17T14:03:15.182Z","case":"dashboard","sample":0,"stage":"context_begin","elapsed_seconds":0.00011329999999998108,"completed_samples":0,"errors":0}
+{"run_id":"9c9b8ab0-10af-4f7e-8a94-3c0441acb4bb","at_utc":"2026-11-17T14:03:15.552Z","case":"dashboard","sample":0,"stage":"login_completed","elapsed_seconds":0.3698063,"completed_samples":0,"errors":0}
+{"run_id":"9c9b8ab0-10af-4f7e-8a94-3c0441acb4bb","at_utc":"2026-11-17T14:03:15.797Z","case":"dashboard","phase":"first_visit","sample":0,"stage":"phase_begin","elapsed_seconds":0.6153583000000001,"completed_samples":0,"errors":0}
+{"run_id":"9c9b8ab0-10af-4f7e-8a94-3c0441acb4bb","at_utc":"2026-11-17T14:03:17.251Z","case":"dashboard","phase":"first_visit","sample":0,"stage":"phase_end","phase_wall_seconds":1.434414,"elapsed_seconds":2.0691572000000003,"completed_samples":1,"errors":0}
+{"run_id":"9c9b8ab0-10af-4f7e-8a94-3c0441acb4bb","at_utc":"2026-11-17T14:03:17.255Z","case":"dashboard","phase":"repeat_visit","sample":0,"stage":"phase_begin","elapsed_seconds":2.0730235,"completed_samples":1,"errors":0}

@@ -1,0 +1,25 @@
+test_duplicate_keys_represent_the_same_account (test_baseline.MeasurementTests.test_duplicate_keys_represent_the_same_account) ... ok
+test_empty_samples_are_missing_not_zero (test_baseline.MeasurementTests.test_empty_samples_are_missing_not_zero) ... ok
+test_external_socket_is_rejected_before_connect (test_baseline.MeasurementTests.test_external_socket_is_rejected_before_connect) ... ok
+test_fixture_is_not_mutated_by_service_consumers (test_baseline.MeasurementTests.test_fixture_is_not_mutated_by_service_consumers) ... ok
+test_p95_uses_nearest_rank_and_keeps_every_sample (test_baseline.MeasurementTests.test_p95_uses_nearest_rank_and_keeps_every_sample) ... ok
+test_real_service_consumes_all_fixture_pages (test_baseline.MeasurementTests.test_real_service_consumes_all_fixture_pages) ... ok
+test_unknown_credentials_and_operations_cannot_fall_through (test_baseline.MeasurementTests.test_unknown_credentials_and_operations_cannot_fall_through) ... ok
+test_loopback_bridge_preserves_post_cookies_and_binary_response (test_container.ContainerResourceTests.test_loopback_bridge_preserves_post_cookies_and_binary_response) ... ok
+test_memory_excludes_only_inactive_file_and_cpu_uses_window (test_container.ContainerResourceTests.test_memory_excludes_only_inactive_file_and_cpu_uses_window) ... ok
+test_missing_cgroup_files_fail_instead_of_reporting_zero (test_container.ContainerResourceTests.test_missing_cgroup_files_fail_instead_of_reporting_zero) ... ok
+test_scoped_export_does_not_read_unrelated_missing_doc_objects (test_container.ContainerResourceTests.test_scoped_export_does_not_read_unrelated_missing_doc_objects) ... ok
+test_complete_current_report_is_retained (test_reports.ReportValidationTests.test_complete_current_report_is_retained) ... ok
+test_existing_output_is_refused_without_overwriting (test_reports.ReportValidationTests.test_existing_output_is_refused_without_overwriting) ... ok
+test_failed_browser_cannot_reuse_an_existing_report (test_reports.ReportValidationTests.test_failed_browser_cannot_reuse_an_existing_report) ... ok
+test_incomplete_success_cannot_be_reported_as_complete (test_reports.ReportValidationTests.test_incomplete_success_cannot_be_reported_as_complete) ... ok
+test_running_checkpoint_cannot_be_accepted (test_reports.ReportValidationTests.test_running_checkpoint_cannot_be_accepted) ... ok
+test_wrong_run_cannot_satisfy_current_sample_count (test_reports.ReportValidationTests.test_wrong_run_cannot_satisfy_current_sample_count) ... ok
+test_other_users_credential_cannot_be_queried (test_server.OfflineHostTests.test_other_users_credential_cannot_be_queried) ... ok
+test_real_billing_route_uses_fixture_account (test_server.OfflineHostTests.test_real_billing_route_uses_fixture_account) ... ok
+test_unauthenticated_route_and_spa_fallback (test_server.OfflineHostTests.test_unauthenticated_route_and_spa_fallback) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 9.146s
+
+OK

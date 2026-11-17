@@ -1,0 +1,59 @@
+{
+  "run_id": "9c9b8ab0-10af-4f7e-8a94-3c0441acb4bb",
+  "status": "failed",
+  "results": [
+    {
+      "case": "dashboard",
+      "phase": "first_visit",
+      "sample": 0,
+      "first_data_ms": 1391.5669,
+      "complete_ms": 1424.2069,
+      "first_api_ms": 571.8981000000001,
+      "complete_api_ms": 1355.2808000000002,
+      "api_requests": [
+        {
+          "path": "/api/auth/me",
+          "ms": 428.4024999999999
+        },
+        {
+          "path": "/api/traffic/summary",
+          "ms": 571.8981000000001
+        },
+        {
+          "path": "/api/instances",
+          "ms": 1355.2808000000002
+        }
+      ],
+      "aws_calls": {
+        "lightsail.get_regions": 3,
+        "lightsail.get_instances": 18,
+        "lightsail.get_static_ips": 6
+      },
+      "sql_queries": 116,
+      "peak_concurrency": 5,
+      "rss_bytes": 111030272,
+      "peak_rss_bytes": 111030272,
+      "cpu_seconds": 0.28125,
+      "wall_seconds": 1.4362484000157565,
+      "violations": [],
+      "failures": [],
+      "page_errors": []
+    }
+  ],
+  "errors": [
+    {
+      "error": "browser process timeout"
+    }
+  ],
+  "current_stage": {
+    "run_id": "9c9b8ab0-10af-4f7e-8a94-3c0441acb4bb",
+    "at_utc": "2026-11-17T14:03:17.255Z",
+    "case": "dashboard",
+    "phase": "repeat_visit",
+    "sample": 0,
+    "stage": "phase_begin",
+    "elapsed_seconds": 2.0730235,
+    "completed_samples": 1,
+    "errors": 0
+  }
+}
