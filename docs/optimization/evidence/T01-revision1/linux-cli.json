@@ -1,0 +1,394 @@
+{
+  "status": "passed",
+  "created_at_utc": "2026-11-18T12:11:52.208982+00:00",
+  "command": [
+    "/usr/local/bin/python",
+    "/src/docs/optimization/evidence/T01/validate_cli.py",
+    "--output",
+    "/tmp/results.json"
+  ],
+  "platform": "Linux-6.18.54-instabox-x86_64-with-glibc2.41",
+  "python": "3.12.16 (main, Nov  5 2026, 07:58:20) [GCC 14.2.0]",
+  "sqlite": "3.46.1",
+  "sqlalchemy": "2.0.36",
+  "cli_smoke": {
+    "commands": [
+      {
+        "argv": [
+          "/usr/local/bin/python",
+          "-m",
+          "app.sqlite_backup",
+          "backup",
+          "--database",
+          "/tmp/tmp0ti74gu_/source.db",
+          "--output",
+          "/tmp/tmp0ti74gu_/snapshot.db"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "stdout": "{\"path\": \"/tmp/tmp0ti74gu_/snapshot.db\", \"sha256\": \"536fedcca5c153ed523bc1a3c7e35f76cf29b5bccd69d22f95b70fb1de9bd31d\", \"created_at_utc\": \"2026-11-18T12:11:50.377843+00:00\"}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "/usr/local/bin/python",
+          "-m",
+          "app.sqlite_backup",
+          "verify",
+          "--backup",
+          "/tmp/tmp0ti74gu_/snapshot.db",
+          "--sha256",
+          "536FEDCCA5C153ED523BC1A3C7E35F76CF29B5BCCD69D22F95B70FB1DE9BD31D"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "stdout": "{\"path\": \"/tmp/tmp0ti74gu_/snapshot.db\", \"sha256\": \"536fedcca5c153ed523bc1a3c7e35f76cf29b5bccd69d22f95b70fb1de9bd31d\", \"integrity\": \"ok\"}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "/usr/local/bin/python",
+          "-m",
+          "app.sqlite_backup",
+          "restore",
+          "--backup",
+          "/tmp/tmp0ti74gu_/snapshot.db",
+          "--database",
+          "/tmp/tmp0ti74gu_/source.db",
+          "--sha256",
+          "536fedcca5c153ed523bc1a3c7e35f76cf29b5bccd69d22f95b70fb1de9bd31d"
+        ],
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "stdout": "{\"status\": \"failed\", \"error\": \"Stop all database users and explicitly select offline recovery\"}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "/usr/local/bin/python",
+          "-m",
+          "app.sqlite_backup",
+          "restore",
+          "--backup",
+          "/tmp/tmp0ti74gu_/snapshot.db",
+          "--database",
+          "/tmp/tmp0ti74gu_/source.db",
+          "--sha256",
+          "0000000000000000000000000000000000000000000000000000000000000000",
+          "--offline"
+        ],
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "stdout": "{\"status\": \"failed\", \"error\": \"Backup SHA256 mismatch\"}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "/usr/local/bin/python",
+          "-m",
+          "app.sqlite_backup",
+          "restore",
+          "--backup",
+          "/tmp/tmp0ti74gu_/snapshot.db",
+          "--database",
+          "/tmp/tmp0ti74gu_/source.db",
+          "--sha256",
+          "536fedcca5c153ed523bc1a3c7e35f76cf29b5bccd69d22f95b70fb1de9bd31d",
+          "--offline"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "stdout": "{\"path\": \"/tmp/tmp0ti74gu_/source.db\", \"restored_from\": \"/tmp/tmp0ti74gu_/snapshot.db\", \"sha256\": \"536fedcca5c153ed523bc1a3c7e35f76cf29b5bccd69d22f95b70fb1de9bd31d\", \"safety_backup\": {\"path\": \"/tmp/tmp0ti74gu_/source.db.pre-restore-6c95b327b2384248a8d3ffd88384f6e9.db\", \"sha256\": \"c2ddb559fa2305ecc5ec7fa4cd3b7e73e2dc5f0508ed7e578504fba4accd2f27\", \"created_at_utc\": \"2026-11-18T12:11:50.992032+00:00\"}, \"requires_paired_images_and_task_reconciliation\": true}\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "/usr/local/bin/python",
+          "-m",
+          "app.sqlite_backup",
+          "verify",
+          "--backup",
+          "/tmp/tmp0ti74gu_/snapshot.db",
+          "--sha256",
+          "536fedcca5c153ed523bc1a3c7e35f76cf29b5bccd69d22f95b70fb1de9bd31d"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "stdout": "{\"path\": \"/tmp/tmp0ti74gu_/snapshot.db\", \"sha256\": \"536fedcca5c153ed523bc1a3c7e35f76cf29b5bccd69d22f95b70fb1de9bd31d\", \"integrity\": \"ok\"}\n",
+        "stderr": ""
+      }
+    ],
+    "restored_committed_wal": true,
+    "preserved_pre_restore_data": true,
+    "snapshot_bytes": 8192,
+    "snapshot_permission_mode": "0o600",
+    "application_secret_variables_removed": true
+  },
+  "small_fixture_observations": [
+    {
+      "fixture": "new",
+      "samples": [
+        {
+          "upgrade_ms": 5.601249999017455,
+          "restart_ms": 0.5425999988801777,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 3.54707999213133,
+          "restart_ms": 0.6362499989336357,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 4.224638993036933,
+          "restart_ms": 0.41354999120812863,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 2.8632899920921773,
+          "restart_ms": 0.40284999704454094,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 4.251949998433702,
+          "restart_ms": 0.4967800050508231,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 3.567910011042841,
+          "restart_ms": 0.5860700039193034,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 4.857448991970159,
+          "restart_ms": 0.4762899916386232,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 3.8674999959766865,
+          "restart_ms": 0.5339500057743862,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 3.5185599990654737,
+          "restart_ms": 0.5382899980759248,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        },
+        {
+          "upgrade_ms": 4.620899009751156,
+          "restart_ms": 0.4727100022137165,
+          "database_before_bytes": 0,
+          "database_after_bytes": 90112,
+          "backup_bytes": 0,
+          "backup_count": 0
+        }
+      ],
+      "upgrade_median_ms": 4.04606949450681,
+      "upgrade_p95_ms": 5.601249999017455,
+      "restart_median_ms": 0.5153650054126047
+    },
+    {
+      "fixture": "single",
+      "samples": [
+        {
+          "upgrade_ms": 9.671858992078342,
+          "restart_ms": 0.5277899908833206,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 7.555588992545381,
+          "restart_ms": 0.46861000009812415,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 13.74679000582546,
+          "restart_ms": 0.47304900363087654,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 9.954558991012163,
+          "restart_ms": 0.43801999709103256,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 7.820958999218419,
+          "restart_ms": 0.4509100108407438,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 9.588799002813175,
+          "restart_ms": 0.47588000597897917,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 10.916250001173466,
+          "restart_ms": 0.6199899944476783,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 8.388040005229414,
+          "restart_ms": 0.5360700015444309,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 12.15858999057673,
+          "restart_ms": 0.6231799925444648,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 8.700028993189335,
+          "restart_ms": 0.5585699982475489,
+          "database_before_bytes": 28672,
+          "database_after_bytes": 94208,
+          "backup_bytes": 28672,
+          "backup_count": 1
+        }
+      ],
+      "upgrade_median_ms": 9.630328997445758,
+      "upgrade_p95_ms": 13.74679000582546,
+      "restart_median_ms": 0.5018349984311499
+    },
+    {
+      "fixture": "multi",
+      "samples": [
+        {
+          "upgrade_ms": 4.947228997480124,
+          "restart_ms": 0.5103299918118864,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 6.715210009133443,
+          "restart_ms": 0.713850007741712,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 6.148269996629097,
+          "restart_ms": 0.5609499930869788,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 10.180589000810869,
+          "restart_ms": 0.4888800031039864,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 8.377890000701882,
+          "restart_ms": 0.611750001553446,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 7.367780010099523,
+          "restart_ms": 0.5764999950770289,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 8.447189000435174,
+          "restart_ms": 0.5404200055636466,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 9.029070002725348,
+          "restart_ms": 0.6797100068069994,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 7.730448996881023,
+          "restart_ms": 0.5352599982870743,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        },
+        {
+          "upgrade_ms": 6.837509004981257,
+          "restart_ms": 0.5079099937574938,
+          "database_before_bytes": 36864,
+          "database_after_bytes": 90112,
+          "backup_bytes": 36864,
+          "backup_count": 1
+        }
+      ],
+      "upgrade_median_ms": 7.549114503490273,
+      "upgrade_p95_ms": 10.180589000810869,
+      "restart_median_ms": 0.5506849993253127
+    }
+  ],
+  "limits": "10 small temporary fixtures per generation; startup and disk observations only. No page, AWS, image-size, CPU, peak-memory, production-volume or power-loss acceptance claim."
+}

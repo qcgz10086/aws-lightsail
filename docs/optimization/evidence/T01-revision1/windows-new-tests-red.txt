@@ -1,0 +1,215 @@
+test_ambiguous_unique_rule_is_not_silently_removed_or_replayed (test_migration_boundaries.BoundaryTests.test_ambiguous_unique_rule_is_not_silently_removed_or_replayed) ... 
+  test_ambiguous_unique_rule_is_not_silently_removed_or_replayed (test_migration_boundaries.BoundaryTests.test_ambiguous_unique_rule_is_not_silently_removed_or_replayed) (case='collation') ... FAIL
+  test_ambiguous_unique_rule_is_not_silently_removed_or_replayed (test_migration_boundaries.BoundaryTests.test_ambiguous_unique_rule_is_not_silently_removed_or_replayed) (case='partial') ... FAIL
+  test_ambiguous_unique_rule_is_not_silently_removed_or_replayed (test_migration_boundaries.BoundaryTests.test_ambiguous_unique_rule_is_not_silently_removed_or_replayed) (case='reordered') ... FAIL
+test_autoincrement_rejection_preserves_sequence_high_water_mark (test_migration_boundaries.BoundaryTests.test_autoincrement_rejection_preserves_sequence_high_water_mark) ... FAIL
+test_cli_rejects_occupied_output_without_touching_any_original_file (test_migration_boundaries.BoundaryTests.test_cli_rejects_occupied_output_without_touching_any_original_file) ... 
+  test_cli_rejects_occupied_output_without_touching_any_original_file (test_migration_boundaries.BoundaryTests.test_cli_rejects_occupied_output_without_touching_any_original_file) (case='wal') ... FAIL
+  test_cli_rejects_occupied_output_without_touching_any_original_file (test_migration_boundaries.BoundaryTests.test_cli_rejects_occupied_output_without_touching_any_original_file) (case='shm') ... FAIL
+  test_cli_rejects_occupied_output_without_touching_any_original_file (test_migration_boundaries.BoundaryTests.test_cli_rejects_occupied_output_without_touching_any_original_file) (case='journal') ... FAIL
+  test_cli_rejects_occupied_output_without_touching_any_original_file (test_migration_boundaries.BoundaryTests.test_cli_rejects_occupied_output_without_touching_any_original_file) (case='empty-wal') ... FAIL
+test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup (test_migration_boundaries.BoundaryTests.test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup) ... 
+  test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup (test_migration_boundaries.BoundaryTests.test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup) (case='extra') ... FAIL
+  test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup (test_migration_boundaries.BoundaryTests.test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup) (case='update') ... FAIL
+  test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup (test_migration_boundaries.BoundaryTests.test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup) (case='deferred') ... FAIL
+test_rebuild_refuses_non_rowid_primary_key (test_migration_boundaries.BoundaryTests.test_rebuild_refuses_non_rowid_primary_key) ... FAIL
+test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1 (test_migration_boundaries.BoundaryTests.test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1) ... 
+  test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1 (test_migration_boundaries.BoundaryTests.test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1) (table='instance_settings') ... FAIL
+  test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1 (test_migration_boundaries.BoundaryTests.test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1) (table='traffic_usage') ... FAIL
+test_restart_rejects_missing_ledger_metadata_or_primary_key (test_migration_boundaries.BoundaryTests.test_restart_rejects_missing_ledger_metadata_or_primary_key) ... 
+  test_restart_rejects_missing_ledger_metadata_or_primary_key (test_migration_boundaries.BoundaryTests.test_restart_rejects_missing_ledger_metadata_or_primary_key) (case='missing') ... FAIL
+  test_restart_rejects_missing_ledger_metadata_or_primary_key (test_migration_boundaries.BoundaryTests.test_restart_rejects_missing_ledger_metadata_or_primary_key) (case='no_pk') ... FAIL
+test_sidecar_appearing_at_publication_does_not_get_a_success_receipt (test_migration_boundaries.BoundaryTests.test_sidecar_appearing_at_publication_does_not_get_a_success_receipt) ... FAIL
+test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms (test_migration_boundaries.BoundaryTests.test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms) ... 
+  test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms (test_migration_boundaries.BoundaryTests.test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms) (form='explicit', table='instance_settings') ... ERROR
+  test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms (test_migration_boundaries.BoundaryTests.test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms) (form='explicit', table='traffic_usage') ... ERROR
+test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms (test_migration_boundaries.BoundaryTests.test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms) ... FAIL
+test_wal_snapshot_verifies_and_restores_without_creating_source_sidecars (test_migration_boundaries.BoundaryTests.test_wal_snapshot_verifies_and_restores_without_creating_source_sidecars) ... ok
+
+======================================================================
+ERROR: test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms (test_migration_boundaries.BoundaryTests.test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms) (form='explicit', table='instance_settings')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 176, in test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms
+    conn.execute(insert)
+sqlite3.IntegrityError: UNIQUE constraint failed: instance_settings.user_id, instance_settings.region, instance_settings.instance_name
+
+======================================================================
+ERROR: test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms (test_migration_boundaries.BoundaryTests.test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms) (form='explicit', table='traffic_usage')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 176, in test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms
+    conn.execute(insert)
+sqlite3.IntegrityError: UNIQUE constraint failed: traffic_usage.user_id, traffic_usage.region, traffic_usage.instance_name, traffic_usage.year_month
+
+======================================================================
+FAIL: test_ambiguous_unique_rule_is_not_silently_removed_or_replayed (test_migration_boundaries.BoundaryTests.test_ambiguous_unique_rule_is_not_silently_removed_or_replayed) (case='collation')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 206, in test_ambiguous_unique_rule_is_not_silently_removed_or_replayed
+    self.assert_rebuild_refused_with_intact_snapshot(path)
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 105, in assert_rebuild_refused_with_intact_snapshot
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_ambiguous_unique_rule_is_not_silently_removed_or_replayed (test_migration_boundaries.BoundaryTests.test_ambiguous_unique_rule_is_not_silently_removed_or_replayed) (case='partial')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 206, in test_ambiguous_unique_rule_is_not_silently_removed_or_replayed
+    self.assert_rebuild_refused_with_intact_snapshot(path)
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 105, in assert_rebuild_refused_with_intact_snapshot
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_ambiguous_unique_rule_is_not_silently_removed_or_replayed (test_migration_boundaries.BoundaryTests.test_ambiguous_unique_rule_is_not_silently_removed_or_replayed) (case='reordered')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 206, in test_ambiguous_unique_rule_is_not_silently_removed_or_replayed
+    self.assert_rebuild_refused_with_intact_snapshot(path)
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 105, in assert_rebuild_refused_with_intact_snapshot
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_autoincrement_rejection_preserves_sequence_high_water_mark (test_migration_boundaries.BoundaryTests.test_autoincrement_rejection_preserves_sequence_high_water_mark)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 139, in test_autoincrement_rejection_preserves_sequence_high_water_mark
+    self.assert_rebuild_refused_with_intact_snapshot(path)
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 105, in assert_rebuild_refused_with_intact_snapshot
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_cli_rejects_occupied_output_without_touching_any_original_file (test_migration_boundaries.BoundaryTests.test_cli_rejects_occupied_output_without_touching_any_original_file) (case='wal')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 65, in test_cli_rejects_occupied_output_without_touching_any_original_file
+    self.assertEqual(result.returncode, 1, result.stdout)
+AssertionError: 0 != 1 : b'{"path": "C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmpd91b37cl\\\\wal\\\\snapshot.db", "sha256": "deff5ee0fe4c30b28c6ec34950e5e38b021e84f3847fc5c008e67bd1a19980a7", "created_at_utc": "2026-11-18T11:47:12.931668+00:00"}\r\n'
+
+======================================================================
+FAIL: test_cli_rejects_occupied_output_without_touching_any_original_file (test_migration_boundaries.BoundaryTests.test_cli_rejects_occupied_output_without_touching_any_original_file) (case='shm')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 65, in test_cli_rejects_occupied_output_without_touching_any_original_file
+    self.assertEqual(result.returncode, 1, result.stdout)
+AssertionError: 0 != 1 : b'{"path": "C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmpd91b37cl\\\\shm\\\\snapshot.db", "sha256": "deff5ee0fe4c30b28c6ec34950e5e38b021e84f3847fc5c008e67bd1a19980a7", "created_at_utc": "2026-11-18T11:47:13.084139+00:00"}\r\n'
+
+======================================================================
+FAIL: test_cli_rejects_occupied_output_without_touching_any_original_file (test_migration_boundaries.BoundaryTests.test_cli_rejects_occupied_output_without_touching_any_original_file) (case='journal')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 65, in test_cli_rejects_occupied_output_without_touching_any_original_file
+    self.assertEqual(result.returncode, 1, result.stdout)
+AssertionError: 0 != 1 : b'{"path": "C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmpd91b37cl\\\\journal\\\\snapshot.db", "sha256": "deff5ee0fe4c30b28c6ec34950e5e38b021e84f3847fc5c008e67bd1a19980a7", "created_at_utc": "2026-11-18T11:47:13.249387+00:00"}\r\n'
+
+======================================================================
+FAIL: test_cli_rejects_occupied_output_without_touching_any_original_file (test_migration_boundaries.BoundaryTests.test_cli_rejects_occupied_output_without_touching_any_original_file) (case='empty-wal')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 65, in test_cli_rejects_occupied_output_without_touching_any_original_file
+    self.assertEqual(result.returncode, 1, result.stdout)
+AssertionError: 0 != 1 : b'{"path": "C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmpd91b37cl\\\\empty-wal\\\\snapshot.db", "sha256": "deff5ee0fe4c30b28c6ec34950e5e38b021e84f3847fc5c008e67bd1a19980a7", "created_at_utc": "2026-11-18T11:47:13.416392+00:00"}\r\n'
+
+======================================================================
+FAIL: test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup (test_migration_boundaries.BoundaryTests.test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup) (case='extra')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 126, in test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup
+    self.assert_rebuild_refused_with_intact_snapshot(path)
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 105, in assert_rebuild_refused_with_intact_snapshot
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup (test_migration_boundaries.BoundaryTests.test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup) (case='update')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 126, in test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup
+    self.assert_rebuild_refused_with_intact_snapshot(path)
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 105, in assert_rebuild_refused_with_intact_snapshot
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup (test_migration_boundaries.BoundaryTests.test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup) (case='deferred')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 126, in test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup
+    self.assert_rebuild_refused_with_intact_snapshot(path)
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 105, in assert_rebuild_refused_with_intact_snapshot
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_rebuild_refuses_non_rowid_primary_key (test_migration_boundaries.BoundaryTests.test_rebuild_refuses_non_rowid_primary_key)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 150, in test_rebuild_refuses_non_rowid_primary_key
+    self.assert_rebuild_refused_with_intact_snapshot(path)
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 105, in assert_rebuild_refused_with_intact_snapshot
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1 (test_migration_boundaries.BoundaryTests.test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1) (table='instance_settings')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 192, in test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1 (test_migration_boundaries.BoundaryTests.test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1) (table='traffic_usage')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 192, in test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_restart_rejects_missing_ledger_metadata_or_primary_key (test_migration_boundaries.BoundaryTests.test_restart_rejects_missing_ledger_metadata_or_primary_key) (case='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 219, in test_restart_rejects_missing_ledger_metadata_or_primary_key
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_restart_rejects_missing_ledger_metadata_or_primary_key (test_migration_boundaries.BoundaryTests.test_restart_rejects_missing_ledger_metadata_or_primary_key) (case='no_pk')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 219, in test_restart_rejects_missing_ledger_metadata_or_primary_key
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_sidecar_appearing_at_publication_does_not_get_a_success_receipt (test_migration_boundaries.BoundaryTests.test_sidecar_appearing_at_publication_does_not_get_a_success_receipt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 82, in test_sidecar_appearing_at_publication_does_not_get_a_success_receipt
+    with self.assertRaises(DatabaseRecoveryError):
+AssertionError: DatabaseRecoveryError not raised
+
+======================================================================
+FAIL: test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms (test_migration_boundaries.BoundaryTests.test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t01-db-migration\aws-lightsail\backend\tests\test_migration_boundaries.py", line 181, in test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms
+    self.assertEqual(conn.execute("SELECT * FROM writes").fetchall(), [("ap-southeast-1",)])
+AssertionError: Lists differ: [] != [('ap-southeast-1',)]
+
+Second list contains 1 additional elements.
+First extra element 0:
+('ap-southeast-1',)
+
+- []
++ [('ap-southeast-1',)]
+
+----------------------------------------------------------------------
+Ran 10 tests in 1.989s
+
+FAILED (failures=18, errors=2)

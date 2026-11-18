@@ -1,0 +1,119 @@
+{
+  "head": "7acd675ef41d5200c55b0148575d97fac0df2e9f",
+  "python": "3.12.16 (main, Nov  5 2026, 07:58:20) [GCC 14.2.0]",
+  "sqlite": "3.46.1",
+  "observations": [
+    {
+      "probe": "ledger_required_columns",
+      "accepted": false,
+      "error": "SQLite migration failed; startup stopped",
+      "cause": "Invalid migration ledger schema; review the original database and backup",
+      "ledger_columns": [
+        [
+          0,
+          "version",
+          "INTEGER",
+          0,
+          null,
+          0
+        ]
+      ]
+    },
+    {
+      "probe": "custom_inline_foreign_key",
+      "before": [
+        [
+          0,
+          0,
+          "allowed_labels",
+          "account_label",
+          "label",
+          "NO ACTION",
+          "RESTRICT",
+          "NONE"
+        ],
+        [
+          1,
+          0,
+          "users",
+          "user_id",
+          "id",
+          "NO ACTION",
+          "CASCADE",
+          "NONE"
+        ]
+      ],
+      "accepted": false,
+      "error": "SQLite migration failed; startup stopped",
+      "cause": "aws_credentials: custom foreign key requires manual review",
+      "after": [
+        [
+          0,
+          0,
+          "allowed_labels",
+          "account_label",
+          "label",
+          "NO ACTION",
+          "RESTRICT",
+          "NONE"
+        ],
+        [
+          1,
+          0,
+          "users",
+          "user_id",
+          "id",
+          "NO ACTION",
+          "CASCADE",
+          "NONE"
+        ]
+      ]
+    },
+    {
+      "probe": "legacy_explicit_unique_index",
+      "accepted": true,
+      "second_credential_same_instance_accepted": true,
+      "second_credential_same_traffic_accepted": true,
+      "indexes": [
+        [
+          0,
+          "ix_instance_settings_user_id",
+          0,
+          "c",
+          0
+        ],
+        [
+          1,
+          "ix_instance_settings_credential_id",
+          0,
+          "c",
+          0
+        ],
+        [
+          2,
+          "sqlite_autoindex_instance_settings_1",
+          1,
+          "u",
+          0
+        ]
+      ]
+    },
+    {
+      "probe": "custom_autoincrement",
+      "sequence_before": [
+        [
+          "aws_credentials",
+          100
+        ]
+      ],
+      "accepted": false,
+      "error": "SQLite migration failed; startup stopped",
+      "cause": "aws_credentials: custom table constraints require manual review"
+    },
+    {
+      "probe": "snapshot_output_sidecar",
+      "accepted": false,
+      "error": "{'status': 'failed', 'error': 'SQLite sidecar present: /tmp/audit-t01-maptkuaq/occupied-output.db-wal'}"
+    }
+  ]
+}

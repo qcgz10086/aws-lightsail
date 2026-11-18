@@ -1,0 +1,4 @@
+* -text whitespace=cr-at-eol
+*.txt -whitespace
+*.tar.gz binary
+.gitattributes text eol=lf

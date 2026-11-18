@@ -1,0 +1,64 @@
+{
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "sqlite": "3.43.1",
+  "runs": {
+    "windows-migrations": {
+      "command": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_migrat*.py",
+        "-v"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t01-db-migration\\aws-lightsail\\backend",
+      "exit": 0,
+      "sha256": "687a74f339fba24c04cc5f7e10621230521a980fef675fe38b03d913f40d1bcb",
+      "tests": 34,
+      "seconds": 7.011
+    },
+    "windows-tests": {
+      "command": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t01-db-migration\\aws-lightsail\\backend",
+      "exit": 0,
+      "sha256": "1a28c9dc5de4532b1c7b536005ffa3276f077e8b28b0b26d0255a50de250ff47",
+      "tests": 169,
+      "seconds": 29.322
+    },
+    "windows-cli": {
+      "command": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "docs/optimization/evidence/T01/validate_cli.py",
+        "--output",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t01-db-migration\\aws-lightsail\\docs\\optimization\\evidence\\T01-revision1\\windows-cli.json"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t01-db-migration\\aws-lightsail",
+      "exit": 0,
+      "sha256": "5966bc096ed8c19622e599318411f6ec21d2e2738bf47b85ab2e863defbc5a77"
+    },
+    "windows-probe": {
+      "command": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "C:/Users/liyang/Documents/ChatGPT/aws-lightsail/.audit/T01-7acd675e/probe_boundaries.py",
+        "--source",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t01-db-migration\\aws-lightsail",
+        "--output",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t01-db-migration\\aws-lightsail\\docs\\optimization\\evidence\\T01-revision1\\windows-boundaries-after.json"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t01-db-migration\\aws-lightsail",
+      "exit": 0,
+      "sha256": "69d04fb450191313aadab0a384e7ed455583b1f2af4c96f7e11844717e5573f3"
+    }
+  }
+}

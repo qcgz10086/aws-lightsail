@@ -1,0 +1,122 @@
+Database migration failed; startup stopped. Backup: none
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\audit-t01-df6dcz93\backups\custom-fk.db.pre-v1-4ef112cc9d3d4954a9379f54717efdee.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\audit-t01-df6dcz93\backups\autoincrement.db.pre-v1-561b9816a63043d98269c9fda215a9d9.db
+{
+  "head": "7acd675ef41d5200c55b0148575d97fac0df2e9f",
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "sqlite": "3.43.1",
+  "observations": [
+    {
+      "probe": "ledger_required_columns",
+      "accepted": false,
+      "error": "SQLite migration failed; startup stopped",
+      "cause": "Invalid migration ledger schema; review the original database and backup",
+      "ledger_columns": [
+        [
+          0,
+          "version",
+          "INTEGER",
+          0,
+          null,
+          0
+        ]
+      ]
+    },
+    {
+      "probe": "custom_inline_foreign_key",
+      "before": [
+        [
+          0,
+          0,
+          "allowed_labels",
+          "account_label",
+          "label",
+          "NO ACTION",
+          "RESTRICT",
+          "NONE"
+        ],
+        [
+          1,
+          0,
+          "users",
+          "user_id",
+          "id",
+          "NO ACTION",
+          "CASCADE",
+          "NONE"
+        ]
+      ],
+      "accepted": false,
+      "error": "SQLite migration failed; startup stopped",
+      "cause": "aws_credentials: custom foreign key requires manual review",
+      "after": [
+        [
+          0,
+          0,
+          "allowed_labels",
+          "account_label",
+          "label",
+          "NO ACTION",
+          "RESTRICT",
+          "NONE"
+        ],
+        [
+          1,
+          0,
+          "users",
+          "user_id",
+          "id",
+          "NO ACTION",
+          "CASCADE",
+          "NONE"
+        ]
+      ]
+    },
+    {
+      "probe": "legacy_explicit_unique_index",
+      "accepted": true,
+      "second_credential_same_instance_accepted": true,
+      "second_credential_same_traffic_accepted": true,
+      "indexes": [
+        [
+          0,
+          "ix_instance_settings_user_id",
+          0,
+          "c",
+          0
+        ],
+        [
+          1,
+          "ix_instance_settings_credential_id",
+          0,
+          "c",
+          0
+        ],
+        [
+          2,
+          "sqlite_autoindex_instance_settings_1",
+          1,
+          "u",
+          0
+        ]
+      ]
+    },
+    {
+      "probe": "custom_autoincrement",
+      "sequence_before": [
+        [
+          "aws_credentials",
+          100
+        ]
+      ],
+      "accepted": false,
+      "error": "SQLite migration failed; startup stopped",
+      "cause": "aws_credentials: custom table constraints require manual review"
+    },
+    {
+      "probe": "snapshot_output_sidecar",
+      "accepted": false,
+      "error": "{'status': 'failed', 'error': 'SQLite sidecar present: C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\audit-t01-df6dcz93\\\\occupied-output.db-wal'}"
+    }
+  ]
+}

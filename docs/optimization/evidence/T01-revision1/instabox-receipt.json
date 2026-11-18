@@ -1,0 +1,19 @@
+{
+  "machine_id": "m_agqymokr64sggvjgxypiphnoke",
+  "archive": "/data/lightsail-t00-revision1/t01-revision1-7acd675e/linux-evidence.tar.gz",
+  "raw_results_directory": "/data/lightsail-t00-revision1/t01-revision1-7acd675e/results/",
+  "local_archive": "linux-evidence.tar.gz",
+  "archive_bytes": 16200,
+  "archive_sha256": "017dbde2e7b909dd0f247189c35dbef9167ae6e8266d79096592531067c10306",
+  "archive_members_checked_against_results": 10,
+  "local_archive_matched_remote_sha256": true,
+  "image": "sha256:b15660664c13e949f6ccdf151eac6523a7d6682375e8805604be935b73192f9f",
+  "image_user": "appuser",
+  "network": "none",
+  "running_containers_before_suspend": [],
+  "suspend_operation_id": "op_agq65kti7qdpafjnwengr6dwum",
+  "suspend_operation_state": "succeeded",
+  "suspend_updated_at": "2026-11-18T12:38:29.11584Z",
+  "machine_state_on_suspend": "suspended",
+  "storage_synced_on_suspend_receipt": false
+}

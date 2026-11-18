@@ -1,0 +1,133 @@
+{
+  "task": "T01-revision1",
+  "plan_version": "V1.0 (2026-11-17)",
+  "original_base": "024d9d5664fa60a49c4710d129de504bfffbce2c",
+  "task_base": "7932688b7dd610310b4955b514b80909efd3ef1d",
+  "repair_base": "7acd675ef41d5200c55b0148575d97fac0df2e9f",
+  "implementation_head": "6ee91532a6542381d3a64fc975b9106c0d0b9e29",
+  "cli_driver_sha256": "2b4ec054cec7eb3aa640c0d275026a083753210b85dc348edcc9c908e3eb03a5",
+  "source_manifest_sha256": "5ede5f3dc1f8096d9ce3d111dd24ce364139d54afab58c14728be6a690f23c7d",
+  "source_manifest_format": "sha256 of the 37 Git blobs under backend/app and backend/tests (*.py); Linux files identical; Windows text normalized CRLF to LF for source comparison only",
+  "raw_probe_head_is_hardcoded": true,
+  "original_audit_files": {
+    "AUDIT.md": "ff04ecee794908faace04f0fcff05f039bbafbaf9e47bebf563485928deb2047",
+    "verification.json": "142c2e12ba873f231ebad72c1782e5403770962fb2fc46fc09d4a7e3c1500a2b",
+    "probe_boundaries.py": "ed9d7332f39fbc3f0f2a9ae7df2bb4c44d233d56b4b2d0f9247ba51279122ef2"
+  },
+  "files": {
+    "instabox-receipt.json": {
+      "bytes": 909,
+      "sha256": "ea7f9e3bb058157f8cc5e1ff2ae1fd863c118ae0f283b8f4c4d6189a19f7dd68"
+    },
+    "linux-boundaries-after.json": {
+      "bytes": 2611,
+      "sha256": "7854f9cbe96c781d38ed69f87bc0d4e2b46a3dc5c5ae4319a68e8647455b6a95"
+    },
+    "linux-boundaries-before.json": {
+      "bytes": 3570,
+      "sha256": "7feccdc0f8a36ea6b646ae92fef1d99dbe319b0fd376d3ce4ebb098b4e9bcdd3"
+    },
+    "linux-cli.json": {
+      "bytes": 12779,
+      "sha256": "7bf9e2d6e9e3ea763e9ab9a25ec02cbe0586301e6481ffe4181e3aa35d9140a7"
+    },
+    "linux-evidence.tar.gz": {
+      "bytes": 16200,
+      "sha256": "017dbde2e7b909dd0f247189c35dbef9167ae6e8266d79096592531067c10306"
+    },
+    "linux-runs.json": {
+      "bytes": 3270,
+      "sha256": "a47bd4f2e59ca34c7f92e1d8dd060ea747c706359b7f21bae2c8eba77657fd07"
+    },
+    "probe_boundaries.py": {
+      "bytes": 9210,
+      "sha256": "ed9d7332f39fbc3f0f2a9ae7df2bb4c44d233d56b4b2d0f9247ba51279122ef2"
+    },
+    "source-manifest.json": {
+      "bytes": 3808,
+      "sha256": "5ede5f3dc1f8096d9ce3d111dd24ce364139d54afab58c14728be6a690f23c7d"
+    },
+    "verify_evidence.py": {
+      "bytes": 4843,
+      "sha256": "74e046a3302d250d6b712f8cf5e9e2dd8a5df1d72c52e129feda4a93799a2e2b"
+    },
+    "windows-boundaries-after.json": {
+      "bytes": 2811,
+      "sha256": "2df67c020a2d70b9d2931503ef4d8a7e139772cee3dd49566c9d1b629b28c54f"
+    },
+    "windows-boundaries-before.json": {
+      "bytes": 3772,
+      "sha256": "79956916326eceb1bbdc296e0a211a7461e1642d99438159147170aed276ec28"
+    },
+    "windows-cli.json": {
+      "bytes": 14619,
+      "sha256": "4c4ec7a4ff7baa62cde5fe1ee2288b8291af7ad8f5877576522c90352dfd4baf"
+    },
+    "windows-cli.txt": {
+      "bytes": 483,
+      "sha256": "5966bc096ed8c19622e599318411f6ec21d2e2738bf47b85ab2e863defbc5a77"
+    },
+    "windows-migrations.txt": {
+      "bytes": 7443,
+      "sha256": "687a74f339fba24c04cc5f7e10621230521a980fef675fe38b03d913f40d1bcb"
+    },
+    "windows-new-tests-red.txt": {
+      "bytes": 22360,
+      "sha256": "bb3831c90aa4042c773ee44dab323ba157abffed6683a60eb920ed365cbb5a2b"
+    },
+    "windows-probe.txt": {
+      "bytes": 3215,
+      "sha256": "69d04fb450191313aadab0a384e7ed455583b1f2af4c96f7e11844717e5573f3"
+    },
+    "windows-runs.json": {
+      "bytes": 2552,
+      "sha256": "18499a478e86320ed668f6697dc1cd5c5ff7a1a0650a6251b8d994eba5805bf8"
+    },
+    "windows-tests.txt": {
+      "bytes": 44874,
+      "sha256": "1a28c9dc5de4532b1c7b536005ffa3276f077e8b28b0b26d0255a50de250ff47"
+    }
+  },
+  "linux_archive_members": {
+    "linux-boundaries-after-stderr.txt": {
+      "bytes": 341,
+      "sha256": "fc843115ba1d636fe2d70e01947fc32dcfe34452df0312feca275097f6ea0493"
+    },
+    "linux-boundaries-after.json": {
+      "bytes": 2611,
+      "sha256": "7854f9cbe96c781d38ed69f87bc0d4e2b46a3dc5c5ae4319a68e8647455b6a95"
+    },
+    "linux-boundaries-before.json": {
+      "bytes": 3570,
+      "sha256": "7feccdc0f8a36ea6b646ae92fef1d99dbe319b0fd376d3ce4ebb098b4e9bcdd3"
+    },
+    "linux-cli-stderr.txt": {
+      "bytes": 477,
+      "sha256": "816477eb6b69b4c032495b7aa3244208a4e602ff9326c6487c440e94d512bf08"
+    },
+    "linux-cli.json": {
+      "bytes": 12779,
+      "sha256": "7bf9e2d6e9e3ea763e9ab9a25ec02cbe0586301e6481ffe4181e3aa35d9140a7"
+    },
+    "linux-migrations.txt": {
+      "bytes": 7210,
+      "sha256": "c1cef56a13301f3c2ab19ac6bce6b07b66ec85da490838883731a7ef8c12aa6d"
+    },
+    "linux-new-tests-red.txt": {
+      "bytes": 21765,
+      "sha256": "a7fcb963f051ae29dff9f57e7da1a00cc5423a6296a7fee46c47423df8b706a9"
+    },
+    "linux-runs.json": {
+      "bytes": 3270,
+      "sha256": "a47bd4f2e59ca34c7f92e1d8dd060ea747c706359b7f21bae2c8eba77657fd07"
+    },
+    "linux-tests.txt": {
+      "bytes": 43197,
+      "sha256": "3145f5a49cfd1952a98a37c315a6e18857b54999ddac2146689a444da770c826"
+    },
+    "source-manifest.json": {
+      "bytes": 3808,
+      "sha256": "5ede5f3dc1f8096d9ce3d111dd24ce364139d54afab58c14728be6a690f23c7d"
+    }
+  }
+}
