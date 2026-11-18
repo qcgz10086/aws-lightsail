@@ -296,6 +296,21 @@ class BillingRouteTests(unittest.TestCase):
         row = response.json()["currencies"][0]
         self.assertEqual(row["forecast_remaining"], "5")
         self.assertEqual(row["forecast_month_total"], "13")
+        with self.mocks(), patch.object(b, "get_billing_summary", side_effect=b.BillingUnavailableError("cost failed")):
+            response = self.client.get(f"/api/billing/summary?credential_id={self.first.id}")
+        self.assertIsNone(response.json()["forecast_cost"])
+        self.assertEqual(response.json()["status"], "unavailable")
+
+    def test_forecast_decimal_addition_is_exact_before_legacy_float_adapter(self):
+        costs = {"year_month": "2026-11", "currencies": [{"currency": "USD", "total_cost": "0.1",
+            "net_cost": "0.1", "credits_applied": "0", "refunds": "0", "discounts": "0",
+            "lightsail_cost": "0.1"}], "by_service": []}
+        with self.mocks(), patch.object(b, "get_billing_summary", return_value=costs), \
+             patch.object(b, "get_forecast_result", return_value={"currency": "USD", "amount": "0.2"}):
+            exact = self.client.get(f"/api/v2/billing/summary?credential_id={self.first.id}")
+            legacy = self.client.get(f"/api/billing/summary?credential_id={self.first.id}")
+        self.assertEqual(exact.json()["currencies"][0]["forecast_month_total"], "0.3")
+        self.assertEqual(legacy.json()["forecast_cost"], 0.3)
 
 
 class MigrationV3Tests(unittest.TestCase):
