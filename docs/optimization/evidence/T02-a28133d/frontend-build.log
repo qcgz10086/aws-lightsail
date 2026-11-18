@@ -1,0 +1,18 @@
+vite v6.4.6 building for production...
+transforming...
+✓ 3512 modules transformed.
+rendering chunks...
+computing gzip size...
+../.baseline-runs/T02/final-a28133d/frontend-build/index.html                     0.42 kB │ gzip:   0.30 kB
+../.baseline-runs/T02/final-a28133d/frontend-build/assets/index-Ccfr7oNe.css      0.24 kB │ gzip:   0.22 kB
+../.baseline-runs/T02/final-a28133d/frontend-build/assets/index-DvYsLMrC.js   1,749.79 kB │ gzip: 540.20 kB
+✓ built in 12.08s
+
+(!) outDir C:\Users\liyang\.codex\worktrees\t02-account-proxy\aws-lightsail\.baseline-runs\T02\final-a28133d\frontend-build is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

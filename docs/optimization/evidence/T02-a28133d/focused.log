@@ -1,0 +1,119 @@
+AWS_TRANSPORT_ATTEMPTS 0
+C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+test_account_id_change_pauses_old_strategy_without_moving_it (test_t02_identity_proxy.T02Tests.test_account_id_change_pauses_old_strategy_without_moving_it) ... 2026-11-19 06:08:05,229 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:05,464 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_account_id_is_persisted_and_exposed_without_access_key_material (test_t02_identity_proxy.T02Tests.test_account_id_is_persisted_and_exposed_without_access_key_material) ... 2026-11-19 06:08:06,247 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:06,484 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:06,522 INFO [httpx] HTTP Request: POST http://testserver/api/credentials "HTTP/1.1 201 Created"
+ok
+test_all_service_factories_delegate_to_common_session_factory (test_t02_identity_proxy.T02Tests.test_all_service_factories_delegate_to_common_session_factory) ... 2026-11-19 06:08:07,215 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:07,450 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_automatic_conflicting_strategies_are_preserved_but_paused (test_t02_identity_proxy.T02Tests.test_automatic_conflicting_strategies_are_preserved_but_paused) ... 2026-11-19 06:08:08,157 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:08,392 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_changed_account_does_not_apply_old_limit_to_instance_traffic (test_t02_identity_proxy.T02Tests.test_changed_account_does_not_apply_old_limit_to_instance_traffic) ... 2026-11-19 06:08:09,108 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:09,347 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:09,394 INFO [httpx] HTTP Request: GET http://testserver/api/instances/us-east-1/server?credential_id=1 "HTTP/1.1 200 OK"
+ok
+test_compat_update_rejects_omitted_corrupt_proxy (test_t02_identity_proxy.T02Tests.test_compat_update_rejects_omitted_corrupt_proxy) ... 2026-11-19 06:08:10,089 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:10,321 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:10,333 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials "HTTP/1.1 400 Bad Request"
+ok
+test_conflict_acknowledgement_rejects_uncoordinated_unknown_or_foreign_policies (test_t02_identity_proxy.T02Tests.test_conflict_acknowledgement_rejects_uncoordinated_unknown_or_foreign_policies) ... 2026-11-19 06:08:11,027 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:11,261 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:11,286 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 409 Conflict"
+2026-11-19 06:08:11,297 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 409 Conflict"
+2026-11-19 06:08:11,312 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 409 Conflict"
+2026-11-19 06:08:11,320 INFO [httpx] HTTP Request: GET http://testserver/api/instances/us-east-1/server/policy-conflict?credential_id=1 "HTTP/1.1 400 Bad Request"
+ok
+test_conflict_is_credential_identity_based_and_different_aws_accounts_do_not_conflict (test_t02_identity_proxy.T02Tests.test_conflict_is_credential_identity_based_and_different_aws_accounts_do_not_conflict) ... 2026-11-19 06:08:12,012 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:12,244 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_corrupt_stored_proxy_rejects_key_rotation_without_falling_back_to_direct (test_t02_identity_proxy.T02Tests.test_corrupt_stored_proxy_rejects_key_rotation_without_falling_back_to_direct) ... 2026-11-19 06:08:12,951 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:13,183 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:13,197 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials/1 "HTTP/1.1 400 Bad Request"
+ok
+test_credentials_are_scoped_to_user_and_account_identity (test_t02_identity_proxy.T02Tests.test_credentials_are_scoped_to_user_and_account_identity) ... 2026-11-19 06:08:13,892 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:14,124 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_default_switch_does_not_bypass_policy_conflict_and_scan_once (test_t02_identity_proxy.T02Tests.test_default_switch_does_not_bypass_policy_conflict_and_scan_once) ... 2026-11-19 06:08:14,827 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:15,062 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:15,094 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/2/default "HTTP/1.1 200 OK"
+ok
+test_explicit_true_vs_false_conflicts_but_missing_strategy_does_not (test_t02_identity_proxy.T02Tests.test_explicit_true_vs_false_conflicts_but_missing_strategy_does_not) ... 2026-11-19 06:08:15,796 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:16,028 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_explicitly_clearing_proxy_allows_direct_validation_but_omitting_it_does_not (test_t02_identity_proxy.T02Tests.test_explicitly_clearing_proxy_allows_direct_validation_but_omitting_it_does_not) ... 2026-11-19 06:08:16,729 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:16,961 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:16,976 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials/1 "HTTP/1.1 400 Bad Request"
+2026-11-19 06:08:16,988 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials/1 "HTTP/1.1 200 OK"
+ok
+test_identity_failure_saves_credential_as_unknown_without_reusing_old_identity (test_t02_identity_proxy.T02Tests.test_identity_failure_saves_credential_as_unknown_without_reusing_old_identity) ... 2026-11-19 06:08:17,685 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:17,915 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:17,927 INFO [app.routers.credentials] STS 身份尚未确认：STS offline
+2026-11-19 06:08:17,932 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials/1 "HTTP/1.1 200 OK"
+ok
+test_instance_list_deduplicates_account_and_batches_database_reads (test_t02_identity_proxy.T02Tests.test_instance_list_deduplicates_account_and_batches_database_reads) ... 2026-11-19 06:08:18,625 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:18,896 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:18,917 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+ok
+test_manual_validation_refreshes_sts_identity (test_t02_identity_proxy.T02Tests.test_manual_validation_refreshes_sts_identity) ... 2026-11-19 06:08:19,611 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:19,846 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:19,863 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/validate "HTTP/1.1 200 OK"
+ok
+test_one_client_factory_passes_same_explicit_credentials_and_proxy_to_all_services (test_t02_identity_proxy.T02Tests.test_one_client_factory_passes_same_explicit_credentials_and_proxy_to_all_services) ... 2026-11-19 06:08:20,556 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:20,789 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_patch_cannot_silently_release_conflict_and_collector_stays_paused (test_t02_identity_proxy.T02Tests.test_patch_cannot_silently_release_conflict_and_collector_stays_paused) ... 2026-11-19 06:08:21,494 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:21,733 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:21,759 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 06:08:21,781 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 06:08:21,802 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=2 "HTTP/1.1 200 OK"
+2026-11-19 06:08:21,820 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 409 Conflict"
+2026-11-19 06:08:21,831 INFO [httpx] HTTP Request: GET http://testserver/api/instances/us-east-1/server/policy-conflict?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 06:08:21,842 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 409 Conflict"
+2026-11-19 06:08:21,857 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 06:08:21,863 WARNING [app.services.collector] 超限自动关机 user=t02-alice us-east-1/server 4.00GB > 1.00GB
+ok
+test_paused_policy_response_keeps_saved_value_and_note_edit_does_not_disable_it (test_t02_identity_proxy.T02Tests.test_paused_policy_response_keeps_saved_value_and_note_edit_does_not_disable_it) ... 2026-11-19 06:08:22,553 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:22,786 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:22,808 INFO [httpx] HTTP Request: GET http://testserver/api/instances/us-east-1/server?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 06:08:22,824 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 200 OK"
+ok
+test_same_label_in_different_panel_users_never_conflicts (test_t02_identity_proxy.T02Tests.test_same_label_in_different_panel_users_never_conflicts) ... 2026-11-19 06:08:23,527 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:23,761 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_sts_outage_preserves_last_known_conflict_and_blocks_other_key_stop (test_t02_identity_proxy.T02Tests.test_sts_outage_preserves_last_known_conflict_and_blocks_other_key_stop) ... 2026-11-19 06:08:24,465 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:24,696 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:24,721 INFO [app.routers.credentials] STS 身份尚未确认：temporary STS failure
+2026-11-19 06:08:24,724 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/2/validate "HTTP/1.1 200 OK"
+ok
+test_traffic_history_stays_bound_to_observed_account_after_key_identity_change (test_t02_identity_proxy.T02Tests.test_traffic_history_stays_bound_to_observed_account_after_key_identity_change) ... 2026-11-19 06:08:25,429 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:25,664 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_traffic_summary_query_count_is_constant_as_instance_count_grows (test_t02_identity_proxy.T02Tests.test_traffic_summary_query_count_is_constant_as_instance_count_grows) ... 2026-11-19 06:08:26,370 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:26,661 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_traffic_summary_respects_explicit_credential_filter (test_t02_identity_proxy.T02Tests.test_traffic_summary_respects_explicit_credential_filter) ... 2026-11-19 06:08:27,464 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:27,705 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_two_enabled_different_effective_thresholds_conflict_but_equal_thresholds_do_not (test_t02_identity_proxy.T02Tests.test_two_enabled_different_effective_thresholds_conflict_but_equal_thresholds_do_not) ... 2026-11-19 06:08:28,426 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:28,665 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_two_explicitly_disabled_strategies_and_absent_record_are_distinct (test_t02_identity_proxy.T02Tests.test_two_explicitly_disabled_strategies_and_absent_record_are_distinct) ... 2026-11-19 06:08:29,392 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:29,624 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_unknown_identity_keeps_settings_isolated (test_t02_identity_proxy.T02Tests.test_unknown_identity_keeps_settings_isolated) ... 2026-11-19 06:08:30,333 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:30,566 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_unknown_traffic_is_visible_but_excluded_from_confirmed_total (test_t02_identity_proxy.T02Tests.test_unknown_traffic_is_visible_but_excluded_from_confirmed_total) ... 2026-11-19 06:08:31,271 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 06:08:31,504 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+
+----------------------------------------------------------------------
+Ran 28 tests in 27.029s
+
+OK

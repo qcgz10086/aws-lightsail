@@ -1,0 +1,45 @@
+C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+test_paused_policy_response_keeps_saved_value_and_note_edit_does_not_disable_it (test_t02_identity_proxy.T02Tests.test_paused_policy_response_keeps_saved_value_and_note_edit_does_not_disable_it) ... 2026-11-19 05:59:30,779 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 05:59:31,044 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 05:59:31,136 INFO [httpx] HTTP Request: GET http://testserver/api/instances/us-east-1/server?credential_id=1 "HTTP/1.1 200 OK"
+ERROR
+test_changed_account_does_not_apply_old_limit_to_instance_traffic (test_t02_identity_proxy.T02Tests.test_changed_account_does_not_apply_old_limit_to_instance_traffic) ... 2026-11-19 05:59:31,836 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 05:59:32,070 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 05:59:32,102 INFO [httpx] HTTP Request: GET http://testserver/api/instances/us-east-1/server?credential_id=1 "HTTP/1.1 200 OK"
+FAIL
+test_patch_cannot_silently_release_conflict_and_collector_stays_paused (test_t02_identity_proxy.T02Tests.test_patch_cannot_silently_release_conflict_and_collector_stays_paused) ... 2026-11-19 05:59:32,801 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 05:59:33,036 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 05:59:33,063 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 200 OK"
+FAIL
+
+======================================================================
+ERROR: test_paused_policy_response_keeps_saved_value_and_note_edit_does_not_disable_it (test_t02_identity_proxy.T02Tests.test_paused_policy_response_keeps_saved_value_and_note_edit_does_not_disable_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t02-account-proxy\aws-lightsail\backend\tests\test_t02_identity_proxy.py", line 331, in test_paused_policy_response_keeps_saved_value_and_note_edit_does_not_disable_it
+    self.assertTrue(response.json()["configured_auto_stop_on_limit"])
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'configured_auto_stop_on_limit'
+
+======================================================================
+FAIL: test_changed_account_does_not_apply_old_limit_to_instance_traffic (test_t02_identity_proxy.T02Tests.test_changed_account_does_not_apply_old_limit_to_instance_traffic)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t02-account-proxy\aws-lightsail\backend\tests\test_t02_identity_proxy.py", line 355, in test_changed_account_does_not_apply_old_limit_to_instance_traffic
+    self.assertIsNone(response.json()["traffic"]["limit_gb"])
+AssertionError: 1.0 is not None
+
+======================================================================
+FAIL: test_patch_cannot_silently_release_conflict_and_collector_stays_paused (test_t02_identity_proxy.T02Tests.test_patch_cannot_silently_release_conflict_and_collector_stays_paused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t02-account-proxy\aws-lightsail\backend\tests\test_t02_identity_proxy.py", line 273, in test_patch_cannot_silently_release_conflict_and_collector_stays_paused
+    self.assertTrue(response.json()["auto_stop_conflict"])
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 3 tests in 3.032s
+
+FAILED (failures=2, errors=1)
+AWS_TRANSPORT_ATTEMPTS 0
