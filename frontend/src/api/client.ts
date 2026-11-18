@@ -189,6 +189,7 @@ export interface BillingCurrency {
   discounts: string | null
   lightsail_cost: string | null
   forecast_remaining?: string | null
+  forecast_month_total?: string | null
   official_remaining?: string | null
   official_estimated?: string | null
   costs_complete?: boolean

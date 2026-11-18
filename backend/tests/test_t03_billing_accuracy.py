@@ -263,8 +263,23 @@ class BillingRouteTests(unittest.TestCase):
         data = response.json()
         self.assertIn("total_cost", data)
         self.assertIsInstance(data["total_cost"], float)
+        self.assertEqual(data["forecast_cost"], 13.0)  # actual signed 8 + remaining-month forecast 5
         self.assertEqual([row["credit_id"] for row in data["credits"]], ["owned"])
         self.assertIsNone(data["credits"][0]["remaining_estimate"])
+
+    def test_full_month_forecast_requires_successful_matching_currency_costs(self):
+        for forecast in ({"amount": "5", "currency": "EUR"}, b.BillingUnavailableError("forecast failed")):
+            with self.subTest(forecast=forecast):
+                kwargs = {"side_effect": forecast} if isinstance(forecast, Exception) else {"return_value": forecast}
+                with self.mocks(), patch.object(b, "get_forecast_result", **kwargs):
+                    response = self.client.get(f"/api/billing/summary?credential_id={self.first.id}")
+                self.assertEqual(response.status_code, 200, response.text)
+                self.assertIsNone(response.json()["forecast_cost"])
+        with self.mocks():
+            response = self.client.get(f"/api/v2/billing/summary?credential_id={self.first.id}")
+        row = response.json()["currencies"][0]
+        self.assertEqual(row["forecast_remaining"], "5")
+        self.assertEqual(row["forecast_month_total"], "13")
 
 
 class MigrationV3Tests(unittest.TestCase):

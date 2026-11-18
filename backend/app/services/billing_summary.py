@@ -112,6 +112,10 @@ def aggregate(accounts):
                         "forecast_remaining", "official_remaining", "official_estimated"):
                 row[key] = (service.decimal_string(values[key])
                             if key in values and not values.get(key + "_missing") else None)
+            row["forecast_month_total"] = (service.decimal_string(
+                values["net_cost"] + values["forecast_remaining"])
+                if statuses["costs"] and statuses["forecast"] and "net_cost" in values
+                and "forecast_remaining" in values else None)
             result.append(row)
     return result
 

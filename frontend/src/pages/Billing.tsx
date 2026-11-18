@@ -95,6 +95,7 @@ export default function BillingPage() {
           { title: '官方赠金余额', render: (_, row) => money(row.official_remaining, row.currency) },
           { title: '官方估算余额', render: (_, row) => money(row.official_estimated, row.currency) },
           { title: '本月剩余期间预测', render: (_, row) => money(row.forecast_remaining, row.currency) },
+          { title: '完整月预测（已发生净额＋剩余预测）', render: (_, row) => money(row.forecast_month_total, row.currency) },
           { title: '完整性', render: (_, row) => row.costs_complete && row.forecast_complete && row.credits_complete
             ? '全部账号成功' : '部分数据，查看账号状态' }]} />
     </Card>

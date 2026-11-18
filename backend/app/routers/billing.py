@@ -65,7 +65,9 @@ async def billing_summary(
         year_month=result["year_month"], currency=currency.get("currency", "MULTI"),
         total_cost=number("total_cost"), net_cost=number("net_cost"),
         credits_applied=number("credits_applied"), lightsail_cost=number("lightsail_cost"),
-        forecast_cost=None, by_service=services, credits=[_credit_out(row) for row in records if row.id in selected],
+        forecast_cost=(float(currency["forecast_month_total"])
+                       if currency.get("forecast_month_total") is not None else None),
+        by_service=services, credits=[_credit_out(row) for row in records if row.id in selected],
         aws_credits=official, aws_credits_status="ok" if credits_ok else "unavailable",
         aws_credits_error=None if credits_ok else "部分账号官方赠金不可用；详见 v2 独立状态",
         aws_account_id=account["account_id"] if account else None)
