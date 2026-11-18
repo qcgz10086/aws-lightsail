@@ -107,7 +107,8 @@ export default function InstanceDetailPage() {
                 </Tag>
               ) : null}
             </p>
-            <p>月限额：{inst.monthly_limit_gb ?? inst.traffic?.limit_gb ?? '未设置'} GB</p>
+            <p>{inst.auto_stop_identity_changed ? '原账号保存限额（未生效）' : '月限额'}：
+              {inst.monthly_limit_gb ?? inst.traffic?.limit_gb ?? '未设置'} GB</p>
             <p>
               超限自动关机：
               {inst.auto_stop_conflict ? (
@@ -120,7 +121,7 @@ export default function InstanceDetailPage() {
                 <Tag>仅告警</Tag>
               )}
             </p>
-            <p>备注：{inst.note || '-'}</p>
+            <p>{inst.auto_stop_identity_changed ? '原账号备注' : '备注'}：{inst.note || '-'}</p>
           </Card>
         </Col>
         <Col xs={24} md={16}>

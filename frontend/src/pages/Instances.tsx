@@ -15,7 +15,7 @@ import {
   Select,
   Switch,
 } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import api, { CredentialItem, CredentialOut, Instance, getErrorMessage } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
@@ -38,6 +38,7 @@ export default function InstancesPage() {
   const [acting, setActing] = useState<string | null>(null)
   const [limitModal, setLimitModal] = useState<Instance | null>(null)
   const [limitForm] = Form.useForm()
+  const editedLimitFields = useRef(new Set<string>())
 
   const loadCreds = async () => {
     try {
@@ -235,6 +236,7 @@ export default function InstancesPage() {
                       size="small"
                       onClick={() => {
                         setLimitModal(row)
+                        editedLimitFields.current.clear()
                         limitForm.resetFields()
                         limitForm.setFieldsValue({
                           monthly_limit_gb: row.monthly_limit_gb,
@@ -272,7 +274,7 @@ export default function InstancesPage() {
           try {
             await api.patch(
               `/instances/${limitModal.region}/${limitModal.name}/settings`,
-              Object.fromEntries(Object.entries(values).filter(([key]) => limitForm.isFieldTouched(key))),
+              Object.fromEntries(Object.entries(values).filter(([key]) => editedLimitFields.current.has(key))),
               { params: { credential_id: limitModal.credential_id || undefined } },
             )
             message.success('已保存')
@@ -283,6 +285,9 @@ export default function InstancesPage() {
           }
         }}
       >
+        {limitModal?.auto_stop_identity_changed ? <Alert type="warning" showIcon
+          message="显示的是原账号保存配置，尚未对当前账号生效；请确认 AWS 账号后明确设置策略。"
+          style={{ marginBottom: 16 }} /> : null}
         {limitModal?.auto_stop_conflict ? <Alert type="warning" showIcon
           message="策略冲突已暂停；保存单条设置不会解除暂停。请协调全部竞争凭证策略后明确确认解除。"
           action={<Button size="small" onClick={async () => {
@@ -328,7 +333,9 @@ export default function InstancesPage() {
             }
           }}>查看并确认</Button>}
           style={{ marginBottom: 16 }} /> : null}
-        <Form form={limitForm} layout="vertical">
+        <Form form={limitForm} layout="vertical" onValuesChange={(changed) => {
+          Object.keys(changed).forEach((key) => editedLimitFields.current.add(key))
+        }}>
           <Form.Item
             name="monthly_limit_gb"
             label="月流量限额（GB）"

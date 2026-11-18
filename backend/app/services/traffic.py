@@ -169,7 +169,7 @@ def resolve_auto_stop_conflict(db: Session, user: User, credential: AwsCredentia
 
 
 def _policy_confirmation_token(user, identity, rows, current):
-    values = [(row.credential_id, row.auto_stop_on_limit, effective_limit_gb(user, row),
+    values = [(row.credential_id, row.region, row.instance_name, row.auto_stop_on_limit, effective_limit_gb(user, row),
                current.get(row.credential_id)) for row in sorted(rows, key=lambda row: row.credential_id)]
     payload = json.dumps([user.id, identity, values], separators=(",", ":"))
     return hashlib.sha256(payload.encode()).hexdigest()
