@@ -23,13 +23,13 @@ Cost Explorer 本身：
 from __future__ import annotations
 
 import logging
+import boto3
 from calendar import monthrange
 from datetime import date, datetime, timedelta, timezone
 
-import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 
-from app.proxy_config import proxy_config
+from app.services.aws_clients import make_client as make_aws_client
 
 logger = logging.getLogger(__name__)
 
@@ -70,35 +70,23 @@ class BillingValidationError(Exception):
 
 def make_sts_client(access_key_id: str, secret_access_key: str, proxy_url: str | None = None):
     """STS 客户端（固定 us-east-1，仅用于 GetCallerIdentity 取账号 ID）。"""
-    return boto3.client(
-        "sts",
-        region_name=BILLING_REGION,
-        aws_access_key_id=access_key_id,
-        aws_secret_access_key=secret_access_key,
-        config=proxy_config(proxy_url),
-    )
+    return make_aws_client("sts", access_key_id, secret_access_key, BILLING_REGION, proxy_url)
+
+
+def get_sts_identity(access_key_id: str, secret_access_key: str, proxy_url: str | None = None) -> str | None:
+    response = make_sts_client(access_key_id, secret_access_key, proxy_url).get_caller_identity()
+    account_id = (response or {}).get("Account") or ""
+    return account_id if isinstance(account_id, str) and len(account_id) == 12 and account_id.isascii() and account_id.isdigit() else None
 
 
 def make_billing_client(access_key_id: str, secret_access_key: str, proxy_url: str | None = None):
     """AWS Billing 客户端（固定 us-east-1；需 boto3 >= 1.44.3 才有 GetCredits）。"""
-    return boto3.client(
-        "billing",
-        region_name=BILLING_REGION,
-        aws_access_key_id=access_key_id,
-        aws_secret_access_key=secret_access_key,
-        config=proxy_config(proxy_url),
-    )
+    return make_aws_client("billing", access_key_id, secret_access_key, BILLING_REGION, proxy_url)
 
 
 def make_ce_client(access_key_id: str, secret_access_key: str, proxy_url: str | None = None):
     """Cost Explorer 客户端（固定 us-east-1）。"""
-    return boto3.client(
-        "ce",
-        region_name=CE_REGION,
-        aws_access_key_id=access_key_id,
-        aws_secret_access_key=secret_access_key,
-        config=proxy_config(proxy_url),
-    )
+    return make_aws_client("ce", access_key_id, secret_access_key, CE_REGION, proxy_url)
 
 
 def _today_utc(now: datetime | None = None) -> date:

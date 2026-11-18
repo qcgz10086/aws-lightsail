@@ -5,14 +5,15 @@ from __future__ import annotations
 import base64
 import logging
 import time
+import boto3
 from datetime import datetime, timezone
 from typing import Any
 
-import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 
 from app.password_strength import validate_strong_password
-from app.proxy_config import proxy_config, sanitize_error_message
+from app.proxy_config import sanitize_error_message
+from app.services.aws_clients import make_client as make_aws_client
 
 logger = logging.getLogger(__name__)
 
@@ -30,13 +31,7 @@ def make_client(
     region: str = "us-east-1",
     proxy_url: str | None = None,
 ):
-    return boto3.client(
-        "lightsail",
-        region_name=region,
-        aws_access_key_id=access_key_id,
-        aws_secret_access_key=secret_access_key,
-        config=proxy_config(proxy_url),
-    )
+    return make_aws_client("lightsail", access_key_id, secret_access_key, region, proxy_url)
 
 
 def make_service_quotas_client(
@@ -45,13 +40,7 @@ def make_service_quotas_client(
     region: str = "us-east-1",
     proxy_url: str | None = None,
 ):
-    return boto3.client(
-        "service-quotas",
-        region_name=region,
-        aws_access_key_id=access_key_id,
-        aws_secret_access_key=secret_access_key,
-        config=proxy_config(proxy_url),
-    )
+    return make_aws_client("service-quotas", access_key_id, secret_access_key, region, proxy_url)
 
 
 # Lightsail Service Quotas（按 Region 生效；Instances 配额单位是 vCPU）

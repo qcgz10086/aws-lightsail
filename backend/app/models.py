@@ -11,6 +11,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -80,6 +81,9 @@ class AwsCredential(Base):
     # 信息（http://user:pass@host:port），与密钥同等对待，绝不明文存。
     proxy_url_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
     account_label: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    account_id: Mapped[str | None] = mapped_column(String(12), nullable=True, index=True)
+    last_confirmed_account_id: Mapped[str | None] = mapped_column(String(12), nullable=True)
+    auto_stop_conflict: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("0"), nullable=False)
     is_default: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     last_validated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     # Lightsail Service Quotas：Instances 配额单位为 vCPU/Region（社区常称 5V/8V/32V）
@@ -118,6 +122,9 @@ class InstanceSetting(Base):
     monthly_limit_gb: Mapped[float | None] = mapped_column(Float, nullable=True)
     # 勾选后超限才自动关机；默认 False 仅告警
     auto_stop_on_limit: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    auto_stop_conflict: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("0"), nullable=False)
+    auto_stop_configured: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("0"), nullable=False)
+    auto_stop_account_id: Mapped[str | None] = mapped_column(String(12), nullable=True)
     note: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
@@ -134,6 +141,7 @@ class TrafficUsage(Base):
             "region",
             "instance_name",
             "year_month",
+            "account_id",
             name="uq_traffic_usage",
         ),
     )
@@ -148,6 +156,9 @@ class TrafficUsage(Base):
     region: Mapped[str] = mapped_column(String(32), nullable=False)
     instance_name: Mapped[str] = mapped_column(String(128), nullable=False)
     year_month: Mapped[str] = mapped_column(String(7), nullable=False)  # YYYY-MM
+    # Empty string is the unknown-identity sentinel, so the composite unique key
+    # also protects rows when STS cannot confirm an account.
+    account_id: Mapped[str] = mapped_column(String(12), default="", server_default=text("''"), nullable=False)
     network_in_bytes: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
     network_out_bytes: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
     last_synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

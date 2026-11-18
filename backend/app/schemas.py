@@ -69,6 +69,9 @@ class CredentialItem(BaseModel):
     id: int
     access_key_masked: str
     account_label: str | None = None
+    account_id: str | None = None
+    account_identity_status: str = "unknown"
+    auto_stop_conflict: bool = False
     # 脱敏后的代理地址（http://user:***@host:port）；未配代理为 None（直连）
     proxy_masked: str | None = None
     is_default: bool = False
@@ -125,6 +128,8 @@ class InstanceSettingsUpdate(BaseModel):
     monthly_limit_gb: float | None = None
     auto_stop_on_limit: bool | None = None
     note: str | None = None
+    resolve_conflict_credential_ids: list[int] | None = None
+    resolve_conflict_token: str | None = None
 
 
 class InstanceTraffic(BaseModel):
@@ -133,6 +138,7 @@ class InstanceTraffic(BaseModel):
     total_gb: float = 0
     limit_gb: float | None = None
     over_limit: bool = False
+    auto_stop_conflict: bool = False
     year_month: str | None = None
 
 
@@ -152,6 +158,9 @@ class InstanceOut(BaseModel):
     traffic: InstanceTraffic | None = None
     monthly_limit_gb: float | None = None
     auto_stop_on_limit: bool = False
+    configured_auto_stop_on_limit: bool = False
+    auto_stop_conflict: bool = False
+    auto_stop_identity_changed: bool = False
     note: str | None = None
     credential_id: int | None = None
     account_label: str | None = None
@@ -179,12 +188,14 @@ class TrafficInstanceRow(BaseModel):
     name: str
     credential_id: int | None = None
     account_label: str | None = None
+    account_id: str | None = None
     in_gb: float
     out_gb: float
     total_gb: float
     limit_gb: float | None = None
     over_limit: bool = False
     auto_stop_on_limit: bool = False
+    auto_stop_conflict: bool = False
     year_month: str
 
 

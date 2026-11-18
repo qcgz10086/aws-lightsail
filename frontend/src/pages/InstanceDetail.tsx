@@ -110,7 +110,11 @@ export default function InstanceDetailPage() {
             <p>月限额：{inst.monthly_limit_gb ?? inst.traffic?.limit_gb ?? '未设置'} GB</p>
             <p>
               超限自动关机：
-              {inst.auto_stop_on_limit ? (
+              {inst.auto_stop_conflict ? (
+                <Tag color="red">策略冲突，已暂停</Tag>
+              ) : inst.auto_stop_identity_changed ? (
+                <Tag color="gold">AWS 账号变化，已暂停</Tag>
+              ) : inst.auto_stop_on_limit ? (
                 <Tag color="orange">已开启</Tag>
               ) : (
                 <Tag>仅告警</Tag>

@@ -14,6 +14,7 @@ os.environ.setdefault("ENCRYPTION_KEY", "WWevy1rc32FPbz51VPopb5qw2SqEo-6VNp0jX1b
 os.environ.setdefault("ADMIN_PASSWORD", "TestAdminPass123!")
 
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.schema import CreateTable
 from sqlalchemy.dialects import sqlite
 from app import database, models, migrations
@@ -74,6 +75,30 @@ def seed_current(path, unique=False):
         conn.execute("INSERT INTO credit_records (id,user_id,credential_id,name,total_amount,currency,start_date,created_at) VALUES (13,1,7,'credit',100,'USD','2026-01-01','2026-01-01')")
 
 
+def downgrade_fixture_to_t01(path):
+    """Restore the T01 columns and its original five-column traffic UNIQUE key."""
+    with connect(path) as conn:
+        conn.execute("DROP INDEX IF EXISTS ix_aws_credentials_account_id")
+        for column in ("account_id", "last_confirmed_account_id", "auto_stop_conflict"):
+            if column in {row[1] for row in conn.execute("PRAGMA table_info(aws_credentials)")}:
+                conn.execute(f'ALTER TABLE aws_credentials DROP COLUMN "{column}"')
+        for column in ("auto_stop_conflict", "auto_stop_configured", "auto_stop_account_id"):
+            if column in {row[1] for row in conn.execute("PRAGMA table_info(instance_settings)")}:
+                conn.execute(f'ALTER TABLE instance_settings DROP COLUMN "{column}"')
+        conn.execute("""CREATE TABLE traffic_usage_t01 (
+            id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, credential_id INTEGER NOT NULL,
+            region VARCHAR(32) NOT NULL, instance_name VARCHAR(128) NOT NULL,
+            year_month VARCHAR(7) NOT NULL, network_in_bytes BIGINT NOT NULL,
+            network_out_bytes BIGINT NOT NULL, last_synced_at DATETIME,
+            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY(credential_id) REFERENCES aws_credentials(id) ON DELETE CASCADE,
+            CONSTRAINT uq_traffic_usage UNIQUE(user_id,credential_id,region,instance_name,year_month))""")
+        conn.execute("INSERT INTO traffic_usage_t01 SELECT id,user_id,credential_id,region,instance_name,year_month,network_in_bytes,network_out_bytes,last_synced_at FROM traffic_usage")
+        conn.execute("DROP TABLE traffic_usage")
+        conn.execute("ALTER TABLE traffic_usage_t01 RENAME TO traffic_usage")
+        conn.execute("DELETE FROM schema_migrations WHERE version=2")
+
+
 class MigrationTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -107,6 +132,7 @@ class MigrationTests(unittest.TestCase):
             conn.executescript(LEGACY)
         self.migrate()
         self.assertEqual(self.rows("SELECT id,credential_id,auto_stop_on_limit,note FROM instance_settings"), [(9, 7, 1, "keep")])
+        self.assertEqual(self.rows("SELECT auto_stop_configured,auto_stop_account_id FROM instance_settings"), [(1, None)])
         self.assertEqual(self.rows("SELECT id,credential_id,network_in_bytes,network_out_bytes FROM traffic_usage"), [(11, 7, 123456, 987654)])
         self.assertEqual(self.rows("SELECT proxy_url_enc,vcpu_quota,is_default FROM aws_credentials"), [(None, None, 1)])
 
@@ -121,9 +147,66 @@ class MigrationTests(unittest.TestCase):
 
     def test_new_database_has_version_and_repeated_start_is_idempotent(self):
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,)])
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,)])
+
+    def test_t01_database_upgrades_atomically_to_t02_with_paired_snapshot(self):
+        seed_current(self.path)
+        self.migrate()
+        downgrade_fixture_to_t01(self.path)
+        with connect(self.path) as conn:
+            conn.execute("UPDATE instance_settings SET auto_stop_on_limit=1 WHERE id=9")
+        self.migrate()
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations ORDER BY version"), [(1,), (2,)])
+        self.assertEqual(self.rows("SELECT account_id FROM aws_credentials WHERE id=7"), [(None,)])
+        self.assertEqual(self.rows("SELECT last_confirmed_account_id FROM aws_credentials WHERE id=7"), [(None,)])
+        self.assertEqual(self.rows("SELECT auto_stop_configured,auto_stop_account_id FROM instance_settings WHERE id=9"), [(1, None)])
+        self.assertIn("account_id", {row[1] for row in self.rows("PRAGMA table_info(traffic_usage)")})
+        receipt, checksum = self.rows("SELECT backup_path,backup_sha256 FROM schema_migrations WHERE version=2")[0]
+        self.assertTrue(Path(receipt).is_file())
+        restored = Path(self.tmp.name) / "v1-restored.db"
+        restore_database(receipt, restored, checksum, offline=True)
+        with connect(restored) as conn:
+            self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,)])
+            self.assertNotIn("account_id", {row[1] for row in conn.execute("PRAGMA table_info(aws_credentials)")})
+            self.assertNotIn("account_id", {row[1] for row in conn.execute("PRAGMA table_info(traffic_usage)")})
+            self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,)])
+
+    def test_false_legacy_policy_remains_off_after_upgrade_with_user_default_on(self):
+        from app.models import AwsCredential, InstanceSetting, User
+        from app.services.collector import sync_user_traffic
+
+        seed_current(self.path)
+        self.migrate()
+        downgrade_fixture_to_t01(self.path)
+        with connect(self.path) as conn:
+            conn.execute("UPDATE users SET auto_stop_on_limit_default=1 WHERE id=1")
+            conn.execute("UPDATE instance_settings SET auto_stop_on_limit=0 WHERE id=9")
+            from app.security import encrypt_secret
+            conn.execute("UPDATE aws_credentials SET access_key_id_enc=?, secret_access_key_enc=?, proxy_url_enc=NULL WHERE id=7",
+                         (encrypt_secret("AKIAIOSFODNN7EXAMPLE"),
+                          encrypt_secret("wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")))
+        self.migrate()
+        self.assertEqual(self.rows("SELECT auto_stop_configured,auto_stop_on_limit,auto_stop_account_id FROM instance_settings WHERE id=9"), [(1, 0, None)])
+
+        db = sessionmaker(bind=self.engine)()
+        try:
+            user = db.query(User).filter_by(id=1).one()
+            credential = db.query(AwsCredential).filter_by(id=7).one()
+            self.assertIsNone(credential.account_id)
+            with patch("app.services.collector.ls.get_regions", return_value=[{"name": "ap-southeast-1"}]), \
+                 patch("app.services.collector.ls.list_instances_in_region", return_value=[{"name": "server", "state": "running"}]), \
+                 patch("app.services.collector.ls.get_metric_sum_bytes", return_value=200 * 1024**3) as metrics, \
+                 patch("app.services.collector.ls.stop_instance") as stop:
+                self.assertEqual(sync_user_traffic(db, user), 1)
+                self.assertEqual(metrics.call_count, 2)
+                stop.assert_not_called()
+            setting = db.query(InstanceSetting).filter_by(id=9).one()
+            self.assertFalse(setting.auto_stop_on_limit)
+            self.assertTrue(user.auto_stop_on_limit_default)
+        finally:
+            db.close()
 
     def test_current_multi_key_data_is_unchanged(self):
         seed_current(self.path)
@@ -132,7 +215,7 @@ class MigrationTests(unittest.TestCase):
         before = self.rows("SELECT * FROM aws_credentials")
         self.migrate()
         self.assertEqual(self.rows("SELECT * FROM aws_credentials"), before)
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,)])
 
 
     def test_migration_failure_rolls_back_ddl_and_keeps_verified_original_backup(self):
@@ -157,7 +240,7 @@ class MigrationTests(unittest.TestCase):
             self.assertEqual(conn.execute("SELECT type,name,sql FROM sqlite_master ORDER BY name").fetchall(), before)
         # No version is committed on failure; the same original DB can upgrade next time.
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,)])
 
     def test_backup_failure_prevents_any_schema_change(self):
         with connect(self.path) as conn:
@@ -171,12 +254,12 @@ class MigrationTests(unittest.TestCase):
     def test_future_version_and_versioned_schema_drift_stop_startup(self):
         self.migrate()
         with connect(self.path) as conn:
-            conn.execute("UPDATE schema_migrations SET version=2")
+            conn.execute("INSERT INTO schema_migrations VALUES (3,'future','2026-11-19',NULL,NULL)")
         with self.assertRaises(migrations.MigrationError):
             self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(2,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,)])
         with connect(self.path) as conn:
-            conn.execute("UPDATE schema_migrations SET version=1")
+            conn.execute("DELETE FROM schema_migrations WHERE version=3")
             conn.execute("ALTER TABLE aws_credentials DROP COLUMN quota_message")
         with self.assertRaises(migrations.MigrationError):
             self.migrate()
@@ -291,7 +374,7 @@ database.init_db()
         self.assertEqual(result.returncode, 86, result.stderr)
         self.assertEqual(self.rows("SELECT type,name,sql FROM sqlite_master ORDER BY name"), before)
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,)])
 
     def test_roundtrip_backup_upgrade_restore_for_three_database_generations(self):
         for kind in ("new", "single", "multi"):

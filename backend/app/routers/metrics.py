@@ -48,11 +48,12 @@ def traffic_summary(
 
 @router.post("/traffic/sync")
 async def traffic_sync(
+    credential_id: int | None = Query(None),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> dict:
     try:
-        count = await asyncio.to_thread(sync_user_traffic, db, user)
+        count = await asyncio.to_thread(sync_user_traffic, db, user, credential_id)
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=400, detail=str(exc))
     return {"message": f"同步完成，更新 {count} 条记录", "count": count}

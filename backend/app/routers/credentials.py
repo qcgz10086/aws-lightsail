@@ -1,3 +1,4 @@
+import logging
 import re
 from datetime import datetime, timezone
 
@@ -30,10 +31,12 @@ from app.rate_limit import (
 )
 from app.security import decrypt_secret, encrypt_secret, mask_access_key
 from app.services import account as acct
+from app.services import billing as billing_svc
 from app.services import lightsail as ls
-from app.services.traffic import get_credential_proxy_url
+from app.services.traffic import get_credential_proxy_url, reconcile_auto_stop_conflicts
 
 router = APIRouter(prefix="/credentials", tags=["credentials"])
+logger = logging.getLogger(__name__)
 
 
 def _remaining_vcpu(cred: AwsCredential) -> float | None:
@@ -56,14 +59,27 @@ def _proxy_masked(cred: AwsCredential) -> str | None:
 
 
 def _stored_proxy(cred: AwsCredential) -> str | None:
-    """取已存代理；未配或解密失败返回 None（调用方按直连处理）。
-    使用时复核拦住时抛 ProxyConfigError，不静默回落直连。"""
+    """取已存代理；解密或使用时校验失败均拒绝请求。"""
     try:
         return get_credential_proxy_url(cred)
     except ProxyConfigError:
         raise
-    except Exception:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001
+        raise ProxyConfigError("已保存的代理配置无法解密；请明确修复或清除代理") from exc
+
+
+def _account_identity(ak: str, sk: str, proxy_url: str | None) -> str | None:
+    try:
+        return billing_svc.get_sts_identity(ak, sk, proxy_url)
+    except Exception as exc:  # noqa: BLE001
+        logger.info("STS 身份尚未确认：%s", sanitize_error_message(str(exc)))
         return None
+
+
+def _record_account_identity(cred: AwsCredential, account_id: str | None) -> None:
+    cred.account_id = account_id
+    if account_id:
+        cred.last_confirmed_account_id = account_id
 
 
 def _parse_proxy_or_400(value: str | None) -> str | None:
@@ -83,6 +99,9 @@ def _item(cred: AwsCredential) -> CredentialItem:
         id=cred.id,
         access_key_masked=masked,
         account_label=cred.account_label,
+        account_id=cred.account_id,
+        account_identity_status="confirmed" if cred.account_id else "unknown",
+        auto_stop_conflict=bool(cred.auto_stop_conflict),
         proxy_masked=_proxy_masked(cred),
         is_default=bool(cred.is_default),
         last_validated_at=cred.last_validated_at,
@@ -176,8 +195,10 @@ def create_credential(
         is_default=make_default,
         last_validated_at=now,
     )
+    _record_account_identity(cred, _account_identity(ak, sk, proxy_url))
     _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
     db.add(cred)
+    db.flush()
     db.add(
         OperationLog(
             user_id=user.id,
@@ -186,6 +207,7 @@ def create_credential(
             message=body.account_label or mask_access_key(body.access_key_id.strip()),
         )
     )
+    reconcile_auto_stop_conflicts(db, user)
     db.commit()
     db.refresh(user)
     return _list_out(user)
@@ -229,12 +251,16 @@ def update_credential(
             raise HTTPException(status_code=400, detail=f"AWS 凭证校验失败: {exc.message}")
         except ProxyConfigError as exc:
             raise HTTPException(status_code=400, detail=f"代理不可用: {exc}")
+        if keys_updated:
+            cred.last_confirmed_account_id = None
         if body.access_key_id:
             cred.access_key_id_enc = encrypt_secret(body.access_key_id.strip())
         if body.secret_access_key:
             cred.secret_access_key_enc = encrypt_secret(body.secret_access_key.strip())
-        if keys_updated:
+        if keys_updated or proxy_changed:
+            _record_account_identity(cred, _account_identity(ak, sk, effective_proxy))
             cred.last_validated_at = datetime.now(timezone.utc)
+        if keys_updated:
             _apply_quota_to_cred(cred, ak, sk, proxy_url=effective_proxy)
     if proxy_changed:
         cred.proxy_url_enc = encrypt_secret(new_proxy) if new_proxy else None
@@ -260,6 +286,8 @@ def update_credential(
             cred.is_default = True
 
     db.add(cred)
+    db.flush()
+    reconcile_auto_stop_conflicts(db, user)
     db.commit()
     db.refresh(user)
     return _list_out(user)
@@ -310,12 +338,20 @@ def validate_one(
     try:
         ls.validate_credentials(ak, sk, proxy_url)
     except ls.LightsailError as exc:
+        _record_account_identity(cred, None)
+        reconcile_auto_stop_conflicts(db, user)
+        db.commit()
         raise HTTPException(status_code=400, detail=f"校验失败: {exc.message}")
     except Exception as exc:  # noqa: BLE001
+        _record_account_identity(cred, None)
+        reconcile_auto_stop_conflicts(db, user)
+        db.commit()
         raise HTTPException(status_code=400, detail=sanitize_error_message(str(exc)))
+    _record_account_identity(cred, _account_identity(ak, sk, proxy_url))
     cred.last_validated_at = datetime.now(timezone.utc)
     _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
     db.add(cred)
+    reconcile_auto_stop_conflicts(db, user)
     db.commit()
     db.refresh(cred)
     return _item(cred)
@@ -515,6 +551,7 @@ def delete_credential(
             message=f"deleted credential #{credential_id}",
         )
     )
+    reconcile_auto_stop_conflicts(db, user)
     db.commit()
     return {"message": "已删除凭证"}
 
@@ -535,7 +572,7 @@ def put_compat(
     default = user.default_credential
     # 未传 proxy_url 时沿用默认凭证已存的代理；传了（哪怕空串）就按传的来。
     try:
-        proxy_url = req_proxy if body.proxy_url is not None else (
+        proxy_url = req_proxy if "proxy_url" in body.model_fields_set else (
             _stored_proxy(default) if default is not None else None
         )
     except ProxyConfigError as exc:
@@ -547,6 +584,7 @@ def put_compat(
     except ProxyConfigError as exc:
         raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
 
+    identity = _account_identity(ak, sk, proxy_url)
     if default is None:
         cred = AwsCredential(
             user_id=user.id,
@@ -556,6 +594,8 @@ def put_compat(
             proxy_url_enc=encrypt_secret(proxy_url) if proxy_url else None,
             is_default=True,
             last_validated_at=now,
+            account_id=identity,
+            last_confirmed_account_id=identity,
         )
         _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
         db.add(cred)
@@ -563,9 +603,11 @@ def put_compat(
     else:
         default.access_key_id_enc = encrypt_secret(ak)
         default.secret_access_key_enc = encrypt_secret(sk)
+        default.last_confirmed_account_id = None
+        _record_account_identity(default, identity)
         if body.account_label is not None:
             default.account_label = body.account_label
-        if body.proxy_url is not None:
+        if "proxy_url" in body.model_fields_set:
             default.proxy_url_enc = encrypt_secret(proxy_url) if proxy_url else None
         default.last_validated_at = now
         _apply_quota_to_cred(default, ak, sk, proxy_url=proxy_url)
@@ -579,6 +621,7 @@ def put_compat(
             message=body.account_label or mask_access_key(body.access_key_id.strip()),
         )
     )
+    reconcile_auto_stop_conflicts(db, user)
     db.commit()
     db.refresh(user)
     return _list_out(user)

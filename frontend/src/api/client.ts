@@ -47,6 +47,9 @@ export interface CredentialItem {
   id: number
   access_key_masked: string
   account_label?: string | null
+  account_id?: string | null
+  account_identity_status?: 'confirmed' | 'unknown'
+  auto_stop_conflict?: boolean
   /** 脱敏后的代理地址（http://user:***@host:port）；未配代理为 null（直连） */
   proxy_masked?: string | null
   is_default: boolean
@@ -80,6 +83,7 @@ export interface InstanceTraffic {
   total_gb: number
   limit_gb: number | null
   over_limit: boolean
+  auto_stop_conflict?: boolean
   year_month?: string | null
 }
 
@@ -99,6 +103,10 @@ export interface Instance {
   traffic?: InstanceTraffic | null
   monthly_limit_gb?: number | null
   auto_stop_on_limit?: boolean
+  auto_stop_conflict?: boolean
+  auto_stop_identity_changed?: boolean
+  configured_auto_stop_on_limit?: boolean
+  account_id?: string | null
   note?: string | null
   credential_id?: number | null
   account_label?: string | null
@@ -179,12 +187,14 @@ export interface TrafficSummary {
     name: string
     credential_id?: number | null
     account_label?: string | null
+    account_id?: string | null
     in_gb: number
     out_gb: number
     total_gb: number
     limit_gb: number | null
     over_limit: boolean
     auto_stop_on_limit?: boolean
+    auto_stop_conflict?: boolean
     year_month: string
   }[]
   by_region: {

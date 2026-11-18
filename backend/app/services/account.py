@@ -9,11 +9,12 @@ Management API（固定 us-east-1）在用户点确认后启用区域，生效�
 须由管理账号操作。
 """
 from __future__ import annotations
-
 import boto3
+
 from botocore.exceptions import BotoCoreError, ClientError
 
-from app.proxy_config import proxy_config, sanitize_error_message
+from app.proxy_config import sanitize_error_message
+from app.services.aws_clients import make_client as make_aws_client
 
 ACCOUNT_REGION = "us-east-1"
 
@@ -34,13 +35,7 @@ def make_account_client(
     access_key_id: str, secret_access_key: str, proxy_url: str | None = None
 ):
     """Account Management 客户端（固定 us-east-1，该 API 只有该区域端点）。"""
-    return boto3.client(
-        "account",
-        region_name=ACCOUNT_REGION,
-        aws_access_key_id=access_key_id,
-        aws_secret_access_key=secret_access_key,
-        config=proxy_config(proxy_url),
-    )
+    return make_aws_client("account", access_key_id, secret_access_key, ACCOUNT_REGION, proxy_url)
 
 
 def _raise_from_aws(exc: Exception) -> None:

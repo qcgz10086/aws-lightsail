@@ -345,10 +345,12 @@ def _normalize_scheme(url: str) -> str:
     return url
 
 
-def proxy_config(proxy_url: str | None) -> Config | None:
-    """给 boto3.client 用的 Config；无代理时返回 None（直连）。"""
+def proxy_config(proxy_url: str | None) -> Config:
+    """Return an explicit per-credential proxy config, including an explicit direct route."""
     if not proxy_url:
-        return None
+        # An explicit empty per-scheme value keeps transport behavior independent
+        # of process proxy variables; a missing proxy means direct connection.
+        return Config(proxies={"http": None, "https": None})
     proxy_url = _normalize_scheme(proxy_url)
     if urlparse(proxy_url).scheme in ("socks5", "socks5h") and not _SOCKS_PATCH_APPLIED:
         raise ProxyConfigError("当前 botocore 版本不支持 SOCKS 代理，请改用 http(s) 代理或检查 boto3 版本")

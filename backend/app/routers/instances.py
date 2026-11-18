@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.deps import get_current_user
-from app.models import InstanceSetting, OperationLog, User
+from app.models import InstanceSetting, OperationLog, TrafficUsage, User
 from app.proxy_config import ProxyConfigError
 from app.schemas import (
     ChangeIpResponse,
@@ -21,14 +21,21 @@ from app.schemas import (
     OperationResult,
 )
 from app.services import lightsail as ls
+from app.services.aws_clients import select_scan_credentials
 from app.services.traffic import (
     NoCredentialsError,
     effective_auto_stop,
     effective_limit_gb,
+    resolve_auto_stop_policy,
     get_credential_proxy_url,
     get_setting,
     get_user_aws_keys_and_cred,
+    reconcile_auto_stop_conflicts,
+    resolve_auto_stop_policies,
+    resolve_auto_stop_conflict,
+    auto_stop_conflict_details,
     traffic_for_instance,
+    current_year_month,
 )
 
 logger = logging.getLogger(__name__)
@@ -86,15 +93,27 @@ def _to_out(
     raw: dict,
     credential_id: int,
     account_label: str | None,
+    policy: tuple[bool, float | None, bool, bool] | None = None,
+    setting: InstanceSetting | None = None,
+    usage: TrafficUsage | None = None,
+    preloaded: bool = False,
 ) -> InstanceOut:
     region = raw["region"]
     name = raw["name"]
-    setting = get_setting(db, user.id, region, name, credential_id)
-    traffic = traffic_for_instance(db, user, region, name, credential_id) or {}
-    limit = effective_limit_gb(user, setting)
-    if traffic.get("limit_gb") is None:
-        traffic["limit_gb"] = limit
-        traffic["over_limit"] = limit is not None and traffic.get("total_gb", 0) > limit
+    if not preloaded:
+        setting = get_setting(db, user.id, region, name, credential_id)
+    credential = next((item for item in user.credentials if item.id == credential_id), None)
+    account_id = credential.account_id if credential else None
+    traffic = traffic_for_instance(
+        db, user, region, name, credential_id, account_id, setting, usage, preloaded
+    ) or {}
+    auto_stop_enabled, policy_limit, conflict, identity_changed = (
+        policy or resolve_auto_stop_policy(db, user, credential, region, name)
+        if credential else (effective_auto_stop(user, setting), effective_limit_gb(user, setting), False, False)
+    )
+    limit = None if identity_changed else policy_limit
+    traffic["limit_gb"] = limit
+    traffic["over_limit"] = limit is not None and traffic.get("total_gb", 0) > limit
     return InstanceOut(
         name=name,
         region=region,
@@ -110,7 +129,11 @@ def _to_out(
         created_at=raw.get("created_at"),
         traffic=InstanceTraffic(**traffic) if traffic else None,
         monthly_limit_gb=setting.monthly_limit_gb if setting else None,
-        auto_stop_on_limit=effective_auto_stop(user, setting),
+        auto_stop_on_limit=auto_stop_enabled,
+        configured_auto_stop_on_limit=(bool(setting.auto_stop_on_limit)
+                                       if setting and setting.auto_stop_configured else auto_stop_enabled),
+        auto_stop_conflict=conflict,
+        auto_stop_identity_changed=identity_changed,
         note=setting.note if setting else None,
         credential_id=credential_id,
         account_label=account_label,
@@ -131,6 +154,9 @@ async def list_instances(
         creds = [c for c in creds if c.id == credential_id]
         if not creds:
             raise HTTPException(status_code=404, detail="凭证不存在")
+
+    if credential_id is None:
+        creds = select_scan_credentials(creds)
 
     sem = asyncio.Semaphore(5)
     raw_items: list[tuple[int, str | None, dict]] = []
@@ -174,8 +200,36 @@ async def list_instances(
         errors.extend(errs)
 
     # SQLAlchemy Session 非并发安全：统一在主协程组装输出
+    credential_by_id = {credential.id: credential for credential in user.credentials}
+    settings = db.query(InstanceSetting).filter(InstanceSetting.user_id == user.id).all()
+    policies = resolve_auto_stop_policies(db, user, [
+        (credential_by_id[cred_id], raw["region"], raw["name"])
+        for cred_id, _label, raw in raw_items if cred_id in credential_by_id
+    ], list(credential_by_id.values()), settings)
+    requested_keys = {(cid, raw["region"], raw["name"]) for cid, _label, raw in raw_items}
+    credentials = credential_by_id
+    credential_ids = set(credentials)
+    setting_map = {
+        (row.credential_id, row.region, row.instance_name): row
+        for row in settings if (row.credential_id, row.region, row.instance_name) in requested_keys
+    }
+    usage_rows = db.query(TrafficUsage).filter(
+        TrafficUsage.user_id == user.id,
+        TrafficUsage.year_month == current_year_month(),
+        TrafficUsage.credential_id.in_(credential_ids),
+    ).all() if credential_ids else []
+    usage_map = {
+        (row.credential_id, row.region, row.instance_name, row.account_id): row
+        for row in usage_rows
+    }
     instances = [
-        _to_out(db, user, raw, cred_id, label) for cred_id, label, raw in raw_items
+        _to_out(db, user, raw, cred_id, label,
+                policies.get((cred_id, raw["region"], raw["name"])),
+                setting_map.get((cred_id, raw["region"], raw["name"])),
+                usage_map.get((cred_id, raw["region"], raw["name"],
+                               credentials[cred_id].account_id or "") if cred_id in credentials else None),
+                True)
+        for cred_id, label, raw in raw_items
     ]
     instances.sort(key=lambda x: (x.region, x.name, x.credential_id or 0))
     if not instances and errors:
@@ -234,6 +288,8 @@ async def create_instance(
                 region=body.region,
                 instance_name=body.instance_name,
                 auto_stop_on_limit=bool(user.auto_stop_on_limit_default),
+                auto_stop_configured=bool(user.auto_stop_on_limit_default),
+                auto_stop_account_id=cred.account_id if user.auto_stop_on_limit_default else None,
             )
             db.add(setting)
         _log(
@@ -386,6 +442,18 @@ async def delete_instance(
         lock.release()
 
 
+@router.get("/{region}/{name}/policy-conflict")
+def policy_conflict(
+    region: str,
+    name: str,
+    credential_id: int | None = Query(None),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    _ak, _sk, cred, _proxy = _keys(user, credential_id)
+    return auto_stop_conflict_details(db, user, cred, region, name)
+
+
 @router.patch("/{region}/{name}/settings", response_model=InstanceOut)
 async def update_settings(
     region: str,
@@ -396,6 +464,8 @@ async def update_settings(
     db: Session = Depends(get_db),
 ) -> InstanceOut:
     ak, sk, cred, proxy_url = _keys(user, credential_id)
+    # Capture an existing conflict before accepting changes to a single row.
+    reconcile_auto_stop_conflicts(db, user)
     setting = get_setting(db, user.id, region, name, cred.id)
     if setting is None:
         setting = InstanceSetting(
@@ -404,29 +474,52 @@ async def update_settings(
             region=region,
             instance_name=name,
             auto_stop_on_limit=bool(user.auto_stop_on_limit_default),
+            auto_stop_configured=bool(user.auto_stop_on_limit_default),
+            auto_stop_account_id=cred.account_id if user.auto_stop_on_limit_default else None,
         )
         db.add(setting)
     if "monthly_limit_gb" in body.model_fields_set:
         setting.monthly_limit_gb = body.monthly_limit_gb
     if "auto_stop_on_limit" in body.model_fields_set and body.auto_stop_on_limit is not None:
         setting.auto_stop_on_limit = bool(body.auto_stop_on_limit)
+        setting.auto_stop_configured = True
+        if cred.account_id:
+            setting.auto_stop_account_id = cred.account_id
     if "note" in body.model_fields_set:
         setting.note = body.note
     db.add(setting)
+    reconcile_auto_stop_conflicts(db, user)
+    if body.resolve_conflict_credential_ids is not None:
+        try:
+            resolve_auto_stop_conflict(db, user, cred, region, name,
+                                       body.resolve_conflict_credential_ids, body.resolve_conflict_token)
+        except ValueError as exc:
+            db.rollback()
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
     db.commit()
 
     try:
         raw = await asyncio.to_thread(ls.get_instance, ak, sk, region, name, proxy_url=proxy_url)
         return _to_out(db, user, raw, cred.id, cred.account_label)
     except ls.LightsailError:
-        traffic = traffic_for_instance(db, user, region, name, cred.id)
+        traffic = traffic_for_instance(db, user, region, name, cred.id, cred.account_id)
+        auto_stop_enabled, _policy_limit, conflict, identity_changed = resolve_auto_stop_policy(
+            db, user, cred, region, name
+        )
+        if traffic:
+            traffic["limit_gb"] = None if identity_changed else _policy_limit
+            traffic["over_limit"] = (traffic["limit_gb"] is not None
+                                     and traffic["total_gb"] > traffic["limit_gb"])
         return InstanceOut(
             name=name,
             region=region,
             state="unknown",
             traffic=InstanceTraffic(**traffic) if traffic else None,
             monthly_limit_gb=setting.monthly_limit_gb,
-            auto_stop_on_limit=bool(setting.auto_stop_on_limit),
+            auto_stop_on_limit=auto_stop_enabled,
+            configured_auto_stop_on_limit=bool(setting.auto_stop_on_limit),
+            auto_stop_conflict=conflict,
+            auto_stop_identity_changed=identity_changed,
             note=setting.note,
             credential_id=cred.id,
             account_label=cred.account_label,

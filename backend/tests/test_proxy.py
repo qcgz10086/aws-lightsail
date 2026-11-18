@@ -186,8 +186,8 @@ class TestProxyConfigDegradation(unittest.TestCase):
 
 class TestProxyConfig(unittest.TestCase):
     def test_none_means_direct(self):
-        self.assertIsNone(proxy_config(None))
-        self.assertIsNone(proxy_config(""))
+        self.assertEqual(proxy_config(None).proxies, {"http": None, "https": None})
+        self.assertEqual(proxy_config("").proxies, {"http": None, "https": None})
 
     def test_proxies_dict(self):
         cfg = proxy_config(PROXY)
@@ -266,7 +266,7 @@ class TestFactoriesPassProxy(unittest.TestCase):
         with patch("app.services.lightsail.boto3.client") as mk:
             ls.make_client("AKID", "SK", "us-east-1")
             _, kwargs = mk.call_args
-            self.assertIsNone(kwargs["config"])
+            self.assertEqual(kwargs["config"].proxies, {"http": None, "https": None})
         with patch("app.services.lightsail.boto3.client") as mk:
             ls.make_service_quotas_client("AKID", "SK", "us-east-1", PROXY)
             _, kwargs = mk.call_args
@@ -281,7 +281,7 @@ class TestFactoriesPassProxy(unittest.TestCase):
             with patch("app.services.billing.boto3.client") as mk:
                 fn("AKID", "SK")
                 _, kwargs = mk.call_args
-                self.assertIsNone(kwargs["config"])
+                self.assertEqual(kwargs["config"].proxies, {"http": None, "https": None})
 
 
 class TestServiceForwarding(unittest.TestCase):
@@ -395,6 +395,9 @@ class _ClientCase(unittest.TestCase):
 class TestCredentialProxyApi(_ClientCase):
     def setUp(self):
         super().setUp()
+        self.sts_patcher = patch("app.routers.credentials.billing_svc.get_sts_identity", return_value="123456789012")
+        self.sts_patcher.start()
+        self.addCleanup(self.sts_patcher.stop)
         _create_user(self.db, "proxyalice", "AlicePass123!x")
         self.token = self._login("proxyalice", "AlicePass123!x")
         self._validate_patcher = patch(

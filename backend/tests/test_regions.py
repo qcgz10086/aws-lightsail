@@ -39,7 +39,7 @@ class TestMakeAccountClient(unittest.TestCase):
         with patch("app.services.account.boto3.client") as mk:
             make_account_client("AKID", "SK")
             _, kwargs = mk.call_args
-            self.assertIsNone(kwargs["config"])
+            self.assertEqual(kwargs["config"].proxies, {"http": None, "https": None})
 
 
 class TestGetRegionOptStatus(unittest.TestCase):

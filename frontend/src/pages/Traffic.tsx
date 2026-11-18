@@ -78,7 +78,9 @@ export default function TrafficPage() {
             onClick={async () => {
               setSyncing(true)
               try {
-                const res = await api.post('/traffic/sync')
+                const res = await api.post('/traffic/sync', null, {
+                  params: filterCred === 'all' ? undefined : { credential_id: filterCred },
+                })
                 message.success(res.data.message || '同步完成')
                 await load()
               } catch (err) {
@@ -152,14 +154,16 @@ export default function TrafficPage() {
 
       <Card title="按实例明细">
         <Table
-          rowKey={(r) => `${r.credential_id}/${r.region}/${r.name}`}
+          rowKey={(r) => `${r.credential_id}/${r.account_id || 'unknown'}/${r.region}/${r.name}`}
           loading={loading}
           dataSource={data?.instances || []}
           columns={[
             {
               title: '账号',
               width: 120,
-              render: (_, r) => r.account_label || (r.credential_id ? `#${r.credential_id}` : '-'),
+              render: (_, r) => r.account_id && r.account_label
+                ? `${r.account_label} (${r.account_id})`
+                : r.account_id ? `账号 ${r.account_id}` : r.account_label || (r.credential_id ? `#${r.credential_id}` : '-'),
             },
             { title: '地区', dataIndex: 'region', width: 130 },
             { title: '实例', dataIndex: 'name' },
@@ -183,7 +187,9 @@ export default function TrafficPage() {
               title: '自动关机',
               dataIndex: 'auto_stop_on_limit',
               width: 90,
-              render: (v: boolean) => (v ? <Tag color="orange">开</Tag> : <Tag>关</Tag>),
+              render: (v: boolean, r) => r.auto_stop_conflict
+                ? <Tag color="red">冲突，已暂停</Tag>
+                : v ? <Tag color="orange">开</Tag> : <Tag>关</Tag>,
             },
           ]}
         />

@@ -193,8 +193,9 @@ export default function InstancesPage() {
             {
               title: '超限关机',
               width: 90,
-              render: (_, row) =>
-                row.auto_stop_on_limit ? <Tag color="orange">开</Tag> : <Tag>关</Tag>,
+              render: (_, row) => row.auto_stop_conflict ? <Tag color="red">冲突，已暂停</Tag>
+                : row.auto_stop_identity_changed ? <Tag color="gold">账号变化，已暂停</Tag>
+                  : row.auto_stop_on_limit ? <Tag color="orange">开</Tag> : <Tag>关</Tag>,
             },
             {
               title: '操作',
@@ -234,9 +235,10 @@ export default function InstancesPage() {
                       size="small"
                       onClick={() => {
                         setLimitModal(row)
+                        limitForm.resetFields()
                         limitForm.setFieldsValue({
                           monthly_limit_gb: row.monthly_limit_gb,
-                          auto_stop_on_limit: !!row.auto_stop_on_limit,
+                          auto_stop_on_limit: row.configured_auto_stop_on_limit ?? !!row.auto_stop_on_limit,
                           note: row.note,
                         })
                       }}
@@ -270,7 +272,7 @@ export default function InstancesPage() {
           try {
             await api.patch(
               `/instances/${limitModal.region}/${limitModal.name}/settings`,
-              values,
+              Object.fromEntries(Object.entries(values).filter(([key]) => limitForm.isFieldTouched(key))),
               { params: { credential_id: limitModal.credential_id || undefined } },
             )
             message.success('已保存')
@@ -281,6 +283,51 @@ export default function InstancesPage() {
           }
         }}
       >
+        {limitModal?.auto_stop_conflict ? <Alert type="warning" showIcon
+          message="策略冲突已暂停；保存单条设置不会解除暂停。请协调全部竞争凭证策略后明确确认解除。"
+          action={<Button size="small" onClick={async () => {
+            try {
+              const params = { credential_id: limitModal.credential_id || undefined }
+              const path = `/instances/${limitModal.region}/${limitModal.name}`
+              const res = await api.get<{
+                account_id: string | null
+                confirmation_token: string
+                strategies: { credential_id: number; auto_stop_on_limit: boolean;
+                  limit_gb: number | null; identity_confirmed: boolean }[]
+              }>(`${path}/policy-conflict`, { params })
+              const strategies = res.data.strategies
+              if (!strategies.length) {
+                message.info('当前没有待确认的冲突策略，请刷新列表')
+                return
+              }
+              Modal.confirm({
+                title: `确认 AWS 账号 ${res.data.account_id} 的全部竞争策略`,
+                content: <div>{strategies.map((strategy) => <p key={strategy.credential_id}>
+                  凭证 #{strategy.credential_id}：{strategy.auto_stop_on_limit ? '开启' : '关闭'}，
+                  限额 {strategy.limit_gb ?? '未设置'} GB
+                  {strategy.identity_confirmed ? '' : '（身份未确认，禁止解除）'}
+                </p>)}<p>仅在以上策略全部协调一致后解除暂停；未保存的表单内容不参与确认。</p></div>,
+                okText: '确认全部策略并解除暂停',
+                onOk: async () => {
+                  try {
+                    await api.patch(`${path}/settings`, {
+                      resolve_conflict_credential_ids: strategies.map((strategy) => strategy.credential_id),
+                      resolve_conflict_token: res.data.confirmation_token,
+                    }, { params })
+                    message.success('全部策略已确认，冲突暂停已解除')
+                    setLimitModal(null)
+                    void load()
+                  } catch (err) {
+                    message.error(getErrorMessage(err))
+                    throw err
+                  }
+                },
+              })
+            } catch (err) {
+              message.error(getErrorMessage(err))
+            }
+          }}>查看并确认</Button>}
+          style={{ marginBottom: 16 }} /> : null}
         <Form form={limitForm} layout="vertical">
           <Form.Item
             name="monthly_limit_gb"

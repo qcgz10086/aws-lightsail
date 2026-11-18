@@ -12,14 +12,14 @@ from app.config import get_settings
 from app.database import SessionLocal
 from app.models import AwsCredential, OperationLog, User
 from app.services import lightsail as ls
+from app.services.aws_clients import select_scan_credentials
 from app.services.traffic import (
     bytes_to_gb,
     current_year_month,
-    effective_auto_stop,
-    effective_limit_gb,
     get_credential_keys,
     get_credential_proxy_url,
-    get_setting,
+    reconcile_auto_stop_conflicts,
+    resolve_auto_stop_policies,
     month_start_utc,
     upsert_traffic,
 )
@@ -64,10 +64,12 @@ def _sync_credential(db: Session, user: User, cred: AwsCredential) -> int:
             )
             continue
 
-        for inst in instances:
+        named_instances = [inst for inst in instances if inst.get("name")]
+        policies = resolve_auto_stop_policies(
+            db, user, [(cred, region, inst["name"]) for inst in named_instances]
+        )
+        for inst in named_instances:
             name = inst.get("name")
-            if not name:
-                continue
             try:
                 inn = ls.get_metric_sum_bytes(
                     ak, sk, region, name, "NetworkIn", start, now, 86400, proxy_url=proxy_url
@@ -75,17 +77,20 @@ def _sync_credential(db: Session, user: User, cred: AwsCredential) -> int:
                 out = ls.get_metric_sum_bytes(
                     ak, sk, region, name, "NetworkOut", start, now, 86400, proxy_url=proxy_url
                 )
-                upsert_traffic(db, user.id, cred.id, region, name, ym, inn, out)
+                upsert_traffic(db, user.id, cred.id, region, name, ym, inn, out, cred.account_id)
                 count += 1
 
                 # 可选：超限且勾选了 auto_stop 才关机
-                setting = get_setting(db, user.id, region, name, cred.id)
-                limit = effective_limit_gb(user, setting)
-                auto_stop = effective_auto_stop(user, setting)
+                auto_stop, limit, policy_conflict, identity_changed = policies[(cred.id, region, name)]
                 total_gb = bytes_to_gb((inn or 0) + (out or 0))
                 state = (inst.get("state") or "").lower()
+                if policy_conflict and total_gb > 0:
+                    db.add(OperationLog(user_id=user.id, action="auto_stop_on_limit", region=region,
+                                        target=name, status="conflict", message=
+                                        f"同一 AWS 实例存在冲突策略，自动关机已暂停 (credential=#{cred.id})"))
                 if (
                     auto_stop
+                    and not identity_changed
                     and limit is not None
                     and total_gb > limit
                     and state == "running"
@@ -143,12 +148,21 @@ def _sync_credential(db: Session, user: User, cred: AwsCredential) -> int:
     return count
 
 
-def sync_user_traffic(db: Session, user: User) -> int:
-    """同步用户全部凭证下的实例当月流量。返回成功写入条数。"""
+def sync_user_traffic(db: Session, user: User, credential_id: int | None = None) -> int:
+    """每个已确认 AWS 账号只采集一次；未知身份仍按各 credential 隔离。"""
     if not user.credentials:
         return 0
+    reconcile_auto_stop_conflicts(db, user)
+    credentials = list(user.credentials)
+    if credential_id is None:
+        selected = select_scan_credentials(credentials)
+    else:
+        selected = [credential for credential in credentials if credential.id == credential_id]
+        if not selected:
+            from app.services.traffic import NoCredentialsError
+            raise NoCredentialsError(f"凭证不存在: {credential_id}")
     total = 0
-    for cred in list(user.credentials):
+    for cred in selected:
         total += _sync_credential(db, user, cred)
     if total:
         db.commit()

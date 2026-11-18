@@ -29,6 +29,7 @@ def test_region_traffic_sum():
         access_key_id_enc="enc-ak",
         secret_access_key_enc="enc-sk",
         account_label="main",
+        account_id="123456789012",
         is_default=True,
     )
     db.add(cred)
@@ -45,6 +46,7 @@ def test_region_traffic_sum():
                 region="ap-northeast-1",
                 instance_name=name,
                 year_month="2099-01",
+                account_id="123456789012",
                 network_in_bytes=gb // 2,
                 network_out_bytes=gb // 2,
             )

@@ -100,6 +100,12 @@ export default function CredentialsPage() {
                 <Space>
                   {v || `凭证 #${row.id}`}
                   {row.is_default ? <Tag color="blue">默认</Tag> : null}
+                  {row.account_identity_status === 'confirmed' ? (
+                    <Tag color="green">账号 {row.account_id}</Tag>
+                  ) : (
+                    <Tag>账号未确认</Tag>
+                  )}
+                  {row.auto_stop_conflict ? <Tag color="red">自动关机策略冲突</Tag> : null}
                 </Space>
               ),
             },
