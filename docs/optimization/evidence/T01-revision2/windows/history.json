@@ -1,0 +1,80 @@
+[
+  {
+    "model": "00a599f",
+    "model_sha256": "89a84b8c0ee3812ffc287338c8902dc0216826c258f0a1236d4d1c6ec225f974",
+    "original_rows_checked": {
+      "aws_credentials": 3,
+      "instance_settings": 3,
+      "operation_logs": 1,
+      "traffic_usage": 3,
+      "users": 2
+    },
+    "upgraded": true,
+    "single_backup_after_restart": true,
+    "original_schema_and_values_restored": true,
+    "safety_snapshot_has_later_write": true
+  },
+  {
+    "model": "433b021",
+    "model_sha256": "31b0b036c22c1b521870e8015e863119b82c49e2058e1256b8825705218d850b",
+    "original_rows_checked": {
+      "aws_credentials": 3,
+      "credit_records": 1,
+      "instance_settings": 3,
+      "operation_logs": 1,
+      "traffic_usage": 3,
+      "users": 2
+    },
+    "upgraded": true,
+    "single_backup_after_restart": true,
+    "original_schema_and_values_restored": true,
+    "safety_snapshot_has_later_write": true
+  },
+  {
+    "model": "701ae5a",
+    "model_sha256": "2e88785c9dfb430bb9033e588c8d640d77925c00e930fb7890a5debc354fb03a",
+    "original_rows_checked": {
+      "aws_credentials": 3,
+      "credit_records": 1,
+      "instance_settings": 3,
+      "operation_logs": 1,
+      "traffic_usage": 3,
+      "users": 2
+    },
+    "upgraded": true,
+    "single_backup_after_restart": true,
+    "original_schema_and_values_restored": true,
+    "safety_snapshot_has_later_write": true
+  },
+  {
+    "model": "c0de0ef",
+    "model_sha256": "1496e16f8f8c174a2d826bebd64c65b7e2d3cb7593b5b6ce83630ba17315717a",
+    "original_rows_checked": {
+      "aws_credentials": 3,
+      "instance_settings": 3,
+      "operation_logs": 1,
+      "traffic_usage": 3,
+      "users": 2
+    },
+    "upgraded": true,
+    "single_backup_after_restart": true,
+    "original_schema_and_values_restored": true,
+    "safety_snapshot_has_later_write": true
+  },
+  {
+    "model": "c822f0a",
+    "model_sha256": "ae82421e09641e95fb0fab3386ef9978a19573bb8b8a24071bdf80da231fa4e7",
+    "original_rows_checked": {
+      "aws_credentials": 3,
+      "credit_records": 1,
+      "instance_settings": 3,
+      "operation_logs": 1,
+      "traffic_usage": 3,
+      "users": 2
+    },
+    "upgraded": true,
+    "single_backup_after_restart": true,
+    "original_schema_and_values_restored": true,
+    "safety_snapshot_has_later_write": true
+  }
+]

@@ -1,0 +1,125 @@
+{
+  "task": "T01",
+  "plan": "V1.0 2026-11-17",
+  "status": "awaiting_independent_review",
+  "base": "73655ef8baed876e1cbf2bcae0c578bc94b931df",
+  "implementation_head": "a2c1dcc4217fbac67be129b17ea01cf8bddc4f30",
+  "implementation_tree": "4cd27e082d68b74488d7d476420652c78bdd2d3e",
+  "image": "sha256:b15660664c13e949f6ccdf151eac6523a7d6682375e8805604be935b73192f9f",
+  "input_driver_sha256": {
+    "historical_roundtrip.py": "085c406436dfd3ce849cc9534222622cfebe4c18be0dad6a8e7922afcad4f43d",
+    "impact_checks.py": "6d4574f7e57b055782a8cf2c4a4cd705ee39f7ad88738d4d82102cad9c0d6913",
+    "probe_boundaries.py": "ed9d7332f39fbc3f0f2a9ae7df2bb4c44d233d56b4b2d0f9247ba51279122ef2",
+    "run_suite.py": "3a7ca7186673b2de6d148957dbebd4fe8e0d1537f24e2a5e7520db51af3f32e4"
+  },
+  "files": {
+    ".gitattributes": {
+      "bytes": 111,
+      "sha256": "ae605015f0a0747b186654feb4ccc4cd50b6235b07d35def72632acf6fc94472"
+    },
+    "export_inputs.py": {
+      "bytes": 2105,
+      "sha256": "ed5fe7791299d47526dec9bb7cb39b59d4884b0f0113965e8a93984b169fdfd6"
+    },
+    "historical_roundtrip.py": {
+      "bytes": 5922,
+      "sha256": "085c406436dfd3ce849cc9534222622cfebe4c18be0dad6a8e7922afcad4f43d"
+    },
+    "identity.json": {
+      "bytes": 8043,
+      "sha256": "f80e8e9e74cbde50377a800a8cf4e1ed0ee7babd580d8ce4bf7ff499da70c207"
+    },
+    "impact_checks.py": {
+      "bytes": 4729,
+      "sha256": "6d4574f7e57b055782a8cf2c4a4cd705ee39f7ad88738d4d82102cad9c0d6913"
+    },
+    "instabox-suspend.json": {
+      "bytes": 383,
+      "sha256": "c169ef53ddf60614386d6d19a344f00dd21f82f3d079006cbe4ea8591d95fa4a"
+    },
+    "linux-execution.json": {
+      "bytes": 2808,
+      "sha256": "2b6e6d840666bd673e332ba91fb7553e62ace72f805ff698d7d9e01e872fd97b"
+    },
+    "linux-impact-base.json": {
+      "bytes": 3915,
+      "sha256": "877b835d1ce803e24614a8af06256ed112ab872dec24149ff744ee10a5aa6222"
+    },
+    "linux-impact-candidate.json": {
+      "bytes": 3356,
+      "sha256": "a9a63c4efb91c129a168a046942d6b9fb29a916f8b18135c0b3ffbd2778c1661"
+    },
+    "linux-results.tar.gz": {
+      "bytes": 18338,
+      "sha256": "a93f57721eb5f71ccdb373fb906e72254fa0143b7bccfb6c2f05c230fe81cc43"
+    },
+    "linux-runs.json": {
+      "bytes": 2673,
+      "sha256": "087f6db92439122e6ca60e5afc09f8bcc6415f95c85e27ecc12312852b9a1358"
+    },
+    "run_suite.py": {
+      "bytes": 6416,
+      "sha256": "3a7ca7186673b2de6d148957dbebd4fe8e0d1537f24e2a5e7520db51af3f32e4"
+    },
+    "verify_evidence.py": {
+      "bytes": 6092,
+      "sha256": "06cb4ee0f0056f32c7911848222af29ee5d7a2d9d598b7122b1ce2d2c8483eb7"
+    },
+    "windows/boundaries-command.log": {
+      "bytes": 3279,
+      "sha256": "9789fd55e172f219a9d5de5e3c16ee73593b3fb89a1831fcc7b4b10649231a73"
+    },
+    "windows/boundaries.json": {
+      "bytes": 2811,
+      "sha256": "520723b86ad71ce6afee1729cc5df57615cc09cce7f00ff8504992b326b6fdd4"
+    },
+    "windows/cli-command.log": {
+      "bytes": 481,
+      "sha256": "370f13c6798353f487ca7aa3944f64525850734726811f632d876f5d11635901"
+    },
+    "windows/cli.json": {
+      "bytes": 14637,
+      "sha256": "f165644f6ac3e9a2431361503093a3fe3fa708b33d068307972714b3699daf36"
+    },
+    "windows/focused.log": {
+      "bytes": 15138,
+      "sha256": "00c03877af39e2199e7dc194d6a5f2272962374fe6f5f0575fd033fc087bea52"
+    },
+    "windows/full.log": {
+      "bytes": 58912,
+      "sha256": "6477135d5edcbf64a9b070c55f202e3a9b065b84a0741252b3a422f71c797860"
+    },
+    "windows/history.json": {
+      "bytes": 2379,
+      "sha256": "40aea743e2dcda86855b8d3414beb6b343db3b371fd1b2133b430f718215c7be"
+    },
+    "windows/history.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "windows/impact-base.json": {
+      "bytes": 4018,
+      "sha256": "13e35dfd113f27296e04d3fa2f8849d0614be52d6dd8c601a4c22d653eeaddd6"
+    },
+    "windows/impact-base.stderr": {
+      "bytes": 704,
+      "sha256": "5361823edb708253bd457a66a8e6a6a1df35571820ee1854c1d7bdb84faab4e7"
+    },
+    "windows/impact-candidate.json": {
+      "bytes": 3448,
+      "sha256": "d088ba3a5c9a3bbe5aba279f63e4808b48e6e7123b020c12a6bfa480e188874e"
+    },
+    "windows/impact-candidate.stderr": {
+      "bytes": 1041,
+      "sha256": "b4640eab81de28fd55298ceba637795905ebbae0532fa57316f76272fb13c745"
+    },
+    "windows/red.log": {
+      "bytes": 18102,
+      "sha256": "d34ea93d05c8997daee75aebae71342036d10ffac5f7fdefd3821a8c6058cfe2"
+    },
+    "windows/runs.json": {
+      "bytes": 4441,
+      "sha256": "25f4cb7c2eda5fcd84e683292cdbe809459e9dfe20afa179b9858f4e695570fc"
+    }
+  }
+}

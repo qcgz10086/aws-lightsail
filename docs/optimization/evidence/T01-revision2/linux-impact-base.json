@@ -1,0 +1,104 @@
+{
+  "python": "3.12.16",
+  "sqlite": "3.46.1",
+  "retry": [
+    {
+      "accepted": false,
+      "cause": "aws_credentials: custom table constraints require manual review",
+      "ledger_present": false,
+      "source_sha256": "930e64dc875122a2ca5a296f743e262953f06d7252cd289b4761ded7a47fbc21",
+      "source_unchanged": true,
+      "paths": [
+        "app.db.pre-v1-32fa8b82c2f440ca897ce834d3f7b6e0.db"
+      ],
+      "count": 1,
+      "snapshot_bytes": 32768,
+      "digests": [
+        "f53812269b34e0955063f5e23679c97de1bfba2476046a505133ccbe41f5a340"
+      ]
+    },
+    {
+      "accepted": false,
+      "cause": "aws_credentials: custom table constraints require manual review",
+      "ledger_present": false,
+      "source_sha256": "930e64dc875122a2ca5a296f743e262953f06d7252cd289b4761ded7a47fbc21",
+      "source_unchanged": true,
+      "paths": [
+        "app.db.pre-v1-32fa8b82c2f440ca897ce834d3f7b6e0.db",
+        "app.db.pre-v1-35785221a0ba448bbe2c0014a2a8e9ff.db"
+      ],
+      "count": 2,
+      "snapshot_bytes": 65536,
+      "digests": [
+        "f53812269b34e0955063f5e23679c97de1bfba2476046a505133ccbe41f5a340",
+        "f53812269b34e0955063f5e23679c97de1bfba2476046a505133ccbe41f5a340"
+      ]
+    },
+    {
+      "accepted": false,
+      "cause": "aws_credentials: custom table constraints require manual review",
+      "ledger_present": false,
+      "source_sha256": "930e64dc875122a2ca5a296f743e262953f06d7252cd289b4761ded7a47fbc21",
+      "source_unchanged": true,
+      "paths": [
+        "app.db.pre-v1-32fa8b82c2f440ca897ce834d3f7b6e0.db",
+        "app.db.pre-v1-35785221a0ba448bbe2c0014a2a8e9ff.db",
+        "app.db.pre-v1-e17b432db9244871859a1113543f0297.db"
+      ],
+      "count": 3,
+      "snapshot_bytes": 98304,
+      "digests": [
+        "f53812269b34e0955063f5e23679c97de1bfba2476046a505133ccbe41f5a340",
+        "f53812269b34e0955063f5e23679c97de1bfba2476046a505133ccbe41f5a340",
+        "f53812269b34e0955063f5e23679c97de1bfba2476046a505133ccbe41f5a340"
+      ]
+    },
+    {
+      "accepted": false,
+      "cause": "aws_credentials: custom table constraints require manual review",
+      "ledger_present": false,
+      "source_sha256": "930e64dc875122a2ca5a296f743e262953f06d7252cd289b4761ded7a47fbc21",
+      "source_unchanged": true,
+      "paths": [
+        "app.db.pre-v1-32fa8b82c2f440ca897ce834d3f7b6e0.db",
+        "app.db.pre-v1-35785221a0ba448bbe2c0014a2a8e9ff.db",
+        "app.db.pre-v1-e17b432db9244871859a1113543f0297.db",
+        "app.db.pre-v1-f7c00d940f4142028761160d9ce92c6f.db"
+      ],
+      "count": 4,
+      "snapshot_bytes": 131072,
+      "digests": [
+        "f53812269b34e0955063f5e23679c97de1bfba2476046a505133ccbe41f5a340",
+        "f53812269b34e0955063f5e23679c97de1bfba2476046a505133ccbe41f5a340",
+        "f53812269b34e0955063f5e23679c97de1bfba2476046a505133ccbe41f5a340",
+        "f53812269b34e0955063f5e23679c97de1bfba2476046a505133ccbe41f5a340"
+      ]
+    }
+  ],
+  "retry_source_sha256_before": "930e64dc875122a2ca5a296f743e262953f06d7252cd289b4761ded7a47fbc21",
+  "retry_source_bytes": 32768,
+  "column_rule": {
+    "before": {
+      "declared_not_null": true,
+      "sql_default": "'unlabelled'",
+      "null_write_allowed": false
+    },
+    "accepted": true,
+    "after": {
+      "declared_not_null": false,
+      "sql_default": null,
+      "null_write_allowed": true
+    },
+    "ledger_present": true,
+    "ledger_version": 1,
+    "source_sha256_before": "86e779b6055b3950f39e041ed2fa29e059d11dc159577fae9c45e5f160f193de",
+    "source_sha256_after": "1daef12cb64ca971507104437a7e711facdd3adb7dfba01fe7a1a0b3ef715a3e",
+    "verified_backup_name": "app.db.pre-v1-524a4fda3a404b59a1885b7dea9e02b1.db",
+    "verified_backup_sha256": "7e683554085a5e73561da69146b73a7b73aee32b0ac0a6fab97cc08dc9a73237",
+    "verified_backup_rule": {
+      "declared_not_null": true,
+      "sql_default": "'unlabelled'",
+      "null_write_allowed": false
+    }
+  }
+}

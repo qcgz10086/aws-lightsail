@@ -1,0 +1,88 @@
+{
+  "machine": "m_agqymokr64sggvjgxypiphnoke",
+  "container_id": "d7aaeeeb8cdad596e83bcc39945678b974a5ee30f527bc44bb249f6968550c19",
+  "started": "2026-11-18T15:40:37.217248962Z",
+  "finished": "2026-11-18T15:41:30.003156656Z",
+  "image": "sha256:b15660664c13e949f6ccdf151eac6523a7d6682375e8805604be935b73192f9f",
+  "user": "appuser",
+  "network": "none",
+  "command": [
+    "python",
+    "/in/drivers/run_suite.py",
+    "/in",
+    "/out"
+  ],
+  "mounts": [
+    {
+      "Source": "/data/lightsail-t00-revision1/t01-revision2-73655ef8/validated-4cd27e08/inputs",
+      "Destination": "/in",
+      "RW": false
+    },
+    {
+      "Source": "/data/lightsail-t00-revision1/t01-revision2-73655ef8/validated-4cd27e08/results",
+      "Destination": "/out",
+      "RW": true
+    }
+  ],
+  "exit": 0,
+  "oom_killed": false,
+  "input_sha256": "d2e4a410fb411ba9955c76974ba62ccfab70299493067e84538ce1e5f5bf0311",
+  "files": {
+    "boundaries-command.log": {
+      "bytes": 3016,
+      "sha256": "eb991e63596dc8a528550644abca3146f1a81f38190f179e148045ed4ceb281f"
+    },
+    "boundaries.json": {
+      "bytes": 2611,
+      "sha256": "3e886382d940e3c5e539b8e5d0db3ffcc6ca6ad90863aba84ffb7d0009f9b5bb"
+    },
+    "cli-command.log": {
+      "bytes": 483,
+      "sha256": "cd4fb77b213ca5d595131249375153cd3f19a91ea3aee97e0b01706963a32031"
+    },
+    "cli.json": {
+      "bytes": 12817,
+      "sha256": "36642175e1529a80a3a5386cf870780dd06914b546170fae8859b53b68c715f3"
+    },
+    "focused.log": {
+      "bytes": 13889,
+      "sha256": "1122d94feefb7c312423de12c3033bd035d9d3457b82ea0bafd33552e22e1ecb"
+    },
+    "full.log": {
+      "bytes": 59414,
+      "sha256": "d902301f9afe23c2f50670348cfdfc02c4fd4cc8a8dc05d2bcf7a6943a873e83"
+    },
+    "history.json": {
+      "bytes": 2299,
+      "sha256": "2779d2312248c54ff21e90b6f1081d9d7d5a254f6f6292c6e2587a341c507cbc"
+    },
+    "history.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "impact-base.json": {
+      "bytes": 3915,
+      "sha256": "877b835d1ce803e24614a8af06256ed112ab872dec24149ff744ee10a5aa6222"
+    },
+    "impact-base.stderr": {
+      "bytes": 580,
+      "sha256": "f2788f290ed22e11074c35f659b02ef261139fa5ffba03a67dedad012d176486"
+    },
+    "impact-candidate.json": {
+      "bytes": 3356,
+      "sha256": "a9a63c4efb91c129a168a046942d6b9fb29a916f8b18135c0b3ffbd2778c1661"
+    },
+    "impact-candidate.stderr": {
+      "bytes": 886,
+      "sha256": "f13210a43099180afb0a3910fda8c20ea752bfe29feb9a7f20e0c5ff00066c22"
+    },
+    "red.log": {
+      "bytes": 17861,
+      "sha256": "f6514c1211f4f731ceeea9d92233e5fae9cfa460d59c2325c6198cbcd3ad6751"
+    },
+    "runs.json": {
+      "bytes": 2673,
+      "sha256": "087f6db92439122e6ca60e5afc09f8bcc6415f95c85e27ecc12312852b9a1358"
+    }
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "base": "73655ef8baed876e1cbf2bcae0c578bc94b931df",
+  "source_tree": "4cd27e082d68b74488d7d476420652c78bdd2d3e",
+  "source_files": 38,
+  "platform": "Linux-6.18.54-instabox-x86_64-with-glibc2.41",
+  "python": "3.12.16 (main, Nov  5 2026, 07:58:20) [GCC 14.2.0]",
+  "sqlite": "3.46.1",
+  "sqlalchemy": "2.0.36",
+  "runs": {
+    "impact-base": {
+      "cwd": "/tmp/t01-r2-9548xaci",
+      "argv": [
+        "/usr/local/bin/python",
+        "/in/drivers/impact_checks.py",
+        "/tmp/t01-r2-9548xaci/base"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    "impact-candidate": {
+      "cwd": "/tmp/t01-r2-9548xaci",
+      "argv": [
+        "/usr/local/bin/python",
+        "/in/drivers/impact_checks.py",
+        "/tmp/t01-r2-9548xaci/source"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    "red": {
+      "cwd": "/tmp/t01-r2-9548xaci/base/backend",
+      "argv": [
+        "/usr/local/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_migration_retries.py",
+        "-v"
+      ],
+      "exit": 1,
+      "expected": 1
+    },
+    "focused": {
+      "cwd": "/tmp/t01-r2-9548xaci/source/backend",
+      "argv": [
+        "/usr/local/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_migrat*.py",
+        "-v"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "tests": 47,
+      "seconds": 5.099,
+      "skipped": 0
+    },
+    "full": {
+      "cwd": "/tmp/t01-r2-9548xaci/source/backend",
+      "argv": [
+        "/usr/local/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "tests": 182,
+      "seconds": 24.448,
+      "skipped": 0
+    },
+    "history": {
+      "cwd": "/tmp/t01-r2-9548xaci",
+      "argv": [
+        "/usr/local/bin/python",
+        "/in/drivers/historical_roundtrip.py",
+        "/tmp/t01-r2-9548xaci"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    "cli-command": {
+      "cwd": "/tmp/t01-r2-9548xaci",
+      "argv": [
+        "/usr/local/bin/python",
+        "/tmp/t01-r2-9548xaci/source/docs/optimization/evidence/T01/validate_cli.py",
+        "--output",
+        "/out/cli.json"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    "boundaries-command": {
+      "cwd": "/tmp/t01-r2-9548xaci",
+      "argv": [
+        "/usr/local/bin/python",
+        "/in/drivers/probe_boundaries.py",
+        "--source",
+        "/tmp/t01-r2-9548xaci/source",
+        "--output",
+        "/out/boundaries.json"
+      ],
+      "exit": 0,
+      "expected": 0
+    }
+  }
+}

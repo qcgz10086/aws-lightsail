@@ -1,0 +1,10 @@
+{
+  "machine": "m_agqymokr64sggvjgxypiphnoke",
+  "running_container_ids_before_suspend": [],
+  "operation": "op_agq66u62zv2gb44srmgeya3wee",
+  "operation_result": "succeeded",
+  "state": "suspended",
+  "updated_at_utc": "2026-11-18T15:43:32.785716Z",
+  "storage_synced_at_return": false,
+  "local_archive_sha256": "a93f57721eb5f71ccdb373fb906e72254fa0143b7bccfb6c2f05c230fe81cc43"
+}

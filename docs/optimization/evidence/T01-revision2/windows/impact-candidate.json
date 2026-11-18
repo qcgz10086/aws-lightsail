@@ -1,0 +1,93 @@
+{
+  "python": "3.12.2",
+  "sqlite": "3.43.1",
+  "retry": [
+    {
+      "accepted": false,
+      "cause": "aws_credentials: custom table constraints require manual review",
+      "ledger_present": false,
+      "source_sha256": "e3498a96ed91773a206cd0ade66852ba868a18c649cb0083edac44f4af8d2616",
+      "source_unchanged": true,
+      "paths": [
+        "app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db"
+      ],
+      "count": 1,
+      "snapshot_bytes": 32768,
+      "digests": [
+        "c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb"
+      ]
+    },
+    {
+      "accepted": false,
+      "cause": "aws_credentials: custom table constraints require manual review",
+      "ledger_present": false,
+      "source_sha256": "e3498a96ed91773a206cd0ade66852ba868a18c649cb0083edac44f4af8d2616",
+      "source_unchanged": true,
+      "paths": [
+        "app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db"
+      ],
+      "count": 1,
+      "snapshot_bytes": 32768,
+      "digests": [
+        "c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb"
+      ]
+    },
+    {
+      "accepted": false,
+      "cause": "aws_credentials: custom table constraints require manual review",
+      "ledger_present": false,
+      "source_sha256": "e3498a96ed91773a206cd0ade66852ba868a18c649cb0083edac44f4af8d2616",
+      "source_unchanged": true,
+      "paths": [
+        "app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db"
+      ],
+      "count": 1,
+      "snapshot_bytes": 32768,
+      "digests": [
+        "c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb"
+      ]
+    },
+    {
+      "accepted": false,
+      "cause": "aws_credentials: custom table constraints require manual review",
+      "ledger_present": false,
+      "source_sha256": "e3498a96ed91773a206cd0ade66852ba868a18c649cb0083edac44f4af8d2616",
+      "source_unchanged": true,
+      "paths": [
+        "app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db"
+      ],
+      "count": 1,
+      "snapshot_bytes": 32768,
+      "digests": [
+        "c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb"
+      ]
+    }
+  ],
+  "retry_source_sha256_before": "e3498a96ed91773a206cd0ade66852ba868a18c649cb0083edac44f4af8d2616",
+  "retry_source_bytes": 32768,
+  "column_rule": {
+    "before": {
+      "declared_not_null": true,
+      "sql_default": "'unlabelled'",
+      "null_write_allowed": false
+    },
+    "accepted": false,
+    "cause": "aws_credentials.account_label: custom nullability requires manual review",
+    "after": {
+      "declared_not_null": true,
+      "sql_default": "'unlabelled'",
+      "null_write_allowed": false
+    },
+    "ledger_present": false,
+    "ledger_version": null,
+    "source_sha256_before": "c0cd38b01219fb4ba5b7bceb5fe7576de8e558508a2aac335f272bf3ae8ea039",
+    "source_sha256_after": "c0cd38b01219fb4ba5b7bceb5fe7576de8e558508a2aac335f272bf3ae8ea039",
+    "verified_backup_name": "app.db.pre-v1-19792235213e0d07178483865039fb117cff287b7a60cfd84098f28e56dd510a.db",
+    "verified_backup_sha256": "19792235213e0d07178483865039fb117cff287b7a60cfd84098f28e56dd510a",
+    "verified_backup_rule": {
+      "declared_not_null": true,
+      "sql_default": "'unlabelled'",
+      "null_write_allowed": false
+    }
+  }
+}

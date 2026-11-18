@@ -1,0 +1,117 @@
+{
+  "base": "73655ef8baed876e1cbf2bcae0c578bc94b931df",
+  "source_tree": "4cd27e082d68b74488d7d476420652c78bdd2d3e",
+  "source_files": 38,
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "sqlite": "3.43.1",
+  "sqlalchemy": "2.0.36",
+  "runs": {
+    "impact-base": {
+      "cwd": "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk",
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-final-run-44b389f32a\\inputs\\drivers\\impact_checks.py",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk\\base"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    "impact-candidate": {
+      "cwd": "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk",
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-final-run-44b389f32a\\inputs\\drivers\\impact_checks.py",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk\\source"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    "red": {
+      "cwd": "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk\\base\\backend",
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_migration_retries.py",
+        "-v"
+      ],
+      "exit": 1,
+      "expected": 1
+    },
+    "focused": {
+      "cwd": "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk\\source\\backend",
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_migrat*.py",
+        "-v"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "tests": 47,
+      "seconds": 9.39,
+      "skipped": 1
+    },
+    "full": {
+      "cwd": "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk\\source\\backend",
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "tests": 182,
+      "seconds": 31.465,
+      "skipped": 1
+    },
+    "history": {
+      "cwd": "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk",
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-final-run-44b389f32a\\inputs\\drivers\\historical_roundtrip.py",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    "cli-command": {
+      "cwd": "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk",
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk\\source\\docs\\optimization\\evidence\\T01\\validate_cli.py",
+        "--output",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-final-run-44b389f32a\\windows\\cli.json"
+      ],
+      "exit": 0,
+      "expected": 0
+    },
+    "boundaries-command": {
+      "cwd": "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk",
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-final-run-44b389f32a\\inputs\\drivers\\probe_boundaries.py",
+        "--source",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-r2-hij5lsjk\\source",
+        "--output",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t01-final-run-44b389f32a\\windows\\boundaries.json"
+      ],
+      "exit": 0,
+      "expected": 0
+    }
+  }
+}

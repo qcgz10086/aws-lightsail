@@ -1,0 +1,187 @@
+test_contaminated_or_replaced_retry_snapshot_is_not_trusted_or_overwritten (test_migration_retries.RetryTests.test_contaminated_or_replaced_retry_snapshot_is_not_trusted_or_overwritten) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp7xcjw8xq\backups\app.db.pre-v1-7c53986f82d34e5994451526fc75a192.db
+FAIL
+test_custom_column_in_each_child_is_classified_before_application_ddl (test_migration_retries.RetryTests.test_custom_column_in_each_child_is_classified_before_application_ddl) ... 
+  test_custom_column_in_each_child_is_classified_before_application_ddl (test_migration_retries.RetryTests.test_custom_column_in_each_child_is_classified_before_application_ddl) (column='note TEXT') ... FAIL
+  test_custom_column_in_each_child_is_classified_before_application_ddl (test_migration_retries.RetryTests.test_custom_column_in_each_child_is_classified_before_application_ddl) (column='network_out_bytes BIGINT') ... FAIL
+test_custom_column_rules_are_refused_with_verified_original_and_no_ledger (test_migration_retries.RetryTests.test_custom_column_rules_are_refused_with_verified_original_and_no_ledger) ... 
+  test_custom_column_rules_are_refused_with_verified_original_and_no_ledger (test_migration_retries.RetryTests.test_custom_column_rules_are_refused_with_verified_original_and_no_ledger) (clause="NOT NULL DEFAULT 'unlabelled'") ... FAIL
+  test_custom_column_rules_are_refused_with_verified_original_and_no_ledger (test_migration_retries.RetryTests.test_custom_column_rules_are_refused_with_verified_original_and_no_ledger) (clause='NOT NULL') ... FAIL
+  test_custom_column_rules_are_refused_with_verified_original_and_no_ledger (test_migration_retries.RetryTests.test_custom_column_rules_are_refused_with_verified_original_and_no_ledger) (clause="DEFAULT 'other'") ... FAIL
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpzshv1t4n\backups\case-3.db.pre-v1-a28295e2304c4fb3915799c0085bcf86.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpzshv1t4n\backups\case-4.db.pre-v1-b30715f8383a42fa91785f0ec4abb2f1.db
+test_failed_retries_reuse_first_verified_snapshot_without_creating_another (test_migration_retries.RetryTests.test_failed_retries_reuse_first_verified_snapshot_without_creating_another) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpdqqlbtxk\backups\app.db.pre-v1-15e8b301883f4241b1d17abb7543df3f.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpdqqlbtxk\backups\app.db.pre-v1-360a891953d646bda9d97f7416f47a3d.db
+FAIL
+test_generated_known_column_is_not_rebuilt_as_a_plain_column (test_migration_retries.RetryTests.test_generated_known_column_is_not_rebuilt_as_a_plain_column) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpwrazllg6\backups\app.db.pre-v1-c7e8f896c3a240f3bdec8bc74c55286b.db
+ok
+test_historical_zero_server_defaults_still_apply_to_omitted_columns (test_migration_retries.RetryTests.test_historical_zero_server_defaults_still_apply_to_omitted_columns) ... FAIL
+test_malformed_receipt_or_missing_recorded_snapshot_stops_before_ddl (test_migration_retries.RetryTests.test_malformed_receipt_or_missing_recorded_snapshot_stops_before_ddl) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpga2wqpf2\backups\app.db.pre-v1-4ed2dea23e0c4da1872c853fc8108495.db
+ERROR
+test_new_wal_commit_gets_its_own_snapshot_but_rollback_and_checkpoint_reuse_it (test_migration_retries.RetryTests.test_new_wal_commit_gets_its_own_snapshot_but_rollback_and_checkpoint_reuse_it) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp45a5bbux\backups\app.db.pre-v1-2e2ad41c49e24a359d35a3d572412595.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp45a5bbux\backups\app.db.pre-v1-364d9147b5a14b2bbf6e1fdec263d6a9.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp45a5bbux\backups\app.db.pre-v1-3fea8d94aafe4fbdb17e3438a1f78b3a.db
+FAIL
+test_retry_rejects_a_hard_link_to_the_live_database (test_migration_retries.RetryTests.test_retry_rejects_a_hard_link_to_the_live_database) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpmxj18itn\backups\app.db.pre-v1-768356412e834167a538c55d168d38ad.db
+FAIL
+test_retry_rejects_a_link_in_place_of_the_receipt_or_recorded_snapshot (test_migration_retries.RetryTests.test_retry_rejects_a_link_in_place_of_the_receipt_or_recorded_snapshot) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmph6nxrc71\backups\app.db.pre-v1-7bbe4d414e3a424ebf2f3ab6d6d10e56.db
+skipped "symlink unavailable: [WinError 1314] 客户端没有所需的特权。: 'C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmph6nxrc71\\\\backups\\\\app.db.pre-v1-7bbe4d414e3a424ebf2f3ab6d6d10e56.saved-db' -> 'C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmph6nxrc71\\\\backups\\\\app.db.pre-v1-7bbe4d414e3a424ebf2f3ab6d6d10e56.db'"
+test_snapshot_creation_and_reuse_hold_the_sqlite_writer_lock (test_migration_retries.RetryTests.test_snapshot_creation_and_reuse_hold_the_sqlite_writer_lock) ... ERROR
+test_snapshot_survives_failure_between_publication_and_retry_receipt (test_migration_retries.RetryTests.test_snapshot_survives_failure_between_publication_and_retry_receipt) ... ERROR
+test_transient_failure_then_success_records_original_path_and_sha (test_migration_retries.RetryTests.test_transient_failure_then_success_records_original_path_and_sha) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp6btz_2gn\backups\app.db.pre-v1-b648e967c396438482ade95cd8b54000.db
+FAIL
+
+======================================================================
+ERROR: test_malformed_receipt_or_missing_recorded_snapshot_stops_before_ddl (test_migration_retries.RetryTests.test_malformed_receipt_or_missing_recorded_snapshot_stops_before_ddl)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 128, in test_malformed_receipt_or_missing_recorded_snapshot_stops_before_ddl
+    original = receipt.read_bytes()
+               ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\AppData\Local\Programs\Python\Python312\Lib\pathlib.py", line 1019, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\AppData\Local\Programs\Python\Python312\Lib\pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\liyang\\AppData\\Local\\Temp\\tmpga2wqpf2\\backups\\app.db.pre-v1.json'
+
+======================================================================
+ERROR: test_snapshot_creation_and_reuse_hold_the_sqlite_writer_lock (test_migration_retries.RetryTests.test_snapshot_creation_and_reuse_hold_the_sqlite_writer_lock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 171, in test_snapshot_creation_and_reuse_hold_the_sqlite_writer_lock
+    backup = migrations.migration_backup
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'app.migrations' has no attribute 'migration_backup'
+
+======================================================================
+ERROR: test_snapshot_survives_failure_between_publication_and_retry_receipt (test_migration_retries.RetryTests.test_snapshot_survives_failure_between_publication_and_retry_receipt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 96, in test_snapshot_survives_failure_between_publication_and_retry_receipt
+    with patch.object(migrations.os, 'replace', side_effect=OSError('cannot publish retry receipt')):
+                      ^^^^^^^^^^^^^
+AttributeError: module 'app.migrations' has no attribute 'os'
+
+======================================================================
+FAIL: test_contaminated_or_replaced_retry_snapshot_is_not_trusted_or_overwritten (test_migration_retries.RetryTests.test_contaminated_or_replaced_retry_snapshot_is_not_trusted_or_overwritten)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 113, in test_contaminated_or_replaced_retry_snapshot_is_not_trusted_or_overwritten
+    self.refused()
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 35, in refused
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_custom_column_in_each_child_is_classified_before_application_ddl (test_migration_retries.RetryTests.test_custom_column_in_each_child_is_classified_before_application_ddl) (column='note TEXT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 247, in test_custom_column_in_each_child_is_classified_before_application_ddl
+    self.refused()
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 35, in refused
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_custom_column_in_each_child_is_classified_before_application_ddl (test_migration_retries.RetryTests.test_custom_column_in_each_child_is_classified_before_application_ddl) (column='network_out_bytes BIGINT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 247, in test_custom_column_in_each_child_is_classified_before_application_ddl
+    self.refused()
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 35, in refused
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_custom_column_rules_are_refused_with_verified_original_and_no_ledger (test_migration_retries.RetryTests.test_custom_column_rules_are_refused_with_verified_original_and_no_ledger) (clause="NOT NULL DEFAULT 'unlabelled'")
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 206, in test_custom_column_rules_are_refused_with_verified_original_and_no_ledger
+    self.refused()
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 35, in refused
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_custom_column_rules_are_refused_with_verified_original_and_no_ledger (test_migration_retries.RetryTests.test_custom_column_rules_are_refused_with_verified_original_and_no_ledger) (clause='NOT NULL')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 206, in test_custom_column_rules_are_refused_with_verified_original_and_no_ledger
+    self.refused()
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 35, in refused
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_custom_column_rules_are_refused_with_verified_original_and_no_ledger (test_migration_retries.RetryTests.test_custom_column_rules_are_refused_with_verified_original_and_no_ledger) (clause="DEFAULT 'other'")
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 206, in test_custom_column_rules_are_refused_with_verified_original_and_no_ledger
+    self.refused()
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 35, in refused
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_failed_retries_reuse_first_verified_snapshot_without_creating_another (test_migration_retries.RetryTests.test_failed_retries_reuse_first_verified_snapshot_without_creating_another)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 51, in test_failed_retries_reuse_first_verified_snapshot_without_creating_another
+    self.assertEqual(self.backups(), first)
+AssertionError: {Wind[178 chars]ebeb', WindowsPath('C:/Users/liyang/AppData/Lo[144 chars]beb'} != {Wind[178 chars]ebeb'}
+Diff is 962 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_historical_zero_server_defaults_still_apply_to_omitted_columns (test_migration_retries.RetryTests.test_historical_zero_server_defaults_still_apply_to_omitted_columns)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 232, in test_historical_zero_server_defaults_still_apply_to_omitted_columns
+    self.assertEqual((row[3], row[4]), (1, '0'))
+AssertionError: Tuples differ: (1, None) != (1, '0')
+
+First differing element 1:
+None
+'0'
+
+- (1, None)
++ (1, '0')
+
+======================================================================
+FAIL: test_new_wal_commit_gets_its_own_snapshot_but_rollback_and_checkpoint_reuse_it (test_migration_retries.RetryTests.test_new_wal_commit_gets_its_own_snapshot_but_rollback_and_checkpoint_reuse_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 78, in test_new_wal_commit_gets_its_own_snapshot_but_rollback_and_checkpoint_reuse_it
+    self.assertEqual(self.backups(), both)
+AssertionError: {Wind[367 chars]9997', WindowsPath('C:/Users/liyang/AppData/Lo[144 chars]997'} != {Wind[367 chars]9997'}
+Diff is 1154 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_retry_rejects_a_hard_link_to_the_live_database (test_migration_retries.RetryTests.test_retry_rejects_a_hard_link_to_the_live_database)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 165, in test_retry_rejects_a_hard_link_to_the_live_database
+    self.refused()
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 35, in refused
+    with self.assertRaises(migrations.MigrationError):
+AssertionError: MigrationError not raised
+
+======================================================================
+FAIL: test_transient_failure_then_success_records_original_path_and_sha (test_migration_retries.RetryTests.test_transient_failure_then_success_records_original_path_and_sha)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\AppData\Local\Temp\t01-r2-hij5lsjk\base\backend\tests\test_migration_retries.py", line 89, in test_transient_failure_then_success_records_original_path_and_sha
+    self.assertEqual(self.backups(), before)
+AssertionError: {Wind[73 chars]e-v1-77166a300cbb4fe0ba29c402f03425ce.db'): '2[249 chars]4d6'} != {Wind[73 chars]e-v1-b648e967c396438482ade95cd8b54000.db'): '2[60 chars]4d6'}
+- {WindowsPath('C:/Users/liyang/AppData/Local/Temp/tmp6btz_2gn/backups/app.db.pre-v1-77166a300cbb4fe0ba29c402f03425ce.db'): '2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6',
+-  WindowsPath('C:/Users/liyang/AppData/Local/Temp/tmp6btz_2gn/backups/app.db.pre-v1-b648e967c396438482ade95cd8b54000.db'): '2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6'}
+? ^
+
++ {WindowsPath('C:/Users/liyang/AppData/Local/Temp/tmp6btz_2gn/backups/app.db.pre-v1-b648e967c396438482ade95cd8b54000.db'): '2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6'}
+? ^
+
+
+----------------------------------------------------------------------
+Ran 13 tests in 1.566s
+
+FAILED (failures=11, errors=3, skipped=1)
