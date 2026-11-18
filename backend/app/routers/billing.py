@@ -49,6 +49,7 @@ async def billing_summary(
     credits_ok = bool(result["accounts"]) and all(row["credits"]["status"] == "ok" for row in result["accounts"])
     def number(key):
         return float(currency[key]) if costs_ok and currency.get(key) is not None else None
+    forecast_value = currency.get("forecast_month_total")
     official = []
     services = []
     for row in result["accounts"]:
@@ -61,12 +62,13 @@ async def billing_summary(
     records = db.query(CreditRecord).filter(CreditRecord.user_id == user.id).all()
     selected = {row["id"] for row in result["manual_credits"] + result["pending_assignment"]}
     return BillingSummary(status="ok" if costs_ok else "unavailable",
-        message="多币种和各账号独立状态请使用 v2；手动记录无逐笔可靠匹配不估算剩余。",
+        message=("多币种和各账号独立状态请使用 v2；手动记录无逐笔可靠匹配不估算剩余。"
+                 + ("完整月预测由已发生净额加不重叠剩余期间预测。" if forecast_value is not None
+                    else "完整月预测不可用：费用或逐日预测缺失/失败，或账号币种不配对。")),
         year_month=result["year_month"], currency=currency.get("currency", "MULTI"),
         total_cost=number("total_cost"), net_cost=number("net_cost"),
         credits_applied=number("credits_applied"), lightsail_cost=number("lightsail_cost"),
-        forecast_cost=(float(currency["forecast_month_total"])
-                       if currency.get("forecast_month_total") is not None else None),
+        forecast_cost=float(forecast_value) if forecast_value is not None else None,
         by_service=services, credits=[_credit_out(row) for row in records if row.id in selected],
         aws_credits=official, aws_credits_status="ok" if credits_ok else "unavailable",
         aws_credits_error=None if credits_ok else "部分账号官方赠金不可用；详见 v2 独立状态",
