@@ -1,11 +1,12 @@
 """SQLite snapshots and offline recovery; usable without application secrets."""
 import argparse
-from contextlib import closing
+from contextlib import closing, suppress
 from datetime import datetime, timezone
 import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import sqlite3
 import tempfile
 import time
@@ -40,11 +41,18 @@ def check_database(conn: sqlite3.Connection) -> None:
         raise DatabaseRecoveryError("SQLite foreign_key_check failed")
 
 
+def require_no_sidecars(path: Path) -> None:
+    for suffix in ("-wal", "-shm", "-journal"):
+        if os.path.lexists(str(path) + suffix):
+            raise DatabaseRecoveryError(f"SQLite sidecar present: {path}{suffix}")
+
+
 def snapshot_database(source: Path, destination: Path) -> dict:
     """Copy committed data through SQLite's backup API, including a live WAL."""
-    source, destination = Path(source).resolve(), Path(destination).resolve()
-    if source == destination or destination.exists():
+    source, destination = Path(source).resolve(), Path(destination).absolute()
+    if source == destination or os.path.lexists(destination):
         raise DatabaseRecoveryError("Backup destination must be a new path")
+    require_no_sidecars(destination)
     if not source.is_file():
         raise DatabaseRecoveryError("Source database does not exist")
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -64,10 +72,20 @@ def snapshot_database(source: Path, destination: Path) -> dict:
                 check_database(dst)
         with staging.open("r+b") as stream:
             os.fsync(stream.fileno())
+        digest = file_sha256(staging)
+        require_no_sidecars(destination)
         # Link publishes atomically without overwriting an existing destination.
         os.link(staging, destination)
-        sync_directory(destination.parent)
-        return {"path": str(destination), "sha256": file_sha256(destination),
+        try:
+            sync_directory(destination.parent)
+            verify_backup(destination, digest)
+        except (DatabaseRecoveryError, OSError, sqlite3.Error):
+            with suppress(FileNotFoundError):
+                if os.path.samestat(staging.stat(), destination.lstat()):
+                    destination.unlink()
+                    sync_directory(destination.parent)
+            raise
+        return {"path": str(destination), "sha256": digest,
                 "created_at_utc": datetime.now(timezone.utc).isoformat()}
     finally:
         staging.unlink(missing_ok=True)
@@ -77,13 +95,12 @@ def verify_backup(path: Path, expected_sha256: str) -> dict:
     path = Path(path).resolve()
     if len(expected_sha256) != 64 or any(c not in "0123456789abcdef" for c in expected_sha256.lower()):
         raise DatabaseRecoveryError("A full SHA256 is required")
-    wal = Path(str(path) + "-wal")
-    if wal.exists() and wal.stat().st_size:
-        raise DatabaseRecoveryError("Backup must be a standalone snapshot without WAL")
+    require_no_sidecars(path)
     if file_sha256(path) != expected_sha256.lower():
         raise DatabaseRecoveryError("Backup SHA256 mismatch")
-    with closing(sqlite3.connect(path.as_uri() + "?mode=ro", uri=True)) as conn:
+    with closing(sqlite3.connect(path.as_uri() + "?mode=ro&immutable=1", uri=True)) as conn:
         check_database(conn)
+    require_no_sidecars(path)
     return {"path": str(path), "sha256": expected_sha256.lower(), "integrity": "ok"}
 
 
@@ -96,11 +113,17 @@ def restore_database(backup: Path, destination: Path, expected_sha256: str, *, o
         raise DatabaseRecoveryError("Restore source and target must differ")
     verify_backup(backup, expected_sha256)
     token = uuid.uuid4().hex
-    staging = destination.with_name(f".restore-{token}.db")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    fd, name = tempfile.mkstemp(prefix=".restore-", dir=destination.parent)
+    staging = Path(name)
     safety = None
     try:
-        snapshot_database(backup, staging)
-        verify_backup(backup, expected_sha256)
+        with os.fdopen(fd, "wb") as target, backup.open("rb") as source:
+            shutil.copyfileobj(source, target)
+            target.flush()
+            os.fsync(target.fileno())
+        verify_backup(staging, expected_sha256)
+        require_no_sidecars(backup)
         if destination.exists():
             safety = snapshot_database(destination, destination.with_name(f"{destination.name}.pre-restore-{token}.db"))
             with closing(sqlite3.connect(destination, timeout=1, isolation_level=None)) as conn:
@@ -110,8 +133,7 @@ def restore_database(backup: Path, destination: Path, expected_sha256: str, *, o
                 if busy:
                     raise DatabaseRecoveryError("Destination WAL is still in use")
             # SQLite removes sidecars on the last clean close. Never remove them ourselves.
-        if any(Path(str(destination) + suffix).exists() for suffix in ("-wal", "-shm", "-journal")):
-            raise DatabaseRecoveryError("Destination sidecar remains; stop all database users")
+        require_no_sidecars(destination)
         os.replace(staging, destination)
         sync_directory(destination.parent)
         return {"path": str(destination), "restored_from": str(backup),

@@ -13,6 +13,11 @@ from sqlalchemy.dialects import sqlite
 from app.sqlite_backup import check_database, snapshot_database
 
 SCHEMA_VERSION = 1
+LEGACY_UNIQUE_KEYS = {
+    "aws_credentials": ("user_id",),
+    "instance_settings": ("user_id", "region", "instance_name"),
+    "traffic_usage": ("user_id", "region", "instance_name", "year_month"),
+}
 logger = logging.getLogger(__name__)
 
 
@@ -37,6 +42,32 @@ def unique_columns(conn, table):
             for row in conn.execute(f"PRAGMA index_list({quote(table)})") if row[2] and not row[4]]
 
 
+def legacy_unique_indexes(conn, table):
+    identity = LEGACY_UNIQUE_KEYS[table]
+    found = set()
+    for _, name, unique, _, partial in conn.execute(f"PRAGMA index_list({quote(table)})"):
+        if not unique:
+            continue
+        keys = [row for row in conn.execute(f"PRAGMA index_xinfo({quote(name)})") if row[5]]
+        names = tuple(row[2] for row in keys)
+        if set(names) != set(identity):
+            continue
+        if partial or names != identity or any(row[3] or row[4].upper() != "BINARY" for row in keys):
+            raise MigrationError(f"{table}: nonstandard unique index {name} requires manual review")
+        found.add(name)
+    return found
+
+
+def model_foreign_keys(table):
+    return {(col.name, fk.column.table.name, fk.column.name, (fk.onupdate or "NO ACTION").upper(),
+             (fk.ondelete or "NO ACTION").upper()) for col in table.columns for fk in col.foreign_keys}
+
+
+def foreign_keys(conn, table):
+    return [(row[3], row[2], row[4], row[5].upper(), row[6].upper())
+            for row in conn.execute(f"PRAGMA foreign_key_list({quote(table)})")]
+
+
 def create_table(conn, table, name=None):
     ddl = str(CreateTable(table).compile(dialect=sqlite.dialect()))
     if name:
@@ -47,29 +78,29 @@ def create_table(conn, table, name=None):
 
 
 def rebuild(conn, table, defaults):
-    old_cols = columns(conn, table.name)
-    unknown = old_cols - set(table.columns.keys())
-    if unknown:
+    info = conn.execute(f"PRAGMA table_xinfo({quote(table.name)})").fetchall()
+    old_cols = {row[1] for row in info}
+    if old_cols - set(table.columns.keys()) or any(row[6] for row in info):
         raise MigrationError(f"{table.name}: unknown columns require manual review")
     table_sql = conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (table.name,)).fetchone()[0]
-    if re.search(r"\b(CHECK|COLLATE|GENERATED)\b|WITHOUT\s+ROWID", table_sql, re.IGNORECASE):
+    if re.search(r"\b(CHECK|COLLATE|GENERATED|AUTOINCREMENT|DEFERRABLE|MATCH|STRICT)\b|WITHOUT\s+ROWID|ON\s+CONFLICT",
+                 table_sql, re.IGNORECASE):
         raise MigrationError(f"{table.name}: custom table constraints require manual review")
-    allowed_legacy_unique = {
-        "aws_credentials": ["user_id"],
-        "instance_settings": ["user_id", "region", "instance_name"],
-        "traffic_usage": ["user_id", "region", "instance_name", "year_month"],
-    }[table.name]
-    for row in conn.execute(f"PRAGMA index_list({quote(table.name)})"):
-        if row[2] and row[3] == "u":
-            keys = [item[2] for item in conn.execute(f"PRAGMA index_info({quote(row[1])})")]
-            if keys != allowed_legacy_unique:
-                raise MigrationError(f"{table.name}: custom unique constraint requires manual review")
+    indexes = conn.execute(f"PRAGMA index_list({quote(table.name)})").fetchall()
+    pk = [(row[1], row[2].upper()) for row in info if row[5]]
+    if pk != [("id", "INTEGER")] or any(row[3] == "pk" for row in indexes):
+        raise MigrationError(f"{table.name}: expected id to be the INTEGER PRIMARY KEY rowid alias")
+    actual = foreign_keys(conn, table.name)
+    if (len(actual) != len(set(actual)) or not set(actual) <= model_foreign_keys(table)
+            or any(row[1] for row in conn.execute(f"PRAGMA foreign_key_list({quote(table.name)})"))):
+        raise MigrationError(f"{table.name}: custom foreign key requires manual review")
+    removed = legacy_unique_indexes(conn, table.name)
+    if any(row[3] == "u" and row[1] not in removed for row in indexes):
+        raise MigrationError(f"{table.name}: custom unique constraint requires manual review")
     temp = f"_t01_{table.name}"
     if temp in tables(conn):
         raise MigrationError(f"{table.name}: unexpected temporary table")
     saved = conn.execute("SELECT type,name,sql FROM sqlite_master WHERE tbl_name=? AND type IN ('index','trigger') AND sql IS NOT NULL", (table.name,)).fetchall()
-    removed = {name for name, cols in unique_columns(conn, table.name)
-               if table.name == "aws_credentials" and cols == ["user_id"]}
     create_table(conn, table, temp)
     names, values = [], []
     for col in table.columns:
@@ -91,7 +122,7 @@ def rebuild(conn, table, defaults):
     conn.execute(f"DROP TABLE {quote(table.name)}")
     conn.execute(f"ALTER TABLE {quote(temp)} RENAME TO {quote(table.name)}")
     for kind, name, ddl in saved:
-        if name not in removed:
+        if kind != "index" or name not in removed:
             conn.execute(ddl)
 
 
@@ -108,7 +139,7 @@ def apply_v1(conn, metadata):
         add_columns(conn, "users", {"auto_stop_on_limit_default": "BOOLEAN DEFAULT 0 NOT NULL",
                                    "token_version": "INTEGER DEFAULT 0 NOT NULL"})
     if "aws_credentials" in existing:
-        if any(cols == ["user_id"] for _, cols in unique_columns(conn, "aws_credentials")):
+        if legacy_unique_indexes(conn, "aws_credentials"):
             rebuild(conn, metadata.tables["aws_credentials"], {"is_default": "1"})
         else:
             add_columns(conn, "aws_credentials", {
@@ -151,14 +182,20 @@ def validate_schema(conn, metadata):
         for col in table.columns:
             if col.unique and (col.name,) not in uniques:
                 raise MigrationError(f"{table.name}: required unique column constraint is missing")
-        actual_fks = {(r[3], r[2], r[4], r[6].upper()) for r in conn.execute(f"PRAGMA foreign_key_list({quote(table.name)})")}
-        for col in table.columns:
-            for fk in col.foreign_keys:
-                if (col.name, fk.column.table.name, fk.column.name, (fk.ondelete or "NO ACTION").upper()) not in actual_fks:
-                    raise MigrationError(f"{table.name}: foreign key definition does not match")
-    if any(cols == ["user_id"] for _, cols in unique_columns(conn, "aws_credentials")):
-        raise MigrationError("aws_credentials: obsolete single-key constraint remains")
+        if not model_foreign_keys(table) <= set(foreign_keys(conn, table.name)):
+            raise MigrationError(f"{table.name}: foreign key definition does not match")
+        if table.name in LEGACY_UNIQUE_KEYS and legacy_unique_indexes(conn, table.name):
+            raise MigrationError(f"{table.name}: obsolete single-credential unique constraint remains")
     check_database(conn)
+
+
+def validate_ledger(conn):
+    layout = {row[1]: (row[2].upper(), row[3], row[5]) for row in conn.execute("PRAGMA table_info(schema_migrations)")}
+    if layout != {"version": ("INTEGER", 0, 1), "name": ("TEXT", 1, 0), "applied_at_utc": ("TEXT", 1, 0),
+                  "backup_path": ("TEXT", 0, 0), "backup_sha256": ("TEXT", 0, 0)}:
+        raise MigrationError("Invalid migration ledger schema; review the original database and backup")
+    if conn.execute("SELECT version FROM schema_migrations").fetchall() != [(SCHEMA_VERSION,)]:
+        raise MigrationError("Unsupported migration version; use the paired application image")
 
 
 def upgrade_database(engine, metadata: MetaData) -> None:
@@ -171,10 +208,8 @@ def upgrade_database(engine, metadata: MetaData) -> None:
         conn.execute("PRAGMA foreign_keys=OFF")
         conn.execute("BEGIN IMMEDIATE")
         existing = tables(conn)
-        versions = conn.execute("SELECT version FROM schema_migrations ORDER BY version").fetchall() if "schema_migrations" in existing else []
-        if versions not in ([], [(SCHEMA_VERSION,)]):
-            raise MigrationError("Unsupported migration version; use the paired application image")
-        if versions:
+        if "schema_migrations" in existing:
+            validate_ledger(conn)
             validate_schema(conn, metadata)
             conn.commit()
             return
