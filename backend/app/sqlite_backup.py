@@ -25,6 +25,12 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def verify_migration_snapshot(path: Path, digest: str, source: Path) -> dict:
+    if path.is_symlink() or not path.is_file() or path.samefile(source):
+        raise DatabaseRecoveryError(f'Invalid migration snapshot: {path}')
+    return verify_backup(path, digest)
+
+
 def sync_directory(path: Path) -> None:
     if os.name != "nt":
         fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
@@ -47,12 +53,13 @@ def require_no_sidecars(path: Path) -> None:
             raise DatabaseRecoveryError(f"SQLite sidecar present: {path}{suffix}")
 
 
-def snapshot_database(source: Path, destination: Path) -> dict:
+def snapshot_database(source: Path, destination: Path, *, by_content: bool = False) -> dict:
     """Copy committed data through SQLite's backup API, including a live WAL."""
     source, destination = Path(source).resolve(), Path(destination).absolute()
-    if source == destination or os.path.lexists(destination):
-        raise DatabaseRecoveryError("Backup destination must be a new path")
-    require_no_sidecars(destination)
+    if not by_content:
+        if source == destination or os.path.lexists(destination):
+            raise DatabaseRecoveryError("Backup destination must be a new path")
+        require_no_sidecars(destination)
     if not source.is_file():
         raise DatabaseRecoveryError("Source database does not exist")
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -73,6 +80,11 @@ def snapshot_database(source: Path, destination: Path) -> dict:
         with staging.open("r+b") as stream:
             os.fsync(stream.fileno())
         digest = file_sha256(staging)
+        if by_content:
+            # A physical source change is not necessarily a new committed image.
+            destination = destination.with_name(f"{destination.stem}-{digest}{destination.suffix}")
+            if os.path.lexists(destination):
+                return verify_migration_snapshot(destination, digest, source)
         require_no_sidecars(destination)
         # Link publishes atomically without overwriting an existing destination.
         os.link(staging, destination)

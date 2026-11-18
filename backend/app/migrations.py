@@ -1,16 +1,19 @@
 """Versioned SQLite startup migration. All DDL and the ledger share one transaction."""
-from datetime import datetime, timezone
+import hashlib
+import json
 import logging
+import os
 import re
+import tempfile
+from contextlib import ExitStack
+from datetime import datetime, timezone
 from pathlib import Path
-import sqlite3
-import uuid
 
-from sqlalchemy import MetaData, UniqueConstraint
+from sqlalchemy import DefaultClause, MetaData, Text, UniqueConstraint, text
 from sqlalchemy.schema import CreateIndex, CreateTable
 from sqlalchemy.dialects import sqlite
 
-from app.sqlite_backup import check_database, snapshot_database
+from app.sqlite_backup import check_database, snapshot_database, sync_directory, verify_migration_snapshot
 
 SCHEMA_VERSION = 1
 LEGACY_UNIQUE_KEYS = {
@@ -18,6 +21,10 @@ LEGACY_UNIQUE_KEYS = {
     "instance_settings": ("user_id", "region", "instance_name"),
     "traffic_usage": ("user_id", "region", "instance_name", "year_month"),
 }
+LEGACY_ZERO_DEFAULTS = {('aws_credentials', 'is_default'), ('instance_settings', 'auto_stop_on_limit'),
+                        ('traffic_usage', 'network_in_bytes'), ('traffic_usage', 'network_out_bytes')}
+LEGACY_NULLABLE_DATES = {('aws_credentials', 'created_at'), ('instance_settings', 'created_at'),
+                         ('traffic_usage', 'last_synced_at')}
 logger = logging.getLogger(__name__)
 
 
@@ -77,13 +84,13 @@ def create_table(conn, table, name=None):
     conn.execute(ddl)
 
 
-def rebuild(conn, table, defaults):
+def rebuild_definition(conn, table):
     info = conn.execute(f"PRAGMA table_xinfo({quote(table.name)})").fetchall()
     old_cols = {row[1] for row in info}
     if old_cols - set(table.columns.keys()) or any(row[6] for row in info):
         raise MigrationError(f"{table.name}: unknown columns require manual review")
     table_sql = conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (table.name,)).fetchone()[0]
-    if re.search(r"\b(CHECK|COLLATE|GENERATED|AUTOINCREMENT|DEFERRABLE|MATCH|STRICT)\b|WITHOUT\s+ROWID|ON\s+CONFLICT",
+    if re.search(r"\b(CHECK|COLLATE|GENERATED|AUTOINCREMENT|DEFERRABLE|MATCH|STRICT|WITHOUT|CONFLICT)\b",
                  table_sql, re.IGNORECASE):
         raise MigrationError(f"{table.name}: custom table constraints require manual review")
     indexes = conn.execute(f"PRAGMA index_list({quote(table.name)})").fetchall()
@@ -97,6 +104,32 @@ def rebuild(conn, table, defaults):
     removed = legacy_unique_indexes(conn, table.name)
     if any(row[3] == "u" and row[1] not in removed for row in indexes):
         raise MigrationError(f"{table.name}: custom unique constraint requires manual review")
+    # Never mutate the shared ORM metadata. Only these known historical differences
+    # are supported, and the replacement must retain their actual SQL semantics.
+    schema = MetaData()
+    for parent in {fk.column.table for fk in table.foreign_keys}:
+        parent.to_metadata(schema)
+    target = table.to_metadata(schema)
+    for _, name, declared, not_null, default, _, _ in info:
+        col = target.c[name]
+        key = (table.name, name)
+        if key == ('instance_settings', 'note') and declared.upper() == 'TEXT':
+            col.type = Text()
+        if declared.upper() != col.type.compile(dialect=sqlite.dialect()).upper():
+            raise MigrationError(f"{table.name}.{name}: custom column type requires manual review")
+        if not not_null and key in LEGACY_NULLABLE_DATES:
+            col.nullable = True
+        if not col.primary_key and bool(not_null) != (not col.nullable):
+            raise MigrationError(f"{table.name}.{name}: custom nullability requires manual review")
+        if default is not None:
+            if key not in LEGACY_ZERO_DEFAULTS or default != '0':
+                raise MigrationError(f"{table.name}.{name}: custom SQL default requires manual review")
+            col.server_default = DefaultClause(text('0'))
+    return target, old_cols, removed
+
+
+def rebuild(conn, definition, defaults):
+    table, old_cols, removed = definition
     temp = f"_t01_{table.name}"
     if temp in tables(conn):
         raise MigrationError(f"{table.name}: unexpected temporary table")
@@ -133,14 +166,14 @@ def add_columns(conn, table, definitions):
             conn.execute(f"ALTER TABLE {quote(table)} ADD COLUMN {quote(name)} {definition}")
 
 
-def apply_v1(conn, metadata):
+def apply_v1(conn, metadata, rebuilds):
     existing = tables(conn)
     if "users" in existing:
         add_columns(conn, "users", {"auto_stop_on_limit_default": "BOOLEAN DEFAULT 0 NOT NULL",
                                    "token_version": "INTEGER DEFAULT 0 NOT NULL"})
     if "aws_credentials" in existing:
-        if legacy_unique_indexes(conn, "aws_credentials"):
-            rebuild(conn, metadata.tables["aws_credentials"], {"is_default": "1"})
+        if "aws_credentials" in rebuilds:
+            rebuild(conn, rebuilds["aws_credentials"], {"is_default": "1"})
         else:
             add_columns(conn, "aws_credentials", {
                 "is_default": "BOOLEAN DEFAULT 0 NOT NULL", "proxy_url_enc": "TEXT",
@@ -150,12 +183,12 @@ def apply_v1(conn, metadata):
     for name in ("instance_settings", "traffic_usage"):
         if name not in existing:
             continue
-        if "credential_id" not in columns(conn, name):
+        if name in rebuilds:
             ambiguous = conn.execute(f"""SELECT o.id FROM {quote(name)} o
                 WHERE (SELECT COUNT(*) FROM aws_credentials c WHERE c.user_id=o.user_id) != 1 LIMIT 1""").fetchone()
             if ambiguous:
                 raise MigrationError(f"{name}: legacy credential ownership is missing or ambiguous")
-            rebuild(conn, metadata.tables[name], {
+            rebuild(conn, rebuilds[name], {
                 "credential_id": "(SELECT c.id FROM aws_credentials c WHERE c.user_id=o.user_id)",
                 "auto_stop_on_limit": "0"})
         elif name == "instance_settings":
@@ -198,9 +231,62 @@ def validate_ledger(conn):
         raise MigrationError("Unsupported migration version; use the paired application image")
 
 
+def preflight_rebuilds(conn, metadata, existing):
+    definitions = {}
+    for name in LEGACY_UNIQUE_KEYS:
+        if name not in existing:
+            continue
+        rebuild_needed = (bool(legacy_unique_indexes(conn, name)) if name == 'aws_credentials'
+                          else 'credential_id' not in columns(conn, name))
+        if rebuild_needed:
+            definitions[name] = rebuild_definition(conn, metadata.tables[name])
+    return definitions
+
+
+def migration_backup(conn, source, open_files):
+    directory = source.parent / 'backups'
+    stem = f'{source.name}.pre-v1'
+    receipt = directory / (stem + '.json')
+    if directory.is_symlink() or directory.is_junction():
+        raise MigrationError(f'Invalid migration backup directory: {directory}')
+    sources = [source]
+    wal = Path(str(source) + '-wal')
+    if conn.execute('PRAGMA journal_mode').fetchone()[0] == 'wal' and wal.is_file() and wal.stat().st_size:
+        sources.append(wal)
+    # On POSIX, closing a raw descriptor for the live DB drops the process's SQLite locks.
+    fingerprints = [hashlib.file_digest(open_files.enter_context(path.open('rb')), 'sha256').hexdigest()
+                    for path in sources]
+    if os.path.lexists(receipt):
+        if receipt.is_symlink() or not receipt.is_file():
+            raise MigrationError(f'Invalid migration backup receipt: {receipt}')
+        state = json.loads(receipt.read_text(encoding='utf-8'))
+        checksum = state['backup_sha256']
+        recorded = state['source_files_sha256']
+        if (not isinstance(recorded, list) or len(recorded) not in (1, 2)
+                or not all(isinstance(value, str) and re.fullmatch('[0-9a-f]{64}', value)
+                           for value in [*recorded, checksum])):
+            raise MigrationError(f'Invalid migration backup receipt hashes: {receipt}')
+        previous = verify_migration_snapshot(directory / f'{stem}-{checksum}.db', checksum, source)
+        if recorded == fingerprints:
+            return previous
+    backup = snapshot_database(source, directory / (stem + '.db'), by_content=True)
+    fd, name = tempfile.mkstemp(prefix='.migration-receipt-', dir=directory)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as out:
+            json.dump({'source_files_sha256': fingerprints, 'backup_sha256': backup['sha256']}, out)
+            out.flush()
+            os.fsync(out.fileno())
+        os.replace(name, receipt)
+        sync_directory(directory)
+    finally:
+        Path(name).unlink(missing_ok=True)
+    return backup
+
+
 def upgrade_database(engine, metadata: MetaData) -> None:
     raw = engine.raw_connection()
     conn = raw.driver_connection
+    open_files = ExitStack()
     backup = None
     try:
         # SQLite ignores foreign_keys changes inside a transaction.
@@ -214,18 +300,24 @@ def upgrade_database(engine, metadata: MetaData) -> None:
             conn.commit()
             return
         check_database(conn)
+        rejection = None
+        try:
+            rebuilds = preflight_rebuilds(conn, metadata, existing)
+        except MigrationError as exc:
+            rejection = exc
         path = engine.url.database
         if existing and path and path != ":memory:":
             if engine.url.query:
                 raise MigrationError("SQLite URI options are unsupported for automatic migration backup")
             source = Path(path).resolve()
-            destination = source.parent / "backups" / f"{source.name}.pre-v1-{uuid.uuid4().hex}.db"
-            backup = snapshot_database(source, destination)
+            backup = migration_backup(conn, source, open_files)
             logger.info("Migration backup: %s SHA256=%s", backup["path"], backup["sha256"])
+        if rejection is not None:
+            raise rejection
         conn.execute("""CREATE TABLE schema_migrations (
             version INTEGER PRIMARY KEY, name TEXT NOT NULL, applied_at_utc TEXT NOT NULL,
             backup_path TEXT, backup_sha256 TEXT)""")
-        apply_v1(conn, metadata)
+        apply_v1(conn, metadata, rebuilds)
         validate_schema(conn, metadata)
         conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
             SCHEMA_VERSION, "T01 baseline schema", datetime.now(timezone.utc).isoformat(),
@@ -236,5 +328,6 @@ def upgrade_database(engine, metadata: MetaData) -> None:
         logger.error("Database migration failed; startup stopped. Backup: %s", backup["path"] if backup else "none")
         raise MigrationError("SQLite migration failed; startup stopped") from exc
     finally:
+        open_files.close()
         conn.execute("PRAGMA foreign_keys=ON")
         raw.close()
