@@ -1,0 +1,102 @@
+AWS_TRANSPORT_ATTEMPTS 0
+test_ambiguous_unique_rule_is_not_silently_removed_or_replayed (test_migration_boundaries.BoundaryTests.test_ambiguous_unique_rule_is_not_silently_removed_or_replayed) ... ok
+test_autoincrement_rejection_preserves_sequence_high_water_mark (test_migration_boundaries.BoundaryTests.test_autoincrement_rejection_preserves_sequence_high_water_mark) ... ok
+test_cli_rejects_occupied_output_without_touching_any_original_file (test_migration_boundaries.BoundaryTests.test_cli_rejects_occupied_output_without_touching_any_original_file) ... ok
+test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup (test_migration_boundaries.BoundaryTests.test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup) ... ok
+test_failed_publication_leaves_a_replacement_file_untouched (test_migration_boundaries.BoundaryTests.test_failed_publication_leaves_a_replacement_file_untouched) ... ok
+test_rebuild_refuses_non_rowid_primary_key (test_migration_boundaries.BoundaryTests.test_rebuild_refuses_non_rowid_primary_key) ... ok
+test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1 (test_migration_boundaries.BoundaryTests.test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1) ... Database migration failed; startup stopped. Backup: none
+Database migration failed; startup stopped. Backup: none
+ok
+test_restart_rejects_missing_ledger_metadata_or_primary_key (test_migration_boundaries.BoundaryTests.test_restart_rejects_missing_ledger_metadata_or_primary_key) ... Database migration failed; startup stopped. Backup: none
+Database migration failed; startup stopped. Backup: none
+ok
+test_sidecar_appearing_at_publication_does_not_get_a_success_receipt (test_migration_boundaries.BoundaryTests.test_sidecar_appearing_at_publication_does_not_get_a_success_receipt) ... ok
+test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms (test_migration_boundaries.BoundaryTests.test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms) ... ok
+test_wal_snapshot_verifies_and_restores_without_creating_source_sidecars (test_migration_boundaries.BoundaryTests.test_wal_snapshot_verifies_and_restores_without_creating_source_sidecars) ... ok
+test_contaminated_or_replaced_retry_snapshot_is_not_trusted_or_overwritten (test_migration_retries.RetryTests.test_contaminated_or_replaced_retry_snapshot_is_not_trusted_or_overwritten) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpgvx4_6b7\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+Database migration failed; startup stopped. Backup: none
+Database migration failed; startup stopped. Backup: none
+ok
+test_custom_column_in_each_child_is_classified_before_application_ddl (test_migration_retries.RetryTests.test_custom_column_in_each_child_is_classified_before_application_ddl) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpr5r7uhad\backups\child-0.db.pre-v1-a4c708cf708b41626aecbc0f9362b955d7e7e6649bfd47d64e9bd82f58fd4b46.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpr5r7uhad\backups\child-1.db.pre-v1-4ba6a98f90f816188b8b5f0fe0bac1844d1941033e9739beb77fde9615756a7a.db
+ok
+test_custom_column_rules_are_refused_with_verified_original_and_no_ledger (test_migration_retries.RetryTests.test_custom_column_rules_are_refused_with_verified_original_and_no_ledger) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpdjhicije\backups\case-0.db.pre-v1-19792235213e0d07178483865039fb117cff287b7a60cfd84098f28e56dd510a.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpdjhicije\backups\case-1.db.pre-v1-271c9ca918f10e4e216bbfce934509cb2aeb4760e2db244e14679e7c556161fc.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpdjhicije\backups\case-2.db.pre-v1-4df01211148be1559ace1d428fc60d0e7751299dfeebf6a62fa9c413ddc05388.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpdjhicije\backups\case-3.db.pre-v1-d551d3a0cca059219c364ed51fc8a5bc95f51ba33feba8b41e01d75b669a5d87.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpdjhicije\backups\case-4.db.pre-v1-22ab7d6d70174ec63053141fbe38dfa2ace41ea9989e9e1ce41252080ec7dee4.db
+ok
+test_failed_retries_reuse_first_verified_snapshot_without_creating_another (test_migration_retries.RetryTests.test_failed_retries_reuse_first_verified_snapshot_without_creating_another) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpvl71879u\backups\app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpvl71879u\backups\app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpvl71879u\backups\app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpvl71879u\backups\app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db
+ok
+test_generated_known_column_is_not_rebuilt_as_a_plain_column (test_migration_retries.RetryTests.test_generated_known_column_is_not_rebuilt_as_a_plain_column) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp9v9l2c7k\backups\app.db.pre-v1-e8026b8648b2884738d78d054ecef7e98a06af38c87699f56bc8bcb96676b0b5.db
+ok
+test_historical_zero_server_defaults_still_apply_to_omitted_columns (test_migration_retries.RetryTests.test_historical_zero_server_defaults_still_apply_to_omitted_columns) ... ok
+test_malformed_receipt_or_missing_recorded_snapshot_stops_before_ddl (test_migration_retries.RetryTests.test_malformed_receipt_or_missing_recorded_snapshot_stops_before_ddl) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmphoup80_i\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+Database migration failed; startup stopped. Backup: none
+Database migration failed; startup stopped. Backup: none
+Database migration failed; startup stopped. Backup: none
+Database migration failed; startup stopped. Backup: none
+Database migration failed; startup stopped. Backup: none
+ok
+test_new_wal_commit_gets_its_own_snapshot_but_rollback_and_checkpoint_reuse_it (test_migration_retries.RetryTests.test_new_wal_commit_gets_its_own_snapshot_but_rollback_and_checkpoint_reuse_it) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpzl3tcd1p\backups\app.db.pre-v1-5054f4ec5ca3ae3525ab98b06cf1673994ef6f3fc90f9e824f51521faf590c47.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpzl3tcd1p\backups\app.db.pre-v1-991ff0b8b8e348e3dbcadccb076746d5d1c7344ebbd0477c66be84daba489997.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpzl3tcd1p\backups\app.db.pre-v1-991ff0b8b8e348e3dbcadccb076746d5d1c7344ebbd0477c66be84daba489997.db
+Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpzl3tcd1p\backups\app.db.pre-v1-991ff0b8b8e348e3dbcadccb076746d5d1c7344ebbd0477c66be84daba489997.db
+ok
+test_retry_rejects_a_hard_link_to_the_live_database (test_migration_retries.RetryTests.test_retry_rejects_a_hard_link_to_the_live_database) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp2de_p6i4\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+Database migration failed; startup stopped. Backup: none
+ok
+test_retry_rejects_a_link_in_place_of_the_receipt_or_recorded_snapshot (test_migration_retries.RetryTests.test_retry_rejects_a_link_in_place_of_the_receipt_or_recorded_snapshot) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp2ijs2xz7\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+skipped "symlink unavailable: [WinError 1314] 客户端没有所需的特权。: 'C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmp2ijs2xz7\\\\backups\\\\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.saved-db' -> 'C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmp2ijs2xz7\\\\backups\\\\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db'"
+test_snapshot_creation_and_reuse_hold_the_sqlite_writer_lock (test_migration_retries.RetryTests.test_snapshot_creation_and_reuse_hold_the_sqlite_writer_lock) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpqjf7_6oz\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+ok
+test_snapshot_survives_failure_between_publication_and_retry_receipt (test_migration_retries.RetryTests.test_snapshot_survives_failure_between_publication_and_retry_receipt) ... Database migration failed; startup stopped. Backup: none
+ok
+test_transient_failure_then_success_records_original_path_and_sha (test_migration_retries.RetryTests.test_transient_failure_then_success_records_original_path_and_sha) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpovdr13xs\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+ok
+test_ambiguous_legacy_owner_stops_instead_of_choosing_a_key (test_migrations.MigrationTests.test_ambiguous_legacy_owner_stops_instead_of_choosing_a_key) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpvbeuv0xm\backups\app.db.pre-v1-4532cbcfd1408826a0f16014d438fd85d2f21f016bf30564a38035b29091a7e7.db
+ok
+test_backup_failure_prevents_any_schema_change (test_migrations.MigrationTests.test_backup_failure_prevents_any_schema_change) ... Database migration failed; startup stopped. Backup: none
+ok
+test_current_multi_key_data_is_unchanged (test_migrations.MigrationTests.test_current_multi_key_data_is_unchanged) ... ok
+test_false_legacy_policy_remains_off_after_upgrade_with_user_default_on (test_migrations.MigrationTests.test_false_legacy_policy_remains_off_after_upgrade_with_user_default_on) ... ok
+test_future_version_and_versioned_schema_drift_stop_startup (test_migrations.MigrationTests.test_future_version_and_versioned_schema_drift_stop_startup) ... Database migration failed; startup stopped. Backup: none
+Database migration failed; startup stopped. Backup: none
+ok
+test_integrity_or_fk_error_is_not_versioned (test_migrations.MigrationTests.test_integrity_or_fk_error_is_not_versioned) ... Database migration failed; startup stopped. Backup: none
+ok
+test_legacy_binding_stays_with_each_panel_user (test_migrations.MigrationTests.test_legacy_binding_stays_with_each_panel_user) ... ok
+test_legacy_rebuild_preserves_all_credential_fields_and_children (test_migrations.MigrationTests.test_legacy_rebuild_preserves_all_credential_fields_and_children) ... ok
+test_migration_crash_during_ddl_rolls_back_on_next_connection (test_migrations.MigrationTests.test_migration_crash_during_ddl_rolls_back_on_next_connection) ... ok
+test_migration_failure_rolls_back_ddl_and_keeps_verified_original_backup (test_migrations.MigrationTests.test_migration_failure_rolls_back_ddl_and_keeps_verified_original_backup) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpdlun13uv\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+ok
+test_minimal_legacy_preserves_auto_stop_and_assigns_only_owner_key (test_migrations.MigrationTests.test_minimal_legacy_preserves_auto_stop_and_assigns_only_owner_key) ... ok
+test_new_database_has_version_and_repeated_start_is_idempotent (test_migrations.MigrationTests.test_new_database_has_version_and_repeated_start_is_idempotent) ... ok
+test_rebuild_preserves_explicit_indexes_triggers_and_delete_rules (test_migrations.MigrationTests.test_rebuild_preserves_explicit_indexes_triggers_and_delete_rules) ... ok
+test_rebuild_refuses_unknown_inline_unique_constraints_without_loss (test_migrations.MigrationTests.test_rebuild_refuses_unknown_inline_unique_constraints_without_loss) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp69i2gufe\backups\app.db.pre-v1-ea5a483aa8ae8038b229ad7e1aa25848242604384c6142f2e9f5704a7244ab0f.db
+ok
+test_restart_does_not_create_more_backups_or_change_version_time (test_migrations.MigrationTests.test_restart_does_not_create_more_backups_or_change_version_time) ... ok
+test_roundtrip_backup_upgrade_restore_for_three_database_generations (test_migrations.MigrationTests.test_roundtrip_backup_upgrade_restore_for_three_database_generations) ... ok
+test_startup_failure_does_not_seed_or_start_scheduler (test_migrations.MigrationTests.test_startup_failure_does_not_seed_or_start_scheduler) ... ok
+test_t01_database_upgrades_atomically_to_t02_with_paired_snapshot (test_migrations.MigrationTests.test_t01_database_upgrades_atomically_to_t02_with_paired_snapshot) ... 2026-11-19 07:18:05,095 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmp3dx2atyz\backups\app.db.pre-v1-40d867857b6c39e00e5c522e54c95e4721a5e81cf9a0695173205f07a57a8cf9.db SHA256=40d867857b6c39e00e5c522e54c95e4721a5e81cf9a0695173205f07a57a8cf9
+2026-11-19 07:18:05,190 INFO [app.migrations] Migration v2 backup: C:\Users\liyang\AppData\Local\Temp\tmp3dx2atyz\backups\app.db.pre-v2-282161d8e3dae854fda298c162bc95c82668f0be901156a5ef5deaf94220883c.db SHA256=282161d8e3dae854fda298c162bc95c82668f0be901156a5ef5deaf94220883c
+ok
+test_unowned_legacy_records_abort_instead_of_being_dropped (test_migrations.MigrationTests.test_unowned_legacy_records_abort_instead_of_being_dropped) ... 2026-11-19 07:18:05,317 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmp01g9_3n2\backups\app.db.pre-v1-173670660c81218a15087196c5745009bcb02e214cf0dd642363da6a4fbceaf1.db SHA256=173670660c81218a15087196c5745009bcb02e214cf0dd642363da6a4fbceaf1
+2026-11-19 07:18:05,320 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp01g9_3n2\backups\app.db.pre-v1-173670660c81218a15087196c5745009bcb02e214cf0dd642363da6a4fbceaf1.db
+ok
+test_upgrade_snapshot_includes_uncheckpointed_wal (test_migrations.MigrationTests.test_upgrade_snapshot_includes_uncheckpointed_wal) ... 2026-11-19 07:18:05,407 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpt_tj6vk8\backups\app.db.pre-v1-30a27379f21bf87dc8f20d722f7f3ce6418f26c4b340223b91a9627b93cea93b.db SHA256=30a27379f21bf87dc8f20d722f7f3ce6418f26c4b340223b91a9627b93cea93b
+ok
+test_backup_includes_committed_wal_excludes_uncommitted_and_does_not_overwrite (test_migrations.RecoveryTests.test_backup_includes_committed_wal_excludes_uncommitted_and_does_not_overwrite) ... ok
+test_restore_rejects_active_wal_reader_without_removing_sidecars (test_migrations.RecoveryTests.test_restore_rejects_active_wal_reader_without_removing_sidecars) ... ok
+test_restore_rejects_hash_mismatch_corruption_and_same_path (test_migrations.RecoveryTests.test_restore_rejects_hash_mismatch_corruption_and_same_path) ... ok
+test_restore_reverts_data_preserves_safety_backup_and_requires_offline (test_migrations.RecoveryTests.test_restore_reverts_data_preserves_safety_backup_and_requires_offline) ... ok
+test_restore_to_new_database_and_wal_destination (test_migrations.RecoveryTests.test_restore_to_new_database_and_wal_destination) ... ok
+
+----------------------------------------------------------------------
+Ran 49 tests in 9.570s
+
+OK (skipped=1)
