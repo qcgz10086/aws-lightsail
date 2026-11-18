@@ -96,7 +96,11 @@ def downgrade_fixture_to_t01(path):
         conn.execute("INSERT INTO traffic_usage_t01 SELECT id,user_id,credential_id,region,instance_name,year_month,network_in_bytes,network_out_bytes,last_synced_at FROM traffic_usage")
         conn.execute("DROP TABLE traffic_usage")
         conn.execute("ALTER TABLE traffic_usage_t01 RENAME TO traffic_usage")
-        conn.execute("DELETE FROM schema_migrations WHERE version=2")
+        conn.execute("DELETE FROM schema_migrations WHERE version>=2")
+        conn.execute("DROP INDEX IF EXISTS ix_credit_records_account_id")
+        for column in ("total_amount_decimal", "account_id", "amount_precision"):
+            if column in {row[1] for row in conn.execute("PRAGMA table_info(credit_records)")}:
+                conn.execute(f'ALTER TABLE credit_records DROP COLUMN "{column}"')
 
 
 class MigrationTests(unittest.TestCase):
@@ -147,9 +151,9 @@ class MigrationTests(unittest.TestCase):
 
     def test_new_database_has_version_and_repeated_start_is_idempotent(self):
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,)])
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,)])
 
     def test_t01_database_upgrades_atomically_to_t02_with_paired_snapshot(self):
         seed_current(self.path)
@@ -158,11 +162,13 @@ class MigrationTests(unittest.TestCase):
         with connect(self.path) as conn:
             conn.execute("UPDATE instance_settings SET auto_stop_on_limit=1 WHERE id=9")
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations ORDER BY version"), [(1,), (2,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations ORDER BY version"), [(1,), (2,), (3,)])
         self.assertEqual(self.rows("SELECT account_id FROM aws_credentials WHERE id=7"), [(None,)])
         self.assertEqual(self.rows("SELECT last_confirmed_account_id FROM aws_credentials WHERE id=7"), [(None,)])
         self.assertEqual(self.rows("SELECT auto_stop_configured,auto_stop_account_id FROM instance_settings WHERE id=9"), [(1, None)])
         self.assertIn("account_id", {row[1] for row in self.rows("PRAGMA table_info(traffic_usage)")})
+        self.assertEqual(self.rows("SELECT account_id,amount_precision FROM credit_records"), [(None, "legacy_float")])
+        self.assertEqual(float(self.rows("SELECT total_amount_decimal FROM credit_records")[0][0]), 100.0)
         receipt, checksum = self.rows("SELECT backup_path,backup_sha256 FROM schema_migrations WHERE version=2")[0]
         self.assertTrue(Path(receipt).is_file())
         restored = Path(self.tmp.name) / "v1-restored.db"
@@ -215,7 +221,7 @@ class MigrationTests(unittest.TestCase):
         before = self.rows("SELECT * FROM aws_credentials")
         self.migrate()
         self.assertEqual(self.rows("SELECT * FROM aws_credentials"), before)
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,)])
 
 
     def test_migration_failure_rolls_back_ddl_and_keeps_verified_original_backup(self):
@@ -240,7 +246,7 @@ class MigrationTests(unittest.TestCase):
             self.assertEqual(conn.execute("SELECT type,name,sql FROM sqlite_master ORDER BY name").fetchall(), before)
         # No version is committed on failure; the same original DB can upgrade next time.
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,)])
 
     def test_backup_failure_prevents_any_schema_change(self):
         with connect(self.path) as conn:
@@ -254,12 +260,12 @@ class MigrationTests(unittest.TestCase):
     def test_future_version_and_versioned_schema_drift_stop_startup(self):
         self.migrate()
         with connect(self.path) as conn:
-            conn.execute("INSERT INTO schema_migrations VALUES (3,'future','2026-11-19',NULL,NULL)")
+            conn.execute("INSERT INTO schema_migrations VALUES (4,'future','2026-11-19',NULL,NULL)")
         with self.assertRaises(migrations.MigrationError):
             self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,)])
         with connect(self.path) as conn:
-            conn.execute("DELETE FROM schema_migrations WHERE version=3")
+            conn.execute("DELETE FROM schema_migrations WHERE version=4")
             conn.execute("ALTER TABLE aws_credentials DROP COLUMN quota_message")
         with self.assertRaises(migrations.MigrationError):
             self.migrate()
@@ -374,7 +380,7 @@ database.init_db()
         self.assertEqual(result.returncode, 86, result.stderr)
         self.assertEqual(self.rows("SELECT type,name,sql FROM sqlite_master ORDER BY name"), before)
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,)])
 
     def test_roundtrip_backup_upgrade_restore_for_three_database_generations(self):
         for kind in ("new", "single", "multi"):

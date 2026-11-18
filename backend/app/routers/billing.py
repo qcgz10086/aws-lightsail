@@ -1,14 +1,9 @@
-"""账单路由：Cost Explorer 费用 + AWS Billing GetCredits 官方赠金 + 手动赠金记录。
+"""旧账单结构兼容适配；金额计算与账号隔离使用 v2 共用核心。
 
-GET /billing/summary 不抛 500：CE 与 GetCredits 各自独立查询、各自返回
-状态（status / aws_credits_status），一方失败不影响另一方展示。
-官方赠金来自 billing:GetCredits（remainingAmount / estimatedAmount 为
-AWS 返回的真实余额）；手动录入的赠金记录是补充，其剩余是估算
-（total - 自 start_date 起 CE 累计抵扣额），两者分开，不混成一条。
+旧响应字段结构保留；共用 Decimal 和按账号隔离的 v2 核心。
+手动记录不从账号级 Credit 推算逐笔剩余；多币种合计字段为空。
 """
 from __future__ import annotations
-
-import asyncio
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -16,24 +11,14 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.deps import get_current_user
 from app.models import CreditRecord, User
-from app.proxy_config import ProxyConfigError
-from app.schemas import AwsCredit, BillingSummary, CreditCreate, CreditOut
+from app.schemas import BillingSummary, CreditCreate, CreditOut
 from app.services import billing as billing_svc
-from app.services.traffic import (
-    NoCredentialsError,
-    get_credential_proxy_url,
-    get_user_aws_keys_and_cred,
-)
 
 router = APIRouter(prefix="/billing", tags=["billing"])
 
 
-def _credit_out(rec: CreditRecord, applied: float | None = None) -> CreditOut:
-    out = CreditOut.model_validate(rec)
-    if applied is not None:
-        out.credits_applied_since_start = round(float(applied), 2)
-        out.remaining_estimate = round(max(0.0, float(rec.total_amount) - float(applied)), 2)
-    return out
+def _credit_out(rec: CreditRecord) -> CreditOut:
+    return CreditOut.model_validate(rec)
 
 
 def _plain_credits(db: Session, user: User) -> list[CreditOut]:
@@ -52,97 +37,38 @@ async def billing_summary(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> BillingSummary:
+    from app.services.billing_summary import summary as precise_summary
     try:
-        ak, sk, cred = get_user_aws_keys_and_cred(user, credential_id)
-        proxy_url = get_credential_proxy_url(cred)
-    except NoCredentialsError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except ProxyConfigError as exc:
-        raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
-    except RuntimeError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-
-    client = billing_svc.make_ce_client(ak, sk, proxy_url)
-
-    # Cost Explorer 与 GetCredits 各自独立查询，一方失败不影响另一方。
-    data: dict | None = None
-    forecast: float | None = None
-    ce_status = "ok"
-    ce_message: str | None = None
-    ce_required: list[str] = []
-    try:
-        data = await asyncio.to_thread(billing_svc.get_billing_summary, client)
-        forecast = await asyncio.to_thread(billing_svc.get_cost_forecast, client)
-    except billing_svc.BillingNoPermissionError as exc:
-        ce_status = "no_permission"
-        ce_message = str(exc)
-        ce_required = list(billing_svc.REQUIRED_PERMISSIONS)
-    except billing_svc.BillingUnavailableError as exc:
-        ce_status = "unavailable"
-        ce_message = str(exc)
-
-    # 官方赠金：STS 取账号 ID -> Billing GetCredits；失败只影响本区状态。
-    aws_credits: list[AwsCredit] = []
-    aws_status = "unavailable"
-    aws_error: str | None = None
-    aws_account_id: str | None = None
-    try:
-        aws_res = await asyncio.to_thread(billing_svc.get_aws_credits, ak, sk, proxy_url=proxy_url)
-        aws_status = str(aws_res.get("status") or "ok")
-        aws_account_id = aws_res.get("account_id")
-        aws_credits = [AwsCredit(**c) for c in aws_res.get("credits") or []]
-    except billing_svc.BillingNoPermissionError as exc:
-        aws_status = "no_permission"
-        aws_error = str(exc)
+        result = await precise_summary(db, user, credential_id)
     except billing_svc.BillingValidationError as exc:
-        # 参数无效（400 级）：只影响官方赠金区，不让整个账单页失败。
-        aws_status = "invalid"
-        aws_error = str(exc)
-    except billing_svc.BillingUnavailableError as exc:
-        aws_status = "unavailable"
-        aws_error = str(exc)
-    except Exception as exc:  # noqa: BLE001 - 官方赠金失败不影响费用汇总
-        aws_status = "unavailable"
-        aws_error = f"查询官方赠金失败：{exc}"
-
-    # 手动赠金记录的估算：每条记录单独按 start_date 累计抵扣；某条失败
-    # 不影响其他条；CE 不可用时估算为 None。
-    credits: list[CreditOut] = []
-    recs = (
-        db.query(CreditRecord)
-        .filter(CreditRecord.user_id == user.id)
-        .order_by(CreditRecord.start_date.desc(), CreditRecord.id.desc())
-        .all()
-    )
-    for rec in recs:
-        applied = None
-        if data is not None:
-            try:
-                applied = await asyncio.to_thread(
-                    billing_svc.get_credits_applied_since, client, rec.start_date
-                )
-            except Exception:  # noqa: BLE001 - 单条估算失败时该条估算为 None
-                applied = None
-        credits.append(_credit_out(rec, applied))
-
-    return BillingSummary(
-        status=ce_status,
-        message=ce_message,
-        year_month=(data or {}).get("year_month") or billing_svc._month_bounds()[2],
-        currency=(data or {}).get("currency") or "USD",
-        total_cost=(data or {}).get("total_cost"),
-        net_cost=(data or {}).get("net_cost"),
-        credits_applied=(data or {}).get("credits_applied"),
-        lightsail_cost=(data or {}).get("lightsail_cost"),
-        forecast_cost=forecast,
-        by_service=(data or {}).get("by_service") or [],
-        credits=credits,
-        aws_credits=aws_credits,
-        aws_credits_status=aws_status,
-        aws_credits_error=aws_error,
-        aws_account_id=aws_account_id,
-        required_permissions=ce_required,
-    )
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    account = result["accounts"][0] if len(result["accounts"]) == 1 else None
+    currencies = result["currencies"]
+    currency = currencies[0] if len(currencies) == 1 else {}
+    costs_ok = bool(result["accounts"]) and all(row["costs"]["status"] == "ok" for row in result["accounts"])
+    credits_ok = bool(result["accounts"]) and all(row["credits"]["status"] == "ok" for row in result["accounts"])
+    def number(key):
+        return float(currency[key]) if costs_ok and currency.get(key) is not None else None
+    official = []
+    services = []
+    for row in result["accounts"]:
+        if row["credits"]["status"] == "ok":
+            official.extend(row["credits"]["credits"])
+        if row["costs"]["status"] == "ok":
+            for item in row["costs"]["by_service"]:
+                services.append({"service": item["service"], "total": item["total_cost"],
+                    "net": item["net_cost"], "credits_applied": item["credits_applied"], "currency": item["currency"]})
+    records = db.query(CreditRecord).filter(CreditRecord.user_id == user.id).all()
+    selected = {row["id"] for row in result["manual_credits"] + result["pending_assignment"]}
+    return BillingSummary(status="ok" if costs_ok else "unavailable",
+        message="多币种和各账号独立状态请使用 v2；手动记录无逐笔可靠匹配不估算剩余。",
+        year_month=result["year_month"], currency=currency.get("currency", "MULTI"),
+        total_cost=number("total_cost"), net_cost=number("net_cost"),
+        credits_applied=number("credits_applied"), lightsail_cost=number("lightsail_cost"),
+        forecast_cost=None, by_service=services, credits=[_credit_out(row) for row in records if row.id in selected],
+        aws_credits=official, aws_credits_status="ok" if credits_ok else "unavailable",
+        aws_credits_error=None if credits_ok else "部分账号官方赠金不可用；详见 v2 独立状态",
+        aws_account_id=account["account_id"] if account else None)
 
 
 @router.get("/credits", response_model=list[CreditOut])
@@ -150,7 +76,7 @@ def list_credits(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> list[CreditOut]:
-    # 列表本身不调 CE（避免多次计费调用）；估算值见 /billing/summary。
+    # 列表本身不调 AWS；无逐笔可靠匹配时兼容估算字段为空。
     return _plain_credits(db, user)
 
 
@@ -160,27 +86,8 @@ def create_credit(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> CreditOut:
-    if body.expires_at is not None and body.expires_at < body.start_date:
-        raise HTTPException(status_code=400, detail="到期日不能早于开始日期")
-    if body.credential_id is not None and not any(
-        c.id == body.credential_id for c in user.credentials
-    ):
-        raise HTTPException(status_code=400, detail=f"凭证不存在: {body.credential_id}")
-    rec = CreditRecord(
-        user_id=user.id,
-        credential_id=body.credential_id,
-        name=body.name.strip(),
-        credit_id=(body.credit_id or "").strip() or None,
-        total_amount=float(body.total_amount),
-        currency=(body.currency or "USD").strip().upper() or "USD",
-        start_date=body.start_date,
-        expires_at=body.expires_at,
-        note=(body.note or "").strip() or None,
-    )
-    db.add(rec)
-    db.commit()
-    db.refresh(rec)
-    return _credit_out(rec)
+    from app.routers.billing_v2 import create_record
+    return _credit_out(create_record(body, user, db))
 
 
 @router.delete("/credits/{credit_id}", response_model=dict)

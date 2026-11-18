@@ -180,6 +180,57 @@ export interface BillingSummary {
   required_permissions?: string[]
 }
 
+export interface BillingCurrency {
+  currency: string
+  total_cost: string | null
+  net_cost: string | null
+  credits_applied: string | null
+  refunds: string | null
+  discounts: string | null
+  lightsail_cost: string | null
+  forecast_remaining?: string | null
+  official_remaining?: string | null
+  official_estimated?: string | null
+  costs_complete?: boolean
+  forecast_complete?: boolean
+  credits_complete?: boolean
+}
+
+export interface ExactAwsCredit extends Omit<AwsCredit, 'initial_amount' | 'remaining_amount' | 'estimated_amount'> {
+  initial_amount: string | null
+  remaining_amount: string | null
+  estimated_amount: string | null
+}
+
+export interface ExactManualCredit extends Omit<CreditRecordOut, 'total_amount' | 'remaining_estimate' | 'credits_applied_since_start'> {
+  total_amount: string
+  amount_precision: 'legacy_float' | 'exact_decimal'
+  precision_note: string
+  account_id: string | null
+  status: string
+  balance_included: boolean
+  official_remaining?: string | null
+  official_estimated?: string | null
+}
+
+export interface BillingV2Summary {
+  year_month: string
+  status: string
+  note: string
+  currencies: BillingCurrency[]
+  manual_credits: ExactManualCredit[]
+  pending_assignment: ExactManualCredit[]
+  accounts: {
+    account_id: string | null
+    credential_id: number
+    account_label?: string | null
+    costs: { status: string; error?: string; currencies?: BillingCurrency[];
+      by_service?: (BillingCurrency & { service: string })[] }
+    forecast: { status: string; error?: string; amount?: string; currency?: string }
+    credits: { status: string; error?: string; credits?: ExactAwsCredit[] }
+  }[]
+}
+
 export interface TrafficSummary {
   year_month: string
   instances: {

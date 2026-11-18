@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -281,7 +282,7 @@ class OperationResult(BaseModel):
 class CreditCreate(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     credit_id: str | None = Field(default=None, max_length=128)
-    total_amount: float = Field(gt=0)
+    total_amount: Decimal = Field(gt=0, max_digits=40, decimal_places=18, allow_inf_nan=False)
     currency: str = Field(default="USD", max_length=8)
     start_date: date
     expires_at: date | None = None
@@ -296,14 +297,15 @@ class CreditOut(BaseModel):
     name: str
     credit_id: str | None = None
     total_amount: float
+    amount_precision: str = "legacy_float"
+    account_id: str | None = None
     currency: str = "USD"
     start_date: date
     expires_at: date | None = None
     note: str | None = None
     credential_id: int | None = None
     created_at: datetime | None = None
-    # 估算值：仅在 /billing/summary 里由 Cost Explorer 算出；
-    # CE 不可用时为 None。/billing/credits 列表里同样可能为 None。
+    # 兼容字段；无可靠逐笔消耗匹配时始终为 None。
     remaining_estimate: float | None = None
     credits_applied_since_start: float | None = None
 

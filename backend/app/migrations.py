@@ -7,6 +7,7 @@ import re
 import tempfile
 from contextlib import ExitStack
 from datetime import datetime, timezone
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from sqlalchemy import DefaultClause, MetaData, Text, UniqueConstraint, text
@@ -15,7 +16,7 @@ from sqlalchemy.dialects import sqlite
 
 from app.sqlite_backup import check_database, snapshot_database, sync_directory, verify_migration_snapshot
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 LEGACY_UNIQUE_KEYS = {
     "aws_credentials": ("user_id",),
     "instance_settings": ("user_id", "region", "instance_name"),
@@ -185,6 +186,28 @@ def add_columns(conn, table, definitions):
     for name, definition in definitions.items():
         if name not in existing:
             conn.execute(f"ALTER TABLE {quote(table)} ADD COLUMN {quote(name)} {definition}")
+
+
+def apply_v3(conn, metadata):
+    if "credit_records" in tables(conn):
+        add_columns(conn, "credit_records", {
+            "total_amount_decimal": "TEXT", "account_id": "VARCHAR(12)",
+            "amount_precision": "VARCHAR(32) DEFAULT 'legacy_float' NOT NULL",
+        })
+        # Current credential identity cannot establish historical grant ownership.
+        legacy = conn.execute("SELECT id,total_amount FROM credit_records WHERE total_amount_decimal IS NULL")
+        while rows := legacy.fetchmany(512):
+            exact = []
+            for record_id, amount in rows:
+                try:
+                    value = Decimal(str(amount))
+                    if not value.is_finite() or value <= 0:
+                        raise ValueError("invalid legacy amount")
+                except (InvalidOperation, ValueError) as exc:
+                    raise MigrationError("Historical credit amount requires manual review") from exc
+                exact.append((format(value, "f"), record_id))
+            conn.executemany("UPDATE credit_records SET total_amount_decimal=? WHERE id=?", exact)
+        conn.execute("CREATE INDEX IF NOT EXISTS ix_credit_records_account_id ON credit_records (account_id)")
 
 
 def apply_v2(conn, metadata):
@@ -370,6 +393,7 @@ def upgrade_database(engine, metadata: MetaData) -> None:
                     "aws_credentials": {"account_id", "last_confirmed_account_id", "auto_stop_conflict"},
                     "instance_settings": {"auto_stop_conflict", "auto_stop_configured", "auto_stop_account_id"},
                     "traffic_usage": {"account_id"},
+                    "credit_records": {"total_amount_decimal", "account_id", "amount_precision"},
                 })
                 path = engine.url.database
                 if not path or path == ":memory:":
@@ -381,9 +405,27 @@ def upgrade_database(engine, metadata: MetaData) -> None:
                     backup = migration_backup(conn, source, open_files, version=2)
                     logger.info("Migration v2 backup: %s SHA256=%s", backup["path"], backup["sha256"])
                 apply_v2(conn, metadata)
-                validate_schema(conn, metadata)
+                validate_schema(conn, metadata, {"credit_records": {"total_amount_decimal", "account_id", "amount_precision"}})
                 conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
                     2, "T02 account identity and policy conflicts", datetime.now(timezone.utc).isoformat(),
+                    backup["path"] if backup else None, backup["sha256"] if backup else None))
+                apply_v3(conn, metadata)
+                validate_schema(conn, metadata)
+                conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
+                    3, "T03 precise grant amounts and account ownership", datetime.now(timezone.utc).isoformat(),
+                    backup["path"] if backup else None, backup["sha256"] if backup else None))
+            elif current_version == 2:
+                validate_schema(conn, metadata, {"credit_records": {"total_amount_decimal", "account_id", "amount_precision"}})
+                path = engine.url.database
+                backup = None
+                if path and path != ":memory:":
+                    if engine.url.query:
+                        raise MigrationError("SQLite URI options are unsupported for automatic migration backup")
+                    backup = migration_backup(conn, Path(path).resolve(), open_files, version=3)
+                apply_v3(conn, metadata)
+                validate_schema(conn, metadata)
+                conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
+                    3, "T03 precise grant amounts and account ownership", datetime.now(timezone.utc).isoformat(),
                     backup["path"] if backup else None, backup["sha256"] if backup else None))
             else:
                 validate_schema(conn, metadata)
@@ -409,6 +451,7 @@ def upgrade_database(engine, metadata: MetaData) -> None:
             backup_path TEXT, backup_sha256 TEXT)""")
         apply_v1(conn, metadata, rebuilds)
         apply_v2(conn, metadata)
+        apply_v3(conn, metadata)
         validate_schema(conn, metadata)
         conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
             1, "T01 baseline schema", datetime.now(timezone.utc).isoformat(),
@@ -417,6 +460,9 @@ def upgrade_database(engine, metadata: MetaData) -> None:
         conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
             2, "T02 account identity and policy conflicts", datetime.now(timezone.utc).isoformat(),
             t02_backup["path"] if t02_backup else None, t02_backup["sha256"] if t02_backup else None))
+        conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
+            3, "T03 precise grant amounts and account ownership", datetime.now(timezone.utc).isoformat(),
+            backup["path"] if backup else None, backup["sha256"] if backup else None))
         conn.commit()
     except BaseException as exc:
         conn.rollback()

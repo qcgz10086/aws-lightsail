@@ -168,11 +168,10 @@ class TrafficUsage(Base):
 
 
 class CreditRecord(Base):
-    """用户手动录入的赠金/抵扣金记录（不自动插入任何官方赠金）。
+    """Manual grant with explicit historical account and exact decimal amount.
 
-    total_amount 为该笔赠金总额；剩余为估算值：
-    remaining_estimate = total_amount - 自 start_date 起
-    Cost Explorer 累计抵扣额（Unblended - Net），以官方 Credits 页为准。
+    No per-grant consumption is inferred from account-wide cost differences.
+    total_amount is retained solely for old client/storage compatibility.
     """
 
     __tablename__ = "credit_records"
@@ -190,6 +189,9 @@ class CreditRecord(Base):
     name: Mapped[str] = mapped_column(String(128), nullable=False)
     credit_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
     total_amount: Mapped[float] = mapped_column(Float, nullable=False)
+    total_amount_decimal: Mapped[str | None] = mapped_column(Text, nullable=True)
+    amount_precision: Mapped[str] = mapped_column(String(32), default="legacy_float", server_default=text("'legacy_float'"), nullable=False)
+    account_id: Mapped[str | None] = mapped_column(String(12), nullable=True, index=True)
     currency: Mapped[str] = mapped_column(String(8), default="USD", nullable=False)
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
     expires_at: Mapped[date | None] = mapped_column(Date, nullable=True)
