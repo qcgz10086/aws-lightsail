@@ -398,9 +398,10 @@ def get_billing_summary(client, now: datetime | None = None, account_id: str | N
 
 def get_forecast_result(client, now: datetime | None = None, account_id: str | None = None) -> dict:
     first, _tomorrow, _ym = _month_bounds(now)
-    start = _today_utc(now)
-    kwargs = {"TimePeriod": {"Start": start.isoformat(), "End": _next_month_first(first).isoformat()},
-              "Granularity": "MONTHLY", "Metric": "UNBLENDED_COST", "Filter": account_filter(account_id)}
+    today = _today_utc(now)
+    end = _next_month_first(first)
+    kwargs = {"TimePeriod": {"Start": today.isoformat(), "End": end.isoformat()},
+              "Granularity": "DAILY", "Metric": "UNBLENDED_COST", "Filter": account_filter(account_id)}
     try:
         response = client.get_cost_forecast(**kwargs)
     except ClientError as exc:
@@ -410,7 +411,27 @@ def get_forecast_result(client, now: datetime | None = None, account_id: str | N
     total = response.get("Total") or {}
     if not total.get("Unit"):
         raise BillingUnavailableError("预测缺少币种")
-    return {"amount": decimal_string(total.get("Amount")), "currency": total["Unit"]}
+    periods = response.get("ForecastResultsByTime")
+    if not isinstance(periods, list):
+        raise BillingUnavailableError("预测缺少逐日覆盖，无法排除与已发生费用重叠的今天")
+    daily = {}
+    with localcontext() as context:
+        context.prec = 80
+        for period in periods:
+            try:
+                start = date.fromisoformat(period["TimePeriod"]["Start"])
+                stop = date.fromisoformat(period["TimePeriod"]["End"])
+            except (KeyError, TypeError, ValueError) as exc:
+                raise BillingUnavailableError("预测日期格式无效") from exc
+            if start < today or stop != start + timedelta(days=1) or stop > end or start in daily:
+                raise BillingUnavailableError("预测日期重复、重叠或超出范围")
+            daily[start] = decimal_amount(period.get("MeanValue"))
+        expected = {today + timedelta(days=offset) for offset in range((end - today).days)}
+        if set(daily) != expected:
+            raise BillingUnavailableError("逐日预测未覆盖全部剩余日期，拒绝不完整完整月预测")
+        # The actual-cost query already includes today; discard its forecast.
+        remaining = sum((value for day, value in daily.items() if day > today), Decimal(0))
+        return {"amount": decimal_string(remaining), "currency": total["Unit"]}
 
 
 def get_cost_forecast(client, now: datetime | None = None, account_id: str | None = None):

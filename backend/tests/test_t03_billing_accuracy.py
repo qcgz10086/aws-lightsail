@@ -2,7 +2,7 @@
 import os
 import sys
 import unittest
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from unittest.mock import Mock, patch
 
 os.environ.setdefault("SECRET_KEY", "test-only-secret-key-0123456789abcdef")
@@ -89,10 +89,26 @@ class BillingAccuracyTests(unittest.TestCase):
         credits.get_credits.return_value = {"credits": []}
         b.get_aws_credits("fixed-test-key", "fixed-test-secret", NOW, sts, credits)
         self.assertIs(credits.get_credits.call_args.kwargs["payerAccountFlag"], False)
-        ce.get_cost_forecast.return_value = {"Total": {"Amount": "0.123456789", "Unit": "EUR"}}
+        ce.get_cost_forecast.return_value = {"Total": {"Amount": "9.123456789", "Unit": "EUR"},
+            "ForecastResultsByTime": [{"TimePeriod": {"Start": date(2026, 11, day).isoformat(),
+                "End": (date(2026, 11, day) + timedelta(days=1)).isoformat()},
+                "MeanValue": "9" if day == 19 else "0.123456789" if day == 20 else "0"}
+                for day in range(19, 31)]}
         forecast = b.get_forecast_result(ce, NOW, account_id=ACCOUNT)
         self.assertEqual(forecast, {"amount": "0.123456789", "currency": "EUR"})
         self.assertEqual(ce.get_cost_forecast.call_args.kwargs["Filter"]["Dimensions"]["Values"], [ACCOUNT])
+        self.assertEqual(ce.get_cost_forecast.call_args.kwargs["TimePeriod"]["Start"], "2026-11-19")
+        self.assertEqual(ce.get_cost_forecast.call_args.kwargs["Granularity"], "DAILY")
+
+    def test_forecast_rejects_missing_daily_coverage_and_excludes_today_on_last_day(self):
+        client = Mock()
+        client.get_cost_forecast.return_value = {"Total": {"Amount": "5", "Unit": "USD"}}
+        with self.assertRaises(b.BillingUnavailableError):
+            b.get_forecast_result(client, NOW, ACCOUNT)
+        client.get_cost_forecast.return_value["ForecastResultsByTime"] = [{"TimePeriod": {
+            "Start": "2026-11-30", "End": "2026-12-01"}, "MeanValue": "5"}]
+        self.assertEqual(b.get_forecast_result(client, datetime(2026, 11, 30, tzinfo=timezone.utc), ACCOUNT),
+                         {"amount": "0", "currency": "USD"})
 
     def test_official_duplicates_do_not_inflate_balance_and_other_account_is_rejected(self):
         sts, credits = Mock(), Mock()

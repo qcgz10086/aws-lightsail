@@ -1,5 +1,6 @@
 """Compose account-scoped billing; no manual grant consumption allocation."""
 import asyncio
+from datetime import timedelta
 from collections import defaultdict
 from decimal import Decimal, localcontext
 
@@ -61,7 +62,7 @@ async def account_summary(credential):
         try:
             client = service.make_ce_client(ak, sk, proxy)
             return {"status": "ok", **await asyncio.to_thread(service.get_forecast_result, client, account_id=account_id),
-                    "basis": "remaining_month", "start_date": service._today_utc().isoformat()}
+                    "basis": "remaining_month", "start_date": (service._today_utc() + timedelta(days=1)).isoformat()}
         except Exception as exc:
             return status_error(exc)
 
@@ -112,9 +113,13 @@ def aggregate(accounts):
                         "forecast_remaining", "official_remaining", "official_estimated"):
                 row[key] = (service.decimal_string(values[key])
                             if key in values and not values.get(key + "_missing") else None)
+            paired = all(account["costs"]["status"] == "ok" and account["forecast"]["status"] == "ok"
+                         and all(cost["currency"] == account["forecast"]["currency"]
+                                 for cost in account["costs"]["currencies"])
+                         for account in accounts)
             row["forecast_month_total"] = (service.decimal_string(
                 values["net_cost"] + values["forecast_remaining"])
-                if statuses["costs"] and statuses["forecast"] and "net_cost" in values
+                if paired and statuses["costs"] and statuses["forecast"] and "net_cost" in values
                 and "forecast_remaining" in values else None)
             result.append(row)
     return result

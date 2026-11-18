@@ -8,7 +8,7 @@
 import os
 import sys
 import unittest
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from unittest.mock import Mock
 
 # H-1/H-2 fail-fast：SECRET_KEY / ENCRYPTION_KEY / ADMIN_PASSWORD 为必填，
@@ -115,7 +115,11 @@ class TestBillingSummary(unittest.TestCase):
     def test_forecast_success_and_failure_returns_none(self):
         client = Mock()
         client.get_cost_forecast.return_value = {
-            "Total": {"Amount": "35.50", "Unit": "USD"}
+            "Total": {"Amount": "35.50", "Unit": "USD"},
+            "ForecastResultsByTime": [
+                {"TimePeriod": {"Start": f"2026-11-{day:02}", "End": (date(2026, 11, day) + timedelta(days=1)).isoformat()},
+                 "MeanValue": "9" if day == 16 else "35.5" if day == 17 else "0"}
+                for day in range(16, 31)],
         }
         now = datetime(2026, 11, 16, 12, 0, tzinfo=timezone.utc)
         self.assertEqual(b.get_cost_forecast(client, now=now, account_id="123456789012"), "35.5")
