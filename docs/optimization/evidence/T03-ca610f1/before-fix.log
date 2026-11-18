@@ -1,0 +1,103 @@
+test_credit_reversal_refund_and_discount_are_separate_decimal_records (test_t03_billing_accuracy.BillingAccuracyTests.test_credit_reversal_refund_and_discount_are_separate_decimal_records) ... ERROR
+test_getcredits_explicit_self_scope_and_forecast_scope (test_t03_billing_accuracy.BillingAccuracyTests.test_getcredits_explicit_self_scope_and_forecast_scope) ... ERROR
+test_missing_invalid_or_nonfinite_money_never_becomes_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_missing_invalid_or_nonfinite_money_never_becomes_zero) ... 
+  test_missing_invalid_or_nonfinite_money_never_becomes_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_missing_invalid_or_nonfinite_money_never_becomes_zero) (value=None) ... ERROR
+  test_missing_invalid_or_nonfinite_money_never_becomes_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_missing_invalid_or_nonfinite_money_never_becomes_zero) (value='') ... ERROR
+  test_missing_invalid_or_nonfinite_money_never_becomes_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_missing_invalid_or_nonfinite_money_never_becomes_zero) (value='invalid') ... ERROR
+  test_missing_invalid_or_nonfinite_money_never_becomes_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_missing_invalid_or_nonfinite_money_never_becomes_zero) (value='NaN') ... ERROR
+  test_missing_invalid_or_nonfinite_money_never_becomes_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_missing_invalid_or_nonfinite_money_never_becomes_zero) (value='Infinity') ... ERROR
+test_pages_and_periods_are_all_counted_without_combining_currencies (test_t03_billing_accuracy.BillingAccuracyTests.test_pages_and_periods_are_all_counted_without_combining_currencies) ... ERROR
+test_repeated_page_token_is_rejected_instead_of_counted_twice (test_t03_billing_accuracy.BillingAccuracyTests.test_repeated_page_token_is_rejected_instead_of_counted_twice) ... ERROR
+test_unknown_identity_makes_no_organization_wide_request (test_t03_billing_accuracy.BillingAccuracyTests.test_unknown_identity_makes_no_organization_wide_request) ... ERROR
+
+======================================================================
+ERROR: test_credit_reversal_refund_and_discount_are_separate_decimal_records (test_t03_billing_accuracy.BillingAccuracyTests.test_credit_reversal_refund_and_discount_are_separate_decimal_records)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t03-billing-accuracy\aws-lightsail\backend\tests\test_t03_billing_accuracy.py", line 41, in test_credit_reversal_refund_and_discount_are_separate_decimal_records
+    result = b.get_billing_summary(client, NOW, account_id=ACCOUNT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: get_billing_summary() got an unexpected keyword argument 'account_id'
+
+======================================================================
+ERROR: test_getcredits_explicit_self_scope_and_forecast_scope (test_t03_billing_accuracy.BillingAccuracyTests.test_getcredits_explicit_self_scope_and_forecast_scope)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t03-billing-accuracy\aws-lightsail\backend\tests\test_t03_billing_accuracy.py", line 91, in test_getcredits_explicit_self_scope_and_forecast_scope
+    self.assertIs(credits.get_credits.call_args.kwargs["payerAccountFlag"], False)
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'payerAccountFlag'
+
+======================================================================
+ERROR: test_missing_invalid_or_nonfinite_money_never_becomes_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_missing_invalid_or_nonfinite_money_never_becomes_zero) (value=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t03-billing-accuracy\aws-lightsail\backend\tests\test_t03_billing_accuracy.py", line 71, in test_missing_invalid_or_nonfinite_money_never_becomes_zero
+    b.get_billing_summary(client, NOW, account_id=ACCOUNT)
+TypeError: get_billing_summary() got an unexpected keyword argument 'account_id'
+
+======================================================================
+ERROR: test_missing_invalid_or_nonfinite_money_never_becomes_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_missing_invalid_or_nonfinite_money_never_becomes_zero) (value='')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t03-billing-accuracy\aws-lightsail\backend\tests\test_t03_billing_accuracy.py", line 71, in test_missing_invalid_or_nonfinite_money_never_becomes_zero
+    b.get_billing_summary(client, NOW, account_id=ACCOUNT)
+TypeError: get_billing_summary() got an unexpected keyword argument 'account_id'
+
+======================================================================
+ERROR: test_missing_invalid_or_nonfinite_money_never_becomes_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_missing_invalid_or_nonfinite_money_never_becomes_zero) (value='invalid')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t03-billing-accuracy\aws-lightsail\backend\tests\test_t03_billing_accuracy.py", line 71, in test_missing_invalid_or_nonfinite_money_never_becomes_zero
+    b.get_billing_summary(client, NOW, account_id=ACCOUNT)
+TypeError: get_billing_summary() got an unexpected keyword argument 'account_id'
+
+======================================================================
+ERROR: test_missing_invalid_or_nonfinite_money_never_becomes_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_missing_invalid_or_nonfinite_money_never_becomes_zero) (value='NaN')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t03-billing-accuracy\aws-lightsail\backend\tests\test_t03_billing_accuracy.py", line 71, in test_missing_invalid_or_nonfinite_money_never_becomes_zero
+    b.get_billing_summary(client, NOW, account_id=ACCOUNT)
+TypeError: get_billing_summary() got an unexpected keyword argument 'account_id'
+
+======================================================================
+ERROR: test_missing_invalid_or_nonfinite_money_never_becomes_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_missing_invalid_or_nonfinite_money_never_becomes_zero) (value='Infinity')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t03-billing-accuracy\aws-lightsail\backend\tests\test_t03_billing_accuracy.py", line 71, in test_missing_invalid_or_nonfinite_money_never_becomes_zero
+    b.get_billing_summary(client, NOW, account_id=ACCOUNT)
+TypeError: get_billing_summary() got an unexpected keyword argument 'account_id'
+
+======================================================================
+ERROR: test_pages_and_periods_are_all_counted_without_combining_currencies (test_t03_billing_accuracy.BillingAccuracyTests.test_pages_and_periods_are_all_counted_without_combining_currencies)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t03-billing-accuracy\aws-lightsail\backend\tests\test_t03_billing_accuracy.py", line 58, in test_pages_and_periods_are_all_counted_without_combining_currencies
+    result = b.get_billing_summary(client, NOW, account_id=ACCOUNT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: get_billing_summary() got an unexpected keyword argument 'account_id'
+
+======================================================================
+ERROR: test_repeated_page_token_is_rejected_instead_of_counted_twice (test_t03_billing_accuracy.BillingAccuracyTests.test_repeated_page_token_is_rejected_instead_of_counted_twice)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t03-billing-accuracy\aws-lightsail\backend\tests\test_t03_billing_accuracy.py", line 83, in test_repeated_page_token_is_rejected_instead_of_counted_twice
+    b.get_billing_summary(client, NOW, account_id=ACCOUNT)
+TypeError: get_billing_summary() got an unexpected keyword argument 'account_id'
+
+======================================================================
+ERROR: test_unknown_identity_makes_no_organization_wide_request (test_t03_billing_accuracy.BillingAccuracyTests.test_unknown_identity_makes_no_organization_wide_request)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t03-billing-accuracy\aws-lightsail\backend\tests\test_t03_billing_accuracy.py", line 76, in test_unknown_identity_makes_no_organization_wide_request
+    b.get_billing_summary(client, NOW)
+  File "C:\Users\liyang\.codex\worktrees\t03-billing-accuracy\aws-lightsail\backend\tests\..\app\services\billing.py", line 318, in get_billing_summary
+    period = results[0]
+             ~~~~~~~^^^
+TypeError: 'Mock' object is not subscriptable
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.006s
+
+FAILED (errors=10)
+AWS_TRANSPORT_ATTEMPTS 0
