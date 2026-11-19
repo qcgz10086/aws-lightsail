@@ -15,10 +15,10 @@ router = APIRouter(prefix="/v2/billing", tags=["billing-v2"])
 
 
 @router.get("/summary")
-async def billing_summary(credential_id: int | None = None, user: User = Depends(get_current_user),
+async def billing_summary(credential_id: int | None = None, wait: bool = False, user: User = Depends(get_current_user),
                           db: Session = Depends(get_db)):
     try:
-        return await summary(db, user, credential_id)
+        return await summary(db, user, credential_id, cached=True, wait=wait)
     except service.BillingValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

@@ -16,7 +16,7 @@ from sqlalchemy.dialects import sqlite
 
 from app.sqlite_backup import check_database, snapshot_database, sync_directory, verify_migration_snapshot
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 LEGACY_UNIQUE_KEYS = {
     "aws_credentials": ("user_id",),
     "instance_settings": ("user_id", "region", "instance_name"),
@@ -186,6 +186,14 @@ def add_columns(conn, table, definitions):
     for name, definition in definitions.items():
         if name not in existing:
             conn.execute(f"ALTER TABLE {quote(table)} ADD COLUMN {quote(name)} {definition}")
+
+
+def apply_v4(conn, metadata):
+    if "data_snapshots" not in tables(conn):
+        table = metadata.tables["data_snapshots"]
+        create_table(conn, table)
+        for index in table.indexes:
+            conn.execute(str(CreateIndex(index).compile(dialect=sqlite.dialect())))
 
 
 def apply_v3(conn, metadata):
@@ -388,8 +396,13 @@ def upgrade_database(engine, metadata: MetaData) -> None:
         existing = tables(conn)
         if "schema_migrations" in existing:
             current_version = validate_ledger(conn)
+            previous_metadata = MetaData()
+            for table in metadata.sorted_tables:
+                if table.name != "data_snapshots":
+                    table.to_metadata(previous_metadata)
+            validation_metadata = previous_metadata if current_version < 4 else metadata
             if current_version == 1:
-                validate_schema(conn, metadata, {
+                validate_schema(conn, validation_metadata, {
                     "aws_credentials": {"account_id", "last_confirmed_account_id", "auto_stop_conflict"},
                     "instance_settings": {"auto_stop_conflict", "auto_stop_configured", "auto_stop_account_id"},
                     "traffic_usage": {"account_id"},
@@ -405,17 +418,17 @@ def upgrade_database(engine, metadata: MetaData) -> None:
                     backup = migration_backup(conn, source, open_files, version=2)
                     logger.info("Migration v2 backup: %s SHA256=%s", backup["path"], backup["sha256"])
                 apply_v2(conn, metadata)
-                validate_schema(conn, metadata, {"credit_records": {"total_amount_decimal", "account_id", "amount_precision"}})
+                validate_schema(conn, validation_metadata, {"credit_records": {"total_amount_decimal", "account_id", "amount_precision"}})
                 conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
                     2, "T02 account identity and policy conflicts", datetime.now(timezone.utc).isoformat(),
                     backup["path"] if backup else None, backup["sha256"] if backup else None))
                 apply_v3(conn, metadata)
-                validate_schema(conn, metadata)
+                validate_schema(conn, validation_metadata)
                 conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
                     3, "T03 precise grant amounts and account ownership", datetime.now(timezone.utc).isoformat(),
                     backup["path"] if backup else None, backup["sha256"] if backup else None))
             elif current_version == 2:
-                validate_schema(conn, metadata, {"credit_records": {"total_amount_decimal", "account_id", "amount_precision"}})
+                validate_schema(conn, validation_metadata, {"credit_records": {"total_amount_decimal", "account_id", "amount_precision"}})
                 path = engine.url.database
                 backup = None
                 if path and path != ":memory:":
@@ -423,12 +436,26 @@ def upgrade_database(engine, metadata: MetaData) -> None:
                         raise MigrationError("SQLite URI options are unsupported for automatic migration backup")
                     backup = migration_backup(conn, Path(path).resolve(), open_files, version=3)
                 apply_v3(conn, metadata)
-                validate_schema(conn, metadata)
+                validate_schema(conn, validation_metadata)
                 conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
                     3, "T03 precise grant amounts and account ownership", datetime.now(timezone.utc).isoformat(),
                     backup["path"] if backup else None, backup["sha256"] if backup else None))
+            elif current_version == 3:
+                validate_schema(conn, validation_metadata)
+                path = engine.url.database
+                backup = None
+                if path and path != ":memory:":
+                    if engine.url.query:
+                        raise MigrationError("SQLite URI options are unsupported for automatic migration backup")
+                    backup = migration_backup(conn, Path(path).resolve(), open_files, version=4)
             else:
                 validate_schema(conn, metadata)
+            if current_version < 4:
+                apply_v4(conn, metadata)
+                validate_schema(conn, metadata)
+                conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
+                    4, "T04 SQLite snapshots and refresh leases", datetime.now(timezone.utc).isoformat(),
+                    backup["path"] if backup else None, backup["sha256"] if backup else None))
             conn.commit()
             return
         check_database(conn)
@@ -452,6 +479,7 @@ def upgrade_database(engine, metadata: MetaData) -> None:
         apply_v1(conn, metadata, rebuilds)
         apply_v2(conn, metadata)
         apply_v3(conn, metadata)
+        apply_v4(conn, metadata)
         validate_schema(conn, metadata)
         conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
             1, "T01 baseline schema", datetime.now(timezone.utc).isoformat(),
@@ -462,6 +490,9 @@ def upgrade_database(engine, metadata: MetaData) -> None:
             t02_backup["path"] if t02_backup else None, t02_backup["sha256"] if t02_backup else None))
         conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
             3, "T03 precise grant amounts and account ownership", datetime.now(timezone.utc).isoformat(),
+            backup["path"] if backup else None, backup["sha256"] if backup else None))
+        conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
+            4, "T04 SQLite snapshots and refresh leases", datetime.now(timezone.utc).isoformat(),
             backup["path"] if backup else None, backup["sha256"] if backup else None))
         conn.commit()
     except BaseException as exc:

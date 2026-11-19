@@ -17,7 +17,7 @@ import {
 } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import api, { CredentialItem, CredentialOut, Instance, getErrorMessage } from '../api/client'
+import api, { CredentialItem, CredentialOut, Instance, SnapshotMetadata, getErrorMessage } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 
 const stateColor: Record<string, string> = {
@@ -35,10 +35,14 @@ export default function InstancesPage() {
   const [creds, setCreds] = useState<CredentialItem[]>([])
   const [filterCred, setFilterCred] = useState<number | 'all'>('all')
   const [loading, setLoading] = useState(false)
+  const [snapshotScopes, setSnapshotScopes] = useState<(SnapshotMetadata & { region: string | null; credential_id: number })[]>([])
   const [acting, setActing] = useState<string | null>(null)
   const [limitModal, setLimitModal] = useState<Instance | null>(null)
   const [limitForm] = Form.useForm()
   const editedLimitFields = useRef(new Set<string>())
+  const requestVersion = useRef(0)
+  const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pollStarted = useRef(0)
 
   const loadCreds = async () => {
     try {
@@ -50,25 +54,50 @@ export default function InstancesPage() {
   }
 
   const load = async () => {
+    const version = ++requestVersion.current
     setLoading(true)
     try {
       const params =
         filterCred === 'all' ? {} : { credential_id: filterCred }
-      const res = await api.get<Instance[]>('/instances', { params })
-      setData(res.data)
+      const res = await api.get<{ instances: Instance[]; scopes: typeof snapshotScopes; refreshing: boolean }>(
+        '/v2/instances', { params })
+      if (version === requestVersion.current) {
+        setData(res.data.instances)
+        setSnapshotScopes(res.data.scopes)
+        if (res.data.refreshing && Date.now() - pollStarted.current < 30000) {
+          pollTimer.current = setTimeout(() => void load(), 500)
+        }
+      }
     } catch (err) {
-      message.error(getErrorMessage(err))
+      if (version === requestVersion.current) message.error(getErrorMessage(err))
     } finally {
-      setLoading(false)
+      if (version === requestVersion.current) setLoading(false)
     }
   }
 
   useEffect(() => {
     if (user?.has_credentials) {
+      setData([])
+      setSnapshotScopes([])
+      pollStarted.current = Date.now()
       void loadCreds()
       void load()
     }
+    return () => {
+      requestVersion.current += 1
+      if (pollTimer.current) clearTimeout(pollTimer.current)
+    }
   }, [user?.has_credentials, filterCred])
+
+  const refresh = async () => {
+    try {
+      if (pollTimer.current) clearTimeout(pollTimer.current)
+      pollStarted.current = Date.now()
+      await api.post('/v2/refresh', { kind: 'instances',
+        credential_id: filterCred === 'all' ? null : filterCred })
+      void load()
+    } catch (error) { message.error(getErrorMessage(error)) }
+  }
 
   const runAction = async (inst: Instance, action: string) => {
     const key = `${inst.credential_id}/${inst.region}/${inst.name}:${action}`
@@ -91,7 +120,7 @@ export default function InstancesPage() {
         })
         message.success(res.data.message || '操作已提交')
       }
-      setTimeout(() => void load(), 1500)
+      setTimeout(() => void refresh(), 1500)
     } catch (err) {
       message.error(getErrorMessage(err))
     } finally {
@@ -132,12 +161,18 @@ export default function InstancesPage() {
           <Button type="primary" onClick={() => navigate('/create')}>
             开通实例
           </Button>
-          <Button onClick={() => void load()} loading={loading}>
+          <Button onClick={() => void refresh()} loading={loading}>
             刷新
           </Button>
         </Space>
       </div>
 
+      {snapshotScopes.some((scope) => scope.refreshing) ? <Alert type="info" showIcon
+        message="后台刷新中，成功账号和区域先行显示" description="本页最多自动跟进30秒；未完成可稍后刷新。" /> : null}
+      {snapshotScopes.filter((scope) => scope.stale || scope.error).map((scope) => <Alert
+        key={`${scope.credential_id}/${scope.region || 'regions'}`} type="warning" showIcon
+        message={`凭证 #${scope.credential_id} / ${scope.region || '区域目录'}：${scope.stale ? '已过期快照' : '查询失败'}`}
+        description={`最近成功：${scope.last_success_at || '无'}；${scope.error || '正在刷新'}`} />)}
       <Card>
         <Table
           rowKey={(r) => `${r.credential_id}/${r.region}/${r.name}`}

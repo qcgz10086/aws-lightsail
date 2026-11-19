@@ -217,3 +217,24 @@ class OperationLog(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     user: Mapped[User] = relationship(back_populates="operation_logs")
+
+
+class DataSnapshot(Base):
+    __tablename__ = "data_snapshots"
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    credential_id: Mapped[int] = mapped_column(Integer, ForeignKey("aws_credentials.id", ondelete="CASCADE"), nullable=False, index=True)
+    account_id: Mapped[str | None] = mapped_column(String(12), nullable=True)
+    kind: Mapped[str] = mapped_column(String(32), nullable=False)
+    scope: Mapped[str] = mapped_column(Text, nullable=False)
+    version: Mapped[str] = mapped_column(String(64), nullable=False)
+    payload: Mapped[str | None] = mapped_column(Text, nullable=True)
+    payload_bytes: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    last_success: Mapped[float | None] = mapped_column(Float, nullable=True)
+    expires_at: Mapped[float] = mapped_column(Float, nullable=False, default=0)
+    next_retry_at: Mapped[float] = mapped_column(Float, nullable=False, default=0)
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    error_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    lease_token: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    lease_until: Mapped[float] = mapped_column(Float, nullable=False, default=0)
+    updated_at: Mapped[float] = mapped_column(Float, nullable=False, default=0, index=True)

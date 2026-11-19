@@ -75,6 +75,8 @@ def _log(
     status: str,
     message: str | None = None,
 ) -> None:
+    if status == "success" and action in {"create_instance", "start", "stop", "reboot", "change_ip", "delete_instance"}:
+        _expire_instance_snapshots(db, user_id)
     db.add(
         OperationLog(
             user_id=user_id,
@@ -85,6 +87,15 @@ def _log(
             message=message,
         )
     )
+
+
+def _expire_instance_snapshots(db, user_id):
+    from sqlalchemy import update
+    from app.models import DataSnapshot
+    # Existing write routes keep their response contract. The next query must
+    # refresh state rather than presenting a minute-old pre-operation snapshot.
+    db.execute(update(DataSnapshot).where(DataSnapshot.user_id == user_id,
+        DataSnapshot.kind == "instances").values(expires_at=0, lease_token=None, lease_until=0))
 
 
 def _to_out(
@@ -140,65 +151,7 @@ def _to_out(
     )
 
 
-@router.get("", response_model=list[InstanceOut])
-async def list_instances(
-    credential_id: int | None = Query(None, description="仅扫描指定凭证；空=全部凭证"),
-    user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-) -> list[InstanceOut]:
-    if not user.credentials:
-        raise HTTPException(status_code=400, detail="请先绑定 AWS 凭证")
-
-    creds = list(user.credentials)
-    if credential_id is not None:
-        creds = [c for c in creds if c.id == credential_id]
-        if not creds:
-            raise HTTPException(status_code=404, detail="凭证不存在")
-
-    if credential_id is None:
-        creds = select_scan_credentials(creds)
-
-    sem = asyncio.Semaphore(5)
-    raw_items: list[tuple[int, str | None, dict]] = []
-    errors: list[str] = []
-
-    async def fetch_for_cred(cred) -> tuple[list[tuple[int, str | None, dict]], list[str]]:
-        local_items: list[tuple[int, str | None, dict]] = []
-        local_errors: list[str] = []
-        try:
-            ak, sk, _ = get_user_aws_keys_and_cred(user, cred.id)
-            proxy_url = get_credential_proxy_url(cred)
-            regions = await asyncio.to_thread(ls.get_regions, ak, sk, proxy_url=proxy_url)
-        except (NoCredentialsError, RuntimeError, ProxyConfigError, ls.LightsailError) as exc:
-            msg = getattr(exc, "message", str(exc))
-            return [], [f"凭证#{cred.id}: {msg}"]
-        except Exception as exc:  # noqa: BLE001
-            return [], [f"凭证#{cred.id}: {exc}"]
-
-        async def fetch_region(region_name: str) -> tuple[str, list[dict] | str]:
-            async with sem:
-                try:
-                    items = await asyncio.to_thread(
-                        ls.list_instances_in_region, ak, sk, region_name, proxy_url=proxy_url
-                    )
-                    return region_name, items
-                except ls.LightsailError as exc:
-                    return region_name, exc.message
-
-        results = await asyncio.gather(*[fetch_region(r["name"]) for r in regions])
-        for region_name, payload in results:
-            if isinstance(payload, str):
-                local_errors.append(f"凭证#{cred.id}/{region_name}: {payload}")
-                continue
-            for raw in payload:
-                local_items.append((cred.id, cred.account_label, raw))
-        return local_items, local_errors
-
-    gathered = await asyncio.gather(*[fetch_for_cred(c) for c in creds])
-    for items, errs in gathered:
-        raw_items.extend(items)
-        errors.extend(errs)
-
+def outputs_for_raw(db: Session, user: User, raw_items: list) -> list[InstanceOut]:
     # SQLAlchemy Session 非并发安全：统一在主协程组装输出
     credential_by_id = {credential.id: credential for credential in user.credentials}
     settings = db.query(InstanceSetting).filter(InstanceSetting.user_id == user.id).all()
@@ -232,6 +185,34 @@ async def list_instances(
         for cred_id, label, raw in raw_items
     ]
     instances.sort(key=lambda x: (x.region, x.name, x.credential_id or 0))
+    return instances
+
+
+@router.get("", response_model=list[InstanceOut])
+async def list_instances(
+    credential_id: int | None = Query(None, description="仅扫描指定凭证；空=全部凭证"),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[InstanceOut]:
+    if not user.credentials:
+        raise HTTPException(status_code=400, detail="请先绑定 AWS 凭证")
+
+    creds = list(user.credentials)
+    if credential_id is not None:
+        creds = [c for c in creds if c.id == credential_id]
+        if not creds:
+            raise HTTPException(status_code=404, detail="凭证不存在")
+
+    if credential_id is None:
+        creds = select_scan_credentials(creds)
+
+    from app.services.instance_cache import instance_scopes
+    scope_rows = await instance_scopes(db.get_bind(), user, creds, wait=True)
+    labels = {credential.id: credential.account_label for credential in creds}
+    cached_items = [(scope["credential_id"], labels[scope["credential_id"]], raw)
+                    for scope in scope_rows for raw in scope["data"] or []]
+    errors = [scope["error"] for scope in scope_rows if scope.get("error")]
+    instances = outputs_for_raw(db, user, cached_items)
     if not instances and errors:
         raise HTTPException(status_code=400, detail="获取实例失败: " + "; ".join(errors[:8]))
     return instances

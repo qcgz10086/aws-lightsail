@@ -125,7 +125,7 @@ def aggregate(accounts):
     return result
 
 
-async def summary(db, user, credential_id=None):
+async def summary(db, user, credential_id=None, cached=False, wait=False, force=False):
     credentials = list(user.credentials)
     if not credentials:
         raise service.BillingValidationError("请先绑定 AWS 凭证")
@@ -137,9 +137,13 @@ async def summary(db, user, credential_id=None):
         credentials = select_scan_credentials(credentials)
     # ORM data and secrets remain in the route's session thread; each account worker
     # only invokes AWS clients in threads, and never uses the database there.
-    accounts = []
-    for credential in credentials:
-        accounts.append(await account_summary(credential))
+    if cached:
+        db.commit()
+        from app.services.billing_cache import cached_account
+        accounts = await asyncio.gather(*(cached_account(db.get_bind(), user, credential, wait, force)
+                                         for credential in credentials))
+    else:
+        accounts = await asyncio.gather(*(account_summary(credential) for credential in credentials))
     rows = db.query(CreditRecord).filter(CreditRecord.user_id == user.id).order_by(
         CreditRecord.start_date.desc(), CreditRecord.id.desc()).all()
     selected_accounts = {account["account_id"] for account in accounts if account["account_id"]}
@@ -163,8 +167,12 @@ async def summary(db, user, credential_id=None):
                 row["status"] = "historical_account"
             manual.append(row)
     sections = [account[key]["status"] for account in accounts for key in ("costs", "forecast", "credits")]
+    stale = any(account[key].get("cache", {}).get("stale", False)
+                for account in accounts for key in ("costs", "forecast", "credits"))
     return {"year_month": service._month_bounds()[2], "status": "ok" if sections and all(
         status == "ok" for status in sections) else "partial" if "ok" in sections else "unavailable",
-        "accounts": accounts, "currencies": aggregate(accounts), "manual_credits": manual,
+        "accounts": accounts, "currencies": aggregate(accounts), "manual_credits": manual, "stale": stale,
+        "refreshing": any(account[key].get("cache", {}).get("refreshing", False)
+                          for account in accounts for key in ("costs", "forecast", "credits")),
         "pending_assignment": pending, "forecast_basis": "remaining_month",
         "note": "金额按币种分别汇总；手动记录不叠加官方余额，无逐笔可靠匹配不估算剩余。"}

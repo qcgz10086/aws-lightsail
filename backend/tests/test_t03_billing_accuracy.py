@@ -3,6 +3,7 @@ import os
 import sys
 import unittest
 from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 os.environ.setdefault("SECRET_KEY", "test-only-secret-key-0123456789abcdef")
@@ -144,13 +145,15 @@ class BillingRouteTests(unittest.TestCase):
         from fastapi.testclient import TestClient
         from sqlalchemy import create_engine
         from sqlalchemy.orm import sessionmaker
-        from sqlalchemy.pool import StaticPool
+        import tempfile
         from app.database import Base, get_db
         from app.deps import get_current_user
         from app.main import app
         from app.models import AwsCredential, User
         from app.security import encrypt_secret
-        self.engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False}, poolclass=StaticPool)
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.engine = create_engine(f"sqlite:///{Path(self.tmp.name).as_posix()}/app.db", connect_args={"check_same_thread": False})
         Base.metadata.create_all(self.engine)
         self.db = sessionmaker(bind=self.engine)()
         self.user = User(username="t03-owner", password_hash="opaque")
@@ -183,6 +186,9 @@ class BillingRouteTests(unittest.TestCase):
         self.db.add(record); self.db.commit(); return record
 
     def mocks(self):
+        from app.models import DataSnapshot
+        self.db.query(DataSnapshot).delete()
+        self.db.commit()
         return patch.multiple(b, get_sts_identity=Mock(return_value=ACCOUNT),
             make_ce_client=Mock(return_value=Mock()),
             get_billing_summary=Mock(return_value={"year_month": "2026-11", "currencies": [{
@@ -197,7 +203,7 @@ class BillingRouteTests(unittest.TestCase):
         unmatched = self.record(ACCOUNT, "manual-only", self.first.id)
         pending = self.record(None, "old-history", self.first.id)
         with self.mocks(), patch.object(b, "get_sts_identity", side_effect=[ACCOUNT, "210987654321"]) as sts:
-            response = self.client.get("/api/v2/billing/summary")
+            response = self.client.get("/api/v2/billing/summary?wait=true")
         self.assertEqual(response.status_code, 200, response.text)
         data = response.json()
         self.assertEqual(len(data["accounts"]), 2)
@@ -212,7 +218,7 @@ class BillingRouteTests(unittest.TestCase):
         self.record("210987654321", "not-selected", self.second.id)
         self.record(ACCOUNT, "selected", self.first.id)
         with self.mocks(), patch.object(b, "get_forecast_result", side_effect=b.BillingNoPermissionError("denied")):
-            response = self.client.get(f"/api/v2/billing/summary?credential_id={self.first.id}")
+            response = self.client.get(f"/api/v2/billing/summary?wait=true&credential_id={self.first.id}")
         self.assertEqual(response.status_code, 200, response.text)
         account = response.json()["accounts"][0]
         self.assertEqual(account["costs"]["status"], "ok")
@@ -220,13 +226,13 @@ class BillingRouteTests(unittest.TestCase):
         self.assertEqual(account["credits"]["status"], "ok")
         self.assertEqual([row["credit_id"] for row in response.json()["manual_credits"]], ["selected"])
         with self.mocks() as mocks:
-            forbidden = self.client.get(f"/api/v2/billing/summary?credential_id={self.foreign.id}")
+            forbidden = self.client.get(f"/api/v2/billing/summary?wait=true&credential_id={self.foreign.id}")
         self.assertEqual(forbidden.status_code, 400, forbidden.text)
 
     def test_changed_identity_never_queries_old_account_costs(self):
         with self.mocks(), patch.object(b, "get_sts_identity", return_value="999999999999"), \
              patch.object(b, "get_billing_summary") as costs, patch.object(b, "get_aws_credits") as credits:
-            response = self.client.get(f"/api/v2/billing/summary?credential_id={self.first.id}")
+            response = self.client.get(f"/api/v2/billing/summary?wait=true&credential_id={self.first.id}")
         self.assertEqual(response.status_code, 200, response.text)
         self.assertEqual(response.json()["currencies"], [])
         costs.assert_not_called(); credits.assert_not_called()
@@ -262,7 +268,7 @@ class BillingRouteTests(unittest.TestCase):
         record.amount_precision = "legacy_float"
         self.db.commit()
         with self.mocks():
-            response = self.client.get(f"/api/v2/billing/summary?credential_id={self.first.id}")
+            response = self.client.get(f"/api/v2/billing/summary?wait=true&credential_id={self.first.id}")
         self.assertEqual(response.status_code, 200, response.text)
         row = response.json()["pending_assignment"][0]
         self.assertEqual(row["amount_precision"], "legacy_float")
@@ -292,7 +298,7 @@ class BillingRouteTests(unittest.TestCase):
                 self.assertEqual(response.status_code, 200, response.text)
                 self.assertIsNone(response.json()["forecast_cost"])
         with self.mocks():
-            response = self.client.get(f"/api/v2/billing/summary?credential_id={self.first.id}")
+            response = self.client.get(f"/api/v2/billing/summary?wait=true&credential_id={self.first.id}")
         row = response.json()["currencies"][0]
         self.assertEqual(row["forecast_remaining"], "5")
         self.assertEqual(row["forecast_month_total"], "13")
@@ -307,7 +313,7 @@ class BillingRouteTests(unittest.TestCase):
             "lightsail_cost": "0.1"}], "by_service": []}
         with self.mocks(), patch.object(b, "get_billing_summary", return_value=costs), \
              patch.object(b, "get_forecast_result", return_value={"currency": "USD", "amount": "0.2"}):
-            exact = self.client.get(f"/api/v2/billing/summary?credential_id={self.first.id}")
+            exact = self.client.get(f"/api/v2/billing/summary?wait=true&credential_id={self.first.id}")
             legacy = self.client.get(f"/api/billing/summary?credential_id={self.first.id}")
         self.assertEqual(exact.json()["currencies"][0]["forecast_month_total"], "0.3")
         self.assertEqual(legacy.json()["forecast_cost"], 0.3)
@@ -361,7 +367,7 @@ engine.dispose()
             self.assertEqual(file_sha256(path), before)
             migrations.upgrade_database(engine, Base.metadata)
             with closing(sqlite3.connect(path)) as conn:
-                self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,), (2,), (3,)])
+                self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,), (2,), (3,), (4,)])
                 value, account, precision = conn.execute("SELECT total_amount_decimal,account_id,amount_precision FROM credit_records").fetchone()
                 self.assertEqual(value, "0.12345678912345678")
                 self.assertIsNone(account)

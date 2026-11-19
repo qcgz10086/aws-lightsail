@@ -39,7 +39,7 @@ async def billing_summary(
 ) -> BillingSummary:
     from app.services.billing_summary import summary as precise_summary
     try:
-        result = await precise_summary(db, user, credential_id)
+        result = await precise_summary(db, user, credential_id, cached=True, wait=True)
     except billing_svc.BillingValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     account = result["accounts"][0] if len(result["accounts"]) == 1 else None

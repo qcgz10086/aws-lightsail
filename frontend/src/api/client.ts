@@ -217,6 +217,8 @@ export interface ExactManualCredit extends Omit<CreditRecordOut, 'total_amount' 
 export interface BillingV2Summary {
   year_month: string
   status: string
+  refreshing?: boolean
+  stale?: boolean
   note: string
   currencies: BillingCurrency[]
   manual_credits: ExactManualCredit[]
@@ -225,11 +227,20 @@ export interface BillingV2Summary {
     account_id: string | null
     credential_id: number
     account_label?: string | null
-    costs: { status: string; error?: string; currencies?: BillingCurrency[];
+    costs: { status: string; error?: string; cache?: SnapshotMetadata; currencies?: BillingCurrency[];
       by_service?: (BillingCurrency & { service: string })[] }
-    forecast: { status: string; error?: string; amount?: string; currency?: string }
-    credits: { status: string; error?: string; credits?: ExactAwsCredit[] }
+    forecast: { status: string; error?: string; cache?: SnapshotMetadata; amount?: string; currency?: string }
+    credits: { status: string; error?: string; cache?: SnapshotMetadata; credits?: ExactAwsCredit[] }
   }[]
+}
+
+export interface SnapshotMetadata {
+  status: string
+  stale: boolean
+  refreshing: boolean
+  last_success_at: string | null
+  expires_at?: string | null
+  error: string | null
 }
 
 export interface TrafficSummary {

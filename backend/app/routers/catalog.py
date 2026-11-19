@@ -1,6 +1,8 @@
-import asyncio
-
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
+from app.database import get_db
+from app.services.traffic import get_credential
+from app.services.instance_cache import cached_call, validate_region
 
 from app.deps import get_current_user
 from app.models import User
@@ -33,12 +35,14 @@ def _keys(user: User, credential_id: int | None = None):
 async def list_regions(
     credential_id: int | None = Query(None),
     user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> list[RegionOut]:
-    ak, sk, proxy_url = _keys(user, credential_id)
-    try:
-        regions = await asyncio.to_thread(ls.get_regions, ak, sk, proxy_url=proxy_url)
-    except ls.LightsailError as exc:
-        raise HTTPException(status_code=400, detail=exc.message)
+    _keys(user, credential_id)
+    view = await cached_call(db.get_bind(), user, get_credential(user, credential_id), "catalog", "regions", 86400,
+                             ls.get_regions, wait=True)
+    if view["data"] is None:
+        raise HTTPException(status_code=400, detail=view["error"] or "目录刷新未完成")
+    regions = view["data"]
     return [
         RegionOut(
             name=r["name"],
@@ -51,28 +55,40 @@ async def list_regions(
 
 @router.get("/bundles", response_model=list[BundleOut])
 async def list_bundles(
-    region: str = Query(...),
+    region: str = Query(..., min_length=1, max_length=32),
     credential_id: int | None = Query(None),
     user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> list[BundleOut]:
-    ak, sk, proxy_url = _keys(user, credential_id)
     try:
-        items = await asyncio.to_thread(ls.get_bundles, ak, sk, region, proxy_url=proxy_url)
-    except ls.LightsailError as exc:
-        raise HTTPException(status_code=400, detail=exc.message)
+        validate_region(region)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    _keys(user, credential_id)
+    view = await cached_call(db.get_bind(), user, get_credential(user, credential_id), "catalog", "bundles:"+region,
+                             86400, ls.get_bundles, region, wait=True)
+    if view["data"] is None:
+        raise HTTPException(status_code=400, detail=view["error"] or "目录刷新未完成")
+    items = view["data"]
     return [BundleOut(**b) for b in items if b.get("is_active", True)]
 
 
 @router.get("/blueprints", response_model=list[BlueprintOut])
 async def list_blueprints(
-    region: str = Query(...),
+    region: str = Query(..., min_length=1, max_length=32),
     credential_id: int | None = Query(None),
     user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> list[BlueprintOut]:
-    ak, sk, proxy_url = _keys(user, credential_id)
     try:
-        items = await asyncio.to_thread(ls.get_blueprints, ak, sk, region, proxy_url=proxy_url)
-    except ls.LightsailError as exc:
-        raise HTTPException(status_code=400, detail=exc.message)
+        validate_region(region)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    _keys(user, credential_id)
+    view = await cached_call(db.get_bind(), user, get_credential(user, credential_id), "catalog", "blueprints:"+region,
+                             86400, ls.get_blueprints, region, wait=True)
+    if view["data"] is None:
+        raise HTTPException(status_code=400, detail=view["error"] or "目录刷新未完成")
+    items = view["data"]
     active = [b for b in items if b.get("is_active", True)]
     return [BlueprintOut(**b) for b in active]

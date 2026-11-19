@@ -82,6 +82,11 @@ def _record_account_identity(cred: AwsCredential, account_id: str | None) -> Non
         cred.last_confirmed_account_id = account_id
 
 
+def _invalidate_snapshots(db, credential_id):
+    from app.services.snapshots import invalidate_credential
+    invalidate_credential(db, credential_id)
+
+
 def _parse_proxy_or_400(value: str | None) -> str | None:
     try:
         return parse_proxy_url(value)
@@ -285,6 +290,8 @@ def update_credential(
         else:
             cred.is_default = True
 
+    if keys_updated or proxy_changed:
+        _invalidate_snapshots(db, cred.id)
     db.add(cred)
     db.flush()
     reconcile_auto_stop_conflicts(db, user)
@@ -339,17 +346,20 @@ def validate_one(
         ls.validate_credentials(ak, sk, proxy_url)
     except ls.LightsailError as exc:
         _record_account_identity(cred, None)
+        _invalidate_snapshots(db, cred.id)
         reconcile_auto_stop_conflicts(db, user)
         db.commit()
         raise HTTPException(status_code=400, detail=f"校验失败: {exc.message}")
     except Exception as exc:  # noqa: BLE001
         _record_account_identity(cred, None)
+        _invalidate_snapshots(db, cred.id)
         reconcile_auto_stop_conflicts(db, user)
         db.commit()
         raise HTTPException(status_code=400, detail=sanitize_error_message(str(exc)))
     _record_account_identity(cred, _account_identity(ak, sk, proxy_url))
     cred.last_validated_at = datetime.now(timezone.utc)
     _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
+    _invalidate_snapshots(db, cred.id)
     db.add(cred)
     reconcile_auto_stop_conflicts(db, user)
     db.commit()
@@ -621,6 +631,7 @@ def put_compat(
             message=body.account_label or mask_access_key(body.access_key_id.strip()),
         )
     )
+    _invalidate_snapshots(db, default.id if default else cred.id)
     reconcile_auto_stop_conflicts(db, user)
     db.commit()
     db.refresh(user)

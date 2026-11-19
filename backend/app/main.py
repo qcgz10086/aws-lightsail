@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.database import SessionLocal, init_db
-from app.routers import auth, billing, billing_v2, catalog, credentials, instances, metrics, users
+from app.routers import auth, billing, billing_v2, cache_v2, catalog, credentials, instances, metrics, users
 from app.seed import seed_admin
 from app.services.collector import start_scheduler, stop_scheduler
 
@@ -29,6 +29,8 @@ async def lifespan(_: FastAPI):
     logger.info("Lightsail Manager API 已启动")
     yield
     stop_scheduler()
+    from app.services.snapshots import shutdown_refreshes
+    shutdown_refreshes()
     logger.info("Lightsail Manager API 已停止")
 
 
@@ -80,6 +82,7 @@ app.include_router(instances.router, prefix="/api")
 app.include_router(metrics.router, prefix="/api")
 app.include_router(billing.router, prefix="/api")
 app.include_router(billing_v2.router, prefix="/api")
+app.include_router(cache_v2.router, prefix="/api")
 
 
 @app.get("/api/health")

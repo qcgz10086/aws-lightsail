@@ -447,16 +447,15 @@ def traffic_for_instance(
     preloaded: bool = False,
 ) -> dict | None:
     ym = current_year_month()
-    q = db.query(TrafficUsage).filter(
-        TrafficUsage.user_id == user.id,
-        TrafficUsage.region == region,
-        TrafficUsage.instance_name == name,
-        TrafficUsage.year_month == ym,
-    )
-    if credential_id is not None:
-        q = q.filter(TrafficUsage.credential_id == credential_id)
-    row = usage if preloaded else q.filter(TrafficUsage.account_id == (account_id or "")).first()
+    row = usage
     if not preloaded:
+        q = db.query(TrafficUsage).filter(
+            TrafficUsage.user_id == user.id, TrafficUsage.region == region,
+            TrafficUsage.instance_name == name, TrafficUsage.year_month == ym,
+            TrafficUsage.account_id == (account_id or ""))
+        if credential_id is not None:
+            q = q.filter(TrafficUsage.credential_id == credential_id)
+        row = q.first()
         setting = get_setting(db, user.id, region, name, credential_id)
     limit = effective_limit_gb(user, setting)
     if row is None:

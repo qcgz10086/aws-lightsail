@@ -19,13 +19,20 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(false)
   const [form] = Form.useForm()
   const requestVersion = useRef(0)
+  const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pollStarted = useRef(0)
   const load = async () => {
     const version = ++requestVersion.current
     setLoading(true)
     try {
       const params = filterCred === 'all' ? {} : { credential_id: filterCred }
       const res = await api.get<BillingV2Summary>('/v2/billing/summary', { params })
-      if (version === requestVersion.current) setSummary(res.data)
+      if (version === requestVersion.current) {
+        setSummary(res.data)
+        if (res.data.refreshing && Date.now() - pollStarted.current < 30000) {
+          pollTimer.current = setTimeout(() => void load(), 500)
+        }
+      }
     } catch (error) {
       if (version === requestVersion.current) message.error(getErrorMessage(error))
     } finally {
@@ -35,11 +42,15 @@ export default function BillingPage() {
   useEffect(() => {
     if (user?.has_credentials) {
       setSummary(null)
+      pollStarted.current = Date.now()
       void load()
       void api.get<CredentialOut>('/credentials').then((res) => setCreds(res.data.items || []))
         .catch((error) => message.error(getErrorMessage(error)))
     }
-    return () => { requestVersion.current += 1 }
+    return () => {
+      requestVersion.current += 1
+      if (pollTimer.current) clearTimeout(pollTimer.current)
+    }
   }, [user?.has_credentials, filterCred])
 
   if (!user?.has_credentials) return <Alert type="info" showIcon message="请先绑定 AWS 凭证"
@@ -79,12 +90,24 @@ export default function BillingPage() {
       <Space wrap><Select value={filterCred} onChange={setFilterCred} style={{ minWidth: 220 }} options={[
         { value: 'all', label: '全部确认账号（重复 Key 合并）' }, ...creds.map((cred) => ({ value: cred.id,
           label: `${cred.account_label || '凭证'} #${cred.id} · ${cred.account_id || '身份未知'}` }))]} />
-        <Button loading={loading} type="primary" onClick={() => void load()}>刷新</Button></Space>
+        <Button loading={loading} type="primary" onClick={async () => {
+          try {
+            if (pollTimer.current) clearTimeout(pollTimer.current)
+            pollStarted.current = Date.now()
+            await api.post('/v2/refresh', { kind: 'billing',
+              credential_id: filterCred === 'all' ? null : filterCred })
+            void load()
+          } catch (error) { message.error(getErrorMessage(error)) }
+        }}>刷新</Button></Space>
     </Space>
     <Alert type="info" showIcon message="金额按币种分别汇总；不做汇率换算"
       description="费用按 UnblendedCost 账单行和记录类型统计。Credit 冲正、退款和折扣分别显示；缺失不显示为零。官方余额和官方估算余额分开；手动记录不叠加官方余额，也不从账号总抵扣推算每笔剩余。" />
     {summary && summary.status !== 'ok' ? <Alert type="warning" showIcon message="存在未知身份或部分查询失败"
       description="下列汇总只包含成功返回的数据，不代表全部账号总额。请查看各账号费用、预测和赠金的独立状态。" /> : null}
+    {summary?.stale ? <Alert type="warning" showIcon message="正在显示最近成功快照，部分数据已过期"
+      description="保留的旧值不代表本次刷新成功；各账号分区显示最近成功时间和错误。" /> : null}
+    {summary?.refreshing ? <Alert type="info" showIcon message="后台刷新中，已完成的数据先行显示"
+      description="本页最多自动跟进30秒；仍未完成时可稍后点击刷新。" /> : null}
     <Card title={`费用汇总 · ${summary?.year_month || '—'}（成功数据小计）`}>
       <Table rowKey="currency" loading={loading} dataSource={summary?.currencies || []}
         columns={currencyColumns} pagination={false} scroll={{ x: 1200 }} />
@@ -104,7 +127,13 @@ export default function BillingPage() {
       <Space direction="vertical" style={{ width: '100%' }}>
         {(['costs', 'forecast', 'credits'] as const).map((key) => <div key={key}>
           {{ costs: '费用', forecast: '本月剩余期间预测', credits: '官方赠金' }[key]}：
-          {statusTag(account[key].status)}{account[key].error || ''}</div>)}
+          {statusTag(account[key].status)}{account[key].error || ''}
+          {account[key].cache ? <Typography.Text type="secondary">
+            {account[key].cache?.stale ? ' · 已过期' : ''}
+            {account[key].cache?.refreshing ? ' · 刷新中' : ''}
+            {` · 最近成功：${account[key].cache?.last_success_at || '无'}`}
+            {account[key].cache?.error ? ` · ${account[key].cache?.error}` : ''}
+          </Typography.Text> : null}</div>)}
         <Table rowKey={(row) => `${row.currency}/${row.service}`} dataSource={account.costs.by_service || []}
           pagination={false} scroll={{ x: 1000 }} columns={[{ title: '服务', dataIndex: 'service' }, ...currencyColumns]} />
         <Table rowKey={(row, index) => `${account.account_id}/${row.credit_id || index}`}

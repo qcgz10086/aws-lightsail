@@ -480,6 +480,12 @@ class T02Tests(unittest.TestCase):
         from app.deps import get_current_user
         app.dependency_overrides[get_current_user] = lambda: self.user
         self.addCleanup(lambda: app.dependency_overrides.pop(get_current_user, None))
+        # T04 adds persistent snapshot bookkeeping on cold reads. Measure the hot
+        # route separately so policy/settings/usage SQL must stay independent of N.
+        with patch("app.routers.instances.ls.get_regions", return_value=[{"name": "us-east-1"}]), \
+             patch("app.routers.instances.ls.list_instances_in_region", return_value=raw):
+            warm = self.client.get("/api/instances", headers=self.auth())
+            self.assertEqual(warm.status_code, 200, warm.text)
         statements = []
         def count_statement(_conn, _cursor, statement, _parameters, _context, _executemany):
             if statement.lstrip().upper().startswith("SELECT"):
@@ -491,8 +497,8 @@ class T02Tests(unittest.TestCase):
                 response = self.client.get("/api/instances", headers=self.auth())
             self.assertEqual(response.status_code, 200, response.text)
             self.assertEqual(len(response.json()), 24)
-            regions.assert_called_once()
-            self.assertLessEqual(len(statements), 6, f"24 instances issued {len(statements)} SELECTs")
+            regions.assert_not_called()
+            self.assertLessEqual(len(statements), 8, f"24 cached instances issued {len(statements)} SELECTs")
         finally:
             event.remove(self.db.bind, "before_cursor_execute", count_statement)
 
