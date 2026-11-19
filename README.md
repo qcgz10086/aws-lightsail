@@ -278,15 +278,19 @@ Vite 已将 `/api` 代理到 `http://127.0.0.1:8000`。
 | GET | `/api/credentials/{id}/regions/{region}/status` | 查询某区域的启用状态（每分钟 10 次限流） |
 | POST | `/api/credentials/{id}/regions/{region}/enable` | 启用某区域（opt-in 区域，每分钟 5 次限流） |
 | GET | `/api/catalog/regions?credential_id=` | 区域（可指定凭证） |
-| GET | `/api/instances?credential_id=` | 跨区实例列表（空=全部凭证） |
-| POST | `/api/instances` | 创建（body 可带 credential_id） |
-| POST | `/api/instances/{region}/{name}/start\|stop\|reboot\|change-ip?credential_id=` | 生命周期 |
+| GET | `/api/v2/instances?credential_id=&region=` | 按 AWS 账号去重的实例快照、范围状态及刷新时间 |
+| POST | `/api/v2/refresh` | 刷新指定数据域与范围，202 表示已接受查询刷新 |
+| POST | `/api/v2/tasks` | 创建、启停、重启、换 IP、删除任务；携带 Idempotency-Key，202 返回 task_id |
+| GET | `/api/v2/tasks`、`/api/v2/tasks/{task_id}` | 当前用户的持久任务列表、步骤与结果 |
+| POST | `/api/instances` | 兼容创建入口，返回持久任务接受结果 |
+| POST | `/api/instances/{region}/{name}/start\|stop\|reboot\|change-ip?credential_id=` | 兼容生命周期入口，返回持久任务接受结果 |
 | PATCH | `/api/instances/{region}/{name}/settings` | 限额 / **auto_stop_on_limit** / 备注 |
 | DELETE | `/api/instances/{region}/{name}` | 删除+释放静态 IP |
 | GET | `/api/traffic/summary` | 流量汇总 |
 | POST | `/api/traffic/sync` | 手动同步流量（并执行已勾选的超限关机） |
-| GET | `/api/billing/summary?credential_id=` | 本月费用（Cost Explorer）+ 官方赠金（Billing GetCredits）+ 手动赠金记录 |
-| GET/POST | `/api/billing/credits` | 列出 / 新增赠金记录（手动录入，补充用） |
+| GET | `/api/v2/billing/summary?credential_id=` | 分账号、分币种的精确费用、预测、官方赠金和独立刷新状态 |
+| GET | `/api/billing/credits` | 兼容的手动赠金记录列表 |
+| POST | `/api/v2/billing/credits` | 新增手动赠金记录，金额以十进制字符串提交 |
 | DELETE | `/api/billing/credits/{id}` | 删除自己的赠金记录 |
 
 ## 账单与赠金
@@ -303,12 +307,13 @@ Vite 已将 `/api` 代理到 `http://127.0.0.1:8000`。
 
 ### 本月费用（Cost Explorer）
 
-- 本月费用：`GetCostAndUsage`，MONTHLY，`UnblendedCost` + `NetUnblendedCost`，按 SERVICE 分组；已抵扣 = 总费用 − 净费用；Lightsail 费用为服务名含 Lightsail 的合计。
-- 本月预测：`GetCostForecast`（UNBLENDED_COST），预测失败时显示为“—”，不影响主汇总。
+- 本月费用：`GetCostAndUsage`，MONTHLY，按 SERVICE 和 RECORD_TYPE 分组读取 `UnblendedCost`。Credit、退款、折扣保留各自带符号账单行，使用 Decimal 计算并以十进制字符串返回；不同币种单列，不跨币种相加。
+- 同一 AWS 账号的多组凭证只计一次。各账号的费用、预测、官方赠金独立成功或失败；旧快照显示最近成功时间、过期和错误状态。
+- 本月预测使用 `GetCostForecast`（UNBLENDED_COST）：只累加今天之后的预测，再与已发生净费用组成完整月预测，避免今日重复。预测失败显示不可用，不显示为零。
 
 ### 手动赠金记录（补充）
 
-- 手动记录的剩余是**估算**：剩余估算 = 赠金总额 − 自开始日起 Cost Explorer 累计已抵扣额（Unblended − Net），与官方赠金分开显示，不要混用。
+- 手动赠金不按账号累计抵扣推算逐笔余额。只有 AWS 账号、币种和 Credit ID 匹配时才关联官方赠金；匹配后不重复汇总。归属不明确的旧记录保留为待归属，历史 REAL 金额明确标记为浮点近似值。
 - 手动记录不会自动插入：如需补充官方赠金之外的记录，请按官方 Credits 页在账单页手动添加（名称、总额、开始日期、到期日、Credit ID、备注）。
 
 使用前需要：
@@ -326,6 +331,21 @@ Vite 已将 `/api` 代理到 `http://127.0.0.1:8000`。
 6. 不要将 `.env` 提交到公开仓库
 
 > 依赖审计说明：`pip-audit` 在最新依赖下仍报 3 项无修复版本的告警，均已逐项核对不可达——`python-jose` PYSEC-2026-4298（需攻击者持有服务的非对称公钥且算法不限定；本应用只有 HS256 对称密钥且解码显式限定算法）；`ecdsa` PYSEC-2026-1325（Minerva 时序攻击，需调用 ecdsa 签名；本应用只用 HS256，从不调 ecdsa，且 0.19.2 已是最新版、无修复版本）。`npm audit` 0 漏洞。
+
+## 构建、检查与恢复
+
+前端使用已提交的 `frontend/package-lock.json`；本机、CI 和 Docker 均运行 `npm ci`，`npm run build` 包含 TypeScript 检查。后端 Python 3.12 镜像通过 wheel 阶段构建依赖，运行层不含 gcc，仍以非 root 单 worker 运行。两个容器之外无需队列服务。
+
+```bash
+npm ci --prefix frontend
+npm test --prefix frontend
+npm run build --prefix frontend
+python tools/optimization/test_backend_offline.py
+```
+
+后端测试入口禁止真实 AWS 传输。迁移测试需要完整 Git 历史，CI 已设置 `fetch-depth: 0`。测试应在一次性数据库上运行。
+
+升级与回退必须将数据库和前后端镜像作为一组处理，操作步骤见 [升级与恢复](docs/optimization/RECOVERY.md)。202 只代表持久任务已接受，未知 AWS 写入结果在任务中心等待核对；不要通过回退数据库绕过未解决任务的资源锁。
 
 ## 目录结构
 

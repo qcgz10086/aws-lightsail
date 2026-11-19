@@ -305,6 +305,10 @@ def apply_v1(conn, metadata, rebuilds):
         if table.name not in tables(conn):
             create_table(conn, table)
         for index in table.indexes:
+            # The unversioned T00 schema gains identity columns in v2/v3.
+            # Those migrations create their indexes after adding the columns.
+            if not {column.name for column in index.columns} <= columns(conn, table.name):
+                continue
             conn.execute(str(CreateIndex(index, if_not_exists=True).compile(dialect=sqlite.dialect())))
 
 
