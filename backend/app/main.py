@@ -3,10 +3,13 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.responses import JSONResponse
 
 from app.config import get_settings
 from app.database import SessionLocal, init_db
-from app.routers import auth, billing, billing_v2, cache_v2, catalog, credentials, instances, metrics, users
+from app.routers import auth, billing, billing_v2, cache_v2, catalog, credentials, instances, metrics, tasks, users
 from app.seed import seed_admin
 from app.services.collector import start_scheduler, stop_scheduler
 
@@ -25,13 +28,22 @@ async def lifespan(_: FastAPI):
         seed_admin(db)
     finally:
         db.close()
+    from app.services.task_handlers import install_handlers
+    from app.services.task_queue import queue_for
+    from app import database
+    install_handlers()
+    queue = queue_for(database.engine)
+    queue.recover()
     start_scheduler()
     logger.info("Lightsail Manager API 已启动")
-    yield
-    stop_scheduler()
-    from app.services.snapshots import shutdown_refreshes
-    shutdown_refreshes()
-    logger.info("Lightsail Manager API 已停止")
+    try:
+        yield
+    finally:
+        stop_scheduler()
+        queue.shutdown()
+        from app.services.snapshots import shutdown_refreshes
+        shutdown_refreshes()
+        logger.info("Lightsail Manager API 已停止")
 
 
 settings = get_settings()
@@ -46,6 +58,15 @@ app = FastAPI(
     openapi_url="/openapi.json" if settings.enable_docs else None,
 )
 
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(request: Request, exc: RequestValidationError):
+    if request.url.path.startswith("/api/v2/tasks") or (request.url.path == "/api/instances" and request.method == "POST"):
+        # Pydantic's default error includes the entire rejected input, which can
+        # contain a password even when the error is another missing member.
+        return JSONResponse(status_code=422, content={"detail": "任务请求字段无效，请检查必填项与格式"})
+    return await request_validation_exception_handler(request, exc)
+
 # R-8：默认不放行任何跨域来源，只有 CORS_ORIGINS 里明确列出的才放行；
 # 凭据只在有明确来源时才允许；方法与请求头收敛到实际用到的范围。
 # 生产由 nginx 同源反代，不依赖 CORS。
@@ -55,7 +76,7 @@ app.add_middleware(
     allow_origins=_cors_origins,
     allow_credentials=bool(_cors_origins),
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_headers=["Authorization", "Content-Type", "Idempotency-Key"],
 )
 
 
@@ -83,6 +104,7 @@ app.include_router(metrics.router, prefix="/api")
 app.include_router(billing.router, prefix="/api")
 app.include_router(billing_v2.router, prefix="/api")
 app.include_router(cache_v2.router, prefix="/api")
+app.include_router(tasks.router, prefix="/api")
 
 
 @app.get("/api/health")

@@ -7,6 +7,7 @@ from app.models import User
 from app.password_strength import validate_strong_password
 from app.schemas import UserCreate, UserOut, UserUpdate
 from app.security import hash_password
+from app.services.task_queue import has_unresolved_tasks
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -99,6 +100,9 @@ def delete_user(
 ) -> dict:
     if admin.id == user_id:
         raise HTTPException(status_code=400, detail="不能删除当前登录的管理员")
+    db.connection().exec_driver_sql("BEGIN IMMEDIATE")
+    if has_unresolved_tasks(db, user_id=user_id):
+        raise HTTPException(status_code=409, detail="该用户仍有未完成或待核对任务，完成核对后才能删除")
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="用户不存在")

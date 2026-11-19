@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import api, { CredentialItem, CredentialOut, getErrorMessage, readApi } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
+import { submitTask } from '../api/tasks'
 
 interface Region {
   name: string
@@ -386,19 +387,25 @@ export default function CreateInstancePage() {
               message.error('凭证、地区或目录已变化，请等待当前目录加载完成后重新选择')
               return
             }
+            const submitScope = catalogSeqRef.current
+            const currentSubmission = () => isCurrentCatalogScope(credentialId, region, submitScope)
             setSubmitting(true)
             try {
               const { password_confirm: _confirm, ...payload } = values
               if (blueprint.platform) payload.platform = blueprint.platform
               // 未填写时不要传 password 字段，让后端走默认行为
               if (!payload.password) delete payload.password
-              const res = await api.post('/instances', payload, { timeout: 300000 })
-              message.success(res.data.message || '创建请求已提交')
-              navigate('/instances')
+              if (!user) return
+              const task = await submitTask(user.id, { kind: 'create', credential_id: values.credential_id,
+                region: values.region, resource_name: values.instance_name, payload })
+              if (!currentSubmission()) return
+              form.setFieldsValue({ password: undefined, password_confirm: undefined })
+              message.info('建机任务已接受，请查看执行进度')
+              navigate(`/tasks/${task.task_id}`)
             } catch (err) {
-              message.error(getErrorMessage(err))
+              if (currentSubmission()) message.error(getErrorMessage(err))
             } finally {
-              setSubmitting(false)
+              if (currentSubmission()) setSubmitting(false)
             }
           }}
         >

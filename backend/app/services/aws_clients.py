@@ -8,12 +8,13 @@ from botocore.config import Config
 from app.services.aws_limits import limit_client
 
 
-def make_client(service, access_key_id, secret_access_key, region, proxy_url=None, **kwargs):
+def make_client(service, access_key_id, secret_access_key, region, proxy_url=None,
+                *, total_max_attempts=2, before_call=None, **kwargs):
     config = proxy_config(proxy_url).merge(Config(connect_timeout=5, read_timeout=15,
-        retries={"mode": "standard", "total_max_attempts": 2}))
+        retries={"mode": "standard", "total_max_attempts": total_max_attempts}))
     client = boto3.client(service, region_name=region, aws_access_key_id=access_key_id,
                          aws_secret_access_key=secret_access_key, config=config, **kwargs)
-    return limit_client(client, region)
+    return limit_client(client, region, before_call)
 
 
 def group_credentials(credentials):

@@ -743,7 +743,8 @@ class CacheRouteTests(unittest.TestCase):
             await asyncio.to_thread(gate.wait, 3)
             return [{"name": "fixed", "region": "us-east-1", "state": "running"}]
         asyncio.run(read_snapshot(self.engine, scope, 60, old, force=True))
-        with patch("app.routers.instances.ls.stop_instance"):
+        from task_fakes import FakeLightsail
+        with FakeLightsail(name="fixed").installed():
             response = self.client.post(f"/api/instances/us-east-1/fixed/stop?credential_id={self.credential.id}")
         self.assertEqual(response.status_code, 200, response.text)
         gate.set(); self.finish_workers()
@@ -788,7 +789,7 @@ class SnapshotMigrationTests(unittest.TestCase):
             self.assertEqual(file_sha256(path), before)
             migrations.upgrade_database(engine, Base.metadata)
             with closing(sqlite3.connect(path)) as conn:
-                self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,), (2,), (3,), (4,)])
+                self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,), (2,), (3,), (4,), (5,)])
                 self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone(), ("ok",))
                 self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(), [])
                 backup, sha = conn.execute("SELECT backup_path,backup_sha256 FROM schema_migrations WHERE version=4").fetchone()

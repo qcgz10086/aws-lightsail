@@ -34,6 +34,7 @@ from app.services import account as acct
 from app.services import billing as billing_svc
 from app.services import lightsail as ls
 from app.services.traffic import get_credential_proxy_url, reconcile_auto_stop_conflicts
+from app.services.task_queue import has_unresolved_tasks
 
 router = APIRouter(prefix="/credentials", tags=["credentials"])
 logger = logging.getLogger(__name__)
@@ -533,6 +534,7 @@ def delete_credential(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> dict:
+    db.connection().exec_driver_sql("BEGIN IMMEDIATE")
     cred = (
         db.query(AwsCredential)
         .filter(AwsCredential.id == credential_id, AwsCredential.user_id == user.id)
@@ -540,6 +542,8 @@ def delete_credential(
     )
     if not cred:
         raise HTTPException(status_code=404, detail="凭证不存在")
+    if has_unresolved_tasks(db, credential_id=credential_id):
+        raise HTTPException(status_code=409, detail="该凭证仍有未完成或待核对任务，完成核对后才能删除")
     was_default = cred.is_default
     db.delete(cred)
     db.flush()

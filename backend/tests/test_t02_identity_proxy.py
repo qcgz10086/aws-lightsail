@@ -20,7 +20,7 @@ from app.main import app
 from app.models import AwsCredential, InstanceSetting, TrafficUsage, User
 from app.security import encrypt_secret, hash_password
 from app.services import aws_clients, billing, lightsail
-from app.services.collector import sync_user_traffic
+from task_fakes import FakeLightsail, run_traffic as sync_user_traffic
 from app.services.traffic import (conflicting_auto_stop_credentials, reconcile_auto_stop_conflicts,
                                   resolve_auto_stop_policy, build_traffic_summary, current_year_month,
                                   upsert_traffic, traffic_for_instance)
@@ -108,15 +108,12 @@ class T02Tests(unittest.TestCase):
         disabled_setting = self.setting(disabled, auto=False, limit=1)
 
         def scan():
-            with patch("app.services.collector.ls.get_regions", return_value=[{"name": "us-east-1"}]), \
-                 patch("app.services.collector.ls.list_instances_in_region", return_value=[{"name": "server", "state": "running"}]), \
-                 patch("app.services.collector.ls.get_metric_sum_bytes", return_value=2 * 1024**3), \
-                 patch("app.services.collector.ls.stop_instance") as stop:
+            with FakeLightsail().installed() as aws:
                 sync_user_traffic(self.db, self.user)
-                return stop
+                return aws.count("StopInstance")
 
         self.assertEqual(len(reconcile_auto_stop_conflicts(self.db, self.user)), 1)
-        self.assertEqual(scan().call_count, 0)
+        self.assertEqual(scan(), 0)
         with patch("app.routers.credentials.ls.validate_credentials", return_value={}), \
              patch("app.routers.credentials.billing_svc.get_sts_identity", side_effect=RuntimeError("temporary STS failure")), \
              patch("app.routers.credentials._apply_quota_to_cred"):
@@ -128,7 +125,7 @@ class T02Tests(unittest.TestCase):
         self.assertEqual(disabled.last_confirmed_account_id, "123456789012")
         self.assertTrue(disabled_setting.auto_stop_conflict)
         self.assertTrue(enabled_setting.auto_stop_conflict)
-        self.assertEqual(scan().call_count, 0)
+        self.assertEqual(scan(), 0)
 
     def test_credentials_are_scoped_to_user_and_account_identity(self):
         first = self.credential(account_id="123456789012", label="first")
@@ -271,12 +268,9 @@ class T02Tests(unittest.TestCase):
             response = save(cred, values)
             self.assertEqual(response.status_code, 200, response.text)
             self.assertTrue(response.json()["auto_stop_conflict"])
-            with patch("app.services.collector.ls.get_regions", return_value=[{"name": "us-east-1"}]), \
-                 patch("app.services.collector.ls.list_instances_in_region", return_value=[raw]), \
-                 patch("app.services.collector.ls.get_metric_sum_bytes", return_value=2 * 1024**3), \
-                 patch("app.services.collector.ls.stop_instance") as stop:
+            with FakeLightsail().installed() as aws:
                 sync_user_traffic(self.db, self.user)
-                stop.assert_not_called()
+                self.assertEqual(aws.count("StopInstance"), 0)
 
         rejected = save(first, {"resolve_conflict_credential_ids": [first.id]})
         self.assertEqual(rejected.status_code, 409, rejected.text)
@@ -296,12 +290,9 @@ class T02Tests(unittest.TestCase):
                                 "resolve_conflict_token": details.json()["confirmation_token"]})
         self.assertEqual(resolved.status_code, 200, resolved.text)
         self.assertFalse(resolved.json()["auto_stop_conflict"])
-        with patch("app.services.collector.ls.get_regions", return_value=[{"name": "us-east-1"}]), \
-             patch("app.services.collector.ls.list_instances_in_region", return_value=[raw]), \
-             patch("app.services.collector.ls.get_metric_sum_bytes", return_value=2 * 1024**3), \
-             patch("app.services.collector.ls.stop_instance") as stop:
+        with FakeLightsail().installed() as aws:
             sync_user_traffic(self.db, self.user)
-            stop.assert_called_once()
+            self.assertEqual(aws.count("StopInstance"), 1)
 
     def test_conflict_acknowledgement_rejects_uncoordinated_unknown_or_foreign_policies(self):
         first = self.credential(is_default=True)
@@ -436,13 +427,10 @@ class T02Tests(unittest.TestCase):
         second = self.credential(account_id="123456789012", label="second", key="AKIAIOSFODNN8EXAMPLE")
         self.setting(first, auto=True, limit=1)
         self.setting(second, auto=False, limit=1)
-        with patch("app.services.collector.ls.get_regions", return_value=[{"name": "us-east-1"}]) as regions, \
-             patch("app.services.collector.ls.list_instances_in_region", return_value=[{"name": "server", "state": "running"}]), \
-             patch("app.services.collector.ls.get_metric_sum_bytes", return_value=2 * 1024**3), \
-             patch("app.services.collector.ls.stop_instance") as stop:
+        with FakeLightsail().installed() as aws:
             self.assertEqual(sync_user_traffic(self.db, self.user), 1)
-            regions.assert_called_once()
-            stop.assert_not_called()
+            self.assertEqual(aws.count("GetRegions"), 1)
+            self.assertEqual(aws.count("StopInstance"), 0)
             self.db.refresh(first)
             self.assertFalse(resolve_auto_stop_policy(self.db, self.user, first, "us-east-1", "server")[0])
             response = self.client.post(f"/api/credentials/{second.id}/default", headers=self.auth())

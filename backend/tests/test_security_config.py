@@ -243,18 +243,15 @@ class TestCreateInstanceHttp400(unittest.TestCase):
             "allocate_static_ip": False,
             "password": password,
         }
-        client = Mock()
-        client.create_instances.return_value = {}
-        with (
-            patch.object(ls, "make_client", return_value=client),
-            patch.object(ls, "_wait_instance_not_pending", return_value=None),
-        ):
+        from task_fakes import FakeLightsail
+        client = FakeLightsail(name=None)
+        with client.installed():
             return self.client.post("/api/instances", json=body), client
 
     def test_weak_password_returns_400(self):
         resp, client = self._post("weakpass1")
         self.assertEqual(resp.status_code, 400, resp.text)
-        client.create_instances.assert_not_called()
+        self.assertEqual(client.count("CreateInstances"), 0)
 
     def test_short_password_returns_400(self):
         resp, _ = self._post("Ab1!")
@@ -263,7 +260,7 @@ class TestCreateInstanceHttp400(unittest.TestCase):
     def test_strong_password_returns_200_and_ports_closed_by_default(self):
         resp, client = self._post("Abcdefgh123!")
         self.assertEqual(resp.status_code, 200, resp.text)
-        client.put_instance_public_ports.assert_not_called()
+        self.assertEqual(client.count("PutInstancePublicPorts"), 0)
         self.assertNotIn("已开放全部防火墙端口", resp.json()["message"])
 
 

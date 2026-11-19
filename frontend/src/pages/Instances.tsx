@@ -20,6 +20,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import api, { CachedInstancesResponse, CredentialItem, CredentialOut, Instance, readApi,
   SnapshotMetadata, getErrorMessage, invalidateQueryScope, invalidateQueryTags } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
+import { submitTask, TaskKind } from '../api/tasks'
 
 const stateColor: Record<string, string> = {
   running: 'green',
@@ -48,6 +49,9 @@ export default function InstancesPage() {
   const readController = useRef<AbortController | null>(null)
   const actionRefreshTimers = useRef(new Set<ReturnType<typeof setTimeout>>())
   const latestLoad = useRef<() => Promise<void>>(async () => {})
+  const actionScope = useRef('')
+  actionScope.current = `${user?.id}:${sessionKey}:${filterCred}:${filterRegion}`
+  useEffect(() => () => { actionScope.current = '' }, [])
 
   const loadCreds = async (signal?: AbortSignal) => {
     try {
@@ -129,37 +133,19 @@ export default function InstancesPage() {
 
   const runAction = async (inst: Instance, action: string) => {
     const key = `${inst.credential_id}/${inst.region}/${inst.name}:${action}`
+    const scope = actionScope.current
     setActing(key)
     try {
-      const q = { credential_id: inst.credential_id || undefined }
-      if (action === 'delete') {
-        const res = await api.delete(`/instances/${inst.region}/${inst.name}`, { params: q })
-        message.success(res.data.message || '已删除')
-      } else if (action === 'change-ip') {
-        const res = await api.post(`/instances/${inst.region}/${inst.name}/change-ip`, null, {
-          params: q,
-        })
-        message.success(
-          `换 IP 成功：${res.data.old_ip || '-'} → ${res.data.new_ip || res.data.static_ip_name}`,
-        )
-      } else {
-        const res = await api.post(`/instances/${inst.region}/${inst.name}/${action}`, null, {
-          params: q,
-        })
-        message.success(res.data.message || '操作已提交')
-      }
-      invalidateQueryScope('instances', { credential_id: inst.credential_id, region: inst.region })
-      invalidateQueryScope('traffic', { credential_id: inst.credential_id, region: inst.region })
-      invalidateQueryScope('metrics', { credential_id: inst.credential_id, region: inst.region })
-      const timer = setTimeout(() => {
-        actionRefreshTimers.current.delete(timer)
-        void latestLoad.current()
-      }, 1500)
-      actionRefreshTimers.current.add(timer)
+      if (!user || !inst.credential_id) throw new Error('缺少任务归属凭证')
+      const task = await submitTask(user.id, { kind: action.replace('-', '_') as TaskKind,
+        credential_id: inst.credential_id, region: inst.region, resource_name: inst.name })
+      if (scope !== actionScope.current) return
+      message.info('任务已接受，正在确认 AWS 执行结果')
+      navigate(`/tasks/${task.task_id}`)
     } catch (err) {
-      message.error(getErrorMessage(err))
+      if (scope === actionScope.current) message.error(getErrorMessage(err))
     } finally {
-      setActing(null)
+      if (scope === actionScope.current) setActing(null)
     }
   }
 

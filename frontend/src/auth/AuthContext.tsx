@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import api, { establishQueryCacheScope, User, getErrorMessage } from '../api/client'
+import { clearTaskRequests } from '../api/tasks'
 
 interface AuthState {
   user: User | null
@@ -57,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const login = async (username: string, password: string) => {
+    clearTaskRequests()
     const generation = ++sessionGeneration.current
     authReadController.current?.abort()
     authReadController.current = null
@@ -72,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const logout = async () => {
+    clearTaskRequests()
     const generation = ++sessionGeneration.current
     authReadController.current?.abort()
     authReadController.current = null

@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from threading import Lock
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -21,6 +20,7 @@ from app.schemas import (
     OperationResult,
 )
 from app.services import lightsail as ls
+from app.services.task_submission import submit, legacy_result
 from app.services.aws_clients import select_scan_credentials
 from app.services.traffic import (
     NoCredentialsError,
@@ -40,18 +40,6 @@ from app.services.traffic import (
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/instances", tags=["instances"])
-
-_op_locks: dict[str, Lock] = {}
-_op_locks_guard = Lock()
-
-
-def _lock_for(user_id: int, credential_id: int, region: str, name: str) -> Lock:
-    key = f"{user_id}:{credential_id}:{region}:{name}"
-    with _op_locks_guard:
-        if key not in _op_locks:
-            _op_locks[key] = Lock()
-        return _op_locks[key]
-
 
 def _keys(user: User, credential_id: int | None = None):
     """返回 (ak, sk, cred, proxy_url)；代理解密失败同样按 400 处理。"""
@@ -235,192 +223,53 @@ async def get_instance(
 
 
 @router.post("", response_model=CreateInstanceResponse)
-async def create_instance(
-    body: InstanceCreate,
-    user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-) -> CreateInstanceResponse:
-    ak, sk, cred, proxy_url = _keys(user, body.credential_id)
-    lock = _lock_for(user.id, cred.id, body.region, body.instance_name)
-    if not lock.acquire(blocking=False):
-        raise HTTPException(status_code=409, detail="该实例正在执行其他操作，请稍后")
-    try:
-        result = await asyncio.to_thread(
-            ls.create_instance,
-            ak,
-            sk,
-            body.region,
-            body.instance_name,
-            body.blueprint_id,
-            body.bundle_id,
-            body.availability_zone,
-            body.allocate_static_ip,
-            body.password,
-            body.platform,
-            body.open_all_ports,
-            proxy_url=proxy_url,
-        )
-        # 写入默认设置（含用户级 auto_stop 默认）
-        setting = get_setting(db, user.id, body.region, body.instance_name, cred.id)
-        if setting is None:
-            setting = InstanceSetting(
-                user_id=user.id,
-                credential_id=cred.id,
-                region=body.region,
-                instance_name=body.instance_name,
-                auto_stop_on_limit=bool(user.auto_stop_on_limit_default),
-                auto_stop_configured=bool(user.auto_stop_on_limit_default),
-                auto_stop_account_id=cred.account_id if user.auto_stop_on_limit_default else None,
-            )
-            db.add(setting)
-        _log(
-            db,
-            user.id,
-            "create_instance",
-            body.region,
-            body.instance_name,
-            "success",
-            f"{result.get('message')} (credential=#{cred.id})",
-        )
-        db.commit()
-        return CreateInstanceResponse(
-            name=result["name"],
-            region=result["region"],
-            credential_id=cred.id,
-            static_ip_name=result.get("static_ip_name"),
-            message=result.get("message") or "已提交",
-        )
-    except ls.LightsailError as exc:
-        _log(db, user.id, "create_instance", body.region, body.instance_name, "error", exc.message)
-        db.commit()
-        raise HTTPException(status_code=400, detail=exc.message)
-    finally:
-        lock.release()
+async def create_instance(body: InstanceCreate,
+                          idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+                          user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    state = submit(db, user, "create", body.credential_id,
+                   payload=body.model_dump(mode="json"), idempotency_key=idempotency_key)
+    return await legacy_result(db, user, state)
 
 
 @router.post("/{region}/{name}/start", response_model=OperationResult)
-async def start_instance(
-    region: str,
-    name: str,
-    credential_id: int | None = Query(None),
-    user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-) -> OperationResult:
-    return await _simple_op(user, db, region, name, "start", ls.start_instance, credential_id)
+async def start_instance(region: str, name: str, credential_id: int | None = Query(None),
+                         idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+                         user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return await _simple_op(user, db, region, name, "start", credential_id, idempotency_key)
 
 
 @router.post("/{region}/{name}/stop", response_model=OperationResult)
-async def stop_instance(
-    region: str,
-    name: str,
-    credential_id: int | None = Query(None),
-    user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-) -> OperationResult:
-    return await _simple_op(user, db, region, name, "stop", ls.stop_instance, credential_id)
+async def stop_instance(region: str, name: str, credential_id: int | None = Query(None),
+                        idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+                        user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return await _simple_op(user, db, region, name, "stop", credential_id, idempotency_key)
 
 
 @router.post("/{region}/{name}/reboot", response_model=OperationResult)
-async def reboot_instance(
-    region: str,
-    name: str,
-    credential_id: int | None = Query(None),
-    user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-) -> OperationResult:
-    return await _simple_op(user, db, region, name, "reboot", ls.reboot_instance, credential_id)
+async def reboot_instance(region: str, name: str, credential_id: int | None = Query(None),
+                          idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+                          user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return await _simple_op(user, db, region, name, "reboot", credential_id, idempotency_key)
 
 
-async def _simple_op(
-    user: User,
-    db: Session,
-    region: str,
-    name: str,
-    action: str,
-    fn,
-    credential_id: int | None,
-) -> OperationResult:
-    ak, sk, cred, proxy_url = _keys(user, credential_id)
-    lock = _lock_for(user.id, cred.id, region, name)
-    if not lock.acquire(blocking=False):
-        raise HTTPException(status_code=409, detail="该实例正在执行其他操作，请稍后")
-    labels = {"start": "开机", "stop": "关机", "reboot": "重启"}
-    try:
-        await asyncio.to_thread(fn, ak, sk, region, name, proxy_url=proxy_url)
-        msg = f"{labels.get(action, action)}请求已提交，状态稍后刷新"
-        _log(db, user.id, action, region, name, "success", msg)
-        db.commit()
-        return OperationResult(message=msg, region=region, name=name)
-    except ls.LightsailError as exc:
-        _log(db, user.id, action, region, name, "error", exc.message)
-        db.commit()
-        raise HTTPException(status_code=400, detail=exc.message)
-    finally:
-        lock.release()
+async def _simple_op(user, db, region, name, action, credential_id, idempotency_key):
+    state = submit(db, user, action, credential_id, region=region, resource_name=name,
+                   idempotency_key=idempotency_key)
+    return await legacy_result(db, user, state)
 
 
 @router.post("/{region}/{name}/change-ip", response_model=ChangeIpResponse)
-async def change_ip(
-    region: str,
-    name: str,
-    credential_id: int | None = Query(None),
-    user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-) -> ChangeIpResponse:
-    ak, sk, cred, proxy_url = _keys(user, credential_id)
-    lock = _lock_for(user.id, cred.id, region, name)
-    if not lock.acquire(blocking=False):
-        raise HTTPException(status_code=409, detail="该实例正在执行其他操作，请稍后")
-    try:
-        result = await asyncio.to_thread(ls.change_static_ip, ak, sk, region, name, proxy_url=proxy_url)
-        _log(
-            db,
-            user.id,
-            "change_ip",
-            region,
-            name,
-            "success",
-            f"{result.get('old_ip')} -> {result.get('new_ip')} (cred=#{cred.id})",
-        )
-        db.commit()
-        return ChangeIpResponse(**result)
-    except ls.LightsailError as exc:
-        status = 409 if exc.code == "Pending" else 400
-        _log(db, user.id, "change_ip", region, name, "error", exc.message)
-        db.commit()
-        raise HTTPException(status_code=status, detail=exc.message)
-    finally:
-        lock.release()
+async def change_ip(region: str, name: str, credential_id: int | None = Query(None),
+                    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+                    user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return await _simple_op(user, db, region, name, "change_ip", credential_id, idempotency_key)
 
 
 @router.delete("/{region}/{name}", response_model=OperationResult)
-async def delete_instance(
-    region: str,
-    name: str,
-    credential_id: int | None = Query(None),
-    user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-) -> OperationResult:
-    ak, sk, cred, proxy_url = _keys(user, credential_id)
-    lock = _lock_for(user.id, cred.id, region, name)
-    if not lock.acquire(blocking=False):
-        raise HTTPException(status_code=409, detail="该实例正在执行其他操作，请稍后")
-    try:
-        result = await asyncio.to_thread(
-            ls.delete_instance_and_static_ips, ak, sk, region, name, proxy_url=proxy_url
-        )
-        setting = get_setting(db, user.id, region, name, cred.id)
-        if setting:
-            db.delete(setting)
-        _log(db, user.id, "delete_instance", region, name, "success", result.get("message"))
-        db.commit()
-        return OperationResult(message=result.get("message") or "已删除", region=region, name=name)
-    except ls.LightsailError as exc:
-        _log(db, user.id, "delete_instance", region, name, "error", exc.message)
-        db.commit()
-        raise HTTPException(status_code=400, detail=exc.message)
-    finally:
-        lock.release()
+async def delete_instance(region: str, name: str, credential_id: int | None = Query(None),
+                          idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+                          user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return await _simple_op(user, db, region, name, "delete", credential_id, idempotency_key)
 
 
 @router.get("/{region}/{name}/policy-conflict")

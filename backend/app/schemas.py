@@ -114,7 +114,7 @@ class InstanceCreate(BaseModel):
     allocate_static_ip: bool = True
     availability_zone: str | None = None
     credential_id: int | None = None
-    # 自定义登录密码（通过 userData 注入；不落库）
+    # 自定义登录密码通过 userData 注入；持久任务 payload 使用 Fernet 整体加密。
     # 不设 min_length：长度与复杂度统一由 services.lightsail._validate_instance_password
     # 校验并以 LightsailError 返回 400；留空则不启用密码登录，走密钥登录。
     password: str | None = Field(default=None, max_length=64)
@@ -168,6 +168,8 @@ class InstanceOut(BaseModel):
 
 
 class CreateInstanceResponse(BaseModel):
+    task_id: str | None = None
+    status: str | None = None
     name: str
     region: str
     credential_id: int | None = None
@@ -176,6 +178,8 @@ class CreateInstanceResponse(BaseModel):
 
 
 class ChangeIpResponse(BaseModel):
+    task_id: str | None = None
+    status: str | None = None
     instance_name: str
     region: str
     old_ip: str | None = None
@@ -274,6 +278,8 @@ class MessageOut(BaseModel):
 
 
 class OperationResult(BaseModel):
+    task_id: str | None = None
+    status: str | None = None
     message: str
     region: str
     name: str

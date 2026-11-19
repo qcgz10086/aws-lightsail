@@ -16,7 +16,8 @@ from sqlalchemy.dialects import sqlite
 
 from app.sqlite_backup import check_database, snapshot_database, sync_directory, verify_migration_snapshot
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
+T06_TABLES = {"operation_tasks", "operation_task_steps", "operation_task_locks"}
 LEGACY_UNIQUE_KEYS = {
     "aws_credentials": ("user_id",),
     "instance_settings": ("user_id", "region", "instance_name"),
@@ -196,6 +197,26 @@ def apply_v4(conn, metadata):
             conn.execute(str(CreateIndex(index).compile(dialect=sqlite.dialect())))
 
 
+def apply_v5(conn, metadata):
+    for name in ("operation_tasks", "operation_task_steps", "operation_task_locks"):
+        if name not in tables(conn):
+            table = metadata.tables[name]
+            create_table(conn, table)
+            for index in table.indexes:
+                conn.execute(str(CreateIndex(index, if_not_exists=True).compile(dialect=sqlite.dialect())))
+
+
+def metadata_for_version(metadata, version):
+    selected = MetaData()
+    for table in metadata.sorted_tables:
+        if version < 4 and table.name == "data_snapshots":
+            continue
+        if version < 5 and table.name in T06_TABLES:
+            continue
+        table.to_metadata(selected)
+    return selected
+
+
 def apply_v3(conn, metadata):
     if "credit_records" in tables(conn):
         add_columns(conn, "credit_records", {
@@ -279,6 +300,8 @@ def apply_v1(conn, metadata, rebuilds):
         # Historical manual records remain unassigned; T03 resolves ownership explicitly.
         add_columns(conn, "credit_records", {"credential_id": "INTEGER REFERENCES aws_credentials(id) ON DELETE SET NULL"})
     for table in metadata.sorted_tables:
+        if table.name in T06_TABLES:
+            continue
         if table.name not in tables(conn):
             create_table(conn, table)
         for index in table.indexes:
@@ -396,11 +419,7 @@ def upgrade_database(engine, metadata: MetaData) -> None:
         existing = tables(conn)
         if "schema_migrations" in existing:
             current_version = validate_ledger(conn)
-            previous_metadata = MetaData()
-            for table in metadata.sorted_tables:
-                if table.name != "data_snapshots":
-                    table.to_metadata(previous_metadata)
-            validation_metadata = previous_metadata if current_version < 4 else metadata
+            validation_metadata = metadata_for_version(metadata, current_version)
             if current_version == 1:
                 validate_schema(conn, validation_metadata, {
                     "aws_credentials": {"account_id", "last_confirmed_account_id", "auto_stop_conflict"},
@@ -448,13 +467,27 @@ def upgrade_database(engine, metadata: MetaData) -> None:
                     if engine.url.query:
                         raise MigrationError("SQLite URI options are unsupported for automatic migration backup")
                     backup = migration_backup(conn, Path(path).resolve(), open_files, version=4)
+            elif current_version == 4:
+                validate_schema(conn, validation_metadata)
+                path = engine.url.database
+                backup = None
+                if path and path != ":memory:":
+                    if engine.url.query:
+                        raise MigrationError("SQLite URI options are unsupported for automatic migration backup")
+                    backup = migration_backup(conn, Path(path).resolve(), open_files, version=5)
             else:
                 validate_schema(conn, metadata)
             if current_version < 4:
                 apply_v4(conn, metadata)
-                validate_schema(conn, metadata)
+                validate_schema(conn, metadata_for_version(metadata, 4))
                 conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
                     4, "T04 SQLite snapshots and refresh leases", datetime.now(timezone.utc).isoformat(),
+                    backup["path"] if backup else None, backup["sha256"] if backup else None))
+            if current_version < 5:
+                apply_v5(conn, metadata)
+                validate_schema(conn, metadata)
+                conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
+                    5, "T06 durable operation tasks and recovery locks", datetime.now(timezone.utc).isoformat(),
                     backup["path"] if backup else None, backup["sha256"] if backup else None))
             conn.commit()
             return
@@ -480,6 +513,7 @@ def upgrade_database(engine, metadata: MetaData) -> None:
         apply_v2(conn, metadata)
         apply_v3(conn, metadata)
         apply_v4(conn, metadata)
+        apply_v5(conn, metadata)
         validate_schema(conn, metadata)
         conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
             1, "T01 baseline schema", datetime.now(timezone.utc).isoformat(),
@@ -493,6 +527,9 @@ def upgrade_database(engine, metadata: MetaData) -> None:
             backup["path"] if backup else None, backup["sha256"] if backup else None))
         conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
             4, "T04 SQLite snapshots and refresh leases", datetime.now(timezone.utc).isoformat(),
+            backup["path"] if backup else None, backup["sha256"] if backup else None))
+        conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
+            5, "T06 durable operation tasks and recovery locks", datetime.now(timezone.utc).isoformat(),
             backup["path"] if backup else None, backup["sha256"] if backup else None))
         conn.commit()
     except BaseException as exc:

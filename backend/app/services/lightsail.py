@@ -585,7 +585,7 @@ def create_instance(
         client = make_client(access_key_id, secret_access_key, region, proxy_url)
         az = availability_zone
         if not az:
-            regions = get_regions(access_key_id, secret_access_key)
+            regions = get_regions(access_key_id, secret_access_key, proxy_url=proxy_url)
             match = next((r for r in regions if r["name"] == region), None)
             azs = (match or {}).get("availability_zones") or []
             az = azs[0] if azs else f"{region}a"

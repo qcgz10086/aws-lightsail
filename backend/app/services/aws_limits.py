@@ -13,7 +13,7 @@ def is_mutation(operation):
     return not operation.startswith(("Get", "List", "Describe", "Head"))
 
 
-def call_with_limits(fn, operation, parameters, region=""):
+def call_with_limits(fn, operation, parameters, region="", before_call=None):
     mutation = is_mutation(operation)
     resources = parameters.get("instanceNames") or [parameters.get("instanceName") or parameters.get("staticIpName") or "account-write"]
     locks = []
@@ -34,15 +34,17 @@ def call_with_limits(fn, operation, parameters, region=""):
         if mutation:
             stack.enter_context(_writes)
         stack.enter_context(_all)
+        if before_call is not None:
+            before_call()
         return fn(operation, parameters)
 
 
-def limit_client(client, region):
+def limit_client(client, region, before_call=None):
     if getattr(client._make_api_call, "_lightsail_limited", False) is True:
         return client
     original = client._make_api_call
     def bounded(operation, parameters):
-        return call_with_limits(original, operation, parameters, region)
+        return call_with_limits(original, operation, parameters, region, before_call)
     bounded._lightsail_limited = True
     client._make_api_call = bounded
     return client

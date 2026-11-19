@@ -1,12 +1,14 @@
 import { Alert, Button, Card, Col, Row, Space, Table, Tag, Typography, message, Statistic, Select } from 'antd'
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import api, { CredentialItem, CredentialOut, readApi, TrafficSummary, getErrorMessage,
   invalidateQueryScope } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
+import { submitTask } from '../api/tasks'
 
 export default function TrafficPage() {
   const { user, sessionKey } = useAuth()
+  const navigate = useNavigate()
   const [data, setData] = useState<TrafficSummary | null>(null)
   const [creds, setCreds] = useState<CredentialItem[]>([])
   const [filterCred, setFilterCred] = useState<number | 'all'>('all')
@@ -17,6 +19,9 @@ export default function TrafficPage() {
   const requestVersion = useRef(0)
   const readController = useRef<AbortController | null>(null)
   const latestLoad = useRef<() => Promise<void>>(async () => {})
+  const actionScope = useRef('')
+  actionScope.current = `${user?.id}:${sessionKey}:${filterCred}`
+  useEffect(() => () => { actionScope.current = '' }, [])
 
   const load = async () => {
     readController.current?.abort()
@@ -91,20 +96,26 @@ export default function TrafficPage() {
             type="primary"
             loading={syncing}
             onClick={async () => {
+              const scope = actionScope.current
               setSyncing(true)
               try {
-                const res = await api.post('/traffic/sync', null, {
-                  params: filterCredRef.current === 'all' ? undefined : { credential_id: filterCredRef.current },
-                })
-                const credential_id = filterCredRef.current === 'all' ? undefined : filterCredRef.current
-                invalidateQueryScope('traffic', { credential_id })
-                invalidateQueryScope('instances', { credential_id })
-                message.success(res.data.message || '同步完成')
-                await latestLoad.current()
+                if (!user) return
+                const groups = new Map<string, CredentialItem>()
+                for (const cred of creds.filter((c) => filterCred === 'all' || c.id === filterCred)) {
+                  const identity = cred.account_id || `credential:${cred.id}`
+                  if (!groups.has(identity) || cred.is_default) groups.set(identity, cred)
+                }
+                for (const cred of groups.values()) {
+                  if (scope !== actionScope.current) return
+                  await submitTask(user.id, { kind: 'traffic_sync', credential_id: cred.id })
+                }
+                if (scope !== actionScope.current) return
+                message.info('流量同步任务已接受，请查看执行进度')
+                navigate('/tasks')
               } catch (err) {
-                message.error(getErrorMessage(err))
+                if (scope === actionScope.current) message.error(getErrorMessage(err))
               } finally {
-                setSyncing(false)
+                if (scope === actionScope.current) setSyncing(false)
               }
             }}
           >

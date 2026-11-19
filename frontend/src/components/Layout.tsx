@@ -27,6 +27,7 @@ export default function AppLayout() {
     { key: '/instances', icon: <CloudServerOutlined />, label: <Link to="/instances">实例</Link> },
     { key: '/create', icon: <PlusOutlined />, label: <Link to="/create">开通实例</Link> },
     { key: '/traffic', icon: <LineChartOutlined />, label: <Link to="/traffic">流量</Link> },
+    { key: '/tasks', icon: <CloudServerOutlined />, label: <Link to="/tasks">任务中心</Link> },
     { key: '/billing', icon: <WalletOutlined />, label: <Link to="/billing">账单</Link> },
     { key: '/credentials', icon: <KeyOutlined />, label: <Link to="/credentials">AWS 凭证</Link> },
     ...(user?.is_admin

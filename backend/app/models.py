@@ -3,6 +3,7 @@ from datetime import date, datetime, timezone
 from sqlalchemy import (
     BigInteger,
     Boolean,
+    CheckConstraint,
     Date,
     DateTime,
     Float,
@@ -238,3 +239,71 @@ class DataSnapshot(Base):
     lease_token: Mapped[str | None] = mapped_column(String(64), nullable=True)
     lease_until: Mapped[float] = mapped_column(Float, nullable=False, default=0)
     updated_at: Mapped[float] = mapped_column(Float, nullable=False, default=0, index=True)
+
+
+class OperationTask(Base):
+    __tablename__ = "operation_tasks"
+    __table_args__ = (
+        UniqueConstraint("user_id", "idempotency_key", name="uq_operation_task_idempotency"),
+        CheckConstraint(
+            "status IN ('queued','running','succeeded','failed','partial','reconciliation_required','cancelled','resolved')",
+            name="ck_operation_task_status",
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    credential_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    account_scope: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    account_id: Mapped[str | None] = mapped_column(String(12), nullable=True)
+    credential_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    kind: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    region: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    resource_name: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    idempotency_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    request_fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
+    encrypted_payload: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="queued", index=True)
+    current_step: Mapped[str | None] = mapped_column(String(96), nullable=True)
+    result_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    worker_token: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    lease_until: Mapped[float] = mapped_column(Float, nullable=False, default=0)
+    attempt: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class OperationTaskStep(Base):
+    __tablename__ = "operation_task_steps"
+    __table_args__ = (
+        UniqueConstraint("task_id", "sequence", name="uq_operation_task_step_sequence"),
+        CheckConstraint("status IN ('intent','succeeded','failed','unknown','compensated')", name="ck_operation_task_step_status"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    task_id: Mapped[str] = mapped_column(String(36), ForeignKey("operation_tasks.id", ondelete="CASCADE"), nullable=False, index=True)
+    sequence: Mapped[int] = mapped_column(Integer, nullable=False)
+    name: Mapped[str] = mapped_column(String(96), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="intent")
+    intent_json: Mapped[str] = mapped_column(Text, nullable=False, default="{}")
+    result_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    operation_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class OperationTaskLock(Base):
+    __tablename__ = "operation_task_locks"
+
+    lock_key: Mapped[str] = mapped_column(String(192), primary_key=True)
+    task_id: Mapped[str] = mapped_column(String(36), ForeignKey("operation_tasks.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    account_scope: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    region: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    resource_name: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    lock_kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    acquired_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
