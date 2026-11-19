@@ -24,7 +24,11 @@ os.environ["PYTHONIOENCODING"] = "utf-8"
 def command(argv, cwd, log):
     started = time.perf_counter()
     result = subprocess.run(argv, cwd=cwd, capture_output=True, env=os.environ.copy(), timeout=240)
-    log.write_bytes(result.stdout + result.stderr)
+    if log.suffix == ".json":
+        log.write_bytes(result.stdout)
+        log.with_suffix(".stderr").write_bytes(result.stderr)
+    else:
+        log.write_bytes(result.stdout + result.stderr)
     return {"argv": list(map(str, argv)), "cwd": str(cwd), "exit": result.returncode,
             "seconds": round(time.perf_counter() - started, 3), "log": log.name}
 
