@@ -1,7 +1,7 @@
 import { Alert, Button, Card, Col, List, Row, Statistic, Tag, Typography, Spin, Space } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import api, { CachedInstancesResponse, Instance, readApi, TrafficSummary, getErrorMessage,
+import api, { CachedInstancesResponse, Instance, readApi, SnapshotMetadata, TrafficSummary, getErrorMessage,
   invalidateQueryScope } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 
@@ -12,6 +12,9 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [instancesRefreshing, setInstancesRefreshing] = useState(false)
+  const [snapshotScopes, setSnapshotScopes] = useState<(SnapshotMetadata & {
+    region: string | null; credential_id: number; account_id?: string | null
+  })[]>([])
   const requestVersion = useRef(0)
   const activeRead = useRef<AbortController | null>(null)
   const trafficRead = useRef<AbortController | null>(null)
@@ -38,6 +41,7 @@ export default function DashboardPage() {
       })
       if (requestVersion.current === version) {
         setInstances(nextInstances.instances)
+        setSnapshotScopes(nextInstances.scopes)
         setInstancesRefreshing(nextInstances.refreshing)
         if (nextInstances.refreshing && Date.now() - pollStarted.current < 30000) {
           if (pollTimer.current) clearTimeout(pollTimer.current)
@@ -70,6 +74,7 @@ export default function DashboardPage() {
     setInstances([])
     setTraffic(null)
     setInstancesRefreshing(false)
+    setSnapshotScopes([])
     pollStarted.current = Date.now()
     void load()
     return () => {
@@ -100,6 +105,12 @@ export default function DashboardPage() {
   const running = instances.filter((i) => i.state === 'running').length
   const overLimit = traffic?.instances.filter((i) => i.over_limit) || []
   const autoStopOver = overLimit.filter((i) => i.auto_stop_on_limit)
+  const failedInstanceScopes = snapshotScopes.filter((scope) =>
+    scope.error || ['error', 'unavailable', 'no_permission', 'invalidated'].includes(scope.status))
+  const hasKnownInstanceScope = snapshotScopes.some((scope) => scope.region
+    && (scope.status === 'fresh' || scope.stale))
+  const emptyTotalUnavailable = instances.length === 0 && failedInstanceScopes.length > 0 && !hasKnownInstanceScope
+  const instanceLabel = failedInstanceScopes.length ? '实例总数（部分范围）' : '实例总数'
 
   return (
     <Spin spinning={loading}>
@@ -121,16 +132,35 @@ export default function DashboardPage() {
 
         {error && <Alert type="error" showIcon message={error} />}
         {instancesRefreshing && <Alert type="info" showIcon message="实例快照后台刷新中，成功区域先行显示" />}
+        {snapshotScopes.some((scope) => scope.stale || scope.error || scope.status === 'no_permission'
+          || scope.status === 'unavailable' || scope.status === 'invalidated' || scope.status === 'error') ? (
+          <Alert type="warning" showIcon message="实例汇总不完整：部分账号或地区数据已过期或不可用"
+            description={<List size="small" dataSource={snapshotScopes.filter((scope) => scope.stale
+              || scope.error || scope.status === 'no_permission' || scope.status === 'unavailable'
+              || scope.status === 'invalidated' || scope.status === 'error')}
+              renderItem={(scope) => <List.Item>
+                <Space direction="vertical" size={0}>
+                  <span>{scope.account_id ? `账号 ${scope.account_id}` : `凭证 #${scope.credential_id}`}
+                    {' / '}{scope.region || '目录'}</span>
+                  {scope.last_success_at ? <Typography.Text type="secondary">
+                    最近成功：{scope.last_success_at}</Typography.Text> : null}
+                  <Typography.Text type={scope.error ? 'danger' : 'secondary'}>
+                    {scope.error || (scope.status === 'no_permission' ? '权限不足' : scope.status)}</Typography.Text>
+                </Space>
+              </List.Item>} />}
+          />
+        ) : null}
 
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={6}>
             <Card>
-              <Statistic title="实例总数" value={instances.length} />
+              <Statistic title={instanceLabel} value={emptyTotalUnavailable ? '—' : instances.length} />
             </Card>
           </Col>
           <Col xs={24} sm={6}>
             <Card>
-              <Statistic title="运行中" value={running} valueStyle={{ color: '#3f8600' }} />
+              <Statistic title={failedInstanceScopes.length ? '运行中（部分范围）' : '运行中'}
+                value={emptyTotalUnavailable ? '—' : running} valueStyle={{ color: '#3f8600' }} />
             </Card>
           </Col>
           <Col xs={24} sm={6}>

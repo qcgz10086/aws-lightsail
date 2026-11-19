@@ -1,7 +1,7 @@
 import { Alert, Button, Card, Form, Input, Select, Switch, Typography, message, Space } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import api, { CredentialItem, CredentialOut, getErrorMessage, invalidateQueryTags, readApi } from '../api/client'
+import api, { CredentialItem, CredentialOut, getErrorMessage, readApi } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 
 interface Region {
@@ -31,6 +31,12 @@ interface RegionOptStatus {
   status: string
   message?: string
 }
+interface RegionIssue {
+  region: string
+  status: string
+  credentialId: number
+  catalogSeq: number
+}
 
 /** 镜像下拉文案：必须带上版本，否则多个 Ubuntu/Debian 会显示成同一项 */
 function blueprintLabel(b: Blueprint): string {
@@ -55,7 +61,7 @@ export default function CreateInstancePage() {
   const [loadingMeta, setLoadingMeta] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [selectedPlatform, setSelectedPlatform] = useState<string | undefined>()
-  const [regionIssue, setRegionIssue] = useState<{ region: string; status: string } | null>(null)
+  const [regionIssue, setRegionIssue] = useState<RegionIssue | null>(null)
   const [enablingRegion, setEnablingRegion] = useState(false)
   // 区域启用轮询定时器：单例，换地区/重复触发时先停掉旧的，卸载时取消，
   // 避免多个 5 分钟循环叠加、旧 region 的成功回调覆盖当前表单（U-4）。
@@ -65,6 +71,8 @@ export default function CreateInstancePage() {
   // 改状态，代次让它直接返回。
   const pollSeqRef = useRef(0)
   const catalogSeqRef = useRef(0)
+  const readyCatalogScope = useRef<string | null>(null)
+  const regionsCredentialScope = useRef<number | null>(null)
   const catalogController = useRef<AbortController | null>(null)
   const credentialLoadSeq = useRef(0)
   const credentialLoadController = useRef<AbortController | null>(null)
@@ -83,6 +91,51 @@ export default function CreateInstancePage() {
   }, [])
   const navigate = useNavigate()
 
+  const catalogScope = (credentialId: number | undefined, region: string | undefined) =>
+    credentialId && region ? `${credentialId}:${region}` : null
+
+  const isCurrentCatalogScope = (credentialId: number, region: string, seq: number) =>
+    seq === catalogSeqRef.current
+    && form.getFieldValue('credential_id') === credentialId
+    && form.getFieldValue('region') === region
+    && regionsCredentialScope.current === credentialId
+
+  const setCurrentRegionIssue = (region: string, status: string, credentialId: number, seq: number) => {
+    if (isCurrentCatalogScope(credentialId, region, seq)) {
+      setRegionIssue({ region, status, credentialId, catalogSeq: seq })
+    }
+  }
+
+  const clearCatalogSelection = () => {
+    catalogSeqRef.current += 1
+    catalogController.current?.abort()
+    stopRegionPolling()
+    readyCatalogScope.current = null
+    regionsCredentialScope.current = null
+    setRegions([])
+    setBundles([])
+    setBlueprints([])
+    setSelectedPlatform(undefined)
+    setRegionIssue(null)
+    setEnablingRegion(false)
+    form.setFieldsValue({ region: undefined, blueprint_id: undefined, bundle_id: undefined,
+      password: undefined, password_confirm: undefined })
+  }
+
+  const clearCatalogChoices = () => {
+    catalogSeqRef.current += 1
+    catalogController.current?.abort()
+    stopRegionPolling()
+    readyCatalogScope.current = null
+    setBundles([])
+    setBlueprints([])
+    setSelectedPlatform(undefined)
+    setRegionIssue(null)
+    setEnablingRegion(false)
+    form.setFieldsValue({ blueprint_id: undefined, bundle_id: undefined, password: undefined,
+      password_confirm: undefined })
+  }
+
   useEffect(() => {
     if (!user?.has_credentials) return
     form.resetFields()
@@ -90,6 +143,11 @@ export default function CreateInstancePage() {
     setRegions([])
     setBundles([])
     setBlueprints([])
+    readyCatalogScope.current = null
+    regionsCredentialScope.current = null
+    setSelectedPlatform(undefined)
+    setRegionIssue(null)
+    setLoadingMeta(true)
     const seq = ++credentialLoadSeq.current
     credentialLoadController.current?.abort()
     const controller = new AbortController()
@@ -104,6 +162,8 @@ export default function CreateInstancePage() {
         if (defaultId) {
           form.setFieldsValue({ credential_id: defaultId })
           await loadRegions(defaultId)
+        } else {
+          setLoadingMeta(false)
         }
       } catch (err) {
         if (!controller.signal.aborted && seq === credentialLoadSeq.current) message.error(getErrorMessage(err))
@@ -119,8 +179,11 @@ export default function CreateInstancePage() {
   }, [user?.has_credentials, user?.id, sessionKey])
 
   const loadRegions = async (credentialId: number) => {
-    const seq = ++catalogSeqRef.current
+    stopRegionPolling()
     catalogController.current?.abort()
+    clearCatalogSelection()
+    const seq = ++catalogSeqRef.current
+    setLoadingMeta(true)
     const controller = new AbortController()
     catalogController.current = controller
     try {
@@ -129,11 +192,12 @@ export default function CreateInstancePage() {
       })
       if (seq !== catalogSeqRef.current || form.getFieldValue('credential_id') !== credentialId) return
       setRegions(res)
-      setBundles([])
-      setBlueprints([])
-      form.setFieldsValue({ region: undefined, blueprint_id: undefined, bundle_id: undefined })
+      regionsCredentialScope.current = credentialId
     } catch (err) {
-      if (!controller.signal.aborted) message.error(getErrorMessage(err))
+      if (!controller.signal.aborted && seq === catalogSeqRef.current
+        && form.getFieldValue('credential_id') === credentialId) message.error(getErrorMessage(err))
+    } finally {
+      if (seq === catalogSeqRef.current) setLoadingMeta(false)
     }
   }
 
@@ -141,6 +205,9 @@ export default function CreateInstancePage() {
     stopRegionPolling()
     const seq = ++catalogSeqRef.current
     catalogController.current?.abort()
+    readyCatalogScope.current = null
+    setBundles([])
+    setBlueprints([])
     const controller = new AbortController()
     catalogController.current = controller
     setLoadingMeta(true)
@@ -166,11 +233,12 @@ export default function CreateInstancePage() {
         return na.localeCompare(nc)
       })
       setBlueprints(bps)
+      readyCatalogScope.current = catalogScope(credentialId, region)
     } catch (err) {
       if (controller.signal.aborted || seq !== catalogSeqRef.current) return
       const msg = getErrorMessage(err)
       if (msg.includes('UnrecognizedClientException')) {
-        await checkRegionOptStatus(region, credentialId, msg)
+        await checkRegionOptStatus(region, credentialId, msg, seq)
       } else {
         message.error(msg)
       }
@@ -179,12 +247,12 @@ export default function CreateInstancePage() {
     }
   }
 
-  const pollRegionStatus = (region: string, credentialId: number) => {
+  const pollRegionStatus = (region: string, credentialId: number, catalogSeq: number) => {
     stopRegionPolling()
     const seq = pollSeqRef.current
     const deadline = Date.now() + 5 * 60 * 1000
     const tick = async () => {
-      if (seq !== pollSeqRef.current) return
+      if (seq !== pollSeqRef.current || !isCurrentCatalogScope(credentialId, region, catalogSeq)) return
       if (Date.now() > deadline) {
         pollTimerRef.current = null
         message.warning('区域启用超时，请稍后手动刷新重试')
@@ -194,29 +262,26 @@ export default function CreateInstancePage() {
         const res = await api.get<RegionOptStatus>(
           `/credentials/${credentialId}/regions/${region}/status`,
         )
-        if (seq !== pollSeqRef.current) return
+        if (seq !== pollSeqRef.current || !isCurrentCatalogScope(credentialId, region, catalogSeq)) return
         if (res.data.status === 'ENABLED') {
           pollTimerRef.current = null
           setRegionIssue(null)
           message.success(`区域 ${region} 已启用`)
-          // 用户可能已经切了别的地区：只在当前选的还是这个地区时才重载
-          if (form.getFieldValue('region') === region) {
-            await loadCatalog(region, credentialId)
-          }
+          await loadCatalog(region, credentialId)
           return
         }
         if (res.data.status === 'DISABLED') {
           pollTimerRef.current = null
-          setRegionIssue({ region, status: 'DISABLED' })
+          setCurrentRegionIssue(region, 'DISABLED', credentialId, catalogSeq)
           return
         }
         // ENABLING / DISABLING / UNKNOWN：继续等
       } catch {
-        if (seq !== pollSeqRef.current) return
+        if (seq !== pollSeqRef.current || !isCurrentCatalogScope(credentialId, region, catalogSeq)) return
         pollTimerRef.current = null
         return
       }
-      if (seq !== pollSeqRef.current) return
+      if (seq !== pollSeqRef.current || !isCurrentCatalogScope(credentialId, region, catalogSeq)) return
       pollTimerRef.current = window.setTimeout(tick, 10000)
     }
     pollTimerRef.current = window.setTimeout(tick, 10000)
@@ -226,48 +291,63 @@ export default function CreateInstancePage() {
     region: string,
     credentialId: number,
     fallbackMsg: string,
+    catalogSeq: number,
   ) => {
     try {
       const res = await api.get<RegionOptStatus>(
         `/credentials/${credentialId}/regions/${region}/status`,
       )
+      if (!isCurrentCatalogScope(credentialId, region, catalogSeq)) return
       const status = res.data.status
       if (status === 'DISABLED') {
-        setRegionIssue({ region, status })
+        setCurrentRegionIssue(region, status, credentialId, catalogSeq)
       } else if (status === 'ENABLING' || status === 'DISABLING') {
-        setRegionIssue({ region, status })
-        void pollRegionStatus(region, credentialId)
+        setCurrentRegionIssue(region, status, credentialId, catalogSeq)
+        void pollRegionStatus(region, credentialId, catalogSeq)
       } else {
         message.error(fallbackMsg)
       }
     } catch {
-      message.error(fallbackMsg)
+      if (isCurrentCatalogScope(credentialId, region, catalogSeq)) message.error(fallbackMsg)
     }
   }
 
   const enableRegion = async () => {
     if (!regionIssue) return
     const credentialId = form.getFieldValue('credential_id') as number | undefined
-    if (!credentialId) return
+    const selectedRegion = form.getFieldValue('region') as string | undefined
+    if (!credentialId || regionIssue.credentialId !== credentialId
+      || regionIssue.catalogSeq !== catalogSeqRef.current
+      || regionsCredentialScope.current !== credentialId
+      || selectedRegion !== regionIssue.region) return
     const region = regionIssue.region
+    const seq = catalogSeqRef.current
+    const isCurrent = () => seq === catalogSeqRef.current
+      && form.getFieldValue('credential_id') === credentialId
+      && form.getFieldValue('region') === region
+      && regionsCredentialScope.current === credentialId
+      && regionIssue.credentialId === credentialId && regionIssue.catalogSeq === seq
     setEnablingRegion(true)
     try {
       const res = await api.post<RegionOptStatus>(
         `/credentials/${credentialId}/regions/${region}/enable`,
       )
+      if (!isCurrent()) return
       if (res.data.status === 'ENABLED') {
         setRegionIssue(null)
         message.success(res.data.message || '区域已启用')
+        setEnablingRegion(false)
         await loadCatalog(region, credentialId)
       } else {
-        setRegionIssue({ region, status: 'ENABLING' })
+        setCurrentRegionIssue(region, 'ENABLING', credentialId, seq)
         message.info(res.data.message || '区域正在启用，生效需要几分钟')
-        void pollRegionStatus(region, credentialId)
+        setEnablingRegion(false)
+        void pollRegionStatus(region, credentialId, seq)
       }
     } catch (err) {
-      message.error(getErrorMessage(err))
+      if (isCurrent()) message.error(getErrorMessage(err))
     } finally {
-      setEnablingRegion(false)
+      if (isCurrent()) setEnablingRegion(false)
     }
   }
 
@@ -293,10 +373,23 @@ export default function CreateInstancePage() {
           layout="vertical"
           initialValues={{ allocate_static_ip: true, open_all_ports: false }}
           onFinish={async (values) => {
+            const credentialId = Number(form.getFieldValue('credential_id'))
+            const region = String(form.getFieldValue('region') || '')
+            const blueprint = blueprints.find((item) => item.blueprint_id === values.blueprint_id)
+            if (Number(values.credential_id) !== credentialId || String(values.region || '') !== region
+              || !region || readyCatalogScope.current !== catalogScope(credentialId, region)
+              || !creds.some((item) => item.id === credentialId)
+              || regionsCredentialScope.current !== credentialId
+              || !regions.some((item) => item.name === region)
+              || !bundles.some((item) => item.bundle_id === values.bundle_id)
+              || !blueprint) {
+              message.error('凭证、地区或目录已变化，请等待当前目录加载完成后重新选择')
+              return
+            }
             setSubmitting(true)
             try {
               const { password_confirm: _confirm, ...payload } = values
-              if (selectedPlatform) payload.platform = selectedPlatform
+              if (blueprint.platform) payload.platform = blueprint.platform
               // 未填写时不要传 password 字段，让后端走默认行为
               if (!payload.password) delete payload.password
               const res = await api.post('/instances', payload, { timeout: 300000 })
@@ -319,7 +412,10 @@ export default function CreateInstancePage() {
                 value: c.id,
                 label: `${c.account_label || '凭证'} #${c.id}${c.is_default ? ' (默认)' : ''} · ${c.access_key_masked}`,
               }))}
-              onChange={(v) => void loadRegions(v)}
+              onChange={(v) => {
+                clearCatalogSelection()
+                void loadRegions(v)
+              }}
             />
           </Form.Item>
 
@@ -334,7 +430,9 @@ export default function CreateInstancePage() {
               }))}
               onChange={(v) => {
                 const cid = form.getFieldValue('credential_id')
-                if (cid) void loadCatalog(v, cid)
+                clearCatalogChoices()
+                if (cid && v) void loadCatalog(v, cid)
+                else setLoadingMeta(false)
               }}
             />
           </Form.Item>
@@ -486,7 +584,10 @@ export default function CreateInstancePage() {
             <Switch />
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" loading={submitting} block>
+          <Button type="primary" htmlType="submit" loading={submitting}
+            disabled={loadingMeta || !readyCatalogScope.current || readyCatalogScope.current !== catalogScope(
+              Number(form.getFieldValue('credential_id')), form.getFieldValue('region'))}
+            block>
             创建
           </Button>
         </Form>
