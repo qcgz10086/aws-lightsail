@@ -1,0 +1,80 @@
+{
+  "base": "1dd5d56c3bc637aeec9439c64f316f7f8f391438",
+  "revision_base": "a6e13413264306fb2d041405d841420945ec7dfb",
+  "product_head": "55d7aeb168340e96bb5e73da721da3260de85d40",
+  "product_tree": "5c59229c9b07b2146c3cba2092ceea202fcb652f",
+  "files": {
+    ".gitattributes": {
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    "final/build.log": {
+      "bytes": 1027,
+      "sha256": "8e6d821f089f751a71371191452a9ad756fa6e5542b24f96489bd0c6549eb303"
+    },
+    "final/compileall.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "final/focused.log": {
+      "bytes": 7974,
+      "sha256": "ac355428521ca6debbfaef0ba4971761721f462316d93e9d94bbddee100b2144"
+    },
+    "final/full.log": {
+      "bytes": 88290,
+      "sha256": "90fd094c25c9ff3ec8f889f1ee0fd9b5af122f19d5839f5648984e10202750c3"
+    },
+    "final/migration.log": {
+      "bytes": 16073,
+      "sha256": "514840968a6f3061ac88e8dcd11af221444a6c6850a211337f293c091b1e1d6e"
+    },
+    "final/performance-base.json": {
+      "bytes": 3234,
+      "sha256": "f19607811829dac6b740ab10afd5d2a1b4da79d48181725e53cca014f7feb1c2"
+    },
+    "final/performance-base.stderr": {
+      "bytes": 6245,
+      "sha256": "20faf3ed6fad08a83aec6911ecaf0417a4d7e10b1613f56d1d35faf021e20b89"
+    },
+    "final/performance-candidate.json": {
+      "bytes": 3220,
+      "sha256": "c7be182f7a97c381641c8ee26812566b27cb0555338f3704e9abe261a7b31783"
+    },
+    "final/performance-candidate.stderr": {
+      "bytes": 6973,
+      "sha256": "f68c92d0effc82cc5bd159f3a18855d8ceec640289916e5b5014504ac3b253cd"
+    },
+    "final/typescript.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "final/verification.json": {
+      "bytes": 13655,
+      "sha256": "86eeb4acb3953c4276881e410150458a5020eec4d0f1767b26313ae6dbb31a56"
+    },
+    "revision4-after.log": {
+      "bytes": 3982,
+      "sha256": "f0516566cc45851c6626a8c3a55527ad3ba3a408f6895cd7bcf3db6aed1f665f"
+    },
+    "revision4-before.log": {
+      "bytes": 5091,
+      "sha256": "90bec9ccbd931427fed86c63ee0c672c4f3ec3e3c4d5c0a6d1f3ddf74a831dbc"
+    },
+    "revision5-after-sts.log": {
+      "bytes": 1471,
+      "sha256": "074b1ad72a4543bedc864ce95cbb8431bf221fcb170c01f0c1616b691f248c9b"
+    },
+    "revision5-before-sts.log": {
+      "bytes": 1502,
+      "sha256": "07f8ea6b50f90bf68563d88fb811e8449efac2b618471950ed1dd8736893b62a"
+    },
+    "revision5-focused.log": {
+      "bytes": 4461,
+      "sha256": "fcaae19bb07064751be16c2c217b339df3f392f6785f80f8c6a3a7575e782634"
+    },
+    "self-check.json": {
+      "bytes": 10116,
+      "sha256": "59b900691747987ca31aa71d48b4605bde899135efde6967cbc46cee900c5fc1"
+    }
+  }
+}
