@@ -116,7 +116,7 @@ try {
         started = performance.now()
         let first = null, complete = null
         try {
-          if (phase === 'refresh_button') await page.getByRole('button', { name: /^刷\s*新$/ }).click()
+          if (phase === 'refresh_button') await page.locator('button').filter({ hasText: /^刷\s*新$/ }).click()
           else if (phase === 'spa_return') await page.getByRole('link', { name: { dashboard: '总览', instances: '实例', billing: '账单' }[name], exact: true }).click()
           else await page.goto(origin + scenario.path, { waitUntil: 'domcontentloaded' })
           while (performance.now() - started < 30000) {
@@ -146,6 +146,9 @@ try {
       console.log(name, sample, results.slice(-4).map(r => r.error || Math.round(r.first_data_ms)))
     }
   }
+} catch (error) {
+  errors.push({ fatal: String(error) })
+  throw error
 } finally {
   await report(errors.length ? 'failed' : 'completed')
   await browser.close(); await proxy.close()

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import api, { establishQueryCacheScope, User, getErrorMessage } from '../api/client'
+import api, { establishQueryCacheScope, User, getErrorMessage, readApi } from '../api/client'
 import { clearTaskRequests } from '../api/tasks'
 
 interface AuthState {
@@ -25,6 +25,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const res = await api.get<User>('/auth/me', { signal })
     if (generation !== sessionGeneration.current) return
     establishQueryCacheScope(`${res.data.id}:${generation}`)
+    if (res.data.has_credentials) {
+      const path = window.location.pathname
+      const query = path === '/' || path === '/instances' ? '/v2/instances'
+        : path === '/billing' ? '/v2/billing/summary' : null
+      // Share this read with the page while its components render. Scope changes
+      // and auth cancellation retire the same request through the normal cache.
+      if (query) void readApi(query, {}, { signal }).catch(() => {})
+    }
     setUser(res.data)
     setSessionKey(generation)
   }
