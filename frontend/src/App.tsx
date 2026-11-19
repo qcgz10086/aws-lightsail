@@ -5,13 +5,21 @@ import { useAuth } from './auth/AuthContext'
 import AppLayout from './components/Layout'
 import LoginPage from './pages/Login'
 
-const DashboardPage = lazy(() => import('./pages/Dashboard'))
-const InstancesPage = lazy(() => import('./pages/Instances'))
+const initialPages = {
+  '/': () => import('./pages/Dashboard'),
+  '/instances': () => import('./pages/Instances'),
+  '/billing': () => import('./pages/Billing'),
+}
+const initialPage = initialPages[window.location.pathname as keyof typeof initialPages]
+// Fetch the current page's code alongside authentication; other pages stay lazy.
+if (initialPage) void initialPage().catch(() => {})
+const DashboardPage = lazy(initialPages['/'])
+const InstancesPage = lazy(initialPages['/instances'])
 const CreateInstancePage = lazy(() => import('./pages/CreateInstance'))
 const InstanceDetailPage = lazy(() => import('./pages/InstanceDetail'))
 const CredentialsPage = lazy(() => import('./pages/Credentials'))
 const TrafficPage = lazy(() => import('./pages/Traffic'))
-const BillingPage = lazy(() => import('./pages/Billing'))
+const BillingPage = lazy(initialPages['/billing'])
 const UsersPage = lazy(() => import('./pages/Users'))
 const TasksPage = lazy(() => import('./pages/Tasks'))
 

@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from app.services import billing as service
 from app.services.snapshots import (SnapshotError, _row_current, _view, credential_failure,
-                                    permission_failure, read_snapshot, revalidate_snapshot_views, scope_for)
+                                    permission_failure, read_snapshot, revalidate_snapshot_views, scope_for, initial_dependency)
 from app.services.traffic import get_credential_keys, get_credential_proxy_url
 
 TTL = 1800
@@ -63,6 +63,8 @@ async def cached_account(engine, user, credential, wait=False, force=False):
                                 status=status, invalidate_credential=credential_invalid) from exc
 
     identity = await read_snapshot(engine, identity_scope, TTL, identity_loader, wait=wait, force=force)
+    if not wait:
+        identity = await initial_dependency(engine, identity_scope, identity)
     if identity["data"] is None:
         metadata = {key: value for key, value in identity.items() if key != "data"}
         output.update({name: {"status": "refreshing" if identity["refreshing"] else "unavailable",

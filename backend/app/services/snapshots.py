@@ -320,6 +320,20 @@ async def read_snapshot(engine, scope, ttl, loader, wait=False, force=False):
     return await finish_snapshot(engine, scope, ttl, loader, wait, *_read_or_claim(engine, scope, force))
 
 
+async def initial_dependency(engine, scope, view, budget=0.15):
+    """Briefly follow a cold prerequisite so its children can start this request.
+
+    Existing values return immediately. A slow or failed prerequisite still
+    returns its normal snapshot state within the bounded initial wait.
+    """
+    deadline = time.monotonic() + budget
+    while view['data'] is None and view['refreshing'] and time.monotonic() < deadline:
+        await asyncio.sleep(min(0.01, max(0, deadline - time.monotonic())))
+        row, current = _row_current(engine, scope)
+        view = _view(row, time.time()) if row and current else _view(None, time.time(), True)
+    return view
+
+
 async def finish_snapshot(engine, scope, ttl, loader, wait, view, token):
     if token is None and not view["refreshing"]:
         return view

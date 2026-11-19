@@ -103,6 +103,63 @@ class SnapshotTests(unittest.TestCase):
         self.assertIsNone(result["data"])
         self.assertEqual(result["status"], "invalidated")
 
+    def test_initial_dependency_follows_fast_result_but_bounds_slow_work(self):
+        from app.services.snapshots import read_snapshot, initial_dependency
+        async def quick():
+            await asyncio.sleep(0.02)
+            return {'ready': True}
+        async def follow():
+            view = await read_snapshot(self.engine, self.scope, 60, quick)
+            return await initial_dependency(self.engine, self.scope, view)
+        self.assertEqual(asyncio.run(follow())['data'], {'ready': True})
+        gate = threading.Event()
+        async def slow():
+            await asyncio.to_thread(gate.wait, 2)
+            return {'ready': False}
+        async def bounded():
+            view = await read_snapshot(self.engine, self.scope, 60, slow, force=True)
+            # An existing snapshot never waits, even if it is refreshing.
+            started = time.perf_counter()
+            previous = await initial_dependency(self.engine, self.scope, view)
+            self.assertLess(time.perf_counter() - started, 0.05)
+            self.assertEqual(previous['data'], {'ready': True})
+            cold = {**view, 'data': None}
+            started = time.perf_counter()
+            # Use a scope without a previously committed value for the bound.
+            other = {**self.scope, 'key': 'c' * 64, 'scope': 'slow-dependency'}
+            cold = await read_snapshot(self.engine, other, 60, slow)
+            result = await initial_dependency(self.engine, other, cold, budget=0.05)
+            self.assertLess(time.perf_counter() - started, 0.2)
+            self.assertTrue(result['refreshing'])
+            self.assertIsNone(result['data'])
+        try:
+            asyncio.run(bounded())
+        finally:
+            gate.set()
+            from app.services.snapshots import wait_for_refresh
+            wait_for_refresh('c' * 64)
+
+    def test_initial_dependency_rechecks_credential_identity(self):
+        from app.models import AwsCredential
+        from sqlalchemy.orm import Session
+        from app.services.snapshots import read_snapshot, initial_dependency
+        gate = threading.Event()
+        async def load():
+            await asyncio.to_thread(gate.wait, 2)
+            return {'obsolete': True}
+        async def follow():
+            view = await read_snapshot(self.engine, self.scope, 60, load)
+            with Session(self.engine) as db:
+                db.get(AwsCredential, self.scope['credential_id']).account_id = '999999999999'
+                db.commit()
+            result = await initial_dependency(self.engine, self.scope, view)
+            self.assertEqual(result['status'], 'invalidated')
+            self.assertIsNone(result['data'])
+        try:
+            asyncio.run(follow())
+        finally:
+            gate.set()
+
     def test_payload_budget_evicts_old_values_and_rejects_oversized_payload(self):
         from sqlalchemy.orm import Session
         from sqlalchemy import func, select

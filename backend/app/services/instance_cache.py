@@ -6,7 +6,7 @@ import botocore.session
 
 from app.services import lightsail as ls
 from app.services.snapshots import (SnapshotError, credential_failure, permission_failure,
-                                    read_many, read_snapshot, revalidate_snapshot_views, scope_for)
+                                    read_many, read_snapshot, revalidate_snapshot_views, scope_for, initial_dependency)
 from app.services.traffic import get_credential_keys, get_credential_proxy_url
 
 
@@ -52,6 +52,8 @@ async def instance_scopes(engine, user, credentials, wait=False, force=False, re
     async def one_credential(credential):
         catalog = await cached_call(engine, user, credential, "catalog", "regions", 86400,
                                     ls.get_regions, wait=wait, force=False)
+        if not wait:
+            catalog = await initial_dependency(engine, scope_for(user, credential, "catalog", "regions"), catalog)
         if catalog["data"] is None:
             return [{"credential_id": credential.id, "account_id": credential.account_id,
                      "region": None, **catalog}]
