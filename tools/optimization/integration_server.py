@@ -2,6 +2,7 @@
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 import argparse
+import time
 from pathlib import Path
 
 from tools.optimization import benchmark_server as original
@@ -65,6 +66,7 @@ class VersionedAws(OriginalAws):
         if operation == 'get_instances':
             for item in response['instances']:
                 item['blueprintName'] = f'Fixture-generation-{self.generation}'
+                item['publicIpAddress'] = item['publicIpAddress'].replace('203.0.113.', f'203.0.{self.generation}.')
                 item['state'] = {'name': 'running' if self.generation % 2 else 'stopped', 'code': 16}
         return response
 
@@ -73,7 +75,7 @@ seed_original = original.seed
 def seed(aws, samples):
     seed_original(aws, samples)
     from app.database import SessionLocal
-    from app.models import AwsCredential, CreditRecord, TrafficUsage
+    from app.models import AwsCredential, CreditRecord, TrafficUsage, User
     from app.security import decrypt_secret
     with SessionLocal() as db:
         for cred in db.query(AwsCredential).all():
@@ -87,13 +89,19 @@ def seed(aws, samples):
                     row.total_amount_decimal = '100'
                     row.amount_precision = 'decimal'
         db.commit()
+        identities = {user.username: [dict(id=cred.id, account_id=aws.data['keys'][decrypt_secret(cred.access_key_id_enc)],
+            selected=decrypt_secret(cred.access_key_id_enc) != 'T00_ALPHA_DUPLICATE') for cred in user.credentials]
+            for user in db.query(User).all()}
     from app.main import app
+    @app.get('/__baseline__/identities')
+    def seeded_identities():
+        return identities
     @app.post('/__baseline__/generation/{value}')
     def generation(value: int):
         if aws.snapshot()['active']:
             raise RuntimeError('cannot advance fixture while requests active')
         aws.generation = value
-        return {'generation': value}
+        return {'generation': value, 'epoch_ms': time.time() * 1000}
     # The compatibility module uses actual production routes; no API payload
     # rewriting, readiness shortcuts, or disabled cache/poll mechanisms.
 

@@ -2,44 +2,45 @@ import { chromium } from 'playwright'
 import fs from 'node:fs/promises'
 import { performance } from 'node:perf_hooks'
 import { startOfflineProxy } from './offline_proxy.mjs'
+import { randomUUID } from 'node:crypto'
+import { responseFacts } from './integration_facts.mjs'
 
-const [origin, output, chrome] = process.argv.slice(2)
+const [origin, output, chrome, requestedRunId] = process.argv.slice(2)
+const runId = requestedRunId || randomUUID()
 const manifest = await fetch(origin + '/__baseline__/manifest').then(r => r.json())
+const identities = await fetch(origin + '/__baseline__/identities').then(r => r.json())
 const proxy = await startOfflineProxy(origin)
 const browser = await chromium.launch({ executablePath: chrome, headless: true, proxy: { server: proxy.url } })
 const results = [], errors = []
-const report = async status => fs.writeFile(output, JSON.stringify({ status, fixture: manifest, browser: browser.version(),
+const controls = []
+async function control(context, path) {
+  const response = await context.request.post(origin + path)
+  if (!response.ok()) throw new Error(`Control ${path}: HTTP ${response.status()}`)
+  const data = await response.json()
+  controls.push({ path, status: response.status(), at: performance.now(), data })
+  return data
+}
+const report = async status => fs.writeFile(output, JSON.stringify({ run_id: runId, expected_rows: manifest.samples * 12,
+  status, fixture: manifest, identities, controls, browser: browser.version(),
   definitions: { first: 'Current generation business value visible after workload API response; two animation frames',
     complete: 'Current generation all scopes terminal and business DOM visible; observed API pending empty',
     generations: 'Every cold user starts generation 1; repeat uses same; refresh advances to 2; unavailable is a failure',
     phases: 'Fresh context/user, same-context full reload, explicit refresh, SPA link to another page then back' },
   results, errors }, null, 2))
 
-function responseFacts(name, data, generation) {
-  if (name === 'billing') {
-    if (data.accounts) {
-      const costs = data.accounts.filter(a => a.costs?.status === 'ok' &&
-        a.costs.currencies?.some(c => Number(c.total_cost) === 30 + generation))
-      const allOk = data.accounts.length === 2 && data.accounts.every(a =>
-        ['costs', 'credits', 'forecast'].every(k => a[k]?.status === 'ok'))
-      return { first: costs.length > 0, complete: allOk && costs.length === 2 && !data.refreshing,
-        candidate: true, amount: data.currencies?.[0]?.total_cost, status: data.status,
-        accounts: data.accounts.map(a => ({ id: a.account_id, costs: a.costs.status, forecast: a.forecast.status, credits: a.credits.status })) }
-    }
-    const valid = data.status === 'ok' && Number(data.total_cost) > 0 && data.aws_credits_status === 'ok'
-    return { first: valid, complete: valid, candidate: false, amount: data.total_cost, status: data.status }
-  }
-  const rows = Array.isArray(data) ? data : data.instances || []
-  const valid = rows.length > 0 && rows.every(i => i.blueprint_name === `Fixture-generation-${generation}`)
-  const complete = valid && (!data.scopes || (!data.refreshing && data.scopes.filter(s => s.region).length === 4
-    && data.scopes.filter(s => s.region).every(s => s.status === 'fresh' && !s.refreshing)))
-  return { first: valid, complete, candidate: !Array.isArray(data), count: rows.length,
-    running: rows.filter(i => i.state === 'running').length, generation, scopes: data.scopes }
-}
 async function visible(page, name, facts) {
   return page.evaluate(({ name, f }) => {
     const text = document.body.innerText
-    if (name === 'instances') return text.includes(`Fixture-generation-${f.generation}`)
+    if (name === 'instances') {
+      const rows = [...document.querySelectorAll('.ant-table-tbody .ant-table-row')]
+      const matches = row => f.rows.find(r => r.key === row.getAttribute('data-row-key') &&
+        row.innerText.includes(r.ip) && row.innerText.includes(r.state))
+      const first = rows.some(row => matches(row)?.current)
+      if (!f.complete) return first
+      const pages = [...document.querySelectorAll('.ant-pagination-item')].map(p => Number(p.title)).filter(Number.isFinite)
+      return first && rows.length === Math.min(10, f.count) && rows.every(matches)
+        && Math.max(1, ...pages) === Math.ceil(f.count / 10)
+    }
     const stats = [...document.querySelectorAll('.ant-statistic')]
     const value = title => stats.find(x => x.innerText.includes(title))?.querySelector('.ant-statistic-content-value')?.textContent?.replaceAll(',', '')
     if (name === 'dashboard') return Number(value('实例总数')) === f.count && Number(value('运行中')) === f.running
@@ -51,15 +52,17 @@ try {
   for (const [name, scenario] of Object.entries(manifest.page_cases)) {
     for (let sample = 0; sample < manifest.samples; sample++) {
       const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: 'zh-CN', timezoneId: 'UTC' })
-      await context.request.post(origin + '/__baseline__/generation/1')
+      const username = `t00-page-${name}-${String(sample).padStart(2, '0')}`
+      await control(context, '/__baseline__/generation/1')
       const login = await context.request.post(origin + '/api/auth/login', { data: {
-        username: `t00-page-${name}-${String(sample).padStart(2, '0')}`, password: manifest.password } })
+        username, password: manifest.password } })
       if (!login.ok()) throw new Error('login failed')
       const page = await context.newPage()
       const pending = new Set()
-      let observations = [], failures = [], pageErrors = [], started = 0, generation = 1, lastFacts = null
+      let observations = [], failures = [], pageErrors = [], finished = [], started = 0, generation = 1, lastFacts = null, refreshedAfter = 0
       page.on('request', req => { if (new URL(req.url()).pathname.startsWith('/api/')) pending.add(req) })
-      page.on('requestfinished', req => pending.delete(req))
+      page.on('requestfinished', req => { if (pending.delete(req)) finished.push({ path: new URL(req.url()).pathname,
+        method: req.method(), ms: performance.now() - started }) })
       page.on('requestfailed', req => { pending.delete(req); if (req.failure()?.errorText !== 'net::ERR_ABORTED') failures.push(req.failure()) })
       page.on('pageerror', err => pageErrors.push(String(err)))
       page.on('response', async res => {
@@ -70,7 +73,7 @@ try {
         if (!relevant.includes(p) || res.request().method() !== 'GET') return
         try {
           const data = await res.json()
-          const facts = responseFacts(name, data, generation)
+          const facts = responseFacts(name, data, generation, refreshedAfter, identities[username])
           lastFacts = facts
           observations.push({ path: p, ms: performance.now() - started, ...facts })
         } catch (error) { failures.push({ path: p, error: String(error) }) }
@@ -79,12 +82,15 @@ try {
         if (phase === 'spa_return') {
           await page.getByRole('link', { name: name === 'instances' ? '总览' : '实例', exact: true }).click()
           await page.waitForTimeout(100)
-          while (pending.size) await page.waitForTimeout(10)
+          const limit = performance.now() + 30000
+          while (pending.size && performance.now() < limit) await page.waitForTimeout(10)
+          if (pending.size) throw new Error('SPA departure did not settle')
         }
         generation = phase === 'first_visit' || phase === 'repeat_visit' ? 1 : 2
-        await context.request.post(origin + `/__baseline__/generation/${generation}`)
-        const before = await context.request.post(origin + '/__baseline__/reset').then(r => r.json())
-        observations = []; failures = []; pageErrors = []
+        const clock = await control(context, `/__baseline__/generation/${generation}`)
+        if (phase === 'first_visit' || phase === 'refresh_button') refreshedAfter = clock.epoch_ms
+        const before = await control(context, '/__baseline__/reset')
+        observations = []; failures = []; pageErrors = []; finished = []
         if (phase !== 'spa_return') lastFacts = null
         started = performance.now()
         let first = null, complete = null
@@ -103,7 +109,7 @@ try {
           if (complete === null) throw new Error('Current generation business data did not complete: ' + JSON.stringify(lastFacts))
           const after = await context.request.get(origin + '/__baseline__/stats').then(r => r.json())
           results.push({ case: name, phase, sample, generation, first_data_ms: first, complete_ms: complete,
-            observations, aws_calls: after.calls, peak_concurrency: after.peak_concurrency,
+            observations, api_requests: finished, aws_calls: after.calls, peak_concurrency: after.peak_concurrency,
             sql_queries: after.sql_queries, violations: after.violations, failures, page_errors: pageErrors,
             wall_seconds: after.clock_seconds - before.clock_seconds, cpu_seconds: after.cpu_seconds - before.cpu_seconds })
           if (after.violations.length || failures.length || pageErrors.length) errors.push({ case: name, phase, sample, violations: after.violations, failures, pageErrors })

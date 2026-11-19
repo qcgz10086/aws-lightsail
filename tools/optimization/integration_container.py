@@ -10,6 +10,8 @@ import subprocess
 from threading import Event, Thread
 import time
 import uuid
+from datetime import datetime, timezone
+import platform
 
 import httpx
 from tools.optimization.container_baseline import DockerRun, build_images, cgroup_path, read_cgroup, resource_window, loopback_bridge
@@ -21,11 +23,20 @@ def run(args):
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     docker = DockerRun(output)
-    state = {'status': 'running', 'source': str(args.source), 'label': args.label, 'samples': args.samples}
+    run_id = uuid.uuid4().hex
+    state = {'run_id': run_id, 'status': 'running', 'source': str(args.source), 'source_commit': args.label,
+             'source_tree': args.tree, 'samples': args.samples, 'started_at': datetime.now(timezone.utc).isoformat()}
     save_json(output / 'run.json', state)
     try:
         bases = json.loads(args.base_images.read_text())
         images = build_images(docker, args.source.resolve(), args.label, bases)
+        save_json(output / 'image-inspect.json', {name: docker.inspect('image', image['id']) for name,image in images.items()})
+        save_json(output / 'environment.json', {**state, 'platform': platform.platform(), 'cpu_count': os.cpu_count(),
+            'docker': json.loads(docker.command('version', '--format', '{{json .}}')),
+            'source_sha256': {p.relative_to(args.source).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+              for folder in ('backend','frontend') for p in (args.source/folder).rglob('*') if p.is_file() and 'node_modules' not in p.parts},
+            'tool_sha256': {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in (root/'tools/optimization').rglob('*') if p.is_file() and 'node_modules' not in p.parts and '__pycache__' not in p.parts}})
         runtime = output / 'runtime'
         runtime.mkdir()
         shutil.copytree(root / 'tools', runtime / 'tools', ignore=shutil.ignore_patterns('node_modules', '__pycache__'))
@@ -64,9 +75,19 @@ def run(args):
                 time.sleep(.2)
             save_json(output / 'manifest.json', client.get('/__baseline__/manifest').json())
             docker.command('exec', backend, 'python', '-m', 'pip', 'freeze', '--all', log='python-freeze.txt')
-            docker.command('exec', backend, 'sh', '-c', 'id; test -w /data; python -c "import socks,cryptography,sqlite3; from app.security import encrypt_secret,decrypt_secret; assert decrypt_secret(encrypt_secret(\"fixture\"))==\"fixture\""', log='runtime-smoke.log')
+            docker.command('exec', backend, 'python', '-c', 'import os,socks,cryptography,sqlite3; from app.security import encrypt_secret,decrypt_secret; assert decrypt_secret(encrypt_secret("fixture"))=="fixture"; assert os.getuid()!=0; assert os.access("/data",os.W_OK); print("imports encryption uid writable-volume passed")', log='runtime-smoke.log')
             raw, failures, stop = [], [], Event()
-            def capture(): return {'time': time.monotonic(), **{name: read_cgroup(p) for name, p in paths.items()}}
+            def capture():
+                values={}
+                for name,p in paths.items():
+                    current=int((p/'memory.current').read_text())
+                    memory=dict(line.split() for line in (p/'memory.stat').read_text().splitlines())
+                    cpu=dict(line.split() for line in (p/'cpu.stat').read_text().splitlines())
+                    values[name]={'at_monotonic':time.monotonic(), 'memory_current_bytes':current,
+                        'inactive_file_bytes':int(memory['inactive_file']), 'anon_bytes':int(memory['anon']),
+                        'working_set_bytes':max(0,current-int(memory['inactive_file'])),
+                        'cpu_seconds':int(cpu['usage_usec'])/1_000_000}
+                return {'time': time.monotonic(), **values}
             def sample():
                 with (output / 'cgroup.jsonl').open('w') as stream:
                     while not stop.is_set():
@@ -79,7 +100,7 @@ def run(args):
                 idle_start = capture(); time.sleep(10); idle_end = capture(); active_start = capture()
                 with (output / 'browser-process.log').open('w') as stream:
                     result = subprocess.run(['node', str(root / 'tools/optimization/integration_browser.mjs'),
-                        url, str(output / 'browser.json'), args.chrome], stdout=stream, stderr=subprocess.STDOUT, timeout=2400)
+                        url, str(output / 'browser.json'), args.chrome, run_id], stdout=stream, stderr=subprocess.STDOUT, timeout=2400)
                 active_end = capture()
                 final = client.get('/__baseline__/stats').json(); save_json(output / 'final-stats.json', final)
             finally:
@@ -90,7 +111,8 @@ def run(args):
                 samples = [start[name]] + [r[name] for r in raw if start['time'] < r['time'] < end['time']] + [end[name]]
                 return resource_window(samples)
             rows = report['results']
-            summary = {'status': report['status'], 'samples': args.samples, 'browser_exit': result.returncode,
+            summary = {'run_id': run_id, 'status': report['status'], 'samples': args.samples, 'browser_exit': result.returncode,
+                'windows': {'idle_start': idle_start,'idle_end':idle_end,'active_start':active_start,'active_end':active_end},
                 'image_total_bytes': sum(i['size_bytes'] for i in images.values()),
                 'pages_first_data': summarize_rows(rows, 'first_data_ms'), 'pages_complete': summarize_rows(rows, 'complete_ms'),
                 'resources': {name: {'idle': window(idle_start, idle_end, name),
@@ -101,18 +123,25 @@ def run(args):
                                 'images': 'sum of two uncompressed Docker image Size values', 'idle': '10s after startup before workload'}}
             save_json(output / 'summary.json', summary)
             if result.returncode or report['errors'] or len(rows) != args.samples * 12: raise RuntimeError('measurement failed')
-        state['status'] = 'completed'
+        state.update(status='completed',exit_code=0)
     except BaseException as exc:
-        state.update(status='failed', error=str(exc)); raise
+        state.update(status='failed',exit_code=1,error=str(exc)); raise
     finally:
-        docker.cleanup()
-        save_json(output / 'run.json', state)
+        try:
+            docker.cleanup()
+        except BaseException as exc:
+            state.update(status='failed', exit_code=1, cleanup_error=str(exc))
+            raise
+        finally:
+            state['finished_at']=datetime.now(timezone.utc).isoformat()
+            save_json(output / 'run.json', state)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--source', type=Path, required=True)
     parser.add_argument('--label', required=True)
+    parser.add_argument('--tree', default='draft')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--base-images', type=Path, required=True)
     parser.add_argument('--samples', type=int, default=20)
