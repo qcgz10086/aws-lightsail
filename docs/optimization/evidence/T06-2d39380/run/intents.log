@@ -1,0 +1,22 @@
+[
+  {
+    "name": "lost_response_changed_payload_is_not_old_success",
+    "passed": true
+  },
+  {
+    "name": "resource_lock_409_allows_new_intent_after_reload",
+    "passed": true
+  },
+  {
+    "name": "offline_before_acceptance_reload_reuses_original_key",
+    "passed": true
+  },
+  {
+    "name": "accepted_request_reload_reuses_original_key",
+    "passed": true
+  },
+  {
+    "name": "old_user_late_response_never_applies_to_new_session",
+    "passed": true
+  }
+]

@@ -1,0 +1,82 @@
+C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+test_202_recovery_and_conflicting_envelope (test_t06_api.TaskApiTests.test_202_recovery_and_conflicting_envelope) ... 2026-11-19 19:19:49,276 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 202 Accepted"
+2026-11-19 19:19:49,287 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 202 Accepted"
+2026-11-19 19:19:49,298 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 409 Conflict"
+2026-11-19 19:19:49,307 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks/by-key?key=browser-key "HTTP/1.1 200 OK"
+2026-11-19 19:19:49,326 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks/f992a62e-4b10-44d9-8588-9f0f93bac494/cancel "HTTP/1.1 200 OK"
+ok
+test_delete_gates_hold_until_unstarted_task_cancelled (test_t06_api.TaskApiTests.test_delete_gates_hold_until_unstarted_task_cancelled) ... 2026-11-19 19:19:49,569 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 202 Accepted"
+2026-11-19 19:19:49,581 INFO [httpx] HTTP Request: DELETE http://testserver/api/credentials/1 "HTTP/1.1 409 Conflict"
+2026-11-19 19:19:49,592 INFO [httpx] HTTP Request: DELETE http://testserver/api/users/1 "HTTP/1.1 409 Conflict"
+2026-11-19 19:19:49,609 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks/b10c00a5-14bc-48a9-ab38-cb2f00299111/cancel "HTTP/1.1 200 OK"
+2026-11-19 19:19:49,633 INFO [httpx] HTTP Request: DELETE http://testserver/api/credentials/1 "HTTP/1.1 200 OK"
+ok
+test_every_task_route_hides_foreign_owner (test_t06_api.TaskApiTests.test_every_task_route_hides_foreign_owner) ... 2026-11-19 19:19:49,958 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 202 Accepted"
+2026-11-19 19:19:49,970 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks "HTTP/1.1 200 OK"
+2026-11-19 19:19:49,979 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks/by-key?key=browser-key "HTTP/1.1 404 Not Found"
+2026-11-19 19:19:49,989 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks/adfaacec-e9bb-4540-843d-f31ba3824708 "HTTP/1.1 404 Not Found"
+2026-11-19 19:19:50,000 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks/adfaacec-e9bb-4540-843d-f31ba3824708/cancel "HTTP/1.1 404 Not Found"
+2026-11-19 19:19:50,009 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks/adfaacec-e9bb-4540-843d-f31ba3824708/reconcile "HTTP/1.1 404 Not Found"
+2026-11-19 19:19:50,018 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks/adfaacec-e9bb-4540-843d-f31ba3824708/retry "HTTP/1.1 404 Not Found"
+2026-11-19 19:19:50,025 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks/adfaacec-e9bb-4540-843d-f31ba3824708/resolve "HTTP/1.1 404 Not Found"
+2026-11-19 19:19:50,035 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 404 Not Found"
+ok
+test_legacy_timeout_returns_task_identity_without_false_success (test_t06_api.TaskApiTests.test_legacy_timeout_returns_task_identity_without_false_success) ... 2026-11-19 19:19:50,276 INFO [httpx] HTTP Request: POST http://testserver/api/instances/us-east-1/web/stop?credential_id=1 "HTTP/1.1 202 Accepted"
+2026-11-19 19:19:50,287 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks/594658ed-8bdc-4d84-8e19-3e91bfa9d1d2 "HTTP/1.1 200 OK"
+ok
+test_unresolved_tasks_precede_new_terminal_history_with_paging (test_t06_api.TaskApiTests.test_unresolved_tasks_precede_new_terminal_history_with_paging) ... 2026-11-19 19:19:50,541 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 202 Accepted"
+2026-11-19 19:19:50,612 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks?limit=100 "HTTP/1.1 200 OK"
+2026-11-19 19:19:50,623 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks?limit=100&offset=100 "HTTP/1.1 200 OK"
+ok
+test_validation_does_not_echo_password_or_userdata (test_t06_api.TaskApiTests.test_validation_does_not_echo_password_or_userdata) ... 2026-11-19 19:19:50,871 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 19:19:50,880 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 19:19:50,888 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 19:19:50,896 INFO [httpx] HTTP Request: POST http://testserver/api/instances "HTTP/1.1 422 Unprocessable Entity"
+ok
+test_default_az_lookup_and_create_share_proxy (test_t06_proxy_workflow.CreateInstanceProxyInheritanceTests.test_default_az_lookup_and_create_share_proxy) ... ok
+test_explicit_az_uses_one_proxied_client (test_t06_proxy_workflow.CreateInstanceProxyInheritanceTests.test_explicit_az_uses_one_proxied_client) ... ok
+test_cancel_requires_atomic_queued_transition_and_keeps_running_lock (test_t06_task_queue.DurableTaskQueueTests.test_cancel_requires_atomic_queued_transition_and_keeps_running_lock) ... ok
+test_idempotency_returns_same_task_and_rejects_different_envelope (test_t06_task_queue.DurableTaskQueueTests.test_idempotency_returns_same_task_and_rejects_different_envelope) ... ok
+test_same_confirmed_account_lock_conflicts_across_credentials (test_t06_task_queue.DurableTaskQueueTests.test_same_confirmed_account_lock_conflicts_across_credentials) ... ok
+test_schedule_callback_does_not_deadlock_when_future_already_finished (test_t06_task_queue.DurableTaskQueueTests.test_schedule_callback_does_not_deadlock_when_future_already_finished) ... ok
+test_task_payload_is_encrypted_and_intents_are_scrubbed (test_t06_task_queue.DurableTaskQueueTests.test_task_payload_is_encrypted_and_intents_are_scrubbed) ... ok
+test_attach_started_keeps_old_ip_and_lock (test_t06_workflows.WorkflowTests.test_attach_started_keeps_old_ip_and_lock) ... 2026-11-19 19:19:52,950 WARNING [app.services.task_queue] operation task stopped id=14f3db6b-d71a-4182-85a4-4dadefea31a8 kind=change_ip error=AWS 写请求未确认，等待事实核对
+ok
+test_changed_credential_at_transport_gate_prevents_write (test_t06_workflows.WorkflowTests.test_changed_credential_at_transport_gate_prevents_write) ... ok
+test_create_ip_compensated_failure_reports_existing_instance_as_partial (test_t06_workflows.WorkflowTests.test_create_ip_compensated_failure_reports_existing_instance_as_partial) ... ok
+test_create_lost_allocate_second_precision_and_proxy (test_t06_workflows.WorkflowTests.test_create_lost_allocate_second_precision_and_proxy) ... 2026-11-19 19:19:54,760 WARNING [app.services.task_queue] operation task stopped id=9c96ff14-0b00-4fa4-aec9-d5a5b244c224 kind=create error=AWS 写请求未确认，等待事实核对
+ok
+test_credential_rotation_before_effect_releases_lock_as_known_failure (test_t06_workflows.WorkflowTests.test_credential_rotation_before_effect_releases_lock_as_known_failure) ... ok
+test_delete_lost_response_only_releases_recorded_association (test_t06_workflows.WorkflowTests.test_delete_lost_response_only_releases_recorded_association) ... 2026-11-19 19:19:56,419 WARNING [app.services.task_queue] operation task stopped id=3525ad82-1358-46f6-8ea6-973c703ef40d kind=delete error=AWS 写请求未确认，等待事实核对
+ok
+test_delete_pending_never_cleans_ips (test_t06_workflows.WorkflowTests.test_delete_pending_never_cleans_ips) ... 2026-11-19 19:19:57,112 WARNING [app.services.task_queue] operation task stopped id=9fd699cb-c133-43a8-baa5-70dd5aec20a6 kind=delete error=AWS 写请求未确认，等待事实核对
+ok
+test_explicit_resolution_preserves_unknown_evidence_and_requires_owner (test_t06_workflows.WorkflowTests.test_explicit_resolution_preserves_unknown_evidence_and_requires_owner) ... 2026-11-19 19:19:57,563 WARNING [app.services.task_queue] operation task stopped id=b915e854-2e65-401e-b7ea-91495c0228e4 kind=reboot error=AWS 写请求未确认，等待事实核对
+ok
+test_firewall_failure_can_resume_without_repeating_create (test_t06_workflows.WorkflowTests.test_firewall_failure_can_resume_without_repeating_create) ... 2026-11-19 19:19:58,076 WARNING [app.services.task_queue] operation task stopped id=09834296-61d7-4851-b96f-a987ee93b2b3 kind=create error=实例已创建，防火墙设置明确失败；可核对后仅重试剩余步骤
+ok
+test_interrupted_read_plan_can_resume (test_t06_workflows.WorkflowTests.test_interrupted_read_plan_can_resume) ... ok
+test_lost_attach_resumes_cleanup_only (test_t06_workflows.WorkflowTests.test_lost_attach_resumes_cleanup_only) ... 2026-11-19 19:19:59,445 WARNING [app.services.task_queue] operation task stopped id=9f5b685d-96bc-4835-9f05-885a849fe8fb kind=change_ip error=AWS 写请求未确认，等待事实核对
+ok
+test_lost_stop_does_not_claim_same_name_replacement (test_t06_workflows.WorkflowTests.test_lost_stop_does_not_claim_same_name_replacement) ... 2026-11-19 19:20:00,175 WARNING [app.services.task_queue] operation task stopped id=ae4f196a-babd-481d-9af9-ec9a0733a18e kind=stop error=AWS 写请求未确认，等待事实核对
+ok
+test_old_lease_cannot_write_result_or_release_lock (test_t06_workflows.WorkflowTests.test_old_lease_cannot_write_result_or_release_lock) ... ok
+test_old_traffic_window_cannot_overwrite_newer_cumulative_observation (test_t06_workflows.WorkflowTests.test_old_traffic_window_cannot_overwrite_newer_cumulative_observation) ... ok
+test_owner_scope_and_retention_never_remove_unresolved (test_t06_workflows.WorkflowTests.test_owner_scope_and_retention_never_remove_unresolved) ... 2026-11-19 19:20:01,735 WARNING [app.services.task_queue] operation task stopped id=3d28ed21-785c-4255-8a05-0bad6bf23a17 kind=reboot error=AWS 写请求未确认，等待事实核对
+ok
+test_policy_disabled_during_prewrite_read_stops_auto_shutdown (test_t06_workflows.WorkflowTests.test_policy_disabled_during_prewrite_read_stops_auto_shutdown) ... ok
+test_prewrite_recreated_resource_is_rejected (test_t06_workflows.WorkflowTests.test_prewrite_recreated_resource_is_rejected) ... 2026-11-19 19:20:02,559 WARNING [app.services.task_queue] operation task stopped id=81d946ec-9be5-45bf-a1cc-defb155c30d1 kind=stop error=副作用前资源 ARN 已变化，未提交写请求
+ok
+test_reboot_running_does_not_prove_lost_response (test_t06_workflows.WorkflowTests.test_reboot_running_does_not_prove_lost_response) ... 2026-11-19 19:20:03,012 WARNING [app.services.task_queue] operation task stopped id=2661695e-c564-4971-b3e7-216512fb82b0 kind=reboot error=AWS 写请求未确认，等待事实核对
+ok
+test_resumed_queued_task_cannot_be_cancelled_and_release_effect_locks (test_t06_workflows.WorkflowTests.test_resumed_queued_task_cannot_be_cancelled_and_release_effect_locks) ... 2026-11-19 19:20:03,413 WARNING [app.services.task_queue] operation task stopped id=698bcda6-8d90-4450-a6f5-599955c0f919 kind=stop error=AWS 写请求未确认，等待事实核对
+ok
+test_stop_lost_response_reconciles_without_replay (test_t06_workflows.WorkflowTests.test_stop_lost_response_reconciles_without_replay) ... 2026-11-19 19:20:03,853 WARNING [app.services.task_queue] operation task stopped id=3605b646-684b-48cb-9955-e5fe7d89a6ae kind=stop error=AWS 写请求未确认，等待事实核对
+ok
+
+----------------------------------------------------------------------
+Ran 33 tests in 15.083s
+
+OK
+AWS_TRANSPORT_ATTEMPTS 0

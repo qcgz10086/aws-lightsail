@@ -1,0 +1,165 @@
+{
+  "product": "2d39380d54f071965db85697e90963d748701a78",
+  "files": {
+    "product-source.tar": {
+      "bytes": 1157120,
+      "sha256": "28992d5536d1a11fd713259cfc66b84b0884ad6667c813568ede8e10bfc25e3b"
+    },
+    "run/browser/browser.json": {
+      "bytes": 5179,
+      "sha256": "9758626b1f964ea18d667d54e2e9833915186f9c0174bbdda586e6551081d0b3"
+    },
+    "run/browser/task-states.png": {
+      "bytes": 72436,
+      "sha256": "f3a2ba4c4f6fe7b23868c1c6cfe95a918de3c249c395ebbf7076026e64422f37"
+    },
+    "run/browser.log": {
+      "bytes": 1489,
+      "sha256": "1d181c372b27a27c471b1afb071823f84a6f678690a75d92c088e6e02f0e4599"
+    },
+    "run/build.log": {
+      "bytes": 3152,
+      "sha256": "fe03693697fdc3c8473885be64f904a98cbb837ba4cfad9d0db1bd1a85332f71"
+    },
+    "run/cache.log": {
+      "bytes": 1888,
+      "sha256": "afe8a6844d9c85ba365c93e0d1b841700103962beb4fe279db80be6e03816ffe"
+    },
+    "run/compileall.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "run/focused.log": {
+      "bytes": 11616,
+      "sha256": "a8aee8817923cb23a1d301b9d1ac767cf317fb9660aa1ff00f79ffe5fb041951"
+    },
+    "run/frontend-build/assets/Billing-DBqAdDY1.js": {
+      "bytes": 117278,
+      "sha256": "00da6ab5c27328953c133304fa4bd2679f1c4ae769a24cfaade699fc8ffa783e"
+    },
+    "run/frontend-build/assets/CreateInstance-D_tsWvJa.js": {
+      "bytes": 11008,
+      "sha256": "268d6c95bbc9e1d4d1476066dd1aced3fbaaddf6b5a22e3cda8b57619b0a02ef"
+    },
+    "run/frontend-build/assets/Credentials-DSGYCgZP.js": {
+      "bytes": 8202,
+      "sha256": "626e9a8a81ba1ef8db945c1735064919c2795c472449b93f2bd41f0431565d4a"
+    },
+    "run/frontend-build/assets/Dashboard-DKHrVm5R.js": {
+      "bytes": 16588,
+      "sha256": "b3d301d7684b836a2b898aa9ca8481104987f5982c280c8407f87698f33dbc22"
+    },
+    "run/frontend-build/assets/dayjs.min-DsmT9qPy.js": {
+      "bytes": 7156,
+      "sha256": "912fef096fa4e14d121a8bfbb74da64678ced65157f8e4c01884b716d722c1fa"
+    },
+    "run/frontend-build/assets/index-BSNBMGl8.js": {
+      "bytes": 9630,
+      "sha256": "48fa8e0f3a2dfa6930cd7d75bc7a7b44283cf42d4ef5130853b005bc9ec4719e"
+    },
+    "run/frontend-build/assets/index-Ccfr7oNe.css": {
+      "bytes": 238,
+      "sha256": "9cd9b75980fe12ebcfe541d3e86a407fbe18d892619e7dc3188f9ee05194ab93"
+    },
+    "run/frontend-build/assets/index-CnDSwn60.js": {
+      "bytes": 4709,
+      "sha256": "9e5e1b9942cf7c73ff65871443bd514be6390e8b15dc31839df740b240235997"
+    },
+    "run/frontend-build/assets/index-CsqgCo6w.js": {
+      "bytes": 6862,
+      "sha256": "87ff56b21c6c38541c5c00143235fcd6ac0d3625c11cd446bf7b9411d3863cd1"
+    },
+    "run/frontend-build/assets/index-D1_W--Mn.js": {
+      "bytes": 7924,
+      "sha256": "6d9aa8f55adfa30f20e62f51e8b08292333f90f215688421e535b559dfe60820"
+    },
+    "run/frontend-build/assets/index-Da0jFxWw.js": {
+      "bytes": 790104,
+      "sha256": "6ce101636ec0d02afe7c723a6616f5d2d53e97e7aee0b8f5438c62a77a45dd4f"
+    },
+    "run/frontend-build/assets/index-Dcn5DmdI.js": {
+      "bytes": 90983,
+      "sha256": "6fe5b7d13131c26313b1f79dabb406535a0aab2484c160bdd8518d2ca16bf09b"
+    },
+    "run/frontend-build/assets/index-DeRoJN_6.js": {
+      "bytes": 28836,
+      "sha256": "df52f0def235087f08613260536dd5eb73940f4503fd4fe940f3b6c4f77f9af3"
+    },
+    "run/frontend-build/assets/index-MCryARKm.js": {
+      "bytes": 24563,
+      "sha256": "e0d16f14d55e20a7e5b86a2fabf7268782258f77c3fb5591bbaed0d1d603ff88"
+    },
+    "run/frontend-build/assets/InstanceDetail-CbbOmwwc.js": {
+      "bytes": 408838,
+      "sha256": "e51d3068137a7461cd7f42a113a31fdacdda8f4e9d5114fcb9ed38ea9ef89585"
+    },
+    "run/frontend-build/assets/Instances-CdTze2_s.js": {
+      "bytes": 9637,
+      "sha256": "2c95e2b121852b58037834f65263ea0b7cacfbda5a4c6b8f02c6d52cc7e0dfce"
+    },
+    "run/frontend-build/assets/Pagination-jvbVV_kt.js": {
+      "bytes": 24156,
+      "sha256": "3562776cf90a0a52e6d645bdc020ecb269e186ec0adf9d054a7809a328507d34"
+    },
+    "run/frontend-build/assets/Table-COG6OCPz.js": {
+      "bytes": 179691,
+      "sha256": "34c003d47fe0ba59cd1cc5af4df4053c313bc2b540aa5305c9bed19c3799f774"
+    },
+    "run/frontend-build/assets/Tasks-C81QMJyu.js": {
+      "bytes": 14677,
+      "sha256": "ec4ea7bd52a15171331248710cd83a152274ded0d2f0ae27d7e247de03e2333c"
+    },
+    "run/frontend-build/assets/Traffic-lafJGgSe.js": {
+      "bytes": 5247,
+      "sha256": "ca4031f19486a3936b469ffc71d59b262cdc84ef4d05b2c817e4f12445e9e636"
+    },
+    "run/frontend-build/assets/Users-BPh_zOim.js": {
+      "bytes": 3500,
+      "sha256": "226c550aea3b74242816202b9995d35e8965ae7abab1b71f8462bf0848648fcf"
+    },
+    "run/frontend-build/index.html": {
+      "bytes": 422,
+      "sha256": "b4361560ff6c267c0ab8ddaf86c97b01b501598604255883c41f83aa08c4d03b"
+    },
+    "run/full.log": {
+      "bytes": 101867,
+      "sha256": "44bcef6aa86d7447d62a30313925fc4cc32f9c7258b0ae43bb1c46798802e93c"
+    },
+    "run/intents/client.mjs": {
+      "bytes": 7721,
+      "sha256": "4be4d445cb6fa6aaee0a14d9757e9c2368aaec66ece3075062984aba80a7e405"
+    },
+    "run/intents/queryCache.mjs": {
+      "bytes": 5158,
+      "sha256": "e6630862b8d3bfdf7955c583fa749b5797353f65b9772fce04e61751b4d74ea3"
+    },
+    "run/intents/result.json": {
+      "bytes": 559,
+      "sha256": "c66a4896c11b6e58b3a5dafceb0d049c35795c2f536d399f43191dbde2bebde4"
+    },
+    "run/intents/tasks.mjs": {
+      "bytes": 5012,
+      "sha256": "5a3082d062af91a07e277b9633a879575930612ec153125793b6f9dd9efd61f1"
+    },
+    "run/intents.log": {
+      "bytes": 465,
+      "sha256": "0cd8027615c542f9224df22c4860aba4e963cd3ada5aee6b7f8a605dcf5b4deb"
+    },
+    "run/migration.log": {
+      "bytes": 16603,
+      "sha256": "d54e36bdc8890cb076a90a7e67fc8528a8b5c23d2ba203da254e64552b7a29ec"
+    },
+    "run/typescript.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "run/verification.json": {
+      "bytes": 18156,
+      "sha256": "50e295b379ff0aac39207e2287ce927afa0919908981b3555c91a7fe855d133b"
+    },
+    "source-manifest.json": {
+      "bytes": 40585,
+      "sha256": "2fc02af76e294d3e7e97fe3d2c05ff628838ea0a8623434e3293523de9ef9400"
+    }
+  }
+}

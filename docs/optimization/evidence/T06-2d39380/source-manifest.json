@@ -1,0 +1,968 @@
+{
+  "product": "2d39380d54f071965db85697e90963d748701a78",
+  "tree": "382f8bfafe4e0654d35cf724a3741d30f18cee0d",
+  "normalization": "CRLF vs LF in text only; raw archive remains exact git blob bytes",
+  "archive_sha256": "28992d5536d1a11fd713259cfc66b84b0884ad6667c813568ede8e10bfc25e3b",
+  "files": [
+    {
+      "path": "backend/Dockerfile",
+      "git_sha256": "e0ca0fc66032c896ec600b021d07d27b606f8bc18cbbf2e0b0d5c010497e0447",
+      "bytes": 679,
+      "worktree_sha256": "e0ca0fc66032c896ec600b021d07d27b606f8bc18cbbf2e0b0d5c010497e0447",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/__init__.py",
+      "git_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "worktree_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/config.py",
+      "git_sha256": "86be9b706b9f4eda373908805fbb278475654d317609ca2d4cf7a60e8b426e13",
+      "bytes": 4344,
+      "worktree_sha256": "86be9b706b9f4eda373908805fbb278475654d317609ca2d4cf7a60e8b426e13",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/database.py",
+      "git_sha256": "56b2e5d9b39b7386e0910bac3d80908c5f2df9721d27f68fb5a647c4c1986d0b",
+      "bytes": 1531,
+      "worktree_sha256": "56b2e5d9b39b7386e0910bac3d80908c5f2df9721d27f68fb5a647c4c1986d0b",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/deps.py",
+      "git_sha256": "5122475e761c40dc03d9a5f5c142a31017e06398499aa7e9d9635caf9c143dac",
+      "bytes": 2025,
+      "worktree_sha256": "5122475e761c40dc03d9a5f5c142a31017e06398499aa7e9d9635caf9c143dac",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/main.py",
+      "git_sha256": "8c5d9dde54ce04d35c3a448404a751bc33aeeb3fa95574e8d37a6349a0cda0ef",
+      "bytes": 4419,
+      "worktree_sha256": "8c5d9dde54ce04d35c3a448404a751bc33aeeb3fa95574e8d37a6349a0cda0ef",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/migrations.py",
+      "git_sha256": "b0581bd1c18e6d41da38119fa8763054bdeecebaea06c74e5f165bc3861c4056",
+      "bytes": 29444,
+      "worktree_sha256": "b0581bd1c18e6d41da38119fa8763054bdeecebaea06c74e5f165bc3861c4056",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/models.py",
+      "git_sha256": "db3099186bff72745c62e6407641b7fcd7a79497024c28564d0389ec2aa85172",
+      "bytes": 16775,
+      "worktree_sha256": "db3099186bff72745c62e6407641b7fcd7a79497024c28564d0389ec2aa85172",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/password_strength.py",
+      "git_sha256": "9ed02a62e32cdcf74a273c1fdb963b088cacf897afbfe67a1fb204c17da24067",
+      "bytes": 2895,
+      "worktree_sha256": "9ed02a62e32cdcf74a273c1fdb963b088cacf897afbfe67a1fb204c17da24067",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/proxy_config.py",
+      "git_sha256": "930e4b098056b2ecec635f235ebcea286fada7282e3c4ce34d8de4f2c5595fa4",
+      "bytes": 17040,
+      "worktree_sha256": "930e4b098056b2ecec635f235ebcea286fada7282e3c4ce34d8de4f2c5595fa4",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/rate_limit.py",
+      "git_sha256": "5dfb987c2424ea73c719904ea08524edd2dece439a46412e7f42852d0f4a327e",
+      "bytes": 4195,
+      "worktree_sha256": "5dfb987c2424ea73c719904ea08524edd2dece439a46412e7f42852d0f4a327e",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/routers/__init__.py",
+      "git_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "worktree_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/routers/auth.py",
+      "git_sha256": "e08abddd736e37c562dc8d6e5a0dcc84eb6160e5ea1376c58da05db2283e15cc",
+      "bytes": 5356,
+      "worktree_sha256": "e08abddd736e37c562dc8d6e5a0dcc84eb6160e5ea1376c58da05db2283e15cc",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/routers/billing.py",
+      "git_sha256": "21878bcc300968e7ed221224089b7b6b9a491f5d03199faa827770a05b21b9da",
+      "bytes": 5170,
+      "worktree_sha256": "21878bcc300968e7ed221224089b7b6b9a491f5d03199faa827770a05b21b9da",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/routers/billing_v2.py",
+      "git_sha256": "aea40d66ca771c2e676ea24a2e45d79e2784a0c90da3e0082bb58ef0d1fa55db",
+      "bytes": 3901,
+      "worktree_sha256": "aea40d66ca771c2e676ea24a2e45d79e2784a0c90da3e0082bb58ef0d1fa55db",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/routers/cache_v2.py",
+      "git_sha256": "fc473df079c6a7450aee7006c72faaaaa8bbd9234753a81ca014378e838227ba",
+      "bytes": 3444,
+      "worktree_sha256": "fc473df079c6a7450aee7006c72faaaaa8bbd9234753a81ca014378e838227ba",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/routers/catalog.py",
+      "git_sha256": "b1c49db2996f0178ff0e455dc655143d759f88ff0f0a2ca469af8200e649b694",
+      "bytes": 3925,
+      "worktree_sha256": "b1c49db2996f0178ff0e455dc655143d759f88ff0f0a2ca469af8200e649b694",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/routers/credentials.py",
+      "git_sha256": "780db8cda5dab8901b27744d7607e2750b1f529f66f3adbab98c148a2d6dcb86",
+      "bytes": 24518,
+      "worktree_sha256": "780db8cda5dab8901b27744d7607e2750b1f529f66f3adbab98c148a2d6dcb86",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/routers/instances.py",
+      "git_sha256": "bd4df9733b0ccb1f1885df71bea6c6d9793c56e301bbdff2cd5d80c4cd8bae92",
+      "bytes": 15909,
+      "worktree_sha256": "bd4df9733b0ccb1f1885df71bea6c6d9793c56e301bbdff2cd5d80c4cd8bae92",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/routers/metrics.py",
+      "git_sha256": "8bae3d112a73a79019b9dfcc25ff711d134d535ce690513d5f1645ec9b6c20aa",
+      "bytes": 3460,
+      "worktree_sha256": "8bae3d112a73a79019b9dfcc25ff711d134d535ce690513d5f1645ec9b6c20aa",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/routers/tasks.py",
+      "git_sha256": "b58696d8f010d1a4b0052b0b71c80220373f4a6534abdaec40047f7d1c2a8137",
+      "bytes": 9339,
+      "worktree_sha256": "4703ea66c143d38cf6f5538d61460090df35faa188bd01f04a8b785e6448a81c",
+      "matches_raw": false,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/routers/users.py",
+      "git_sha256": "5c585da46de593dc225818b236942d495b3d7c77e27dc5f45eb8d361f229d955",
+      "bytes": 4127,
+      "worktree_sha256": "5c585da46de593dc225818b236942d495b3d7c77e27dc5f45eb8d361f229d955",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/schemas.py",
+      "git_sha256": "f8dc933433e748c95112838d2443f15de078f0e709b59d081c52a25942f590ce",
+      "bytes": 11294,
+      "worktree_sha256": "f8dc933433e748c95112838d2443f15de078f0e709b59d081c52a25942f590ce",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/security.py",
+      "git_sha256": "38debebf45ad4b6697b538366da2cbe269184c780b04c08a5cecb097e2926e3d",
+      "bytes": 3124,
+      "worktree_sha256": "38debebf45ad4b6697b538366da2cbe269184c780b04c08a5cecb097e2926e3d",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/seed.py",
+      "git_sha256": "ca9c46ef738bca6a294c18de111829894e361a8ae38e4ac3a86fddd829abef02",
+      "bytes": 1147,
+      "worktree_sha256": "ca9c46ef738bca6a294c18de111829894e361a8ae38e4ac3a86fddd829abef02",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/__init__.py",
+      "git_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "worktree_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/account.py",
+      "git_sha256": "383eceda370ed49fca331ba7ec85cc7e946bde4040339268905d03e10c91cc03",
+      "bytes": 4999,
+      "worktree_sha256": "383eceda370ed49fca331ba7ec85cc7e946bde4040339268905d03e10c91cc03",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/aws_clients.py",
+      "git_sha256": "6adcc06d5c3c85647a58cffb48b12dadf08ffcc0e14f3a0fd476fe14a030ae81",
+      "bytes": 1911,
+      "worktree_sha256": "6adcc06d5c3c85647a58cffb48b12dadf08ffcc0e14f3a0fd476fe14a030ae81",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/aws_limits.py",
+      "git_sha256": "1eca1debdcbc92a114144765c77d71f9ed414e9f3f9416d56bebe940d01e5104",
+      "bytes": 1897,
+      "worktree_sha256": "1eca1debdcbc92a114144765c77d71f9ed414e9f3f9416d56bebe940d01e5104",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/billing.py",
+      "git_sha256": "33652412c3ba455a311caf932b0c9b2a2222552051c779bc038869824ab9ed25",
+      "bytes": 23752,
+      "worktree_sha256": "33652412c3ba455a311caf932b0c9b2a2222552051c779bc038869824ab9ed25",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/billing_cache.py",
+      "git_sha256": "247ae857a79be2e60dd252c6147be3cc12ada775bcbe0053a8f620dff6b11959",
+      "bytes": 7771,
+      "worktree_sha256": "247ae857a79be2e60dd252c6147be3cc12ada775bcbe0053a8f620dff6b11959",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/billing_summary.py",
+      "git_sha256": "1f968737abbb893965135061c9e0675203aeef97f73793c55e29d797304797a5",
+      "bytes": 12029,
+      "worktree_sha256": "1f968737abbb893965135061c9e0675203aeef97f73793c55e29d797304797a5",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/collector.py",
+      "git_sha256": "dfef0e65d1054c359c495605c81898157abc35a7082118206f9016cc814b96ea",
+      "bytes": 3388,
+      "worktree_sha256": "dfef0e65d1054c359c495605c81898157abc35a7082118206f9016cc814b96ea",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/instance_cache.py",
+      "git_sha256": "72e344c8204e60c45238811a8d5deea919aec39e4720ba0933282da9316b4d93",
+      "bytes": 5049,
+      "worktree_sha256": "72e344c8204e60c45238811a8d5deea919aec39e4720ba0933282da9316b4d93",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/lightsail.py",
+      "git_sha256": "058d0ca0995d2fd867c4eaf0d0fef4e6dfb98f5546b076a5cba853435b81b740",
+      "bytes": 35168,
+      "worktree_sha256": "058d0ca0995d2fd867c4eaf0d0fef4e6dfb98f5546b076a5cba853435b81b740",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/snapshots.py",
+      "git_sha256": "7cdcbce3bbb6d194c1632618fb3e8f80216915fb841d865f6129c3b8b24c6c3b",
+      "bytes": 26320,
+      "worktree_sha256": "7cdcbce3bbb6d194c1632618fb3e8f80216915fb841d865f6129c3b8b24c6c3b",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/task_handlers.py",
+      "git_sha256": "ee1739570e07b6eede4fdc39036c35ba91a951ac463ab24947682b542091ac50",
+      "bytes": 30696,
+      "worktree_sha256": "b049fa038576d05edebd31a9dab5632a1b9e80106dc14b6a678da68a30948d72",
+      "matches_raw": false,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/task_queue.py",
+      "git_sha256": "a4f4719e3b3a4e3c0c2e6e7826b9a1cb2439fc09e2cbd9d0fcf264f31edac59e",
+      "bytes": 39588,
+      "worktree_sha256": "2be3f663d1b762f3d9950628d82f13de7b15afc14f18a2c9fbace3e6b088854b",
+      "matches_raw": false,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/task_submission.py",
+      "git_sha256": "fab2ba02db5ed31839ea6ad11f86ee6989fe3fe3c999f68a8da9244651eef76b",
+      "bytes": 2797,
+      "worktree_sha256": "80449e4ae2c6b2fce017c4bb4f3473e0c640ffe8019393515769fba8001eda64",
+      "matches_raw": false,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/services/traffic.py",
+      "git_sha256": "a185797e84bfc34c5d474390cca4f871995a85ae7d827d09c903c1c3a8b809b0",
+      "bytes": 21157,
+      "worktree_sha256": "a185797e84bfc34c5d474390cca4f871995a85ae7d827d09c903c1c3a8b809b0",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/app/sqlite_backup.py",
+      "git_sha256": "e86cc81e24b4fe1bcad08045f16240ab498d5adf2561e071e04f8ac35bb150bd",
+      "bytes": 8358,
+      "worktree_sha256": "e86cc81e24b4fe1bcad08045f16240ab498d5adf2561e071e04f8ac35bb150bd",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/requirements.txt",
+      "git_sha256": "56ba33d9907e463a94567b2020475f1c43ee2d1a8c4229151575821f563948e6",
+      "bytes": 292,
+      "worktree_sha256": "56ba33d9907e463a94567b2020475f1c43ee2d1a8c4229151575821f563948e6",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/task_fakes.py",
+      "git_sha256": "0332950a15efa56c541210fc3c98f16430df95e5f55de4f5e432a85afbfec7d1",
+      "bytes": 5972,
+      "worktree_sha256": "4cf056b1efb5da7b5e9cb6237f1b0b09a4b9af532d23335f1cb908e3d6ef9f1c",
+      "matches_raw": false,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_billing.py",
+      "git_sha256": "bdb4473bb03edb00d3bf9d07e8e33c786d562c8b5344700057c578731a76ec8e",
+      "bytes": 15032,
+      "worktree_sha256": "bdb4473bb03edb00d3bf9d07e8e33c786d562c8b5344700057c578731a76ec8e",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_migration_boundaries.py",
+      "git_sha256": "35c3c1b7741f8cad25fa985c7fd67040faacc48f5cda944068d4be1c0a5d0443",
+      "bytes": 14054,
+      "worktree_sha256": "35c3c1b7741f8cad25fa985c7fd67040faacc48f5cda944068d4be1c0a5d0443",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_migration_retries.py",
+      "git_sha256": "b273546a2fe66765bbb42d98ca570507ceef9c0e3a11c98ba92897f251480aa2",
+      "bytes": 12044,
+      "worktree_sha256": "b273546a2fe66765bbb42d98ca570507ceef9c0e3a11c98ba92897f251480aa2",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_migrations.py",
+      "git_sha256": "c725e68c0e473bdf463e2ff08c39d6c937fe787ca7ccbe6851d6e3f03bd865b9",
+      "bytes": 33846,
+      "worktree_sha256": "c725e68c0e473bdf463e2ff08c39d6c937fe787ca7ccbe6851d6e3f03bd865b9",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_proxy.py",
+      "git_sha256": "e799a3193ecf590bd08eb4a278b114ed4c56dd56e0ec415bb24c84c1a7d578b3",
+      "bytes": 28800,
+      "worktree_sha256": "e799a3193ecf590bd08eb4a278b114ed4c56dd56e0ec415bb24c84c1a7d578b3",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_rate_limit_password.py",
+      "git_sha256": "dc35890fb5c62cb1f98ce89c378bdbb365c4e7b3acdce4ab6efc98e30ef5f485",
+      "bytes": 10107,
+      "worktree_sha256": "dc35890fb5c62cb1f98ce89c378bdbb365c4e7b3acdce4ab6efc98e30ef5f485",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_regions.py",
+      "git_sha256": "adc895ee2a9795c8ab08a3ecbb9b3b44242faec8e4545570a730d70e5d40f57c",
+      "bytes": 22149,
+      "worktree_sha256": "adc895ee2a9795c8ab08a3ecbb9b3b44242faec8e4545570a730d70e5d40f57c",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_remaining_fixes.py",
+      "git_sha256": "d51c5fcc34935636b81f7b720313034f63b785673aaf1d804e740ff09962778f",
+      "bytes": 8613,
+      "worktree_sha256": "d51c5fcc34935636b81f7b720313034f63b785673aaf1d804e740ff09962778f",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_security_config.py",
+      "git_sha256": "f57393db2c97672cf57deece423706625916dc86e6e0f8545cf24b776a775f5e",
+      "bytes": 10360,
+      "worktree_sha256": "f57393db2c97672cf57deece423706625916dc86e6e0f8545cf24b776a775f5e",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_t02_identity_proxy.py",
+      "git_sha256": "32bc25a9b64c0fdc5e5bf3d62fc81e297d413f74ed669a054a6c1313ee1c3021",
+      "bytes": 35019,
+      "worktree_sha256": "32bc25a9b64c0fdc5e5bf3d62fc81e297d413f74ed669a054a6c1313ee1c3021",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_t03_billing_accuracy.py",
+      "git_sha256": "138411a438eed189050acb150dcf0b3870eba8cb8407e45f53d81bbdfc6422fb",
+      "bytes": 23706,
+      "worktree_sha256": "138411a438eed189050acb150dcf0b3870eba8cb8407e45f53d81bbdfc6422fb",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_t04_cache.py",
+      "git_sha256": "f12fb208d9ac97a53aff0d96c391cc9eb8602178528bcfc3d6e136904986bcb0",
+      "bytes": 50721,
+      "worktree_sha256": "f12fb208d9ac97a53aff0d96c391cc9eb8602178528bcfc3d6e136904986bcb0",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_t06_api.py",
+      "git_sha256": "e46c172b70a374db1282481c6fee82d1997963e48a88b57257f727679ac10a8c",
+      "bytes": 6973,
+      "worktree_sha256": "1624d925cca487b4067466185628b147c12938024ea2fd97a3b8a19640289906",
+      "matches_raw": false,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_t06_proxy_workflow.py",
+      "git_sha256": "dfb2ae00d963585362cb4973636ff61c7bbaaff816cc985070dfac84d60eec7f",
+      "bytes": 3260,
+      "worktree_sha256": "598b2cf68b24ebf6c98c06897d4fa1a5eb8e7b8037b3fc33ef1fc8c64c41e822",
+      "matches_raw": false,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_t06_task_queue.py",
+      "git_sha256": "0dfa2aeb65b41a0060cdde16c4fa91b2124d39a56f00534146c04c223a13bd67",
+      "bytes": 6025,
+      "worktree_sha256": "bd33699bd1364761d3a7d0185d0165e9de698a7a7ed6f323776c1d6f73cb1880",
+      "matches_raw": false,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_t06_workflows.py",
+      "git_sha256": "e4a0f8d02626757037ea85d8c0061010f8629d0c74398d683c5709999b409cba",
+      "bytes": 16888,
+      "worktree_sha256": "900097e055f86a699d4c110c324861a3a04d142d81d9d65ec1635f8900b40c0e",
+      "matches_raw": false,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "backend/tests/test_traffic_sum.py",
+      "git_sha256": "c4362c8c84db54244240682c727ed6dc57cfe60413821cce6032760b80dddd5b",
+      "bytes": 2571,
+      "worktree_sha256": "c4362c8c84db54244240682c727ed6dc57cfe60413821cce6032760b80dddd5b",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "docs/optimization/T06-operations.md",
+      "git_sha256": "fec767a2136f224891795dcea122159addbe32dc149d91b8dd89be50e135c5fe",
+      "bytes": 4888,
+      "worktree_sha256": "fec767a2136f224891795dcea122159addbe32dc149d91b8dd89be50e135c5fe",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "docs/optimization/plans/T06.md",
+      "git_sha256": "205804776bf9c04182d95e03ed28517d6e71f0f877cbb46c087dddd8c6fb4806",
+      "bytes": 10901,
+      "worktree_sha256": "205804776bf9c04182d95e03ed28517d6e71f0f877cbb46c087dddd8c6fb4806",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/Dockerfile",
+      "git_sha256": "1158917d62aab77041530a02bac1e7e89d1ee1c4df751457567cf7596c5ab20a",
+      "bytes": 409,
+      "worktree_sha256": "1158917d62aab77041530a02bac1e7e89d1ee1c4df751457567cf7596c5ab20a",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/index.html",
+      "git_sha256": "326739125fdeb04ff37a70f58ab47bdc0b89e518db97529fe235e93a3a2a428f",
+      "bytes": 324,
+      "worktree_sha256": "326739125fdeb04ff37a70f58ab47bdc0b89e518db97529fe235e93a3a2a428f",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/nginx.conf",
+      "git_sha256": "b769dde52f9a2010641c5a7ca8fa09931798bc433a7853dcdad6c5970ffdb883",
+      "bytes": 1371,
+      "worktree_sha256": "b769dde52f9a2010641c5a7ca8fa09931798bc433a7853dcdad6c5970ffdb883",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/package.json",
+      "git_sha256": "c7e8b5c879232d06f73434e7ecf767e1071e3ae3dfd5c72ffa3904f50b9d49ef",
+      "bytes": 648,
+      "worktree_sha256": "c7e8b5c879232d06f73434e7ecf767e1071e3ae3dfd5c72ffa3904f50b9d49ef",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/App.tsx",
+      "git_sha256": "315686d492fe8491f8ef733a447e70c5a6a86f75a80e2b3596a4aefaaeacbe78",
+      "bytes": 2696,
+      "worktree_sha256": "315686d492fe8491f8ef733a447e70c5a6a86f75a80e2b3596a4aefaaeacbe78",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/api/client.ts",
+      "git_sha256": "03c9a86335da372ead117a3ed12b90911de8aa51d8c04f1fc8d21f09364daa7b",
+      "bytes": 14715,
+      "worktree_sha256": "03c9a86335da372ead117a3ed12b90911de8aa51d8c04f1fc8d21f09364daa7b",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/api/queryCache.d.mts",
+      "git_sha256": "91472c74d936444bcc4360c4097618f0de1785e821c8fc944594adb8131ce07b",
+      "bytes": 773,
+      "worktree_sha256": "91472c74d936444bcc4360c4097618f0de1785e821c8fc944594adb8131ce07b",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/api/queryCache.mjs",
+      "git_sha256": "e6630862b8d3bfdf7955c583fa749b5797353f65b9772fce04e61751b4d74ea3",
+      "bytes": 5158,
+      "worktree_sha256": "e6630862b8d3bfdf7955c583fa749b5797353f65b9772fce04e61751b4d74ea3",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/api/tasks.ts",
+      "git_sha256": "a55d7d06519a20c7f333ed23b0d86f788f73356c0dc199617f542a35bf47149b",
+      "bytes": 5886,
+      "worktree_sha256": "3621619b12e3f45daad4b5b6686259784d88f80567dcec39b61110d2500ca4a1",
+      "matches_raw": false,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/auth/AuthContext.tsx",
+      "git_sha256": "980ffa4b69bba547aafb38c7430de74892e83fe2430d16bd36b5df511240b865",
+      "bytes": 3579,
+      "worktree_sha256": "980ffa4b69bba547aafb38c7430de74892e83fe2430d16bd36b5df511240b865",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/components/Layout.tsx",
+      "git_sha256": "80c83af7288251802ff828cfc50ad9197581eeea6c3176db2b9204ea6925e43f",
+      "bytes": 2928,
+      "worktree_sha256": "80c83af7288251802ff828cfc50ad9197581eeea6c3176db2b9204ea6925e43f",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/index.css",
+      "git_sha256": "acb402f436209e2db06888677bf3f28710e7b6be3f6734e4da4a90d5451f4462",
+      "bytes": 321,
+      "worktree_sha256": "acb402f436209e2db06888677bf3f28710e7b6be3f6734e4da4a90d5451f4462",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/main.tsx",
+      "git_sha256": "89995fdad40b248031bcd7ee1370377ed32dcab0bef646bc923b92f32e9eaa7e",
+      "bytes": 611,
+      "worktree_sha256": "89995fdad40b248031bcd7ee1370377ed32dcab0bef646bc923b92f32e9eaa7e",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/pages/Billing.tsx",
+      "git_sha256": "5ba1c2a56470bcc622cf65208cc5ac98847c300fd3ffef8404b1eb9f94028924",
+      "bytes": 14220,
+      "worktree_sha256": "5ba1c2a56470bcc622cf65208cc5ac98847c300fd3ffef8404b1eb9f94028924",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/pages/CreateInstance.tsx",
+      "git_sha256": "650b4d23ceb620aa92825cffcda8babd7d7e2f43d2e8b292b549eaaefd438cd8",
+      "bytes": 24437,
+      "worktree_sha256": "650b4d23ceb620aa92825cffcda8babd7d7e2f43d2e8b292b549eaaefd438cd8",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/pages/Credentials.tsx",
+      "git_sha256": "6c68c5b950ca3ecc5cbc83bffb6f8ce073c23a97643de61dfeb29586a716faa7",
+      "bytes": 15348,
+      "worktree_sha256": "6c68c5b950ca3ecc5cbc83bffb6f8ce073c23a97643de61dfeb29586a716faa7",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/pages/Dashboard.tsx",
+      "git_sha256": "881846c7b3f13a4223223f8a1c0409a082333f97a0d7476c4be3a0c018876499",
+      "bytes": 10331,
+      "worktree_sha256": "881846c7b3f13a4223223f8a1c0409a082333f97a0d7476c4be3a0c018876499",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/pages/InstanceDetail.tsx",
+      "git_sha256": "5f07c66a53f8ce60533e33a21835677f3d4013ba294c9d74c8704b96a0df6ca2",
+      "bytes": 7275,
+      "worktree_sha256": "5f07c66a53f8ce60533e33a21835677f3d4013ba294c9d74c8704b96a0df6ca2",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/pages/Instances.tsx",
+      "git_sha256": "9125b35b98646808d3bb75891840315cdaeb6bfe4297bdba306ed3cd369cb66d",
+      "bytes": 18337,
+      "worktree_sha256": "9125b35b98646808d3bb75891840315cdaeb6bfe4297bdba306ed3cd369cb66d",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/pages/Login.tsx",
+      "git_sha256": "3ffe621bdb301a50e15d3dc7cc0dc6300d1d05462fe00cd207949b8ba13be758",
+      "bytes": 2336,
+      "worktree_sha256": "3ffe621bdb301a50e15d3dc7cc0dc6300d1d05462fe00cd207949b8ba13be758",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/pages/Tasks.tsx",
+      "git_sha256": "76b13e6b976a926027e16b81d99696204124bf26d0b505253cf2296c5f9637b3",
+      "bytes": 7078,
+      "worktree_sha256": "758022cb53918a99b26d1f1b33e61078a21d2286b0b9f9f7c89a3fb9af021611",
+      "matches_raw": false,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/pages/Traffic.tsx",
+      "git_sha256": "6a094203d94a334fe225c94d02681cb943753dbd7eedfb8f40aa26762ea9edda",
+      "bytes": 9138,
+      "worktree_sha256": "6a094203d94a334fe225c94d02681cb943753dbd7eedfb8f40aa26762ea9edda",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/pages/Users.tsx",
+      "git_sha256": "98cd72345a176c18687df5886ffdb9acb1d9197856d8cc1ecae5e349c59514d0",
+      "bytes": 6708,
+      "worktree_sha256": "98cd72345a176c18687df5886ffdb9acb1d9197856d8cc1ecae5e349c59514d0",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/src/vite-env.d.ts",
+      "git_sha256": "424faf9241dd699dda995b367ed36665732da1e6ec1f33b2fd40394488ecac92",
+      "bytes": 39,
+      "worktree_sha256": "424faf9241dd699dda995b367ed36665732da1e6ec1f33b2fd40394488ecac92",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/tests/queryCache.test.mjs",
+      "git_sha256": "2e079766bf66b2be27182c68581b9695ebcad0b7108c2f41df4a771a14de2587",
+      "bytes": 7069,
+      "worktree_sha256": "2e079766bf66b2be27182c68581b9695ebcad0b7108c2f41df4a771a14de2587",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/tsconfig.json",
+      "git_sha256": "311de90e48985355be609921ecf4a879b4b9bb743586f93802eccf19152afa57",
+      "bytes": 530,
+      "worktree_sha256": "311de90e48985355be609921ecf4a879b4b9bb743586f93802eccf19152afa57",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/tsconfig.node.json",
+      "git_sha256": "c9ce127d1943502bbbad10dc867d877be2e38dee50d4e9fc3c52b3765b8fed30",
+      "bytes": 71,
+      "worktree_sha256": "c9ce127d1943502bbbad10dc867d877be2e38dee50d4e9fc3c52b3765b8fed30",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "frontend/vite.config.ts",
+      "git_sha256": "a88fd026d3fbfdbfcc8eb55ff0e4cf614be1e71e701aee77d26d1d9d991a26a1",
+      "bytes": 295,
+      "worktree_sha256": "a88fd026d3fbfdbfcc8eb55ff0e4cf614be1e71e701aee77d26d1d9d991a26a1",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/README.md",
+      "git_sha256": "a27e0987ce00a9b81c7b791c66ef66ca07a65df9a73b06a15c4950fac38693f1",
+      "bytes": 10607,
+      "worktree_sha256": "a27e0987ce00a9b81c7b791c66ef66ca07a65df9a73b06a15c4950fac38693f1",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/benchmark_server.py",
+      "git_sha256": "89f0dd8511f574747eb48b0504e0308bf284222a227d52f2a55dac539e315250",
+      "bytes": 9907,
+      "worktree_sha256": "89f0dd8511f574747eb48b0504e0308bf284222a227d52f2a55dac539e315250",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/browser_benchmark.mjs",
+      "git_sha256": "cf9ce28e24df87f2dd30bc25786c4a3da8106446b6b5c34d991703efe287fd42",
+      "bytes": 8199,
+      "worktree_sha256": "cf9ce28e24df87f2dd30bc25786c4a3da8106446b6b5c34d991703efe287fd42",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/container_baseline.py",
+      "git_sha256": "c52686673fb8eda4acf32daa81bd876ded7798ca546ec8f545ca08b46b7bcc9f",
+      "bytes": 20529,
+      "worktree_sha256": "c52686673fb8eda4acf32daa81bd876ded7798ca546ec8f545ca08b46b7bcc9f",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/fake_aws.py",
+      "git_sha256": "52b995ef67346e66fd672c031cfed2bd8dd9a8bbacef86668da38c90726260f9",
+      "bytes": 8441,
+      "worktree_sha256": "52b995ef67346e66fd672c031cfed2bd8dd9a8bbacef86668da38c90726260f9",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/fixtures/aws.json",
+      "git_sha256": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c",
+      "bytes": 507,
+      "worktree_sha256": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/measure.py",
+      "git_sha256": "e5eb3feb6e229387750351db3e83e9268469243d77ad39d65e64f103a96f8831",
+      "bytes": 498,
+      "worktree_sha256": "e5eb3feb6e229387750351db3e83e9268469243d77ad39d65e64f103a96f8831",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/offline_proxy.mjs",
+      "git_sha256": "9ed44b7749f8e95f95cb00747a04372981ebb07f80a180532609077c71f3bf1b",
+      "bytes": 2153,
+      "worktree_sha256": "9ed44b7749f8e95f95cb00747a04372981ebb07f80a180532609077c71f3bf1b",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/offline_proxy.test.mjs",
+      "git_sha256": "cd46c329d09c778313732bb71d9f9e9a878b316bb56338ba498561ac8ed444c8",
+      "bytes": 2650,
+      "worktree_sha256": "cd46c329d09c778313732bb71d9f9e9a878b316bb56338ba498561ac8ed444c8",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/package-lock.json",
+      "git_sha256": "d96fb0371e2ee0bf51b2488df05225ddbabb6d4d003a49fe83fda7a83261357e",
+      "bytes": 1577,
+      "worktree_sha256": "d96fb0371e2ee0bf51b2488df05225ddbabb6d4d003a49fe83fda7a83261357e",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/package.json",
+      "git_sha256": "89dde57af030a09e9e767e100c4207917295f3ab9acae091a6dc3614ffaf330d",
+      "bytes": 131,
+      "worktree_sha256": "89dde57af030a09e9e767e100c4207917295f3ab9acae091a6dc3614ffaf330d",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/probe_t04_performance.py",
+      "git_sha256": "6ac6c30b2ae9777f5d7afb7bb4fabcb6f4992ad367ab7d113db941bedb9e8307",
+      "bytes": 6750,
+      "worktree_sha256": "6ac6c30b2ae9777f5d7afb7bb4fabcb6f4992ad367ab7d113db941bedb9e8307",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/probe_t06_browser.mjs",
+      "git_sha256": "90909680815d763c867757a823f02d6e11fa4db4ae7579d3f5b304edcf01c502",
+      "bytes": 9392,
+      "worktree_sha256": "8c00b999ecd68d1b71fa6bf0b9cb480098c7b355277307fc5aed011e63da4333",
+      "matches_raw": false,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/probe_t06_intents.mjs",
+      "git_sha256": "8b73d0bb003e3ac5635590bd95f0ee96224ee5164f7eac9e18c73d27f73d67b3",
+      "bytes": 6311,
+      "worktree_sha256": "8b73d0bb003e3ac5635590bd95f0ee96224ee5164f7eac9e18c73d27f73d67b3",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/processes.py",
+      "git_sha256": "e4718c5e28cc8724953ad9d919ac788f30da135268dd89cba22c32fb758b33c6",
+      "bytes": 581,
+      "worktree_sha256": "e4718c5e28cc8724953ad9d919ac788f30da135268dd89cba22c32fb758b33c6",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/progress_report.mjs",
+      "git_sha256": "2a7e80f390274c518826ff2b48f74e2c213931c9e6e9675a2a55d0f863f85e09",
+      "bytes": 542,
+      "worktree_sha256": "2a7e80f390274c518826ff2b48f74e2c213931c9e6e9675a2a55d0f863f85e09",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/progress_report.test.mjs",
+      "git_sha256": "b2889222138fbdea1b4b4eb6614712394a07814caabfad0ac3f4668a4c383718",
+      "bytes": 1409,
+      "worktree_sha256": "b2889222138fbdea1b4b4eb6614712394a07814caabfad0ac3f4668a4c383718",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/readiness.mjs",
+      "git_sha256": "6901a3af330c155edace1e2450d91f85ed07155f966009bb75c6a1639b6bb7a6",
+      "bytes": 633,
+      "worktree_sha256": "6901a3af330c155edace1e2450d91f85ed07155f966009bb75c6a1639b6bb7a6",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/readiness.test.mjs",
+      "git_sha256": "52c591547281b2016b8f9b27122dc7c5187eadd0ed52e13f859949a763ae7465",
+      "bytes": 1492,
+      "worktree_sha256": "52c591547281b2016b8f9b27122dc7c5187eadd0ed52e13f859949a763ae7465",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/requirements.txt",
+      "git_sha256": "12776e575c334bdb14af784a300455147abdd15c94e9ee3d22c742e31a7c37f5",
+      "bytes": 14,
+      "worktree_sha256": "12776e575c334bdb14af784a300455147abdd15c94e9ee3d22c742e31a7c37f5",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/run_baseline.py",
+      "git_sha256": "296681d20bde1a849235294e5ab07150329e2cf988079a200ec1a7e2c6028c1d",
+      "bytes": 15431,
+      "worktree_sha256": "296681d20bde1a849235294e5ab07150329e2cf988079a200ec1a7e2c6028c1d",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/tests/test_baseline.py",
+      "git_sha256": "c5449b4250e3bce4268acdf80d405c06c0a7124167adae13b82821159aa8ce55",
+      "bytes": 3581,
+      "worktree_sha256": "c5449b4250e3bce4268acdf80d405c06c0a7124167adae13b82821159aa8ce55",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/tests/test_container.py",
+      "git_sha256": "0875b53558caa022cad69f1e03186f95d886ded878351046f275530ed6bae2c7",
+      "bytes": 4164,
+      "worktree_sha256": "0875b53558caa022cad69f1e03186f95d886ded878351046f275530ed6bae2c7",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/tests/test_reports.py",
+      "git_sha256": "f1ba80bb0107c0a406bc1b2a1e75463294ab6f136a8fa02975df5908c9b8a7d4",
+      "bytes": 2237,
+      "worktree_sha256": "f1ba80bb0107c0a406bc1b2a1e75463294ab6f136a8fa02975df5908c9b8a7d4",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/tests/test_server.py",
+      "git_sha256": "7fb6e0326950277b56842b7689cec95859cf65ada5f04675c60d2f00459cfee8",
+      "bytes": 3347,
+      "worktree_sha256": "7fb6e0326950277b56842b7689cec95859cf65ada5f04675c60d2f00459cfee8",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/verify_t02.py",
+      "git_sha256": "0b9a3b2d321867155813f2e0113c8dfabf594e7b2146c66392d180152f0a6cb7",
+      "bytes": 12893,
+      "worktree_sha256": "0b9a3b2d321867155813f2e0113c8dfabf594e7b2146c66392d180152f0a6cb7",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/verify_t03.py",
+      "git_sha256": "07fb397ab796986aef82ffb35089d0949a0406ba18ccf3d23dd67ae612bac3f3",
+      "bytes": 6083,
+      "worktree_sha256": "07fb397ab796986aef82ffb35089d0949a0406ba18ccf3d23dd67ae612bac3f3",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/verify_t04.py",
+      "git_sha256": "21d23f203546714b225e3040ebfb5e43f4c1de9cae6d358fbe72658a290ad306",
+      "bytes": 5318,
+      "worktree_sha256": "21d23f203546714b225e3040ebfb5e43f4c1de9cae6d358fbe72658a290ad306",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/verify_t05_frontend.mjs",
+      "git_sha256": "b9ffbbb232aee7943f5a4a40531e3753440d9359b6d01692876f63e0783ce64d",
+      "bytes": 10859,
+      "worktree_sha256": "b9ffbbb232aee7943f5a4a40531e3753440d9359b6d01692876f63e0783ce64d",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    },
+    {
+      "path": "tools/optimization/verify_t06.py",
+      "git_sha256": "0050633b66df8e8c467a22d3f40c857af2051f8c00063eae00f8833fe4d0b307",
+      "bytes": 4400,
+      "worktree_sha256": "0050633b66df8e8c467a22d3f40c857af2051f8c00063eae00f8833fe4d0b307",
+      "matches_raw": true,
+      "matches_normalized_lf": true
+    }
+  ]
+}

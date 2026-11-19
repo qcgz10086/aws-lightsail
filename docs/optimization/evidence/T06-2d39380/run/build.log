@@ -1,0 +1,37 @@
+vite v6.4.6 building for production...
+
+(!) outDir C:\Users\liyang\.codex\worktrees\t06-persistent-tasks\aws-lightsail\.baseline-runs\t06-candidate\frontend-build is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+transforming...
+✓ 3516 modules transformed.
+rendering chunks...
+computing gzip size...
+../.baseline-runs/t06-candidate/frontend-build/index.html                           0.42 kB │ gzip:   0.30 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/index-Ccfr7oNe.css            0.24 kB │ gzip:   0.22 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/Users-BPh_zOim.js             3.50 kB │ gzip:   1.78 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/index-CnDSwn60.js             4.71 kB │ gzip:   2.01 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/Traffic-lafJGgSe.js           5.25 kB │ gzip:   2.41 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/index-CsqgCo6w.js             6.86 kB │ gzip:   2.69 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/dayjs.min-DsmT9qPy.js         7.16 kB │ gzip:   3.12 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/index-D1_W--Mn.js             7.92 kB │ gzip:   2.69 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/Credentials-DSGYCgZP.js       8.20 kB │ gzip:   3.60 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/index-BSNBMGl8.js             9.63 kB │ gzip:   3.28 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/Instances-CdTze2_s.js         9.64 kB │ gzip:   4.09 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/CreateInstance-D_tsWvJa.js   11.01 kB │ gzip:   4.42 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/Tasks-C81QMJyu.js            14.68 kB │ gzip:   5.35 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/Dashboard-DKHrVm5R.js        16.59 kB │ gzip:   6.28 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/Pagination-jvbVV_kt.js       24.16 kB │ gzip:   7.29 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/index-MCryARKm.js            24.56 kB │ gzip:   8.40 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/index-DeRoJN_6.js            28.84 kB │ gzip:   9.62 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/index-Dcn5DmdI.js            90.98 kB │ gzip:  29.99 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/Billing-DBqAdDY1.js         117.28 kB │ gzip:  38.99 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/Table-COG6OCPz.js           179.69 kB │ gzip:  57.18 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/InstanceDetail-CbbOmwwc.js  408.84 kB │ gzip: 112.31 kB
+../.baseline-runs/t06-candidate/frontend-build/assets/index-Da0jFxWw.js           790.10 kB │ gzip: 259.64 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 14.57s

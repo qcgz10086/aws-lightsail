@@ -1,0 +1,70 @@
+{
+  "results": [
+    {
+      "scenario": "instance_write_submits_task_with_key_and_opens_progress",
+      "passed": true
+    },
+    {
+      "scenario": "direct_task_reload_retains_id",
+      "passed": true,
+      "detail_gets": 2
+    },
+    {
+      "scenario": "polls_running_until_confirmed",
+      "passed": true,
+      "reads": 3,
+      "stopped_polling": true
+    },
+    {
+      "scenario": "all_task_states_distinct",
+      "passed": true,
+      "checks": [
+        {
+          "text": "已接受，等待执行",
+          "visible": true
+        },
+        {
+          "text": "执行中",
+          "visible": true
+        },
+        {
+          "text": "已确认完成",
+          "visible": true
+        },
+        {
+          "text": "明确失败",
+          "visible": true
+        },
+        {
+          "text": "部分完成",
+          "visible": true
+        },
+        {
+          "text": "待核对，资源锁保留",
+          "visible": true
+        },
+        {
+          "text": "已人工决议，AWS 结果未确认",
+          "visible": true
+        }
+      ]
+    },
+    {
+      "scenario": "late_detail_after_navigating_list",
+      "passed": true,
+      "url": "http://127.0.0.1:51056/tasks"
+    },
+    {
+      "scenario": "pending_intent_restores_after_reload",
+      "passed": true,
+      "pending_removed": true
+    },
+    {
+      "scenario": "late_old_user_task_after_login",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "passed": 7,
+  "total": 7
+}
