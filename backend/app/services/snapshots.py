@@ -140,13 +140,17 @@ def _publish(engine, scope, token, ttl, data=None, error=None, invalidate=False,
     # cannot commit between identity checking and compare-and-publish.
     with Session(engine) as db:
         db.connection().exec_driver_sql("BEGIN IMMEDIATE")
-        if not _current(db, scope):
-            db.execute(delete(DataSnapshot).where(DataSnapshot.key == scope["key"], DataSnapshot.lease_token == token))
-            db.commit(); return
-        row = db.execute(select(DataSnapshot.payload_bytes).where(DataSnapshot.key == scope["key"],
-            DataSnapshot.lease_token == token)).first()
+        row = db.execute(select(User.id, User.token_version, AwsCredential.id, AwsCredential.account_id,
+            AwsCredential.access_key_id_enc, AwsCredential.secret_access_key_enc, AwsCredential.proxy_url_enc,
+            DataSnapshot.payload_bytes).join(AwsCredential, AwsCredential.user_id == User.id).join(
+                DataSnapshot, DataSnapshot.key == scope["key"]).where(User.id == scope["user_id"],
+                AwsCredential.id == scope["credential_id"], DataSnapshot.lease_token == token)).first()
         if row is None:
             return
+        current_version = hashlib.sha256(json.dumps(list(row[:7]), separators=(",", ":")).encode()).hexdigest()
+        if current_version != scope["version"]:
+            db.execute(delete(DataSnapshot).where(DataSnapshot.key == scope["key"], DataSnapshot.lease_token == token))
+            db.commit(); return
         values = {"lease_token": None, "lease_until": 0, "updated_at": now,
                   "error": sanitize_error_message(error) if error else None,
                   "error_status": error_status if error else None}
@@ -161,7 +165,7 @@ def _publish(engine, scope, token, ttl, data=None, error=None, invalidate=False,
                 values.update(payload=None, payload_bytes=0, last_success=None, expires_at=0)
         else:
             needed = len(payload.encode())
-            total = db.scalar(select(func.coalesce(func.sum(DataSnapshot.payload_bytes), 0))) - row[0]
+            total = db.scalar(select(func.coalesce(func.sum(DataSnapshot.payload_bytes), 0))) - row[7]
             if total + needed > MAX_PAYLOAD_BYTES:
                 victims = db.execute(select(DataSnapshot.key, DataSnapshot.payload_bytes).where(
                     DataSnapshot.key != scope["key"], DataSnapshot.payload_bytes > 0).order_by(DataSnapshot.updated_at))
