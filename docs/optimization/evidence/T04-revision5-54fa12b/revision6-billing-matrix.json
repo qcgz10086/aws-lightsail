@@ -1,0 +1,463 @@
+{
+  "head": "38395f299155d0cfdf7e590b0685ae7ed268c8fc",
+  "scenarios": [
+    {
+      "target": "costs",
+      "error_code": "ExpiredToken",
+      "checks": {
+        "all_payloads_cleared": true,
+        "no_section_success_data": true,
+        "no_aws_transport": true
+      },
+      "passed": true,
+      "aws_transport_attempts": 0,
+      "section_statuses": {
+        "costs": "credential_invalid",
+        "forecast": "credential_invalid",
+        "credits": "credential_invalid"
+      },
+      "persisted": {
+        "billing-identity": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        },
+        "billing-costs": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        },
+        "billing-forecast": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        },
+        "billing-credits": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        }
+      }
+    },
+    {
+      "target": "costs",
+      "error_code": "AccessDenied",
+      "checks": {
+        "target_cleared": true,
+        "target_no_permission": true,
+        "unrelated_unchanged": true,
+        "no_aws_transport": true
+      },
+      "passed": true,
+      "aws_transport_attempts": 0,
+      "section_statuses": {
+        "costs": "no_permission",
+        "forecast": "ok",
+        "credits": "ok"
+      },
+      "persisted": {
+        "billing-identity": {
+          "payload_present": true,
+          "last_success": 1795057612.4194033,
+          "error_status": null
+        },
+        "billing-costs": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "no_permission"
+        },
+        "billing-forecast": {
+          "payload_present": true,
+          "last_success": 1795057612.4527168,
+          "error_status": null
+        },
+        "billing-credits": {
+          "payload_present": true,
+          "last_success": 1795057612.4577165,
+          "error_status": null
+        }
+      }
+    },
+    {
+      "target": "costs",
+      "error_code": "EndpointConnectionError",
+      "checks": {
+        "all_success_values_preserved": true,
+        "no_aws_transport": true
+      },
+      "passed": true,
+      "aws_transport_attempts": 0,
+      "section_statuses": {
+        "costs": "ok",
+        "forecast": "ok",
+        "credits": "ok"
+      },
+      "persisted": {
+        "billing-identity": {
+          "payload_present": true,
+          "last_success": 1795057612.6545217,
+          "error_status": null
+        },
+        "billing-costs": {
+          "payload_present": true,
+          "last_success": 1795057612.6870737,
+          "error_status": "unavailable"
+        },
+        "billing-forecast": {
+          "payload_present": true,
+          "last_success": 1795057612.6880736,
+          "error_status": null
+        },
+        "billing-credits": {
+          "payload_present": true,
+          "last_success": 1795057612.6927276,
+          "error_status": null
+        }
+      }
+    },
+    {
+      "target": "forecast",
+      "error_code": "ExpiredToken",
+      "checks": {
+        "all_payloads_cleared": true,
+        "no_section_success_data": true,
+        "no_aws_transport": true
+      },
+      "passed": true,
+      "aws_transport_attempts": 0,
+      "section_statuses": {
+        "costs": "credential_invalid",
+        "forecast": "credential_invalid",
+        "credits": "credential_invalid"
+      },
+      "persisted": {
+        "billing-identity": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        },
+        "billing-costs": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        },
+        "billing-forecast": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        },
+        "billing-credits": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        }
+      }
+    },
+    {
+      "target": "forecast",
+      "error_code": "AccessDenied",
+      "checks": {
+        "target_cleared": true,
+        "target_no_permission": true,
+        "unrelated_unchanged": true,
+        "no_aws_transport": true
+      },
+      "passed": true,
+      "aws_transport_attempts": 0,
+      "section_statuses": {
+        "costs": "ok",
+        "forecast": "no_permission",
+        "credits": "ok"
+      },
+      "persisted": {
+        "billing-identity": {
+          "payload_present": true,
+          "last_success": 1795057613.1323736,
+          "error_status": null
+        },
+        "billing-costs": {
+          "payload_present": true,
+          "last_success": 1795057613.165822,
+          "error_status": null
+        },
+        "billing-forecast": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "no_permission"
+        },
+        "billing-credits": {
+          "payload_present": true,
+          "last_success": 1795057613.16782,
+          "error_status": null
+        }
+      }
+    },
+    {
+      "target": "forecast",
+      "error_code": "EndpointConnectionError",
+      "checks": {
+        "all_success_values_preserved": true,
+        "no_aws_transport": true
+      },
+      "passed": true,
+      "aws_transport_attempts": 0,
+      "section_statuses": {
+        "costs": "ok",
+        "forecast": "ok",
+        "credits": "ok"
+      },
+      "persisted": {
+        "billing-identity": {
+          "payload_present": true,
+          "last_success": 1795057613.3686788,
+          "error_status": null
+        },
+        "billing-costs": {
+          "payload_present": true,
+          "last_success": 1795057613.4013999,
+          "error_status": null
+        },
+        "billing-forecast": {
+          "payload_present": true,
+          "last_success": 1795057613.4024,
+          "error_status": "unavailable"
+        },
+        "billing-credits": {
+          "payload_present": true,
+          "last_success": 1795057613.4074016,
+          "error_status": null
+        }
+      }
+    },
+    {
+      "target": "credits_api",
+      "error_code": "ExpiredToken",
+      "checks": {
+        "all_payloads_cleared": true,
+        "no_section_success_data": true,
+        "no_aws_transport": true
+      },
+      "passed": true,
+      "aws_transport_attempts": 0,
+      "section_statuses": {
+        "costs": "credential_invalid",
+        "forecast": "credential_invalid",
+        "credits": "credential_invalid"
+      },
+      "persisted": {
+        "billing-identity": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        },
+        "billing-costs": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        },
+        "billing-forecast": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        },
+        "billing-credits": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        }
+      }
+    },
+    {
+      "target": "credits_api",
+      "error_code": "AccessDenied",
+      "checks": {
+        "target_cleared": true,
+        "target_no_permission": true,
+        "unrelated_unchanged": true,
+        "no_aws_transport": true
+      },
+      "passed": true,
+      "aws_transport_attempts": 0,
+      "section_statuses": {
+        "costs": "ok",
+        "forecast": "ok",
+        "credits": "no_permission"
+      },
+      "persisted": {
+        "billing-identity": {
+          "payload_present": true,
+          "last_success": 1795057613.8569112,
+          "error_status": null
+        },
+        "billing-costs": {
+          "payload_present": true,
+          "last_success": 1795057613.8893542,
+          "error_status": null
+        },
+        "billing-forecast": {
+          "payload_present": true,
+          "last_success": 1795057613.8902922,
+          "error_status": null
+        },
+        "billing-credits": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "no_permission"
+        }
+      }
+    },
+    {
+      "target": "credits_api",
+      "error_code": "EndpointConnectionError",
+      "checks": {
+        "all_success_values_preserved": true,
+        "no_aws_transport": true
+      },
+      "passed": true,
+      "aws_transport_attempts": 0,
+      "section_statuses": {
+        "costs": "ok",
+        "forecast": "ok",
+        "credits": "ok"
+      },
+      "persisted": {
+        "billing-identity": {
+          "payload_present": true,
+          "last_success": 1795057614.0852656,
+          "error_status": null
+        },
+        "billing-costs": {
+          "payload_present": true,
+          "last_success": 1795057614.1181703,
+          "error_status": null
+        },
+        "billing-forecast": {
+          "payload_present": true,
+          "last_success": 1795057614.1191702,
+          "error_status": null
+        },
+        "billing-credits": {
+          "payload_present": true,
+          "last_success": 1795057614.1191702,
+          "error_status": "unavailable"
+        }
+      }
+    },
+    {
+      "target": "credits_sts",
+      "error_code": "ExpiredToken",
+      "checks": {
+        "all_payloads_cleared": true,
+        "no_section_success_data": true,
+        "no_aws_transport": true
+      },
+      "passed": true,
+      "aws_transport_attempts": 0,
+      "section_statuses": {
+        "costs": "credential_invalid",
+        "forecast": "credential_invalid",
+        "credits": "credential_invalid"
+      },
+      "persisted": {
+        "billing-identity": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        },
+        "billing-costs": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        },
+        "billing-forecast": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        },
+        "billing-credits": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "credential_invalid"
+        }
+      }
+    },
+    {
+      "target": "credits_sts",
+      "error_code": "AccessDenied",
+      "checks": {
+        "target_cleared": true,
+        "target_no_permission": true,
+        "unrelated_unchanged": true,
+        "no_aws_transport": true
+      },
+      "passed": true,
+      "aws_transport_attempts": 0,
+      "section_statuses": {
+        "costs": "ok",
+        "forecast": "ok",
+        "credits": "no_permission"
+      },
+      "persisted": {
+        "billing-identity": {
+          "payload_present": true,
+          "last_success": 1795057614.571612,
+          "error_status": null
+        },
+        "billing-costs": {
+          "payload_present": true,
+          "last_success": 1795057614.6026108,
+          "error_status": null
+        },
+        "billing-forecast": {
+          "payload_present": true,
+          "last_success": 1795057614.6036131,
+          "error_status": null
+        },
+        "billing-credits": {
+          "payload_present": false,
+          "last_success": null,
+          "error_status": "no_permission"
+        }
+      }
+    },
+    {
+      "target": "credits_sts",
+      "error_code": "EndpointConnectionError",
+      "checks": {
+        "all_success_values_preserved": true,
+        "no_aws_transport": true
+      },
+      "passed": true,
+      "aws_transport_attempts": 0,
+      "section_statuses": {
+        "costs": "ok",
+        "forecast": "ok",
+        "credits": "ok"
+      },
+      "persisted": {
+        "billing-identity": {
+          "payload_present": true,
+          "last_success": 1795057614.7995634,
+          "error_status": null
+        },
+        "billing-costs": {
+          "payload_present": true,
+          "last_success": 1795057614.8337564,
+          "error_status": null
+        },
+        "billing-forecast": {
+          "payload_present": true,
+          "last_success": 1795057614.8347538,
+          "error_status": null
+        },
+        "billing-credits": {
+          "payload_present": true,
+          "last_success": 1795057614.8395236,
+          "error_status": "unavailable"
+        }
+      }
+    }
+  ],
+  "passed": 12,
+  "total": 12
+}

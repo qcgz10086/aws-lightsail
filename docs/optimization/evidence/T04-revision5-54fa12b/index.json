@@ -1,0 +1,76 @@
+{
+  "base": "1dd5d56c3bc637aeec9439c64f316f7f8f391438",
+  "revision_base": "38395f299155d0cfdf7e590b0685ae7ed268c8fc",
+  "product_head": "54fa12b0b55b00b43341d99b768f7769b002a9db",
+  "product_tree": "a56fbe2eaca3aefd0914909c4097ee3b12aa102a",
+  "files": {
+    ".gitattributes": {
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    "billing-outer-debug.log": {
+      "bytes": 4443,
+      "sha256": "d125e10a13412dc34bff21eb1021304c3547e85363b418e9f4aac44db5a138a1"
+    },
+    "final/build.log": {
+      "bytes": 1027,
+      "sha256": "23a75f52243367f655981d87b9d6d2808435b711a53e4d4d2234717cf0669e01"
+    },
+    "final/compileall.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "final/focused.log": {
+      "bytes": 9972,
+      "sha256": "0beb8e934341516061a8467f0cf3409c966eb0de28a5e3db6809bf6f06dfbc8f"
+    },
+    "final/full.log": {
+      "bytes": 90287,
+      "sha256": "259a44bbb76bcfb932c91f5ac67388eaf17e2aa339d495b4c8c6de22ad694403"
+    },
+    "final/migration.log": {
+      "bytes": 16073,
+      "sha256": "0411217fda6ccd9f4155cc4701a39b0bb6893e53604581e1419b6aa9ce150a48"
+    },
+    "final/performance-base.json": {
+      "bytes": 3234,
+      "sha256": "e99ab51b8739d58c3b39af54334a51a7519509a17da0ea549785d7079613187b"
+    },
+    "final/performance-base.stderr": {
+      "bytes": 6245,
+      "sha256": "10fccb50e5b7b69e30ce8088f57df248c8d9e965055638ee638fc8ff4a622a16"
+    },
+    "final/performance-candidate.json": {
+      "bytes": 3226,
+      "sha256": "4ef88d030f9459ed9b47a4dab46a1f646f77230aeff29407573f54c314ac4d8b"
+    },
+    "final/performance-candidate.stderr": {
+      "bytes": 6973,
+      "sha256": "411d052a20c8f7584ed913f9eb9434c4344eb91a43d9233668f81799c9f586f7"
+    },
+    "final/typescript.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "final/verification.json": {
+      "bytes": 13657,
+      "sha256": "2cc8159432fc949f6f5b0aa378666dceadde72d9f1c3980d7ad8e403914e959e"
+    },
+    "revision6-billing-matrix.json": {
+      "bytes": 13138,
+      "sha256": "dd09a1feea1dc43f3e124d81d1547da9c04f39b2c68912713ecab794799c3cf8"
+    },
+    "revision6-billing-outer.json": {
+      "bytes": 5669,
+      "sha256": "7c48b6a25e56031f33a0b90f21b39b79fc44670513220c98308a1eeca3198a9d"
+    },
+    "revision6-focused.log": {
+      "bytes": 5576,
+      "sha256": "5aa949d2e4b1bdec307edf5d471f2245d4ff41bf5495742b4472664d3a8419fd"
+    },
+    "self-check.json": {
+      "bytes": 10116,
+      "sha256": "2ba1c0ea58122b6693568bf139169d1e79373ecab4b217fc1526816b433a88d9"
+    }
+  }
+}

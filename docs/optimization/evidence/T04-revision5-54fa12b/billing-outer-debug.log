@@ -1,0 +1,20 @@
+C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+2026-11-19 10:54:39,636 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 10:54:42,695 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+F
+======================================================================
+FAIL: test_billing_summary_outer_account_gather_revalidates_invalidated_account (tests.test_t04_cache.CacheRouteTests.test_billing_summary_outer_account_gather_revalidates_invalidated_account)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\tests\test_t04_cache.py", line 585, in test_billing_summary_outer_account_gather_revalidates_invalidated_account
+    self.assertEqual({account["account_id"] for account in body["accounts"]
+AssertionError: Items in the first set but not the second:
+'123456789012'
+Items in the second set but not the first:
+'210987654321' : {'year_month': '2026-11', 'status': 'partial', 'accounts': [{'account_id': '123456789012', 'credential_id': 1, 'account_label': None, 'costs': {'status': 'ok', 'year_month': '2026-11', 'by_service': [], 'currencies': [{'currency': 'USD', 'total_cost': '10', 'net_cost': '8', 'credits_applied': '2', 'refunds': '0', 'discounts': '0', 'lightsail_cost': '10'}], 'cache': {'status': 'stale', 'stale': True, 'refreshing': False, 'last_success_at': '2026-11-19T02:54:39.620133+00:00', 'expires_at': '1970-01-01T00:00:00+00:00', 'error': 'primary billing scope was not committed', 'error_status': 'unavailable'}}, 'forecast': {'status': 'ok', 'amount': '5', 'currency': 'USD', 'basis': 'remaining_month', 'start_date': '2026-11-20', 'cache': {'status': 'fresh', 'stale': False, 'refreshing': False, 'last_success_at': '2026-11-19T02:54:39.697984+00:00', 'expires_at': '2026-11-19T03:24:39.697984+00:00', 'error': None, 'error_status': None}}, 'credits': {'status': 'ok', 'credits': [], 'cache': {'status': 'fresh', 'stale': False, 'refreshing': False, 'last_success_at': '2026-11-19T02:54:39.703983+00:00', 'expires_at': '2026-11-19T03:24:39.703983+00:00', 'error': None, 'error_status': None}}}, {'account_id': '210987654321', 'credential_id': 3, 'account_label': None, 'costs': {'status': 'unavailable', 'error': 'STS ����δ֪��仯��������У��ƾ֤', 'cache': {'status': 'error', 'stale': False, 'refreshing': False, 'last_success_at': None, 'expires_at': '1970-01-01T00:00:00+00:00', 'error': 'STS ����δ֪��仯��������У��ƾ֤', 'error_status': 'credential_invalid'}}, 'forecast': {'status': 'unavailable', 'error': 'STS ����δ֪��仯��������У��ƾ֤', 'cache': {'status': 'error', 'stale': False, 'refreshing': False, 'last_success_at': None, 'expires_at': '1970-01-01T00:00:00+00:00', 'error': 'STS ����δ֪��仯��������У��ƾ֤', 'error_status': 'credential_invalid'}}, 'credits': {'status': 'unavailable', 'error': 'STS ����δ֪��仯��������У��ƾ֤', 'cache': {'status': 'error', 'stale': False, 'refreshing': False, 'last_success_at': None, 'expires_at': '1970-01-01T00:00:00+00:00', 'error': 'STS ����δ֪��仯��������У��ƾ֤', 'error_status': 'credential_invalid'}}}], 'currencies': [{'currency': 'USD', 'costs_complete': False, 'forecast_complete': False, 'credits_complete': False, 'total_cost': '10', 'net_cost': '8', 'credits_applied': '2', 'refunds': '0', 'discounts': '0', 'lightsail_cost': '10', 'forecast_remaining': '5', 'official_remaining': None, 'official_estimated': None, 'forecast_month_total': None}], 'manual_credits': [], 'stale': True, 'refreshing': False, 'pending_assignment': [], 'forecast_basis': 'remaining_month', 'note': '�����ֱַ���ܣ��ֶ���¼�����ӹٷ�������ʿɿ�ƥ�䲻����ʣ�ࡣ'}
+
+----------------------------------------------------------------------
+Ran 1 test in 5.504s
+
+FAILED (failures=1)

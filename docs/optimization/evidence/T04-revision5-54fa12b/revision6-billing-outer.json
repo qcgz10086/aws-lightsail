@@ -1,0 +1,193 @@
+{
+  "head": "38395f299155d0cfdf7e590b0685ae7ed268c8fc",
+  "scenario": "A billing cached_account completes; B loader invalidates A before final aggregate",
+  "first_account_completed": true,
+  "http_status": 200,
+  "response": {
+    "year_month": "2026-11",
+    "status": "partial",
+    "accounts": [
+      {
+        "account_id": "123456789012",
+        "credential_id": 1,
+        "account_label": null,
+        "costs": {
+          "status": "credential_invalid",
+          "error": "concurrent ExpiredToken",
+          "cache": {
+            "status": "error",
+            "stale": false,
+            "refreshing": false,
+            "last_success_at": null,
+            "expires_at": "1970-01-01T00:00:00+00:00",
+            "error": "concurrent ExpiredToken",
+            "error_status": "credential_invalid"
+          }
+        },
+        "forecast": {
+          "status": "credential_invalid",
+          "error": "concurrent ExpiredToken",
+          "cache": {
+            "status": "error",
+            "stale": false,
+            "refreshing": false,
+            "last_success_at": null,
+            "expires_at": "1970-01-01T00:00:00+00:00",
+            "error": "concurrent ExpiredToken",
+            "error_status": "credential_invalid"
+          }
+        },
+        "credits": {
+          "status": "credential_invalid",
+          "error": "concurrent ExpiredToken",
+          "cache": {
+            "status": "error",
+            "stale": false,
+            "refreshing": false,
+            "last_success_at": null,
+            "expires_at": "1970-01-01T00:00:00+00:00",
+            "error": "concurrent ExpiredToken",
+            "error_status": "credential_invalid"
+          }
+        }
+      },
+      {
+        "account_id": "210987654321",
+        "credential_id": 3,
+        "account_label": null,
+        "costs": {
+          "status": "ok",
+          "year_month": "2026-11",
+          "by_service": [],
+          "currencies": [
+            {
+              "currency": "USD",
+              "total_cost": "4",
+              "net_cost": "4",
+              "credits_applied": "0",
+              "refunds": "0",
+              "discounts": "0",
+              "lightsail_cost": "4"
+            }
+          ],
+          "cache": {
+            "status": "fresh",
+            "stale": false,
+            "refreshing": false,
+            "last_success_at": "2026-11-19T03:00:51.082070+00:00",
+            "expires_at": "2026-11-19T03:30:51.082070+00:00",
+            "error": null,
+            "error_status": null
+          }
+        },
+        "forecast": {
+          "status": "ok",
+          "amount": "5",
+          "currency": "USD",
+          "basis": "remaining_month",
+          "start_date": "2026-11-20",
+          "cache": {
+            "status": "fresh",
+            "stale": false,
+            "refreshing": false,
+            "last_success_at": "2026-11-19T03:00:51.060068+00:00",
+            "expires_at": "2026-11-19T03:30:51.060068+00:00",
+            "error": null,
+            "error_status": null
+          }
+        },
+        "credits": {
+          "status": "ok",
+          "credits": [],
+          "cache": {
+            "status": "fresh",
+            "stale": false,
+            "refreshing": false,
+            "last_success_at": "2026-11-19T03:00:51.061069+00:00",
+            "expires_at": "2026-11-19T03:30:51.061069+00:00",
+            "error": null,
+            "error_status": null
+          }
+        }
+      }
+    ],
+    "currencies": [
+      {
+        "currency": "USD",
+        "costs_complete": false,
+        "forecast_complete": false,
+        "credits_complete": false,
+        "total_cost": "4",
+        "net_cost": "4",
+        "credits_applied": "0",
+        "refunds": "0",
+        "discounts": "0",
+        "lightsail_cost": "4",
+        "forecast_remaining": "5",
+        "official_remaining": null,
+        "official_estimated": null,
+        "forecast_month_total": null
+      }
+    ],
+    "manual_credits": [],
+    "stale": false,
+    "refreshing": false,
+    "pending_assignment": [],
+    "forecast_basis": "remaining_month",
+    "note": "金额按币种分别汇总；手动记录不叠加官方余额，无逐笔可靠匹配不估算剩余。"
+  },
+  "stored": [
+    {
+      "credential_id": 1,
+      "kind": "billing-identity",
+      "payload_present": false,
+      "error_status": "credential_invalid"
+    },
+    {
+      "credential_id": 3,
+      "kind": "billing-identity",
+      "payload_present": true,
+      "error_status": null
+    },
+    {
+      "credential_id": 1,
+      "kind": "billing-costs",
+      "payload_present": false,
+      "error_status": "credential_invalid"
+    },
+    {
+      "credential_id": 1,
+      "kind": "billing-forecast",
+      "payload_present": false,
+      "error_status": "credential_invalid"
+    },
+    {
+      "credential_id": 1,
+      "kind": "billing-credits",
+      "payload_present": false,
+      "error_status": "credential_invalid"
+    },
+    {
+      "credential_id": 3,
+      "kind": "billing-costs",
+      "payload_present": true,
+      "error_status": null
+    },
+    {
+      "credential_id": 3,
+      "kind": "billing-forecast",
+      "payload_present": true,
+      "error_status": null
+    },
+    {
+      "credential_id": 3,
+      "kind": "billing-credits",
+      "payload_present": true,
+      "error_status": null
+    }
+  ],
+  "aws_transport_attempts": 0,
+  "expected_healthy_only_net_cost": "4",
+  "observed_net_cost": "4",
+  "healthy_only_net_cost": true
+}

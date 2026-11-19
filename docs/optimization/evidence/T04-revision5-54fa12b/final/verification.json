@@ -1,0 +1,222 @@
+{
+  "base": "1dd5d56c3bc637aeec9439c64f316f7f8f391438",
+  "head": "54fa12b0b55b00b43341d99b768f7769b002a9db",
+  "tree": "a56fbe2eaca3aefd0914909c4097ee3b12aa102a",
+  "status": "",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "runs": {
+    "compileall": {
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "-m",
+        "compileall",
+        "-q",
+        "app"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t04-backend-cache\\aws-lightsail\\backend",
+      "exit": 0,
+      "seconds": 0.167,
+      "log": "compileall.log"
+    },
+    "focused": {
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "-c",
+        "import sys,unittest\nfrom unittest.mock import patch\nsuite=unittest.defaultTestLoader.discover('tests',pattern=sys.argv[1])\nwith patch('botocore.endpoint.Endpoint._send',side_effect=AssertionError('AWS transport forbidden')) as aws:\n result=unittest.TextTestRunner(verbosity=2).run(suite)\n print('AWS_TRANSPORT_ATTEMPTS',aws.call_count)\n sys.exit(0 if result.wasSuccessful() and not aws.call_count else 1)\n",
+        "test_t04*.py"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t04-backend-cache\\aws-lightsail\\backend",
+      "exit": 0,
+      "seconds": 10.972,
+      "log": "focused.log"
+    },
+    "migration": {
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "-c",
+        "import sys,unittest\nfrom unittest.mock import patch\nsuite=unittest.defaultTestLoader.discover('tests',pattern=sys.argv[1])\nwith patch('botocore.endpoint.Endpoint._send',side_effect=AssertionError('AWS transport forbidden')) as aws:\n result=unittest.TextTestRunner(verbosity=2).run(suite)\n print('AWS_TRANSPORT_ATTEMPTS',aws.call_count)\n sys.exit(0 if result.wasSuccessful() and not aws.call_count else 1)\n",
+        "test_migrat*.py"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t04-backend-cache\\aws-lightsail\\backend",
+      "exit": 0,
+      "seconds": 10.781,
+      "log": "migration.log"
+    },
+    "full": {
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "-c",
+        "import sys,unittest\nfrom unittest.mock import patch\nsuite=unittest.defaultTestLoader.discover('tests',pattern=sys.argv[1])\nwith patch('botocore.endpoint.Endpoint._send',side_effect=AssertionError('AWS transport forbidden')) as aws:\n result=unittest.TextTestRunner(verbosity=2).run(suite)\n print('AWS_TRANSPORT_ATTEMPTS',aws.call_count)\n sys.exit(0 if result.wasSuccessful() and not aws.call_count else 1)\n",
+        "test*.py"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t04-backend-cache\\aws-lightsail\\backend",
+      "exit": 0,
+      "seconds": 75.614,
+      "log": "full.log"
+    },
+    "typescript": {
+      "argv": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.json"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t04-backend-cache\\aws-lightsail\\frontend",
+      "exit": 0,
+      "seconds": 4.477,
+      "log": "typescript.log"
+    },
+    "build": {
+      "argv": [
+        "node",
+        "node_modules/vite/bin/vite.js",
+        "build",
+        "--outDir",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t04-backend-cache\\aws-lightsail\\.baseline-runs\\T04\\revision7-fixed\\frontend-build"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t04-backend-cache\\aws-lightsail\\frontend",
+      "exit": 0,
+      "seconds": 13.485,
+      "log": "build.log"
+    },
+    "performance-base": {
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t04-backend-cache\\aws-lightsail\\tools\\optimization\\probe_t04_performance.py",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t04-baseline-l3xjnqen"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t04-backend-cache\\aws-lightsail",
+      "exit": 0,
+      "seconds": 9.104,
+      "log": "performance-base.json"
+    },
+    "performance-candidate": {
+      "argv": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\backend\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t04-backend-cache\\aws-lightsail\\tools\\optimization\\probe_t04_performance.py",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t04-backend-cache\\aws-lightsail"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t04-backend-cache\\aws-lightsail",
+      "exit": 0,
+      "seconds": 4.333,
+      "log": "performance-candidate.json"
+    }
+  },
+  "source_sha256": {
+    "backend/app/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend/app/config.py": "86be9b706b9f4eda373908805fbb278475654d317609ca2d4cf7a60e8b426e13",
+    "backend/app/database.py": "56b2e5d9b39b7386e0910bac3d80908c5f2df9721d27f68fb5a647c4c1986d0b",
+    "backend/app/deps.py": "5122475e761c40dc03d9a5f5c142a31017e06398499aa7e9d9635caf9c143dac",
+    "backend/app/main.py": "4299d866ee1690c6099734a2df12ed2ab2f4dc08f7f4e4212824fe5376839a92",
+    "backend/app/migrations.py": "47d994e376af32a266280dc187f82247a8b7f8ace4ff814bf9ee986b359ede0e",
+    "backend/app/models.py": "d1ecbd55338d4977ce62f0a565e76677d93574cd7f1ee7044ca4e04673a1b772",
+    "backend/app/password_strength.py": "9ed02a62e32cdcf74a273c1fdb963b088cacf897afbfe67a1fb204c17da24067",
+    "backend/app/proxy_config.py": "930e4b098056b2ecec635f235ebcea286fada7282e3c4ce34d8de4f2c5595fa4",
+    "backend/app/rate_limit.py": "5dfb987c2424ea73c719904ea08524edd2dece439a46412e7f42852d0f4a327e",
+    "backend/app/routers/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend/app/routers/auth.py": "e08abddd736e37c562dc8d6e5a0dcc84eb6160e5ea1376c58da05db2283e15cc",
+    "backend/app/routers/billing.py": "21878bcc300968e7ed221224089b7b6b9a491f5d03199faa827770a05b21b9da",
+    "backend/app/routers/billing_v2.py": "aea40d66ca771c2e676ea24a2e45d79e2784a0c90da3e0082bb58ef0d1fa55db",
+    "backend/app/routers/cache_v2.py": "f22a293bb1b81f012eb7ffeae864872babcf2eb6d64cd1342850b8a6e570f7b6",
+    "backend/app/routers/catalog.py": "b1c49db2996f0178ff0e455dc655143d759f88ff0f0a2ca469af8200e649b694",
+    "backend/app/routers/credentials.py": "c6d800c22cffe516075437bde2cccf86740f5d4bf228ca7d30d7203a7aca93b7",
+    "backend/app/routers/instances.py": "924c353673adffda423426ea0cf0b9dbee89e4dbba0c4e7d26797f475f49485a",
+    "backend/app/routers/metrics.py": "a80e83e0c3cf236165802aca079daecb1a85146564e42589569800d74773e1b2",
+    "backend/app/routers/users.py": "0abe777811319f24a1fe44607e7f4652ea728abeb36d95df2922531020b3e55e",
+    "backend/app/schemas.py": "4775df59e45e07f1b638402c7492311f87a30053fb756d9ba5074fcd41da374c",
+    "backend/app/security.py": "38debebf45ad4b6697b538366da2cbe269184c780b04c08a5cecb097e2926e3d",
+    "backend/app/seed.py": "ca9c46ef738bca6a294c18de111829894e361a8ae38e4ac3a86fddd829abef02",
+    "backend/app/services/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend/app/services/account.py": "383eceda370ed49fca331ba7ec85cc7e946bde4040339268905d03e10c91cc03",
+    "backend/app/services/aws_clients.py": "24f9dd07ff8a218426cc83e575591dca01d1eced7b8c9c7e5aa825c9139e0b67",
+    "backend/app/services/aws_limits.py": "03b7fe12835c8b43487f6160dd669f80bb82158745a603afce236b0e483c0bab",
+    "backend/app/services/billing.py": "33652412c3ba455a311caf932b0c9b2a2222552051c779bc038869824ab9ed25",
+    "backend/app/services/billing_cache.py": "c52758f99a3023a26025641dd20ce63e03c2275e43be386d8c22667a78982612",
+    "backend/app/services/billing_summary.py": "1f968737abbb893965135061c9e0675203aeef97f73793c55e29d797304797a5",
+    "backend/app/services/collector.py": "de8413311f3a9a0a2ba00da232a8631deb0d872ba0f10e11a78c2ab755b8a5c4",
+    "backend/app/services/instance_cache.py": "5816b93138d43dc5147e402c26463300b42c6c4ed6232597cbeddad562b56e76",
+    "backend/app/services/lightsail.py": "6cfd9e082bc264dd4a3cea925ff3071ee870efa9e637d0ad53de5e0bdd9eda13",
+    "backend/app/services/snapshots.py": "cc75c1b5d24c373582deec0999f5631627666d761ba3885b0b1700e49c3fbe76",
+    "backend/app/services/traffic.py": "a185797e84bfc34c5d474390cca4f871995a85ae7d827d09c903c1c3a8b809b0",
+    "backend/app/sqlite_backup.py": "e86cc81e24b4fe1bcad08045f16240ab498d5adf2561e071e04f8ac35bb150bd",
+    "backend/tests/test_billing.py": "bdb4473bb03edb00d3bf9d07e8e33c786d562c8b5344700057c578731a76ec8e",
+    "backend/tests/test_migration_boundaries.py": "35c3c1b7741f8cad25fa985c7fd67040faacc48f5cda944068d4be1c0a5d0443",
+    "backend/tests/test_migration_retries.py": "b273546a2fe66765bbb42d98ca570507ceef9c0e3a11c98ba92897f251480aa2",
+    "backend/tests/test_migrations.py": "bf2cdf17ae5a14d6921c8cbc20c209c0673e3326df0df412071d20eed1d109c2",
+    "backend/tests/test_proxy.py": "e799a3193ecf590bd08eb4a278b114ed4c56dd56e0ec415bb24c84c1a7d578b3",
+    "backend/tests/test_rate_limit_password.py": "dc35890fb5c62cb1f98ce89c378bdbb365c4e7b3acdce4ab6efc98e30ef5f485",
+    "backend/tests/test_regions.py": "adc895ee2a9795c8ab08a3ecbb9b3b44242faec8e4545570a730d70e5d40f57c",
+    "backend/tests/test_remaining_fixes.py": "d51c5fcc34935636b81f7b720313034f63b785673aaf1d804e740ff09962778f",
+    "backend/tests/test_security_config.py": "bed998b243d9bc5e5936c27d70b5e65dd00ecff27e26f319a3e0543a45cf2803",
+    "backend/tests/test_t02_identity_proxy.py": "175e64cac1f6ade3288b00e3fd57b66600e65038ee7f9ba1983ac9bc191bb899",
+    "backend/tests/test_t03_billing_accuracy.py": "0a0f461c11e3f0a65534237e10890653b0f6a567af354c05ad3a951b23778497",
+    "backend/tests/test_t04_cache.py": "8b07c0ee06ad6e47e39f8846e77c985fa750b25e83e89fefc38a82725e32cbc5",
+    "backend/tests/test_traffic_sum.py": "c4362c8c84db54244240682c727ed6dc57cfe60413821cce6032760b80dddd5b",
+    "frontend/src/api/client.ts": "e7b497d41d9be436cf2db1a30646a1a20b9a3bb951f89fcc5e18b2ef130826bc",
+    "frontend/src/App.tsx": "a70a3f8a30d8088eb2d5f7c4960bad99482b9ac93dab529de539743711a4535e",
+    "frontend/src/auth/AuthContext.tsx": "d35c0fdccd9f486c290a5072cf17c5da971fde08b3579be2d14f6937efa666b2",
+    "frontend/src/components/Layout.tsx": "c9d7c741fe6d40ee25f54aea7273fac63883383d8cb04a6253f4f00383506dfc",
+    "frontend/src/main.tsx": "89995fdad40b248031bcd7ee1370377ed32dcab0bef646bc923b92f32e9eaa7e",
+    "frontend/src/pages/Billing.tsx": "e01e64dee02e2ad648dce609dd44faa869365d4a10cc595b0c024e7cf98131ba",
+    "frontend/src/pages/CreateInstance.tsx": "0482cc54f5054495a8a80cd994f1d7ad8526021ce588a590ed43ad62cbfc4821",
+    "frontend/src/pages/Credentials.tsx": "e440f34e4d3583133d625558a7c053f26ddb8f5f8603cb734f52ecbb8465e521",
+    "frontend/src/pages/Dashboard.tsx": "f8bf1ad1960514049d5407e71e1334e47a28ae65fc19bcde7ba762c50f9ed794",
+    "frontend/src/pages/InstanceDetail.tsx": "d601b04a8963aae96625a371eaaced41dd1c867499b5220af11f76a684dd2bca",
+    "frontend/src/pages/Instances.tsx": "1b26115dcd1cd2ca19817607cddc52a1f11fa377ce7fd87b9f517eb860fb5727",
+    "frontend/src/pages/Login.tsx": "3ffe621bdb301a50e15d3dc7cc0dc6300d1d05462fe00cd207949b8ba13be758",
+    "frontend/src/pages/Traffic.tsx": "ce22f84f67e546a6806e2f974f7974c3e1e80dc16e85deb1e6dd5da94c45e4e2",
+    "frontend/src/pages/Users.tsx": "33e99752319c39b40dbe1462bd8331fd99322ff492d5056f05f26c74bbe2e7a2",
+    "frontend/src/vite-env.d.ts": "424faf9241dd699dda995b367ed36665732da1e6ec1f33b2fd40394488ecac92"
+  },
+  "all_commands_passed": true,
+  "performance_checks": {
+    "hot_p95_le_1s": true,
+    "hot_no_aws_calls": true,
+    "cold_first_data": true,
+    "complete_no_slower": true
+  },
+  "files": {
+    "build.log": {
+      "bytes": 1027,
+      "sha256": "23a75f52243367f655981d87b9d6d2808435b711a53e4d4d2234717cf0669e01"
+    },
+    "compileall.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "focused.log": {
+      "bytes": 9972,
+      "sha256": "0beb8e934341516061a8467f0cf3409c966eb0de28a5e3db6809bf6f06dfbc8f"
+    },
+    "full.log": {
+      "bytes": 90287,
+      "sha256": "259a44bbb76bcfb932c91f5ac67388eaf17e2aa339d495b4c8c6de22ad694403"
+    },
+    "migration.log": {
+      "bytes": 16073,
+      "sha256": "0411217fda6ccd9f4155cc4701a39b0bb6893e53604581e1419b6aa9ce150a48"
+    },
+    "performance-base.json": {
+      "bytes": 3234,
+      "sha256": "e99ab51b8739d58c3b39af54334a51a7519509a17da0ea549785d7079613187b"
+    },
+    "performance-base.stderr": {
+      "bytes": 6245,
+      "sha256": "10fccb50e5b7b69e30ce8088f57df248c8d9e965055638ee638fc8ff4a622a16"
+    },
+    "performance-candidate.json": {
+      "bytes": 3226,
+      "sha256": "4ef88d030f9459ed9b47a4dab46a1f646f77230aeff29407573f54c314ac4d8b"
+    },
+    "performance-candidate.stderr": {
+      "bytes": 6973,
+      "sha256": "411d052a20c8f7584ed913f9eb9434c4344eb91a43d9233668f81799c9f586f7"
+    },
+    "typescript.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}
