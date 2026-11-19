@@ -92,10 +92,14 @@ def _view(row, now, invalidated=False):
 
 
 def permission_failure(exc):
+    from botocore.exceptions import ClientError
     from app.services.billing import BillingNoPermissionError, BillingValidationError
+    code = (exc.response.get("Error", {}).get("Code", "")
+            if isinstance(exc, ClientError) else getattr(exc, "code", ""))
     return (isinstance(exc, (BillingNoPermissionError, BillingValidationError))
-            or getattr(exc, "code", "") in {"AccessDenied", "AccessDeniedException", "UnauthorizedException",
-                "AuthFailure", "InvalidClientTokenId", "UnrecognizedClientException", "SignatureDoesNotMatch"})
+            or code in {"AccessDenied", "AccessDeniedException", "UnauthorizedException",
+                "AuthFailure", "InvalidClientTokenId", "UnrecognizedClientException", "SignatureDoesNotMatch",
+                "ExpiredToken", "ExpiredTokenException", "InvalidAccessKeyId", "InvalidSignatureException"})
 
 
 def _read_or_claim(engine, scope, force):

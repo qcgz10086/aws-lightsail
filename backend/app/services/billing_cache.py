@@ -74,13 +74,16 @@ async def cached_account(engine, user, credential, wait=False, force=False):
                     row = local.get(DataSnapshot, identity_scope["key"])
                     ready = row and row.payload and not row.error and not row.lease_token and row.expires_at > time.time()
                     running = row and row.lease_token and row.lease_until > time.time()
+                    # Confirmed identity/auth failure clears its payload. A
+                    # temporary STS outage keeps it and must keep section values.
+                    invalidated = row is None or row.payload is None
                 if ready:
                     break
                 if not running:
-                    raise SnapshotError("身份校验失败，停止本次刷新", invalidate=True)
+                    raise SnapshotError("身份校验失败，停止本次刷新", invalidate=invalidated)
                 await asyncio.sleep(0.01)
             else:
-                raise SnapshotError("身份校验等待超时", invalidate=True)
+                raise SnapshotError("身份校验等待超时，保留最近成功快照")
         try:
             if name == "credits":
                 return await asyncio.to_thread(service.get_aws_credits, inputs.access_key, inputs.secret_key,

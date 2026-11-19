@@ -303,6 +303,63 @@ class CacheRouteTests(unittest.TestCase):
             scopes = self.db.query(DataSnapshot.scope).filter(DataSnapshot.kind == "instances").all()
             self.assertEqual(scopes, [("us-east-1",)])
 
+    def test_temporary_identity_failure_preserves_all_stale_billing_sections(self):
+        from app.services import billing as b
+        from app.models import DataSnapshot
+        from sqlalchemy import update
+        gate = threading.Event()
+        self.addCleanup(gate.set)
+        costs = {"year_month": "2026-11", "by_service": [], "currencies": [{"currency": "USD",
+            "total_cost": "10", "net_cost": "8", "credits_applied": "2", "refunds": "0", "discounts": "0", "lightsail_cost": "10"}]}
+        def outage(*_args):
+            gate.wait(3)
+            raise b.BillingUnavailableError("temporary STS outage")
+        with patch.object(b, "get_sts_identity", return_value="123456789012") as identity, \
+             patch.object(b, "make_ce_client"), patch.object(b, "get_billing_summary", return_value=costs) as cost_calls, \
+             patch.object(b, "get_forecast_result", return_value={"amount": "5", "currency": "USD"}) as forecast, \
+             patch.object(b, "get_aws_credits", return_value={"credits": []}) as credits:
+            warm = self.client.get("/api/v2/billing/summary?wait=true").json()
+            success = {name: warm["accounts"][0][name]["cache"]["last_success_at"]
+                       for name in ("costs", "forecast", "credits")}
+            self.db.execute(update(DataSnapshot).values(expires_at=0)); self.db.commit()
+            identity.side_effect = outage
+            pending = self.client.get("/api/v2/billing/summary").json()
+            self.assertTrue(pending["refreshing"])
+            gate.set(); self.finish_workers()
+            after = self.client.get("/api/v2/billing/summary").json()
+            self.assertEqual(after["currencies"][0]["net_cost"], "8")
+            self.assertFalse(after["refreshing"])
+            for name in ("costs", "forecast", "credits"):
+                cache = after["accounts"][0][name]["cache"]
+                self.assertTrue(cache["stale"])
+                self.assertEqual(cache["last_success_at"], success[name])
+                self.assertTrue(cache["error"])
+            self.assertEqual((cost_calls.call_count, forecast.call_count, credits.call_count), (1, 1, 1))
+
+    def test_raw_sts_authentication_failure_invalidates_all_credential_snapshots(self):
+        from app.services import billing as b
+        from app.models import DataSnapshot
+        from sqlalchemy import update
+        from botocore.exceptions import ClientError
+        costs = {"year_month": "2026-11", "by_service": [], "currencies": [{"currency": "USD",
+            "total_cost": "10", "net_cost": "8", "credits_applied": "2", "refunds": "0", "discounts": "0", "lightsail_cost": "10"}]}
+        with patch.object(b, "get_sts_identity", return_value="123456789012") as identity, \
+             patch.object(b, "make_ce_client"), patch.object(b, "get_billing_summary", return_value=costs) as cost_calls, \
+             patch.object(b, "get_forecast_result", return_value={"amount": "5", "currency": "USD"}), \
+             patch.object(b, "get_aws_credits", return_value={"credits": []}):
+            self.client.get("/api/v2/billing/summary?wait=true")
+            # Only identity is expired: confirmed authentication failure must also
+            # invalidate still-fresh sections, independent of their TTL.
+            self.db.execute(update(DataSnapshot).where(DataSnapshot.kind == "billing-identity").values(expires_at=0))
+            self.db.commit()
+            identity.side_effect = ClientError({"Error": {"Code": "ExpiredToken", "Message": "expired"}}, "GetCallerIdentity")
+            self.client.get("/api/v2/billing/summary?wait=true")
+            self.db.expire_all()
+            self.assertTrue(all(row.payload is None for row in self.db.query(DataSnapshot).all()))
+            after = self.client.get("/api/v2/billing/summary").json()
+            self.assertEqual(after["currencies"], [])
+            self.assertEqual(cost_calls.call_count, 1)
+
     def test_successful_stop_expires_snapshot_and_prevents_older_refresh_publish(self):
         from app.models import DataSnapshot
         from app.services.snapshots import read_snapshot, scope_for
