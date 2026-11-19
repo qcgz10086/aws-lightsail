@@ -58,9 +58,17 @@ CE_NO_PERMISSION_HINT = (
 class BillingUnavailableError(Exception):
     """CE 未启用 / 暂无数据 / 其他可恢复的查询失败（前端以 status 展示，不 500）。"""
 
+    def __init__(self, message, code=None):
+        super().__init__(message)
+        self.code = code
+
 
 class BillingNoPermissionError(Exception):
     """IAM 缺少 CE / Billing 权限。"""
+
+    def __init__(self, message, code=None):
+        super().__init__(message)
+        self.code = code
 
 
 class BillingValidationError(Exception):
@@ -68,6 +76,14 @@ class BillingValidationError(Exception):
 
     正常流程下不应触发：accountId 来自 STS，startDate 已按 1 年限制钳制。
     """
+
+    def __init__(self, message, code=None):
+        super().__init__(message)
+        self.code = code
+
+
+class BillingIdentityError(BillingValidationError):
+    """A successful STS response proved that the credential changed accounts."""
 
 
 def make_sts_client(access_key_id: str, secret_access_key: str, proxy_url: str | None = None):
@@ -148,15 +164,15 @@ def _classify_client_error(exc: ClientError) -> Exception:
         "AuthFailure",
         "SignatureDoesNotMatch",
     } or "not authorized" in lowered or "access denied" in lowered:
-        return BillingNoPermissionError(f"{CE_NO_PERMISSION_HINT}（{code}：{message}）")
+        return BillingNoPermissionError(f"{CE_NO_PERMISSION_HINT}（{code}：{message}）", code=code)
     if (
         code in {"DataUnavailableException", "ValidationException"}
         or "dataunavailable" in code.lower()
         or "not enabled" in lowered
         or "cost explorer" in lowered
     ):
-        return BillingUnavailableError(f"{CE_NOT_ENABLED_HINT}（{code}：{message}）")
-    return BillingUnavailableError(f"Cost Explorer 查询失败：{message}")
+        return BillingUnavailableError(f"{CE_NOT_ENABLED_HINT}（{code}：{message}）", code=code)
+    return BillingUnavailableError(f"Cost Explorer 查询失败：{message}", code=code)
 
 
 BILLING_NO_PERMISSION_HINT = (
@@ -183,12 +199,12 @@ def _classify_billing_error(exc: ClientError) -> Exception:
         "AuthFailure",
         "SignatureDoesNotMatch",
     } or "not authorized" in lowered or "access denied" in lowered:
-        return BillingNoPermissionError(f"{BILLING_NO_PERMISSION_HINT}（{code}：{message}）")
+        return BillingNoPermissionError(f"{BILLING_NO_PERMISSION_HINT}（{code}：{message}）", code=code)
     if code in {"ValidationException", "ValidationError", "InvalidParameterValue"} or (
         "validation" in code.lower() or "invalid" in lowered
     ):
-        return BillingValidationError(f"{BILLING_VALIDATION_HINT}（{code}：{message}）")
-    return BillingUnavailableError(f"查询官方赠金失败：{message}")
+        return BillingValidationError(f"{BILLING_VALIDATION_HINT}（{code}：{message}）", code=code)
+    return BillingUnavailableError(f"查询官方赠金失败：{message}", code=code)
 
 
 def _money(amount: dict | None) -> tuple[str | None, str | None]:
@@ -263,14 +279,15 @@ def get_aws_credits(
     except ClientError as exc:
         raise _classify_billing_error(exc) from exc
     except (BotoCoreError, Exception) as exc:  # noqa: BLE001
-        raise BillingUnavailableError(sanitize_error_message(f"STS 查询账号失败：{exc}")) from exc
+        raise BillingUnavailableError(sanitize_error_message(f"STS 查询账号失败：{exc}"),
+                                      code=getattr(exc, "code", None)) from exc
     account_id = (identity or {}).get("Account") or ""
     if not isinstance(account_id, str) or not account_id.isascii() or not account_id.isdigit() or len(account_id) != 12:
         raise BillingUnavailableError(
             "STS 返回的账号 ID 无效（应为 12 位数字），无法查询官方赠金。"
         )
     if expected_account_id is not None and account_id != expected_account_id:
-        raise BillingValidationError("当前 STS 身份与已确认账号不同，官方赠金查询已停止")
+        raise BillingIdentityError("当前 STS 身份与已确认账号不同，官方赠金查询已停止")
 
     start = today - timedelta(days=CREDITS_LOOKBACK_DAYS)
     start_dt = datetime(start.year, start.month, start.day, tzinfo=timezone.utc)
@@ -286,7 +303,8 @@ def get_aws_credits(
     except ClientError as exc:
         raise _classify_billing_error(exc) from exc
     except (BotoCoreError, Exception) as exc:  # noqa: BLE001
-        raise BillingUnavailableError(sanitize_error_message(f"查询官方赠金失败：{exc}")) from exc
+        raise BillingUnavailableError(sanitize_error_message(f"查询官方赠金失败：{exc}"),
+                                      code=getattr(exc, "code", None)) from exc
 
     raw_credits = (resp or {}).get("credits")
     if not isinstance(raw_credits, list):
@@ -324,7 +342,8 @@ def _cost_pages(client, kwargs):
         except ClientError as exc:
             raise _classify_client_error(exc) from exc
         except Exception as exc:
-            raise BillingUnavailableError(sanitize_error_message(f"Cost Explorer 查询失败：{exc}")) from exc
+            raise BillingUnavailableError(sanitize_error_message(f"Cost Explorer 查询失败：{exc}"),
+                                          code=getattr(exc, "code", None)) from exc
         if not isinstance(response, dict) or not isinstance(response.get("ResultsByTime"), list):
             raise BillingUnavailableError("Cost Explorer 响应缺少期间列表")
         yield response["ResultsByTime"]
@@ -407,7 +426,8 @@ def get_forecast_result(client, now: datetime | None = None, account_id: str | N
     except ClientError as exc:
         raise _classify_client_error(exc) from exc
     except Exception as exc:
-        raise BillingUnavailableError(sanitize_error_message(f"费用预测不可用：{exc}")) from exc
+        raise BillingUnavailableError(sanitize_error_message(f"费用预测不可用：{exc}"),
+                                      code=getattr(exc, "code", None)) from exc
     total = response.get("Total") or {}
     if not total.get("Unit"):
         raise BillingUnavailableError("预测缺少币种")

@@ -5,7 +5,8 @@ from functools import lru_cache
 import botocore.session
 
 from app.services import lightsail as ls
-from app.services.snapshots import SnapshotError, credential_failure, permission_failure, read_many, read_snapshot, scope_for
+from app.services.snapshots import (SnapshotError, credential_failure, permission_failure,
+                                    read_many, read_snapshot, revalidate_snapshot_views, scope_for)
 from app.services.traffic import get_credential_keys, get_credential_proxy_url
 
 
@@ -81,4 +82,17 @@ async def instance_scopes(engine, user, credentials, wait=False, force=False, re
         return [{"credential_id": credential.id, "account_id": credential.account_id, "region": name, **view}
                 for name, view in zip(names, views)]
     gathered = await asyncio.gather(*(one_credential(credential) for credential in credentials))
-    return [row for group in gathered for row in group]
+    output = [row for group in gathered for row in group]
+    credential_by_id = {credential.id: credential for credential in credentials}
+    scoped = []
+    for row in output:
+        credential = credential_by_id.get(row["credential_id"])
+        if credential is None:
+            scoped.append((None, row))
+            continue
+        kind, scope = (("catalog", "regions") if row["region"] is None
+                       else ("instances", row["region"]))
+        scoped.append((scope_for(user, credential, kind, scope), row))
+    live = revalidate_snapshot_views(engine, [(scope, row) for scope, row in scoped if scope is not None])
+    live_iter = iter(live)
+    return [{**row, **next(live_iter)} if scope is not None else row for scope, row in scoped]

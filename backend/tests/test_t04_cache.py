@@ -277,6 +277,31 @@ class SnapshotTests(unittest.TestCase):
             with Session(self.engine) as db:
                 self.assertTrue(all(db.get(DataSnapshot, scope["key"]).payload is None for scope in scopes))
 
+    def test_revoked_auth_lease_cannot_suppress_valid_sibling_publish(self):
+        from sqlalchemy.orm import Session
+        from app.models import DataSnapshot
+        from app.services.snapshots import _read_or_claim, _publish_batch
+        scopes = [{**self.scope, "key": f"revoked-{region}".ljust(64, "x"), "scope": region}
+                  for region in ("us-east-1", "eu-west-1")]
+        tokens = [_read_or_claim(self.engine, scope, False)[1] for scope in scopes]
+        with Session(self.engine) as db:
+            row = db.get(DataSnapshot, scopes[0]["key"])
+            row.lease_token = "new-owner-token"
+            row.lease_until = time.time() + 60
+            db.commit()
+        outputs = _publish_batch(self.engine, [
+            (scopes[0], tokens[0], 60, {"error": "ExpiredToken", "invalidate": True,
+                                        "invalidate_credential": True}),
+            (scopes[1], tokens[1], 60, {"data": {"instances": ["owned-by-current-lease"]}}),
+        ])
+        self.assertIsNone(outputs[0])
+        self.assertIsNotNone(outputs[1])
+        with Session(self.engine) as db:
+            stale, valid = (db.get(DataSnapshot, scope["key"]) for scope in scopes)
+            self.assertEqual(stale.lease_token, "new-owner-token")
+            self.assertIsNone(stale.error)
+            self.assertIn("owned-by-current-lease", valid.payload)
+
 
 class AwsLimitTests(unittest.TestCase):
     def test_all_clients_share_five_calls_two_mutations_and_one_same_instance(self):
@@ -371,6 +396,112 @@ class CacheRouteTests(unittest.TestCase):
             self.assertEqual(hot.status_code, 200, hot.text)
             self.assertEqual(calls.call_count, before)
 
+    def test_actual_instances_route_rechecks_views_after_late_credential_invalidation(self):
+        from app.models import DataSnapshot
+        from app.services import lightsail as ls
+        from sqlalchemy import update
+        from sqlalchemy.orm import Session
+        from botocore.endpoint import Endpoint
+        regions = [{"name": "us-east-1"}, {"name": "eu-west-1"}]
+        with patch.object(ls, "get_regions", return_value=regions), \
+             patch.object(ls, "list_instances_in_region", side_effect=lambda _ak, _sk, region, **_kw: [
+                 {"name": "warm-" + region, "region": region, "state": "running"}]), \
+             patch.object(Endpoint, "_send", side_effect=AssertionError("AWS transport forbidden")):
+            catalog = self.client.get(f"/api/catalog/regions?credential_id={self.credential.id}")
+            self.assertEqual(catalog.status_code, 200, catalog.text)
+            warm = self.client.get("/api/v2/instances?wait=true")
+            self.assertEqual(warm.status_code, 200, warm.text)
+            self.assertEqual(len(warm.json()["instances"]), 2)
+
+            self.db.execute(update(DataSnapshot).where(DataSnapshot.kind == "instances").values(expires_at=0))
+            self.db.commit()
+            def load(_ak, _sk, region, **_kwargs):
+                if region == "us-east-1":
+                    return [{"name": "fresh-us-east-1", "region": region, "state": "running"}]
+                deadline = time.monotonic() + 3
+                while time.monotonic() < deadline:
+                    with Session(self.engine) as db:
+                        row = db.query(DataSnapshot).filter(DataSnapshot.kind == "instances",
+                            DataSnapshot.scope == "us-east-1").first()
+                        if row and row.payload and "fresh-us-east-1" in row.payload and row.expires_at > time.time():
+                            break
+                    time.sleep(0.005)
+                else:
+                    raise AssertionError("fast region was not committed before the credential failure")
+                raise ls.LightsailError("expired credential", code="ExpiredToken")
+            with patch.object(ls, "get_regions", return_value=regions), \
+                 patch.object(ls, "list_instances_in_region", side_effect=load), \
+                 patch.object(Endpoint, "_send", side_effect=AssertionError("AWS transport forbidden")) as transport:
+                response = self.client.get("/api/v2/instances?wait=true")
+            self.assertEqual(response.status_code, 200, response.text)
+            self.assertNotIn("fresh-us-east-1", [row["name"] for row in response.json()["instances"]])
+            self.assertTrue(all(scope.get("error_status") == "credential_invalid"
+                                for scope in response.json()["scopes"]), response.json())
+            self.assertFalse(response.json()["refreshing"])
+            self.assertEqual(transport.call_count, 0)
+            self.db.expire_all()
+            rows = self.db.query(DataSnapshot).filter(DataSnapshot.credential_id == self.credential.id).all()
+            self.assertTrue(rows)
+            self.assertTrue(all(row.payload is None and row.last_success is None for row in rows))
+
+    def test_outer_credential_gather_revalidation_keeps_healthy_credential(self):
+        from app.models import AwsCredential, DataSnapshot
+        from app.security import encrypt_secret
+        from app.services import lightsail as ls
+        from sqlalchemy import update
+        from sqlalchemy.orm import Session
+        from botocore.endpoint import Endpoint
+        other = AwsCredential(user_id=self.user.id, account_id="210987654321",
+            access_key_id_enc=encrypt_secret("AKIAIOSFODNN7OTHER"),
+            secret_access_key_enc=encrypt_secret("other-fake-secret"))
+        self.db.add(other); self.db.flush()
+        self.db.commit(); self.db.refresh(other)
+        regions = [{"name": "us-east-1"}, {"name": "eu-west-1"}]
+        with patch.object(ls, "get_regions", return_value=regions), \
+             patch.object(ls, "list_instances_in_region", side_effect=lambda _ak, _sk, region, **_kw: [
+                 {"name": "warm-" + region, "region": region, "state": "running"}]), \
+             patch.object(Endpoint, "_send", side_effect=AssertionError("AWS transport forbidden")):
+            self.client.get(f"/api/catalog/regions?credential_id={self.credential.id}")
+            self.client.get(f"/api/catalog/regions?credential_id={other.id}")
+            warm = self.client.get("/api/v2/instances?wait=true")
+            self.assertEqual(warm.status_code, 200, warm.text)
+            self.assertEqual(len(warm.json()["instances"]), 4)
+            self.db.execute(update(DataSnapshot).where(DataSnapshot.credential_id == self.credential.id,
+                DataSnapshot.kind == "instances").values(expires_at=0)); self.db.commit()
+            def load(ak, _sk, region, **_kwargs):
+                if ak == "AKIAIOSFODNN7EXAMPLE" and region == "us-east-1":
+                    return [{"name": "fresh-primary", "region": region, "state": "running"}]
+                if ak == "AKIAIOSFODNN7EXAMPLE" and region == "eu-west-1":
+                    deadline = time.monotonic() + 3
+                    while time.monotonic() < deadline:
+                        with Session(self.engine) as db:
+                            row = db.query(DataSnapshot).filter(DataSnapshot.credential_id == self.credential.id,
+                                DataSnapshot.kind == "instances", DataSnapshot.scope == "us-east-1").first()
+                            if row and row.payload and "fresh-primary" in row.payload and row.expires_at > time.time():
+                                break
+                        time.sleep(0.005)
+                    else:
+                        raise AssertionError("primary fast scope was not committed")
+                    raise ls.LightsailError("expired primary credential", code="ExpiredToken")
+                return [{"name": "healthy-secondary-" + region, "region": region, "state": "running"}]
+            with patch.object(ls, "get_regions", return_value=regions), \
+                 patch.object(ls, "list_instances_in_region", side_effect=load), \
+                 patch.object(Endpoint, "_send", side_effect=AssertionError("AWS transport forbidden")) as transport:
+                response = self.client.get("/api/v2/instances?wait=true")
+            self.assertEqual(response.status_code, 200, response.text)
+            instances = response.json()["instances"]
+            self.assertEqual({row["name"] for row in instances},
+                             {"warm-us-east-1", "warm-eu-west-1"})
+            self.assertEqual({row["credential_id"] for row in instances}, {other.id})
+            self.assertEqual({scope["credential_id"] for scope in response.json()["scopes"]
+                              if scope.get("error_status") == "credential_invalid"}, {self.credential.id})
+            self.assertEqual(transport.call_count, 0)
+            self.db.expire_all()
+            primary = self.db.query(DataSnapshot).filter(DataSnapshot.credential_id == self.credential.id).all()
+            secondary = self.db.query(DataSnapshot).filter(DataSnapshot.credential_id == other.id).all()
+            self.assertTrue(all(row.payload is None for row in primary))
+            self.assertEqual(len([row for row in secondary if row.payload is not None]), 3)
+
     def test_billing_hot_cache_and_independent_failure_preserve_last_success(self):
         from app.services import billing as b
         from app.models import DataSnapshot
@@ -399,6 +530,85 @@ class CacheRouteTests(unittest.TestCase):
             self.assertEqual(stale["credits"]["status"], "ok")
         forbidden = self.client.post("/api/v2/refresh", json={"kind": "billing", "credential_id": self.foreign.id})
         self.assertEqual(forbidden.status_code, 404, forbidden.text)
+
+    def test_real_cost_explorer_expired_token_invalidates_credential(self):
+        from botocore.exceptions import ClientError
+        from sqlalchemy.orm import Session
+        from app.services import billing as b
+        from app.services.billing_cache import cached_account
+        from app.models import DataSnapshot
+        costs = {"year_month": "2026-11", "by_service": [], "currencies": [{"currency": "USD",
+            "total_cost": "10", "net_cost": "8", "credits_applied": "2", "refunds": "0", "discounts": "0", "lightsail_cost": "10"}]}
+        with patch.object(b, "get_sts_identity", return_value="123456789012"), \
+             patch.object(b, "make_ce_client"), patch.object(b, "get_billing_summary", return_value=costs), \
+             patch.object(b, "get_forecast_result", return_value={"amount": "5", "currency": "USD"}), \
+             patch.object(b, "get_aws_credits", return_value={"credits": []}):
+            self.client.get("/api/v2/billing/summary?wait=true")
+        client = type("CEClient", (), {"get_cost_and_usage": lambda _self, **_kwargs: (_ for _ in ()).throw(
+            ClientError({"Error": {"Code": "ExpiredToken", "Message": "expired"}}, "GetCostAndUsage"))})()
+        with patch.object(b, "get_sts_identity", return_value="123456789012"), \
+             patch.object(b, "make_ce_client", return_value=client), \
+             patch.object(b, "get_aws_credits", return_value={"credits": []}), \
+             patch.object(b, "get_forecast_result", return_value={"amount": "5", "currency": "USD"}):
+            result = asyncio.run(cached_account(self.engine, self.user, self.credential, wait=True, force=True))
+        self.db.expire_all()
+        rows = self.db.query(DataSnapshot).filter(DataSnapshot.credential_id == self.credential.id).all()
+        self.assertEqual(len(rows), 4)
+        self.assertTrue(all(row.payload is None and row.last_success is None for row in rows))
+        self.assertNotEqual(result["costs"]["status"], "ok")
+        self.assertNotEqual(result["forecast"]["status"], "ok")
+        self.assertNotEqual(result["credits"]["status"], "ok")
+
+    def test_billing_summary_outer_account_gather_revalidates_invalidated_account(self):
+        from app.models import AwsCredential, DataSnapshot
+        from app.security import encrypt_secret
+        from app.services import billing as b
+        from app.services import billing_cache
+        from sqlalchemy.orm import Session
+        from botocore.endpoint import Endpoint
+        completed = threading.Event()
+        other = AwsCredential(user_id=self.user.id, account_id="210987654321",
+            access_key_id_enc=encrypt_secret("AKIAIOSFODNN7OTHER"),
+            secret_access_key_enc=encrypt_secret("other-fake-secret"))
+        self.db.add(other); self.db.commit(); self.db.refresh(other)
+        original = billing_cache.cached_account
+        first_credential_id = self.credential.id
+        async def observed(engine, user, credential, *args, **kwargs):
+            result = await original(engine, user, credential, *args, **kwargs)
+            if credential.id == first_credential_id:
+                completed.set()
+            return result
+        def sts(_ak, _sk, _proxy=None): return "123456789012" if _ak == "AKIAIOSFODNN7EXAMPLE" else "210987654321"
+        def load_costs(_client, account_id=None, **_kwargs):
+            value = "8" if account_id == "123456789012" else "4"
+            if account_id == "210987654321":
+                if not completed.wait(5): raise AssertionError("primary cached_account did not complete")
+                from app.services.snapshots import SnapshotError, read_snapshot, scope_for
+                async def expired_identity():
+                    raise SnapshotError("ExpiredToken", invalidate=True, invalidate_credential=True)
+                identity_scope = scope_for(self.user, self.credential, "billing-identity",
+                                           b._today_utc().isoformat())
+                asyncio.run(read_snapshot(self.engine, identity_scope, 1800, expired_identity,
+                                          wait=True, force=True))
+            return {"year_month": "2026-11", "by_service": [], "currencies": [{"currency": "USD",
+                "total_cost": value, "net_cost": value, "credits_applied": "0", "refunds": "0",
+                "discounts": "0", "lightsail_cost": value}]}
+        with patch.object(billing_cache, "cached_account", side_effect=observed), \
+             patch.object(b, "get_sts_identity", side_effect=sts), \
+             patch.object(b, "make_ce_client", side_effect=lambda *_args: object()), \
+             patch.object(b, "get_billing_summary", side_effect=load_costs), \
+             patch.object(b, "get_forecast_result", return_value={"amount": "5", "currency": "USD"}), \
+             patch.object(b, "get_aws_credits", return_value={"credits": []}), \
+             patch.object(Endpoint, "_send", side_effect=AssertionError("AWS transport forbidden")) as transport:
+            response = self.client.get("/api/v2/billing/summary?wait=true")
+        self.assertEqual(response.status_code, 200, response.text)
+        body = response.json()
+        self.assertTrue(completed.is_set())
+        self.assertEqual({account["account_id"] for account in body["accounts"]
+                          if account["costs"]["status"] == "ok"}, {"210987654321"}, body)
+        self.assertEqual([currency["net_cost"] for currency in body["currencies"]
+                          if currency["net_cost"] is not None], ["4"])
+        self.assertEqual(transport.call_count, 0)
 
     def test_invalid_region_creates_no_scope_or_aws_call_and_valid_region_reuses_cache(self):
         from app.models import DataSnapshot

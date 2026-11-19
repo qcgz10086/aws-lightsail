@@ -5,6 +5,7 @@ import hashlib
 import json
 import logging
 from threading import Event, Lock, Thread
+from types import SimpleNamespace
 import time
 import uuid
 
@@ -95,8 +96,7 @@ def _view(row, now, invalidated=False):
 def permission_failure(exc):
     from botocore.exceptions import ClientError
     from app.services.billing import BillingNoPermissionError, BillingValidationError
-    code = (exc.response.get("Error", {}).get("Code", "")
-            if isinstance(exc, ClientError) else getattr(exc, "code", ""))
+    code = _error_code(exc, ClientError)
     return (isinstance(exc, (BillingNoPermissionError, BillingValidationError))
             or code in {"AccessDenied", "AccessDeniedException", "UnauthorizedException",
                 "AuthFailure", "InvalidClientTokenId", "UnrecognizedClientException", "SignatureDoesNotMatch",
@@ -105,11 +105,23 @@ def permission_failure(exc):
 
 def credential_failure(exc):
     from botocore.exceptions import ClientError
-    code = (exc.response.get("Error", {}).get("Code", "")
-            if isinstance(exc, ClientError) else getattr(exc, "code", ""))
-    return code in {
+    from app.services.billing import BillingIdentityError
+    code = _error_code(exc, ClientError)
+    return isinstance(exc, BillingIdentityError) or code in {
         "AuthFailure", "InvalidClientTokenId", "UnrecognizedClientException", "SignatureDoesNotMatch",
         "ExpiredToken", "ExpiredTokenException", "InvalidAccessKeyId", "InvalidSignatureException"}
+
+
+def _error_code(exc, client_error_type):
+    if isinstance(exc, client_error_type):
+        return exc.response.get("Error", {}).get("Code", "")
+    code = getattr(exc, "code", "")
+    if code:
+        return code
+    # Wrapped AWS failures keep their structured code. Do not infer identity
+    # failure from a localized/free-form message.
+    cause = getattr(exc, "__cause__", None)
+    return _error_code(cause, client_error_type) if cause is not None and cause is not exc else ""
 
 
 def _read_or_claim(engine, scope, force):
@@ -160,16 +172,27 @@ def _publish_batch(engine, entries):
             except (TypeError, ValueError) as exc:
                 error = str(exc)
         prepared.append((scope, token, ttl, result, data, error, payload))
-    credential_failures = {
-        scope["credential_id"] for scope, _token, _ttl, result, _data, error, _payload in prepared
-        if error and result.get("invalidate", False)
-        and result.get("invalidate_credential", False)
-    }
     outputs = []
     # Publish only results already ready in this event-loop turn. Never wait
     # for another network result while holding the SQLite writer reservation.
     with engine.begin() as connection:
         connection.exec_driver_sql("BEGIN IMMEDIATE")
+        # An auth failure may suppress sibling results only if this batch entry
+        # still owns its lease and the captured credential version is current.
+        # A superseded worker must not invalidate a newer lease or its results.
+        credential_failures = set()
+        for scope, token, _ttl, result, _data, error, _payload in prepared:
+            if not (error and result.get("invalidate", False)
+                    and result.get("invalidate_credential", False)):
+                continue
+            current = connection.exec_driver_sql("""SELECT u.id,u.token_version,c.id,c.account_id,
+                c.access_key_id_enc,c.secret_access_key_enc,c.proxy_url_enc
+                FROM users AS u JOIN aws_credentials AS c ON c.user_id=u.id
+                JOIN data_snapshots AS s ON s.key=?
+                WHERE u.id=? AND c.id=? AND s.lease_token=?""",
+                (scope["key"], scope["user_id"], scope["credential_id"], token)).first()
+            if current and hashlib.sha256(json.dumps(list(current), separators=(",", ":")).encode()).hexdigest() == scope["version"]:
+                credential_failures.add(scope["credential_id"])
         for scope, token, ttl, result, data, error, payload in prepared:
             now = time.time()
             if scope["credential_id"] in credential_failures and not (
@@ -178,7 +201,7 @@ def _publish_batch(engine, entries):
                 connection.exec_driver_sql("""UPDATE data_snapshots SET lease_token=NULL,lease_until=0,
                     updated_at=?,error=?,error_status=?,next_retry_at=?
                     WHERE key=? AND lease_token=?""",
-                    (now, "同批凭证认证已失效，结果已丢弃", "unavailable", now + RETRY_SECONDS,
+                    (now, "同批凭证认证已失效，结果已丢弃", "credential_invalid", now + RETRY_SECONDS,
                      scope["key"], token))
                 outputs.append(None)
                 continue
@@ -375,8 +398,71 @@ async def read_many(engine, requests, wait=False, force=False):
                 db.expire_all()
                 views.append((_view(db.get(DataSnapshot, scope["key"]), now), None))
         db.commit()
-    return await asyncio.gather(*(finish_snapshot(engine, scope, ttl, loader, wait, view, token)
+    results = await asyncio.gather(*(finish_snapshot(engine, scope, ttl, loader, wait, view, token)
         for (scope, ttl, loader), (view, token) in zip(requests, views)))
+    # Another scope or concurrent request may discover invalid credentials
+    # after an earlier scope completed. Re-read the whole response set so that
+    # a previously captured successful view cannot escape after a credential-
+    # wide invalidation committed in SQLite.
+    return revalidate_snapshot_views(engine, [
+        (scope, view) for (scope, _ttl, _loader), view in zip(requests, results)])
+
+
+def revalidate_snapshot_views(engine, scoped_views):
+    """Return committed values at the response boundary, not stale in-memory views."""
+    if not scoped_views:
+        return []
+    credential_ids = {scope["credential_id"] for scope, _view_value in scoped_views}
+    keys = {scope["key"] for scope, _view_value in scoped_views}
+    # One SELECT supplies a consistent committed response boundary across all
+    # credentials and keys. Parameters are bound; no ORM/session state is reused.
+    all_credential_scopes = {scope["credential_id"] for scope, _previous in scoped_views
+                             if scope["kind"] == "billing-identity"}
+    key_slots = ",".join("?" for _key in keys)
+    credential_slots = ",".join("?" for _id in credential_ids)
+    auth_rows = {}
+    if all_credential_scopes:
+        auth_slots = ",".join("?" for _id in all_credential_scopes)
+        with engine.connect() as connection:
+            auth_rows = {row.credential_id: row for row in connection.exec_driver_sql(
+                "SELECT credential_id,error,error_status FROM data_snapshots "
+                "WHERE kind='billing-identity' AND credential_id IN (" + auth_slots + ")",
+                tuple(all_credential_scopes)).all()}
+    with engine.connect() as connection:
+        rows = connection.exec_driver_sql("""SELECT u.id,u.token_version,c.id,c.account_id,
+            c.access_key_id_enc,c.secret_access_key_enc,c.proxy_url_enc,
+            s.key,s.payload,s.lease_token,s.lease_until,s.expires_at,s.error,s.error_status,s.last_success
+            FROM users AS u JOIN aws_credentials AS c ON c.user_id=u.id
+            LEFT JOIN data_snapshots AS s ON s.credential_id=c.id AND s.key IN (""" + key_slots + ")"
+            + " WHERE c.id IN (" + credential_slots + ")", (*keys, *credential_ids)).all()
+    versions, live = {}, {}
+    for row in rows:
+        versions[row[2]] = hashlib.sha256(json.dumps(list(row[:7]), separators=(",", ":")).encode()).hexdigest()
+        if row[7] is not None:
+            live[row[7]] = SimpleNamespace(**dict(zip(
+                ("payload", "lease_token", "lease_until", "expires_at", "error", "error_status", "last_success"),
+                row[8:])))
+    refreshed = []
+    now = time.time()
+    credential_invalid = {credential_id for credential_id, row in auth_rows.items()
+                          if row.error_status == "credential_invalid"}
+    for scope, previous in scoped_views:
+        if versions.get(scope["credential_id"]) != scope["version"]:
+            refreshed.append(_view(None, now, True)); continue
+        if scope["credential_id"] in credential_invalid:
+            auth_row = auth_rows[scope["credential_id"]]
+            status = auth_row.error_status
+            refreshed.append({"data": None, "status": status, "stale": False, "refreshing": False,
+                              "last_success_at": None, "expires_at": None,
+                              "error_status": status, "error": auth_row.error or "凭证认证已失效"})
+            continue
+        row = live.get(scope["key"])
+        # A local pre-loader failure may have produced no row at all. Keep its
+        # error-only result, never fall back to an in-memory success payload.
+        if row is None and "data" in previous and previous.get("data") is None and previous.get("error"):
+            refreshed.append(previous); continue
+        refreshed.append(_view(row, now) if row is not None else _view(None, now, True))
+    return refreshed
 
 
 def invalidate_credential(db, credential_id):

@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from app.services import billing as service
 from app.services.snapshots import (SnapshotError, _row_current, _view, credential_failure,
-                                    permission_failure, read_snapshot, scope_for)
+                                    permission_failure, read_snapshot, revalidate_snapshot_views, scope_for)
 from app.services.traffic import get_credential_keys, get_credential_proxy_url
 
 TTL = 1800
@@ -125,7 +125,9 @@ async def cached_account(engine, user, credential, wait=False, force=False):
     async def section(name):
         view = await read_snapshot(engine, scope_for(user, credential, "billing-" + name, as_of), TTL,
                                    lambda: load(name), wait=wait, force=force)
-        return _section(view)
+        return view
     views = await asyncio.gather(*(section(name) for name in ("costs", "forecast", "credits")))
-    output["costs"], output["forecast"], output["credits"] = views
+    current = revalidate_snapshot_views(engine, [(scope_for(user, credential, "billing-" + name, as_of), view)
+        for name, view in zip(("costs", "forecast", "credits"), views)])
+    output["costs"], output["forecast"], output["credits"] = map(_section, current)
     return output

@@ -8,6 +8,7 @@ from app.models import CreditRecord
 from app.proxy_config import sanitize_error_message
 from app.services import billing as service
 from app.services.aws_clients import select_scan_credentials
+from app.services.snapshots import revalidate_snapshot_views, scope_for
 from app.services.traffic import get_credential_keys, get_credential_proxy_url
 
 
@@ -142,6 +143,29 @@ async def summary(db, user, credential_id=None, cached=False, wait=False, force=
         from app.services.billing_cache import cached_account
         accounts = await asyncio.gather(*(cached_account(db.get_bind(), user, credential, wait, force)
                                          for credential in credentials))
+        credentials_by_id = {credential.id: credential for credential in credentials}
+        final_scopes, final_sections = [], []
+        as_of = service._today_utc().isoformat()
+        for account in accounts:
+            credential = credentials_by_id.get(account["credential_id"])
+            if credential is None:
+                continue
+            for name in ("costs", "forecast", "credits"):
+                final_scopes.append((scope_for(user, credential, "billing-" + name, as_of),
+                                     account[name].get("cache", {})))
+                final_sections.append((account, name))
+        current_views = revalidate_snapshot_views(db.get_bind(), final_scopes)
+        for (account, name), view in zip(final_sections, current_views):
+                previous = account[name]
+                metadata = {key: value for key, value in view.items() if key != "data"}
+                if view["data"] is None:
+                    if previous.get("status") == "ok":
+                        account[name] = {"status": view.get("error_status") or "unavailable",
+                                         "error": view.get("error"), "cache": metadata}
+                elif previous.get("status") == "ok" and (view["stale"] or view["refreshing"]):
+                    account[name] = {"status": previous["status"],
+                                     **{key: value for key, value in previous.items() if key != "cache"},
+                                     "cache": metadata}
     else:
         accounts = await asyncio.gather(*(account_summary(credential) for credential in credentials))
     rows = db.query(CreditRecord).filter(CreditRecord.user_id == user.id).order_by(
