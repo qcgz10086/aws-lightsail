@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import api, { CachedInstancesResponse, Instance, readApi, SnapshotMetadata, TrafficSummary, getErrorMessage,
   invalidateQueryScope } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
+import { snapshotPollDelay } from '../api/snapshotPolling'
 
 export default function DashboardPage() {
   const { user, sessionKey } = useAuth()
@@ -45,7 +46,7 @@ export default function DashboardPage() {
         setInstancesRefreshing(nextInstances.refreshing)
         if (nextInstances.refreshing && Date.now() - pollStarted.current < 30000) {
           if (pollTimer.current) clearTimeout(pollTimer.current)
-          pollTimer.current = setTimeout(() => void load(false, false), 500)
+          pollTimer.current = setTimeout(() => void load(false, false), snapshotPollDelay(pollStarted.current))
         }
       }
     } catch (err) {

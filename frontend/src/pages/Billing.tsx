@@ -6,6 +6,7 @@ import { type Dayjs } from 'dayjs'
 import api, { BillingV2Summary, BillingCurrency, CredentialItem, CredentialOut,
   ExactManualCredit, getErrorMessage, invalidateQueryTags, readApi } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
+import { snapshotPollDelay } from '../api/snapshotPolling'
 
 const money = (value: string | null | undefined, currency: string) =>
   value == null ? '—（不可用或缺失）' : `${currency} ${value}`
@@ -39,7 +40,7 @@ export default function BillingPage() {
       if (version === requestVersion.current) {
         setSummary(data)
         if (data.refreshing && Date.now() - pollStarted.current < 30000) {
-          pollTimer.current = setTimeout(() => void load(), 500)
+          pollTimer.current = setTimeout(() => void load(), snapshotPollDelay(pollStarted.current))
         }
       }
     } catch (error) {

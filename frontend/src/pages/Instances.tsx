@@ -21,6 +21,7 @@ import api, { CachedInstancesResponse, CredentialItem, CredentialOut, Instance, 
   SnapshotMetadata, getErrorMessage, invalidateQueryScope, invalidateQueryTags } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import { submitTask, TaskKind } from '../api/tasks'
+import { snapshotPollDelay } from '../api/snapshotPolling'
 
 const stateColor: Record<string, string> = {
   running: 'green',
@@ -82,7 +83,7 @@ export default function InstancesPage() {
         setData(res.instances)
         setSnapshotScopes(res.scopes)
         if (res.refreshing && Date.now() - pollStarted.current < 30000) {
-          pollTimer.current = setTimeout(() => void load(), 500)
+          pollTimer.current = setTimeout(() => void load(), snapshotPollDelay(pollStarted.current))
         }
       }
     } catch (err) {

@@ -13,6 +13,7 @@ const proxy = await startOfflineProxy(origin)
 const browser = await chromium.launch({ executablePath: chrome, headless: true, proxy: { server: proxy.url } })
 const results = [], errors = []
 const controls = []
+const departures = []
 async function control(context, path) {
   const response = await context.request.post(origin + path)
   if (!response.ok()) throw new Error(`Control ${path}: HTTP ${response.status()}`)
@@ -21,7 +22,7 @@ async function control(context, path) {
   return data
 }
 const report = async status => fs.writeFile(output, JSON.stringify({ run_id: runId, expected_rows: manifest.samples * 12,
-  status, fixture: manifest, identities, controls, browser: browser.version(),
+  status, fixture: manifest, identities, controls, departures, browser: browser.version(),
   definitions: { first: 'Current generation business value visible after workload API response; two animation frames',
     complete: 'Current generation all scopes terminal and business DOM visible; observed API pending empty',
     generations: 'Every cold user starts generation 1; repeat uses same; refresh advances to 2; unavailable is a failure',
@@ -60,6 +61,8 @@ try {
       const page = await context.newPage()
       const pending = new Set()
       let observations = [], failures = [], pageErrors = [], finished = [], started = 0, generation = 1, lastFacts = null, refreshedAfter = 0
+      let activeName = name
+      const factsByPage = new Map()
       page.on('request', req => { if (new URL(req.url()).pathname.startsWith('/api/')) pending.add(req) })
       page.on('requestfinished', req => { if (pending.delete(req)) finished.push({ path: new URL(req.url()).pathname,
         method: req.method(), ms: performance.now() - started }) })
@@ -69,22 +72,40 @@ try {
         const p = new URL(res.url()).pathname
         if (!p.startsWith('/api/')) return
         if (res.status() >= 400) failures.push({ path: p, status: res.status() })
-        const relevant = name === 'billing' ? ['/api/billing/summary', '/api/v2/billing/summary'] : ['/api/instances', '/api/v2/instances']
+        const relevant = activeName === 'billing' ? ['/api/billing/summary', '/api/v2/billing/summary'] : ['/api/instances', '/api/v2/instances']
         if (!relevant.includes(p) || res.request().method() !== 'GET') return
         try {
           const data = await res.json()
-          const facts = responseFacts(name, data, generation, refreshedAfter, identities[username])
+          const facts = responseFacts(activeName, data, generation, refreshedAfter, identities[username])
           lastFacts = facts
+          factsByPage.set(activeName, facts)
           observations.push({ path: p, ms: performance.now() - started, ...facts })
         } catch (error) { failures.push({ path: p, error: String(error) }) }
       })
       for (const phase of ['first_visit', 'repeat_visit', 'refresh_button', 'spa_return']) {
         if (phase === 'spa_return') {
+          activeName = name === 'instances' ? 'dashboard' : 'instances'
+          lastFacts = factsByPage.get(activeName) || (name !== 'billing' ? lastFacts : null)
+          const departureStarted = performance.now()
+          const departureBefore = await context.request.get(origin + '/__baseline__/stats').then(r => r.json())
+          const returnRefresh = refreshedAfter
+          refreshedAfter = 0
           await page.getByRole('link', { name: name === 'instances' ? '总览' : '实例', exact: true }).click()
-          await page.waitForTimeout(100)
           const limit = performance.now() + 30000
-          while (pending.size && performance.now() < limit) await page.waitForTimeout(10)
-          if (pending.size) throw new Error('SPA departure did not settle')
+          while (performance.now() < limit) {
+            if (lastFacts?.complete && pending.size === 0 && await visible(page, activeName, lastFacts)) {
+              const stats = await context.request.get(origin + '/__baseline__/stats').then(r => r.json())
+              if (stats.active === 0) {
+                departures.push({case:name, sample, page:activeName, ms:performance.now()-departureStarted,
+                  before:departureBefore, after:stats, facts:lastFacts}); break
+              }
+            }
+            await page.waitForTimeout(10)
+          }
+          if (!departures.some(d => d.case === name && d.sample === sample)) throw new Error('SPA departure did not settle')
+          activeName = name
+          lastFacts = factsByPage.get(name)
+          refreshedAfter = returnRefresh
         }
         generation = phase === 'first_visit' || phase === 'repeat_visit' ? 1 : 2
         const clock = await control(context, `/__baseline__/generation/${generation}`)
@@ -110,6 +131,7 @@ try {
           const after = await context.request.get(origin + '/__baseline__/stats').then(r => r.json())
           results.push({ case: name, phase, sample, generation, first_data_ms: first, complete_ms: complete,
             observations, api_requests: finished, aws_calls: after.calls, peak_concurrency: after.peak_concurrency,
+            aws_events: after.events, active_aws_calls: after.active,
             sql_queries: after.sql_queries, violations: after.violations, failures, page_errors: pageErrors,
             wall_seconds: after.clock_seconds - before.clock_seconds, cpu_seconds: after.cpu_seconds - before.cpu_seconds })
           if (after.violations.length || failures.length || pageErrors.length) errors.push({ case: name, phase, sample, violations: after.violations, failures, pageErrors })
