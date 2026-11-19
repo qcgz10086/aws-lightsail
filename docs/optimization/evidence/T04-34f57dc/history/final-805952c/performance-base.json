@@ -1,0 +1,186 @@
+{
+  "candidate": false,
+  "samples": [
+    {
+      "cold_response_ms": 177.637,
+      "first_data_ms": 177.637,
+      "complete_ms": 177.886,
+      "hot_ms": [
+        116.25410000124248,
+        115.70319999736967,
+        115.26350000349339,
+        115.88829999527661,
+        116.57189999823458,
+        116.28760000166949,
+        119.84510000183946
+      ],
+      "hot_aws_calls": 56,
+      "initial_mock_aws_calls": 8,
+      "hot_select_max": 2
+    },
+    {
+      "cold_response_ms": 121.777,
+      "first_data_ms": 121.777,
+      "complete_ms": 122.02,
+      "hot_ms": [
+        116.82880000444129,
+        116.01189999782946,
+        115.39760000596289,
+        115.48559999937424,
+        116.33099999744445,
+        119.0303000039421,
+        115.48839999886695
+      ],
+      "hot_aws_calls": 56,
+      "initial_mock_aws_calls": 8,
+      "hot_select_max": 2
+    },
+    {
+      "cold_response_ms": 119.967,
+      "first_data_ms": 119.967,
+      "complete_ms": 120.202,
+      "hot_ms": [
+        116.29499999980908,
+        116.34029999549966,
+        117.20190000050934,
+        115.18480000086129,
+        115.43890000029933,
+        114.82220000470988,
+        115.32930000248598
+      ],
+      "hot_aws_calls": 56,
+      "initial_mock_aws_calls": 8,
+      "hot_select_max": 2
+    },
+    {
+      "cold_response_ms": 121.676,
+      "first_data_ms": 121.676,
+      "complete_ms": 121.913,
+      "hot_ms": [
+        116.36400000134017,
+        115.61329999676673,
+        116.16599999979371,
+        116.43880000337958,
+        117.00310000014724,
+        116.67630000010831,
+        117.15779999940423
+      ],
+      "hot_aws_calls": 56,
+      "initial_mock_aws_calls": 8,
+      "hot_select_max": 2
+    },
+    {
+      "cold_response_ms": 120.549,
+      "first_data_ms": 120.549,
+      "complete_ms": 120.802,
+      "hot_ms": [
+        116.163200000301,
+        116.46920000202954,
+        115.42929999995977,
+        118.11490000400227,
+        115.49630000081379,
+        115.8891000013682,
+        117.06979999871692
+      ],
+      "hot_aws_calls": 56,
+      "initial_mock_aws_calls": 8,
+      "hot_select_max": 2
+    },
+    {
+      "cold_response_ms": 120.893,
+      "first_data_ms": 120.893,
+      "complete_ms": 121.133,
+      "hot_ms": [
+        116.78850000316743,
+        115.85179999383399,
+        116.27279999811435,
+        116.5545000039856,
+        116.2731000003987,
+        117.968499995186,
+        117.42870000307448
+      ],
+      "hot_aws_calls": 56,
+      "initial_mock_aws_calls": 8,
+      "hot_select_max": 2
+    },
+    {
+      "cold_response_ms": 121.334,
+      "first_data_ms": 121.334,
+      "complete_ms": 121.575,
+      "hot_ms": [
+        115.1601000019582,
+        116.20190000394359,
+        116.73569999402389,
+        116.4405999952578,
+        115.75209999864455,
+        116.02699999639299,
+        152.16920000239043
+      ],
+      "hot_aws_calls": 56,
+      "initial_mock_aws_calls": 8,
+      "hot_select_max": 2
+    }
+  ],
+  "median_first_data_ms": 121.334,
+  "median_complete_ms": 121.575,
+  "hot_p95_ms": 119.0303000039421,
+  "hot_aws_calls": 392
+}
+C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+2026-11-19 08:27:01,124 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:01,241 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:01,356 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:01,472 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:01,587 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:01,703 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:01,821 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:01,940 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:02,120 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:02,236 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:02,353 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:02,468 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:02,584 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:02,700 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:02,819 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:02,934 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:03,114 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:03,231 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:03,347 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:03,464 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:03,580 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:03,695 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:03,810 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:03,925 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:04,103 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:04,219 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:04,335 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:04,450 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:04,567 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:04,684 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:04,801 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:04,919 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:05,110 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:05,227 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:05,343 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:05,459 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:05,577 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:05,693 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:05,808 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:05,925 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:06,098 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:06,215 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:06,332 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:06,447 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:06,564 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:06,681 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:06,798 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:06,916 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:07,093 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:07,208 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:07,325 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:07,441 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:07,558 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:07,674 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:07,790 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 08:27:07,942 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"

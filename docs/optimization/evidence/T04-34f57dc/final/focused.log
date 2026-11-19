@@ -1,0 +1,42 @@
+AWS_TRANSPORT_ATTEMPTS 0
+test_all_clients_share_five_calls_two_mutations_and_one_same_instance (test_t04_cache.AwsLimitTests.test_all_clients_share_five_calls_two_mutations_and_one_same_instance) ... ok
+test_billing_hot_cache_and_independent_failure_preserve_last_success (test_t04_cache.CacheRouteTests.test_billing_hot_cache_and_independent_failure_preserve_last_success) ... C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+2026-11-19 08:31:49,428 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 08:31:49,444 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 08:31:49,478 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 08:31:49,503 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 08:31:49,517 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 404 Not Found"
+ok
+test_instance_hot_cache_avoids_aws_and_slow_region_does_not_hide_success (test_t04_cache.CacheRouteTests.test_instance_hot_cache_avoids_aws_and_slow_region_does_not_hide_success) ... 2026-11-19 08:31:49,696 INFO [httpx] HTTP Request: GET http://testserver/api/catalog/regions?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 08:31:50,020 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 08:31:50,063 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 08:31:50,103 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 08:31:50,115 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+ok
+test_invalid_region_creates_no_scope_or_aws_call_and_valid_region_reuses_cache (test_t04_cache.CacheRouteTests.test_invalid_region_creates_no_scope_or_aws_call_and_valid_region_reuses_cache) ... 2026-11-19 08:31:50,265 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=moon-1 "HTTP/1.1 400 Bad Request"
+2026-11-19 08:31:50,275 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 400 Bad Request"
+2026-11-19 08:31:50,287 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 08:31:50,294 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 08:31:50,301 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=https%3A%2F%2F127.0.0.1 "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 08:31:50,310 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 08:31:50,344 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=eu-west-1&wait=true "HTTP/1.1 400 Bad Request"
+2026-11-19 08:31:50,385 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=us-east-1&wait=true "HTTP/1.1 200 OK"
+2026-11-19 08:31:50,401 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=us-east-1 "HTTP/1.1 200 OK"
+ok
+test_successful_stop_expires_snapshot_and_prevents_older_refresh_publish (test_t04_cache.CacheRouteTests.test_successful_stop_expires_snapshot_and_prevents_older_refresh_publish) ... 2026-11-19 08:31:50,607 INFO [httpx] HTTP Request: POST http://testserver/api/instances/us-east-1/fixed/stop?credential_id=1 "HTTP/1.1 200 OK"
+ok
+test_real_base_v3_upgrade_rollback_and_restore (test_t04_cache.SnapshotMigrationTests.test_real_base_v3_upgrade_rollback_and_restore) ... 2026-11-19 08:31:52,169 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpuc2tuae_\backups\v3.db.pre-v4-da94b32ed7ee32ba30cc0f0c74689e1224b4c667ded156149d125ba650f14fa2.db
+ok
+test_changed_secret_during_refresh_cannot_publish_old_result (test_t04_cache.SnapshotTests.test_changed_secret_during_refresh_cannot_publish_old_result) ... ok
+test_cold_get_returns_promptly_and_failed_load_finishes (test_t04_cache.SnapshotTests.test_cold_get_returns_promptly_and_failed_load_finishes) ... ok
+test_different_user_account_and_proxy_versions_have_distinct_keys (test_t04_cache.SnapshotTests.test_different_user_account_and_proxy_versions_have_distinct_keys) ... ok
+test_expired_refresh_lease_can_recover_after_restart_and_cache_is_persistent (test_t04_cache.SnapshotTests.test_expired_refresh_lease_can_recover_after_restart_and_cache_is_persistent) ... ok
+test_hot_snapshot_and_concurrent_refresh_share_one_loader (test_t04_cache.SnapshotTests.test_hot_snapshot_and_concurrent_refresh_share_one_loader) ... ok
+test_payload_budget_evicts_old_values_and_rejects_oversized_payload (test_t04_cache.SnapshotTests.test_payload_budget_evicts_old_values_and_rejects_oversized_payload) ... ok
+test_transient_failure_preserves_old_success_permission_failure_drops_it (test_t04_cache.SnapshotTests.test_transient_failure_preserves_old_success_permission_failure_drops_it) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 7.375s
+
+OK

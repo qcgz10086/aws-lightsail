@@ -1,0 +1,550 @@
+{
+  "product_head": "34f57dc0deb1cff95702f69b9a8d993858667e21",
+  "product_tree": "0985742a1f7885195d8f8996a16e29f9bffeba54",
+  "raw_source_hashes_match_final_run": true,
+  "git_lf_content_match": true,
+  "python_ast_parse": "passed",
+  "git_diff_check": "passed",
+  "source_files": [
+    {
+      "file": "backend/app/__init__.py",
+      "working_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lf_content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "backend/app/config.py",
+      "working_sha256": "86be9b706b9f4eda373908805fbb278475654d317609ca2d4cf7a60e8b426e13",
+      "git_blob_sha256": "09a8b94c2ae088ac14178659e142511843fa21409a96e0c199bd2d9cb7c4023b",
+      "lf_content_sha256": "09a8b94c2ae088ac14178659e142511843fa21409a96e0c199bd2d9cb7c4023b"
+    },
+    {
+      "file": "backend/app/database.py",
+      "working_sha256": "56b2e5d9b39b7386e0910bac3d80908c5f2df9721d27f68fb5a647c4c1986d0b",
+      "git_blob_sha256": "096938a7fdbd0e583424e1ddf7066bb8722530056e9b79ab89bb4c2fda3b3ceb",
+      "lf_content_sha256": "096938a7fdbd0e583424e1ddf7066bb8722530056e9b79ab89bb4c2fda3b3ceb"
+    },
+    {
+      "file": "backend/app/deps.py",
+      "working_sha256": "5122475e761c40dc03d9a5f5c142a31017e06398499aa7e9d9635caf9c143dac",
+      "git_blob_sha256": "1ac8a68e2be5a2ae2177887cf91814dbc10fee35ed644943032847872efb4a99",
+      "lf_content_sha256": "1ac8a68e2be5a2ae2177887cf91814dbc10fee35ed644943032847872efb4a99"
+    },
+    {
+      "file": "backend/app/main.py",
+      "working_sha256": "4299d866ee1690c6099734a2df12ed2ab2f4dc08f7f4e4212824fe5376839a92",
+      "git_blob_sha256": "bd5369e3b353b5dc7855f6c0a0cacd54412d2a3e6c615794a9a58fd651fc3664",
+      "lf_content_sha256": "bd5369e3b353b5dc7855f6c0a0cacd54412d2a3e6c615794a9a58fd651fc3664"
+    },
+    {
+      "file": "backend/app/migrations.py",
+      "working_sha256": "47d994e376af32a266280dc187f82247a8b7f8ace4ff814bf9ee986b359ede0e",
+      "git_blob_sha256": "054bfbc30fcdda29753ecc6fc2930b24a7f65ba4e89fcaf777df1151f7ac9341",
+      "lf_content_sha256": "054bfbc30fcdda29753ecc6fc2930b24a7f65ba4e89fcaf777df1151f7ac9341"
+    },
+    {
+      "file": "backend/app/models.py",
+      "working_sha256": "d1ecbd55338d4977ce62f0a565e76677d93574cd7f1ee7044ca4e04673a1b772",
+      "git_blob_sha256": "51a3508dcde62e9b09a315ffd1805369d234c2487152a539bac84c59a05a1750",
+      "lf_content_sha256": "51a3508dcde62e9b09a315ffd1805369d234c2487152a539bac84c59a05a1750"
+    },
+    {
+      "file": "backend/app/password_strength.py",
+      "working_sha256": "9ed02a62e32cdcf74a273c1fdb963b088cacf897afbfe67a1fb204c17da24067",
+      "git_blob_sha256": "9b67569f4412b36fb121fb2ada881fa4271b7a4666ea75c157b81b7167a42ba8",
+      "lf_content_sha256": "9b67569f4412b36fb121fb2ada881fa4271b7a4666ea75c157b81b7167a42ba8"
+    },
+    {
+      "file": "backend/app/proxy_config.py",
+      "working_sha256": "930e4b098056b2ecec635f235ebcea286fada7282e3c4ce34d8de4f2c5595fa4",
+      "git_blob_sha256": "a97e1cc165f3fd3c3d11dc1a82ca2a3f13feafbc7d76e62fdccc8e3fdd844da8",
+      "lf_content_sha256": "a97e1cc165f3fd3c3d11dc1a82ca2a3f13feafbc7d76e62fdccc8e3fdd844da8"
+    },
+    {
+      "file": "backend/app/rate_limit.py",
+      "working_sha256": "5dfb987c2424ea73c719904ea08524edd2dece439a46412e7f42852d0f4a327e",
+      "git_blob_sha256": "cc030ca70d002edccf66e8bc2bdfbbe9b39c2f54887b79d31963f50962bf2389",
+      "lf_content_sha256": "cc030ca70d002edccf66e8bc2bdfbbe9b39c2f54887b79d31963f50962bf2389"
+    },
+    {
+      "file": "backend/app/routers/__init__.py",
+      "working_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lf_content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "backend/app/routers/auth.py",
+      "working_sha256": "e08abddd736e37c562dc8d6e5a0dcc84eb6160e5ea1376c58da05db2283e15cc",
+      "git_blob_sha256": "f8b76bbc2bba5991fdebfe2517a2451d64fb65cfcc7653e97cd136a35b7d5d2d",
+      "lf_content_sha256": "f8b76bbc2bba5991fdebfe2517a2451d64fb65cfcc7653e97cd136a35b7d5d2d"
+    },
+    {
+      "file": "backend/app/routers/billing.py",
+      "working_sha256": "21878bcc300968e7ed221224089b7b6b9a491f5d03199faa827770a05b21b9da",
+      "git_blob_sha256": "01977efd59ff7ebeb8a1c9b1d2c079a1eca068780f0f562a5143a61a5908de3c",
+      "lf_content_sha256": "01977efd59ff7ebeb8a1c9b1d2c079a1eca068780f0f562a5143a61a5908de3c"
+    },
+    {
+      "file": "backend/app/routers/billing_v2.py",
+      "working_sha256": "aea40d66ca771c2e676ea24a2e45d79e2784a0c90da3e0082bb58ef0d1fa55db",
+      "git_blob_sha256": "3daae0d6466d48416655c1a5a6fa1006d17f2f775b928c4605313250a45d9a7d",
+      "lf_content_sha256": "3daae0d6466d48416655c1a5a6fa1006d17f2f775b928c4605313250a45d9a7d"
+    },
+    {
+      "file": "backend/app/routers/cache_v2.py",
+      "working_sha256": "f22a293bb1b81f012eb7ffeae864872babcf2eb6d64cd1342850b8a6e570f7b6",
+      "git_blob_sha256": "f22a293bb1b81f012eb7ffeae864872babcf2eb6d64cd1342850b8a6e570f7b6",
+      "lf_content_sha256": "f22a293bb1b81f012eb7ffeae864872babcf2eb6d64cd1342850b8a6e570f7b6"
+    },
+    {
+      "file": "backend/app/routers/catalog.py",
+      "working_sha256": "b1c49db2996f0178ff0e455dc655143d759f88ff0f0a2ca469af8200e649b694",
+      "git_blob_sha256": "e8acc40cc9d54041df03092dbe27605f040329efcb462cdae27a1d546d86855d",
+      "lf_content_sha256": "e8acc40cc9d54041df03092dbe27605f040329efcb462cdae27a1d546d86855d"
+    },
+    {
+      "file": "backend/app/routers/credentials.py",
+      "working_sha256": "c6d800c22cffe516075437bde2cccf86740f5d4bf228ca7d30d7203a7aca93b7",
+      "git_blob_sha256": "c6d800c22cffe516075437bde2cccf86740f5d4bf228ca7d30d7203a7aca93b7",
+      "lf_content_sha256": "c6d800c22cffe516075437bde2cccf86740f5d4bf228ca7d30d7203a7aca93b7"
+    },
+    {
+      "file": "backend/app/routers/instances.py",
+      "working_sha256": "924c353673adffda423426ea0cf0b9dbee89e4dbba0c4e7d26797f475f49485a",
+      "git_blob_sha256": "924c353673adffda423426ea0cf0b9dbee89e4dbba0c4e7d26797f475f49485a",
+      "lf_content_sha256": "924c353673adffda423426ea0cf0b9dbee89e4dbba0c4e7d26797f475f49485a"
+    },
+    {
+      "file": "backend/app/routers/metrics.py",
+      "working_sha256": "a80e83e0c3cf236165802aca079daecb1a85146564e42589569800d74773e1b2",
+      "git_blob_sha256": "5c3f9eda5ff92950b805e958f63aefbb626fc4e01d69a26d04071adb052597b1",
+      "lf_content_sha256": "5c3f9eda5ff92950b805e958f63aefbb626fc4e01d69a26d04071adb052597b1"
+    },
+    {
+      "file": "backend/app/routers/users.py",
+      "working_sha256": "0abe777811319f24a1fe44607e7f4652ea728abeb36d95df2922531020b3e55e",
+      "git_blob_sha256": "e5edd2707b059e103f66fce07a8b710a9b1905c3d3de2d9d870e0da15fe3f9d7",
+      "lf_content_sha256": "e5edd2707b059e103f66fce07a8b710a9b1905c3d3de2d9d870e0da15fe3f9d7"
+    },
+    {
+      "file": "backend/app/schemas.py",
+      "working_sha256": "4775df59e45e07f1b638402c7492311f87a30053fb756d9ba5074fcd41da374c",
+      "git_blob_sha256": "83ebcfb354675f089007b60826dbb1cf9134a2fc8152d73aa7cce82560d9458b",
+      "lf_content_sha256": "83ebcfb354675f089007b60826dbb1cf9134a2fc8152d73aa7cce82560d9458b"
+    },
+    {
+      "file": "backend/app/security.py",
+      "working_sha256": "38debebf45ad4b6697b538366da2cbe269184c780b04c08a5cecb097e2926e3d",
+      "git_blob_sha256": "9f65c2211c5628c8ece04585966881158871d4926a330cccd0c64dace00830de",
+      "lf_content_sha256": "9f65c2211c5628c8ece04585966881158871d4926a330cccd0c64dace00830de"
+    },
+    {
+      "file": "backend/app/seed.py",
+      "working_sha256": "ca9c46ef738bca6a294c18de111829894e361a8ae38e4ac3a86fddd829abef02",
+      "git_blob_sha256": "e7ac8c49cd4f70605416924fa8beda5941304fc71a7db0f208908147bcb9e307",
+      "lf_content_sha256": "e7ac8c49cd4f70605416924fa8beda5941304fc71a7db0f208908147bcb9e307"
+    },
+    {
+      "file": "backend/app/services/__init__.py",
+      "working_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lf_content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "backend/app/services/account.py",
+      "working_sha256": "383eceda370ed49fca331ba7ec85cc7e946bde4040339268905d03e10c91cc03",
+      "git_blob_sha256": "759bc054968aba46529c22b1b20571b2c6d897b1b68df19b5791369906b1f1e2",
+      "lf_content_sha256": "759bc054968aba46529c22b1b20571b2c6d897b1b68df19b5791369906b1f1e2"
+    },
+    {
+      "file": "backend/app/services/aws_clients.py",
+      "working_sha256": "24f9dd07ff8a218426cc83e575591dca01d1eced7b8c9c7e5aa825c9139e0b67",
+      "git_blob_sha256": "e3faf43017c1315369181122765cae421b98cac4ca39e4fc6ffeec590b3dfdb6",
+      "lf_content_sha256": "e3faf43017c1315369181122765cae421b98cac4ca39e4fc6ffeec590b3dfdb6"
+    },
+    {
+      "file": "backend/app/services/aws_limits.py",
+      "working_sha256": "03b7fe12835c8b43487f6160dd669f80bb82158745a603afce236b0e483c0bab",
+      "git_blob_sha256": "03b7fe12835c8b43487f6160dd669f80bb82158745a603afce236b0e483c0bab",
+      "lf_content_sha256": "03b7fe12835c8b43487f6160dd669f80bb82158745a603afce236b0e483c0bab"
+    },
+    {
+      "file": "backend/app/services/billing.py",
+      "working_sha256": "fc5039d85a5b26b1e048f0e579812c6398944ec7783c740446ae6c367664854c",
+      "git_blob_sha256": "2e4a1b01d8caa34261ddb20de0f9ee3d3a210e53b3385d31f79a783042cbf832",
+      "lf_content_sha256": "2e4a1b01d8caa34261ddb20de0f9ee3d3a210e53b3385d31f79a783042cbf832"
+    },
+    {
+      "file": "backend/app/services/billing_cache.py",
+      "working_sha256": "bae357480e334ec8a3f5a8f0584e2e11093153a37a874be606219825aa6ea5d3",
+      "git_blob_sha256": "bae357480e334ec8a3f5a8f0584e2e11093153a37a874be606219825aa6ea5d3",
+      "lf_content_sha256": "bae357480e334ec8a3f5a8f0584e2e11093153a37a874be606219825aa6ea5d3"
+    },
+    {
+      "file": "backend/app/services/billing_summary.py",
+      "working_sha256": "368882afcadb48b5cec23ee61c4f7c4949ead7188c7cdab127f389f438fe3569",
+      "git_blob_sha256": "d2357f982749d4cb4eee068fe7120fa2b7111099fdb44a3cc3fa70a8aacf30ee",
+      "lf_content_sha256": "d2357f982749d4cb4eee068fe7120fa2b7111099fdb44a3cc3fa70a8aacf30ee"
+    },
+    {
+      "file": "backend/app/services/collector.py",
+      "working_sha256": "de8413311f3a9a0a2ba00da232a8631deb0d872ba0f10e11a78c2ab755b8a5c4",
+      "git_blob_sha256": "30c9f40b082cfa47330ebffd475a8fd65f76adcc315cfe5271f2cfb341d5306c",
+      "lf_content_sha256": "30c9f40b082cfa47330ebffd475a8fd65f76adcc315cfe5271f2cfb341d5306c"
+    },
+    {
+      "file": "backend/app/services/instance_cache.py",
+      "working_sha256": "df813bc2f8ec8152220c5fc7aac6fae927904e6c9e0c40dbca44c373727c2887",
+      "git_blob_sha256": "df813bc2f8ec8152220c5fc7aac6fae927904e6c9e0c40dbca44c373727c2887",
+      "lf_content_sha256": "df813bc2f8ec8152220c5fc7aac6fae927904e6c9e0c40dbca44c373727c2887"
+    },
+    {
+      "file": "backend/app/services/lightsail.py",
+      "working_sha256": "6cfd9e082bc264dd4a3cea925ff3071ee870efa9e637d0ad53de5e0bdd9eda13",
+      "git_blob_sha256": "be95178469a8991bb5edfa0fc227fb5ef8a2c8a3a21fa1d9cede31b06c21eaf8",
+      "lf_content_sha256": "be95178469a8991bb5edfa0fc227fb5ef8a2c8a3a21fa1d9cede31b06c21eaf8"
+    },
+    {
+      "file": "backend/app/services/snapshots.py",
+      "working_sha256": "bbc6ab306b4e7e7b84bfb1b97f43dd92334ff1b0239fc8eb733b8b20a26d507d",
+      "git_blob_sha256": "bbc6ab306b4e7e7b84bfb1b97f43dd92334ff1b0239fc8eb733b8b20a26d507d",
+      "lf_content_sha256": "bbc6ab306b4e7e7b84bfb1b97f43dd92334ff1b0239fc8eb733b8b20a26d507d"
+    },
+    {
+      "file": "backend/app/services/traffic.py",
+      "working_sha256": "a185797e84bfc34c5d474390cca4f871995a85ae7d827d09c903c1c3a8b809b0",
+      "git_blob_sha256": "1e25e0ed629c627f04d89924b724febc87a539d0bb4341dce2f1b5372fb8ddca",
+      "lf_content_sha256": "1e25e0ed629c627f04d89924b724febc87a539d0bb4341dce2f1b5372fb8ddca"
+    },
+    {
+      "file": "backend/app/sqlite_backup.py",
+      "working_sha256": "e86cc81e24b4fe1bcad08045f16240ab498d5adf2561e071e04f8ac35bb150bd",
+      "git_blob_sha256": "10d70fb7bb3584938b44a631edd2e28ebec2bae69829065f37bcfdc5c9461afe",
+      "lf_content_sha256": "10d70fb7bb3584938b44a631edd2e28ebec2bae69829065f37bcfdc5c9461afe"
+    },
+    {
+      "file": "backend/tests/test_billing.py",
+      "working_sha256": "bdb4473bb03edb00d3bf9d07e8e33c786d562c8b5344700057c578731a76ec8e",
+      "git_blob_sha256": "0b2f4c13086f014319eaf934356e2f4b2b9677d95d15dad389c031967c71def9",
+      "lf_content_sha256": "0b2f4c13086f014319eaf934356e2f4b2b9677d95d15dad389c031967c71def9"
+    },
+    {
+      "file": "backend/tests/test_migration_boundaries.py",
+      "working_sha256": "35c3c1b7741f8cad25fa985c7fd67040faacc48f5cda944068d4be1c0a5d0443",
+      "git_blob_sha256": "e890c4b33d280165a87ca0fd718a362708b5baa66e499c40c8b7df3e10cdecfd",
+      "lf_content_sha256": "e890c4b33d280165a87ca0fd718a362708b5baa66e499c40c8b7df3e10cdecfd"
+    },
+    {
+      "file": "backend/tests/test_migration_retries.py",
+      "working_sha256": "b273546a2fe66765bbb42d98ca570507ceef9c0e3a11c98ba92897f251480aa2",
+      "git_blob_sha256": "2dd647c1ff79fab8a9aa063d68dc871a8d0a7dbf33231900d51adc680c4c14dc",
+      "lf_content_sha256": "2dd647c1ff79fab8a9aa063d68dc871a8d0a7dbf33231900d51adc680c4c14dc"
+    },
+    {
+      "file": "backend/tests/test_migrations.py",
+      "working_sha256": "bf2cdf17ae5a14d6921c8cbc20c209c0673e3326df0df412071d20eed1d109c2",
+      "git_blob_sha256": "bf2cdf17ae5a14d6921c8cbc20c209c0673e3326df0df412071d20eed1d109c2",
+      "lf_content_sha256": "bf2cdf17ae5a14d6921c8cbc20c209c0673e3326df0df412071d20eed1d109c2"
+    },
+    {
+      "file": "backend/tests/test_proxy.py",
+      "working_sha256": "e799a3193ecf590bd08eb4a278b114ed4c56dd56e0ec415bb24c84c1a7d578b3",
+      "git_blob_sha256": "5137321d1eddfdcd54221685624062c3cfef4929d3904ae766b804886d5fe861",
+      "lf_content_sha256": "5137321d1eddfdcd54221685624062c3cfef4929d3904ae766b804886d5fe861"
+    },
+    {
+      "file": "backend/tests/test_rate_limit_password.py",
+      "working_sha256": "dc35890fb5c62cb1f98ce89c378bdbb365c4e7b3acdce4ab6efc98e30ef5f485",
+      "git_blob_sha256": "d5c9e55fdd454e0b1f203a55fcf2b4032c286ed3770393816f05e2278403e837",
+      "lf_content_sha256": "d5c9e55fdd454e0b1f203a55fcf2b4032c286ed3770393816f05e2278403e837"
+    },
+    {
+      "file": "backend/tests/test_regions.py",
+      "working_sha256": "adc895ee2a9795c8ab08a3ecbb9b3b44242faec8e4545570a730d70e5d40f57c",
+      "git_blob_sha256": "12ac3389e7a0c956781c16e3a1aa365a26e90fa001d83ac8d0167e52ea48d364",
+      "lf_content_sha256": "12ac3389e7a0c956781c16e3a1aa365a26e90fa001d83ac8d0167e52ea48d364"
+    },
+    {
+      "file": "backend/tests/test_remaining_fixes.py",
+      "working_sha256": "d51c5fcc34935636b81f7b720313034f63b785673aaf1d804e740ff09962778f",
+      "git_blob_sha256": "478d59c5626e53a4f79a52234646fb1075087b9c330fc911c5c58095aaafa1ed",
+      "lf_content_sha256": "478d59c5626e53a4f79a52234646fb1075087b9c330fc911c5c58095aaafa1ed"
+    },
+    {
+      "file": "backend/tests/test_security_config.py",
+      "working_sha256": "bed998b243d9bc5e5936c27d70b5e65dd00ecff27e26f319a3e0543a45cf2803",
+      "git_blob_sha256": "edd9d19c6cb3d4665c7aef5d52fe1cba899994ef3681dbc790e64b8a59a8a408",
+      "lf_content_sha256": "edd9d19c6cb3d4665c7aef5d52fe1cba899994ef3681dbc790e64b8a59a8a408"
+    },
+    {
+      "file": "backend/tests/test_t02_identity_proxy.py",
+      "working_sha256": "175e64cac1f6ade3288b00e3fd57b66600e65038ee7f9ba1983ac9bc191bb899",
+      "git_blob_sha256": "37484b476e256c2a7294a74b26c5c006b91c763774ed2575815210dfb0157b4a",
+      "lf_content_sha256": "37484b476e256c2a7294a74b26c5c006b91c763774ed2575815210dfb0157b4a"
+    },
+    {
+      "file": "backend/tests/test_t03_billing_accuracy.py",
+      "working_sha256": "0a0f461c11e3f0a65534237e10890653b0f6a567af354c05ad3a951b23778497",
+      "git_blob_sha256": "0a0f461c11e3f0a65534237e10890653b0f6a567af354c05ad3a951b23778497",
+      "lf_content_sha256": "0a0f461c11e3f0a65534237e10890653b0f6a567af354c05ad3a951b23778497"
+    },
+    {
+      "file": "backend/tests/test_t04_cache.py",
+      "working_sha256": "fcee9aeb2b0122c56f6c94e49cb29fb8000b0f975d9d48c62d52dbece3d34f59",
+      "git_blob_sha256": "fcee9aeb2b0122c56f6c94e49cb29fb8000b0f975d9d48c62d52dbece3d34f59",
+      "lf_content_sha256": "fcee9aeb2b0122c56f6c94e49cb29fb8000b0f975d9d48c62d52dbece3d34f59"
+    },
+    {
+      "file": "backend/tests/test_traffic_sum.py",
+      "working_sha256": "c4362c8c84db54244240682c727ed6dc57cfe60413821cce6032760b80dddd5b",
+      "git_blob_sha256": "5a661f97e1308a83a90f1e5530de0426edaa738ae4762a30146c67374fbb72a5",
+      "lf_content_sha256": "5a661f97e1308a83a90f1e5530de0426edaa738ae4762a30146c67374fbb72a5"
+    },
+    {
+      "file": "frontend/src/App.tsx",
+      "working_sha256": "a70a3f8a30d8088eb2d5f7c4960bad99482b9ac93dab529de539743711a4535e",
+      "git_blob_sha256": "c108843bfbc37fcd33626afd121659fd677223bc4c715c110fb35f98349ea207",
+      "lf_content_sha256": "c108843bfbc37fcd33626afd121659fd677223bc4c715c110fb35f98349ea207"
+    },
+    {
+      "file": "frontend/src/api/client.ts",
+      "working_sha256": "e7b497d41d9be436cf2db1a30646a1a20b9a3bb951f89fcc5e18b2ef130826bc",
+      "git_blob_sha256": "1aee3e430a283d7233151f218706f6f246b215a2e1b846139bc6f2b3503a3840",
+      "lf_content_sha256": "1aee3e430a283d7233151f218706f6f246b215a2e1b846139bc6f2b3503a3840"
+    },
+    {
+      "file": "frontend/src/auth/AuthContext.tsx",
+      "working_sha256": "d35c0fdccd9f486c290a5072cf17c5da971fde08b3579be2d14f6937efa666b2",
+      "git_blob_sha256": "4e5acb436f58ffa483ceeed30f5a2454c99b4abe97c6a322948c4ac9e86e9b82",
+      "lf_content_sha256": "4e5acb436f58ffa483ceeed30f5a2454c99b4abe97c6a322948c4ac9e86e9b82"
+    },
+    {
+      "file": "frontend/src/components/Layout.tsx",
+      "working_sha256": "c9d7c741fe6d40ee25f54aea7273fac63883383d8cb04a6253f4f00383506dfc",
+      "git_blob_sha256": "d8ef781990848e3ed6bba484a51d35fcc0fdd33efea83126e6a0040ff6f25488",
+      "lf_content_sha256": "d8ef781990848e3ed6bba484a51d35fcc0fdd33efea83126e6a0040ff6f25488"
+    },
+    {
+      "file": "frontend/src/main.tsx",
+      "working_sha256": "89995fdad40b248031bcd7ee1370377ed32dcab0bef646bc923b92f32e9eaa7e",
+      "git_blob_sha256": "c4384a2c3afb7ce9b10042d8966f9d00572fb7e128711316eac1d018bcce684e",
+      "lf_content_sha256": "c4384a2c3afb7ce9b10042d8966f9d00572fb7e128711316eac1d018bcce684e"
+    },
+    {
+      "file": "frontend/src/pages/Billing.tsx",
+      "working_sha256": "e01e64dee02e2ad648dce609dd44faa869365d4a10cc595b0c024e7cf98131ba",
+      "git_blob_sha256": "147bb6a7bf9630056eada3f379aa14d35531efe6a14f0e3358985ddef17f22a4",
+      "lf_content_sha256": "147bb6a7bf9630056eada3f379aa14d35531efe6a14f0e3358985ddef17f22a4"
+    },
+    {
+      "file": "frontend/src/pages/CreateInstance.tsx",
+      "working_sha256": "0482cc54f5054495a8a80cd994f1d7ad8526021ce588a590ed43ad62cbfc4821",
+      "git_blob_sha256": "efbe06cf83b170f8181467e453058f5fc650966da85bd664294bbb21ef4d6442",
+      "lf_content_sha256": "efbe06cf83b170f8181467e453058f5fc650966da85bd664294bbb21ef4d6442"
+    },
+    {
+      "file": "frontend/src/pages/Credentials.tsx",
+      "working_sha256": "e440f34e4d3583133d625558a7c053f26ddb8f5f8603cb734f52ecbb8465e521",
+      "git_blob_sha256": "6294f5bf4b55f074abb7fb5d0e1112825cde37f4a5c5d973cb50c4b09eb53b55",
+      "lf_content_sha256": "6294f5bf4b55f074abb7fb5d0e1112825cde37f4a5c5d973cb50c4b09eb53b55"
+    },
+    {
+      "file": "frontend/src/pages/Dashboard.tsx",
+      "working_sha256": "f8bf1ad1960514049d5407e71e1334e47a28ae65fc19bcde7ba762c50f9ed794",
+      "git_blob_sha256": "bfa00059deb4a5f968e5df552b7ba3665b3dbd99a724cc61e06d8dd1095575a1",
+      "lf_content_sha256": "bfa00059deb4a5f968e5df552b7ba3665b3dbd99a724cc61e06d8dd1095575a1"
+    },
+    {
+      "file": "frontend/src/pages/InstanceDetail.tsx",
+      "working_sha256": "d601b04a8963aae96625a371eaaced41dd1c867499b5220af11f76a684dd2bca",
+      "git_blob_sha256": "b9d5a84a3a28bb7ba6a75f4415e88f25856a1872ff689674bbc0f4a68ab8d174",
+      "lf_content_sha256": "b9d5a84a3a28bb7ba6a75f4415e88f25856a1872ff689674bbc0f4a68ab8d174"
+    },
+    {
+      "file": "frontend/src/pages/Instances.tsx",
+      "working_sha256": "1b26115dcd1cd2ca19817607cddc52a1f11fa377ce7fd87b9f517eb860fb5727",
+      "git_blob_sha256": "5edff8b4331dbd92c2fd15e4fae6b0963d7d9ec878d8ed7bb04d848be534fd24",
+      "lf_content_sha256": "5edff8b4331dbd92c2fd15e4fae6b0963d7d9ec878d8ed7bb04d848be534fd24"
+    },
+    {
+      "file": "frontend/src/pages/Login.tsx",
+      "working_sha256": "3ffe621bdb301a50e15d3dc7cc0dc6300d1d05462fe00cd207949b8ba13be758",
+      "git_blob_sha256": "e987eff4bf5e90d64ec4049a4c765904cd92781e1313d0d7584ef6bc3be27999",
+      "lf_content_sha256": "e987eff4bf5e90d64ec4049a4c765904cd92781e1313d0d7584ef6bc3be27999"
+    },
+    {
+      "file": "frontend/src/pages/Traffic.tsx",
+      "working_sha256": "ce22f84f67e546a6806e2f974f7974c3e1e80dc16e85deb1e6dd5da94c45e4e2",
+      "git_blob_sha256": "fe110992f747c7d8afda1931417b2375a2ded72abaeae3525a87fbe1bbfdb623",
+      "lf_content_sha256": "fe110992f747c7d8afda1931417b2375a2ded72abaeae3525a87fbe1bbfdb623"
+    },
+    {
+      "file": "frontend/src/pages/Users.tsx",
+      "working_sha256": "33e99752319c39b40dbe1462bd8331fd99322ff492d5056f05f26c74bbe2e7a2",
+      "git_blob_sha256": "72950f82f40b36eb6ed016a13a00d119dc2e723cf3c57f8c832bd6ecc1cf5bd3",
+      "lf_content_sha256": "72950f82f40b36eb6ed016a13a00d119dc2e723cf3c57f8c832bd6ecc1cf5bd3"
+    },
+    {
+      "file": "frontend/src/vite-env.d.ts",
+      "working_sha256": "424faf9241dd699dda995b367ed36665732da1e6ec1f33b2fd40394488ecac92",
+      "git_blob_sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+      "lf_content_sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    },
+    {
+      "file": "tools/optimization/README.md",
+      "working_sha256": "a27e0987ce00a9b81c7b791c66ef66ca07a65df9a73b06a15c4950fac38693f1",
+      "git_blob_sha256": "a27e0987ce00a9b81c7b791c66ef66ca07a65df9a73b06a15c4950fac38693f1",
+      "lf_content_sha256": "a27e0987ce00a9b81c7b791c66ef66ca07a65df9a73b06a15c4950fac38693f1"
+    },
+    {
+      "file": "tools/optimization/benchmark_server.py",
+      "working_sha256": "89f0dd8511f574747eb48b0504e0308bf284222a227d52f2a55dac539e315250",
+      "git_blob_sha256": "89f0dd8511f574747eb48b0504e0308bf284222a227d52f2a55dac539e315250",
+      "lf_content_sha256": "89f0dd8511f574747eb48b0504e0308bf284222a227d52f2a55dac539e315250"
+    },
+    {
+      "file": "tools/optimization/browser_benchmark.mjs",
+      "working_sha256": "cf9ce28e24df87f2dd30bc25786c4a3da8106446b6b5c34d991703efe287fd42",
+      "git_blob_sha256": "cf9ce28e24df87f2dd30bc25786c4a3da8106446b6b5c34d991703efe287fd42",
+      "lf_content_sha256": "cf9ce28e24df87f2dd30bc25786c4a3da8106446b6b5c34d991703efe287fd42"
+    },
+    {
+      "file": "tools/optimization/container_baseline.py",
+      "working_sha256": "c52686673fb8eda4acf32daa81bd876ded7798ca546ec8f545ca08b46b7bcc9f",
+      "git_blob_sha256": "c52686673fb8eda4acf32daa81bd876ded7798ca546ec8f545ca08b46b7bcc9f",
+      "lf_content_sha256": "c52686673fb8eda4acf32daa81bd876ded7798ca546ec8f545ca08b46b7bcc9f"
+    },
+    {
+      "file": "tools/optimization/fake_aws.py",
+      "working_sha256": "52b995ef67346e66fd672c031cfed2bd8dd9a8bbacef86668da38c90726260f9",
+      "git_blob_sha256": "52b995ef67346e66fd672c031cfed2bd8dd9a8bbacef86668da38c90726260f9",
+      "lf_content_sha256": "52b995ef67346e66fd672c031cfed2bd8dd9a8bbacef86668da38c90726260f9"
+    },
+    {
+      "file": "tools/optimization/fixtures/aws.json",
+      "working_sha256": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c",
+      "git_blob_sha256": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c",
+      "lf_content_sha256": "475c64380364bfeddb88b2e6ec90ee165c11b06b90c2bfb2eadbbf46ca69af9c"
+    },
+    {
+      "file": "tools/optimization/measure.py",
+      "working_sha256": "e5eb3feb6e229387750351db3e83e9268469243d77ad39d65e64f103a96f8831",
+      "git_blob_sha256": "e5eb3feb6e229387750351db3e83e9268469243d77ad39d65e64f103a96f8831",
+      "lf_content_sha256": "e5eb3feb6e229387750351db3e83e9268469243d77ad39d65e64f103a96f8831"
+    },
+    {
+      "file": "tools/optimization/offline_proxy.mjs",
+      "working_sha256": "9ed44b7749f8e95f95cb00747a04372981ebb07f80a180532609077c71f3bf1b",
+      "git_blob_sha256": "9ed44b7749f8e95f95cb00747a04372981ebb07f80a180532609077c71f3bf1b",
+      "lf_content_sha256": "9ed44b7749f8e95f95cb00747a04372981ebb07f80a180532609077c71f3bf1b"
+    },
+    {
+      "file": "tools/optimization/offline_proxy.test.mjs",
+      "working_sha256": "cd46c329d09c778313732bb71d9f9e9a878b316bb56338ba498561ac8ed444c8",
+      "git_blob_sha256": "cd46c329d09c778313732bb71d9f9e9a878b316bb56338ba498561ac8ed444c8",
+      "lf_content_sha256": "cd46c329d09c778313732bb71d9f9e9a878b316bb56338ba498561ac8ed444c8"
+    },
+    {
+      "file": "tools/optimization/package-lock.json",
+      "working_sha256": "d96fb0371e2ee0bf51b2488df05225ddbabb6d4d003a49fe83fda7a83261357e",
+      "git_blob_sha256": "d96fb0371e2ee0bf51b2488df05225ddbabb6d4d003a49fe83fda7a83261357e",
+      "lf_content_sha256": "d96fb0371e2ee0bf51b2488df05225ddbabb6d4d003a49fe83fda7a83261357e"
+    },
+    {
+      "file": "tools/optimization/package.json",
+      "working_sha256": "89dde57af030a09e9e767e100c4207917295f3ab9acae091a6dc3614ffaf330d",
+      "git_blob_sha256": "89dde57af030a09e9e767e100c4207917295f3ab9acae091a6dc3614ffaf330d",
+      "lf_content_sha256": "89dde57af030a09e9e767e100c4207917295f3ab9acae091a6dc3614ffaf330d"
+    },
+    {
+      "file": "tools/optimization/probe_t04_performance.py",
+      "working_sha256": "6ac6c30b2ae9777f5d7afb7bb4fabcb6f4992ad367ab7d113db941bedb9e8307",
+      "git_blob_sha256": "6ac6c30b2ae9777f5d7afb7bb4fabcb6f4992ad367ab7d113db941bedb9e8307",
+      "lf_content_sha256": "6ac6c30b2ae9777f5d7afb7bb4fabcb6f4992ad367ab7d113db941bedb9e8307"
+    },
+    {
+      "file": "tools/optimization/processes.py",
+      "working_sha256": "e4718c5e28cc8724953ad9d919ac788f30da135268dd89cba22c32fb758b33c6",
+      "git_blob_sha256": "e4718c5e28cc8724953ad9d919ac788f30da135268dd89cba22c32fb758b33c6",
+      "lf_content_sha256": "e4718c5e28cc8724953ad9d919ac788f30da135268dd89cba22c32fb758b33c6"
+    },
+    {
+      "file": "tools/optimization/progress_report.mjs",
+      "working_sha256": "2a7e80f390274c518826ff2b48f74e2c213931c9e6e9675a2a55d0f863f85e09",
+      "git_blob_sha256": "2a7e80f390274c518826ff2b48f74e2c213931c9e6e9675a2a55d0f863f85e09",
+      "lf_content_sha256": "2a7e80f390274c518826ff2b48f74e2c213931c9e6e9675a2a55d0f863f85e09"
+    },
+    {
+      "file": "tools/optimization/progress_report.test.mjs",
+      "working_sha256": "b2889222138fbdea1b4b4eb6614712394a07814caabfad0ac3f4668a4c383718",
+      "git_blob_sha256": "b2889222138fbdea1b4b4eb6614712394a07814caabfad0ac3f4668a4c383718",
+      "lf_content_sha256": "b2889222138fbdea1b4b4eb6614712394a07814caabfad0ac3f4668a4c383718"
+    },
+    {
+      "file": "tools/optimization/readiness.mjs",
+      "working_sha256": "6901a3af330c155edace1e2450d91f85ed07155f966009bb75c6a1639b6bb7a6",
+      "git_blob_sha256": "6901a3af330c155edace1e2450d91f85ed07155f966009bb75c6a1639b6bb7a6",
+      "lf_content_sha256": "6901a3af330c155edace1e2450d91f85ed07155f966009bb75c6a1639b6bb7a6"
+    },
+    {
+      "file": "tools/optimization/readiness.test.mjs",
+      "working_sha256": "52c591547281b2016b8f9b27122dc7c5187eadd0ed52e13f859949a763ae7465",
+      "git_blob_sha256": "52c591547281b2016b8f9b27122dc7c5187eadd0ed52e13f859949a763ae7465",
+      "lf_content_sha256": "52c591547281b2016b8f9b27122dc7c5187eadd0ed52e13f859949a763ae7465"
+    },
+    {
+      "file": "tools/optimization/requirements.txt",
+      "working_sha256": "12776e575c334bdb14af784a300455147abdd15c94e9ee3d22c742e31a7c37f5",
+      "git_blob_sha256": "12776e575c334bdb14af784a300455147abdd15c94e9ee3d22c742e31a7c37f5",
+      "lf_content_sha256": "12776e575c334bdb14af784a300455147abdd15c94e9ee3d22c742e31a7c37f5"
+    },
+    {
+      "file": "tools/optimization/run_baseline.py",
+      "working_sha256": "296681d20bde1a849235294e5ab07150329e2cf988079a200ec1a7e2c6028c1d",
+      "git_blob_sha256": "296681d20bde1a849235294e5ab07150329e2cf988079a200ec1a7e2c6028c1d",
+      "lf_content_sha256": "296681d20bde1a849235294e5ab07150329e2cf988079a200ec1a7e2c6028c1d"
+    },
+    {
+      "file": "tools/optimization/tests/test_baseline.py",
+      "working_sha256": "c5449b4250e3bce4268acdf80d405c06c0a7124167adae13b82821159aa8ce55",
+      "git_blob_sha256": "c5449b4250e3bce4268acdf80d405c06c0a7124167adae13b82821159aa8ce55",
+      "lf_content_sha256": "c5449b4250e3bce4268acdf80d405c06c0a7124167adae13b82821159aa8ce55"
+    },
+    {
+      "file": "tools/optimization/tests/test_container.py",
+      "working_sha256": "0875b53558caa022cad69f1e03186f95d886ded878351046f275530ed6bae2c7",
+      "git_blob_sha256": "0875b53558caa022cad69f1e03186f95d886ded878351046f275530ed6bae2c7",
+      "lf_content_sha256": "0875b53558caa022cad69f1e03186f95d886ded878351046f275530ed6bae2c7"
+    },
+    {
+      "file": "tools/optimization/tests/test_reports.py",
+      "working_sha256": "f1ba80bb0107c0a406bc1b2a1e75463294ab6f136a8fa02975df5908c9b8a7d4",
+      "git_blob_sha256": "f1ba80bb0107c0a406bc1b2a1e75463294ab6f136a8fa02975df5908c9b8a7d4",
+      "lf_content_sha256": "f1ba80bb0107c0a406bc1b2a1e75463294ab6f136a8fa02975df5908c9b8a7d4"
+    },
+    {
+      "file": "tools/optimization/tests/test_server.py",
+      "working_sha256": "7fb6e0326950277b56842b7689cec95859cf65ada5f04675c60d2f00459cfee8",
+      "git_blob_sha256": "7fb6e0326950277b56842b7689cec95859cf65ada5f04675c60d2f00459cfee8",
+      "lf_content_sha256": "7fb6e0326950277b56842b7689cec95859cf65ada5f04675c60d2f00459cfee8"
+    },
+    {
+      "file": "tools/optimization/verify_t02.py",
+      "working_sha256": "0b9a3b2d321867155813f2e0113c8dfabf594e7b2146c66392d180152f0a6cb7",
+      "git_blob_sha256": "0b9a3b2d321867155813f2e0113c8dfabf594e7b2146c66392d180152f0a6cb7",
+      "lf_content_sha256": "0b9a3b2d321867155813f2e0113c8dfabf594e7b2146c66392d180152f0a6cb7"
+    },
+    {
+      "file": "tools/optimization/verify_t03.py",
+      "working_sha256": "07fb397ab796986aef82ffb35089d0949a0406ba18ccf3d23dd67ae612bac3f3",
+      "git_blob_sha256": "07fb397ab796986aef82ffb35089d0949a0406ba18ccf3d23dd67ae612bac3f3",
+      "lf_content_sha256": "07fb397ab796986aef82ffb35089d0949a0406ba18ccf3d23dd67ae612bac3f3"
+    },
+    {
+      "file": "tools/optimization/verify_t04.py",
+      "working_sha256": "21d23f203546714b225e3040ebfb5e43f4c1de9cae6d358fbe72658a290ad306",
+      "git_blob_sha256": "21d23f203546714b225e3040ebfb5e43f4c1de9cae6d358fbe72658a290ad306",
+      "lf_content_sha256": "21d23f203546714b225e3040ebfb5e43f4c1de9cae6d358fbe72658a290ad306"
+    }
+  ]
+}
