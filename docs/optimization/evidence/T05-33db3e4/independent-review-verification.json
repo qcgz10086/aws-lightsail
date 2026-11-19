@@ -1,0 +1,86 @@
+{
+  "base": "234d1a91e8e24934d2730b4a5a88c8205ac1f649",
+  "head": "33db3e4f6b04653b93d60e9e88f53d11d785ec94",
+  "tree": "9d4dd144c4fc3c6d426fd03c835b63099f5b47fd",
+  "parent": "bcb2da62c8c2c1fd171c1c4673165c1a2d27969d",
+  "diff_paths": [
+    "docs/optimization/plans/T05.md",
+    "docs/optimization/plans/V1.0.md",
+    "frontend/src/App.tsx",
+    "frontend/src/api/client.ts",
+    "frontend/src/api/queryCache.d.mts",
+    "frontend/src/api/queryCache.mjs",
+    "frontend/src/auth/AuthContext.tsx",
+    "frontend/src/pages/Billing.tsx",
+    "frontend/src/pages/CreateInstance.tsx",
+    "frontend/src/pages/Credentials.tsx",
+    "frontend/src/pages/Dashboard.tsx",
+    "frontend/src/pages/InstanceDetail.tsx",
+    "frontend/src/pages/Instances.tsx",
+    "frontend/src/pages/Traffic.tsx",
+    "frontend/src/pages/Users.tsx",
+    "frontend/tests/queryCache.test.mjs"
+  ],
+  "source_zip_sha256": "c9f5dbaea28346f1c654a8abf240036d1d0fae0e5a4b24eff3e979aa6bf326b1",
+  "checks": [
+    {
+      "label": "cache-tests",
+      "command": [
+        "node",
+        "--test",
+        "tests/queryCache.test.mjs"
+      ],
+      "exit_code": 0,
+      "seconds": 0.234
+    },
+    {
+      "label": "typescript",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.json"
+      ],
+      "exit_code": 0,
+      "seconds": 4.312
+    },
+    {
+      "label": "build",
+      "command": [
+        "node",
+        "node_modules/vite/bin/vite.js",
+        "build",
+        "--outDir",
+        "C:\\Users\\liyang\\Documents\\ChatGPT\\aws-lightsail\\.audit\\T05-revision1-33db3e4\\frontend-build"
+      ],
+      "exit_code": 0,
+      "seconds": 12.438
+    },
+    {
+      "label": "query-cache-probe",
+      "command": [
+        "node",
+        "C:\\Users\\liyang\\Documents\\ChatGPT\\aws-lightsail\\.audit\\T05-preparation\\probe_query_cache.mjs",
+        "C:\\Users\\liyang\\Documents\\ChatGPT\\aws-lightsail\\.audit\\T05-revision1-33db3e4\\source\\frontend\\src\\api\\queryCache.mjs",
+        "C:\\Users\\liyang\\Documents\\ChatGPT\\aws-lightsail\\.audit\\T05-revision1-33db3e4\\query-cache-probe.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.109
+    },
+    {
+      "label": "api-cache-probe",
+      "command": [
+        "node",
+        "C:\\Users\\liyang\\Documents\\ChatGPT\\aws-lightsail\\.audit\\T05-preparation\\probe_api_cache.mjs",
+        "C:\\Users\\liyang\\Documents\\ChatGPT\\aws-lightsail\\.audit\\T05-revision1-33db3e4\\source\\frontend",
+        "C:\\Users\\liyang\\.codex\\worktrees\\lightsail-t00-baseline\\aws-lightsail\\frontend\\node_modules",
+        "C:\\Users\\liyang\\Documents\\ChatGPT\\aws-lightsail\\.audit\\T05-revision1-33db3e4\\adapter"
+      ],
+      "exit_code": 0,
+      "seconds": 0.641
+    }
+  ],
+  "source": "C:\\Users\\liyang\\Documents\\ChatGPT\\aws-lightsail\\.audit\\T05-revision1-33db3e4\\source",
+  "scope": "Exact Git archive, independent output, shared pinned frontend dependencies; no AWS"
+}

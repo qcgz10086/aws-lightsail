@@ -1,0 +1,81 @@
+{
+  "results": [
+    {
+      "scenario": "cold_dashboard_continues_until_snapshot_data_available",
+      "observed_instance_count": "2",
+      "passed": true,
+      "snapshot_query_count": 2
+    },
+    {
+      "scenario": "slow_traffic_does_not_block_successful_instances",
+      "observed_instance_count": "2",
+      "passed": true
+    },
+    {
+      "scenario": "dashboard_to_instances_shared_query",
+      "before": 1,
+      "after": 1,
+      "additional_http_queries": 0
+    },
+    {
+      "scenario": "late_account_a_response_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "passed": true
+    },
+    {
+      "scenario": "account_a_operation_completes_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "selected": "BETA #2",
+      "passed": true
+    },
+    {
+      "scenario": "account_a_traffic_sync_completes_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "selected": "BETA #2",
+      "passed": true
+    },
+    {
+      "scenario": "account_a_billing_refresh_completes_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "selected": "BETA #2 · 210987654321",
+      "passed": true
+    },
+    {
+      "scenario": "create_catalog_account_a_late_response_does_not_replace_b",
+      "image_options": [
+        "US East (us-east-1)",
+        "Europe West (eu-west-1)",
+        "ALPHA #1 (默认) · AKIA***A",
+        "BETA #2 · AKIA***B",
+        "GAMMA #3 · AKIA***C",
+        "beta-image-only · 2026 · LINUX_UNIX  (beta-linux)"
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "switch_create_credential_before_new_catalog_can_submit_old_values",
+      "captured_create_payload": null,
+      "create_button_disabled": true,
+      "passed": true
+    },
+    {
+      "scenario": "old_auth_me_response_after_logout_and_other_login",
+      "old_user_visible": false,
+      "new_user_visible": true,
+      "server_signed_in_user": "audit-other-user",
+      "passed": true
+    },
+    {
+      "scenario": "login_before_initial_auth_me_settles",
+      "url_path": "/",
+      "dashboard_visible": true,
+      "spinner_visible": false,
+      "passed": true
+    }
+  ],
+  "pageErrors": []
+}

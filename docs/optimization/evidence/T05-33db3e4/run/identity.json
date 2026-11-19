@@ -1,0 +1,12 @@
+{
+  "projectBase": "234d1a91e8e24934d2730b4a5a88c8205ac1f649",
+  "productHead": "33db3e4f6b04653b93d60e9e88f53d11d785ec94",
+  "productTree": "9d4dd144c4fc3c6d426fd03c835b63099f5b47fd",
+  "productParent": "bcb2da62c8c2c1fd171c1c4673165c1a2d27969d",
+  "deliveryHead": "33db3e4f6b04653b93d60e9e88f53d11d785ec94",
+  "deliveryTree": "9d4dd144c4fc3c6d426fd03c835b63099f5b47fd",
+  "deliveryProductDirectoriesMatch": true,
+  "verifiedFrontendBlobs": 26,
+  "nodeVersion": "v20.11.1",
+  "sourceArchiveSha256": "28b88feb16d1eb1114dd2a36a478d8b59646224ec1a4648b42c400bde659f8e0"
+}

@@ -1,0 +1,55 @@
+TAP version 13
+# Subtest: normalizes parameter order and reuses values until TTL expires
+ok 1 - normalizes parameter order and reuses values until TTL expires
+  ---
+  duration_ms: 13.6101
+  ...
+# Subtest: deduplicates in-flight work but aborts transport only after the last subscriber leaves
+ok 2 - deduplicates in-flight work but aborts transport only after the last subscriber leaves
+  ---
+  duration_ms: 2.1982
+  ...
+# Subtest: tag invalidation clears cached and in-flight results without caching an error
+ok 3 - tag invalidation clears cached and in-flight results without caching an error
+  ---
+  duration_ms: 1.064
+  ...
+# Subtest: scope changes clear cached values and prevent cross-user reuse
+ok 4 - scope changes clear cached values and prevent cross-user reuse
+  ---
+  duration_ms: 1.2817
+  ...
+# Subtest: scope change rejects old subscribers if their transport ignores abort
+ok 5 - scope change rejects old subscribers if their transport ignores abort
+  ---
+  duration_ms: 6.0748
+  ...
+# Subtest: last-subscriber cancellation retires aborted work before replacement request
+ok 6 - last-subscriber cancellation retires aborted work before replacement request
+  ---
+  duration_ms: 1.4664
+  ...
+# Subtest: tag invalidation rejects in-flight subscribers even if loader ignores abort
+ok 7 - tag invalidation rejects in-flight subscribers even if loader ignores abort
+  ---
+  duration_ms: 1.1675
+  ...
+# Subtest: forced refresh bypasses and replaces an existing value
+ok 8 - forced refresh bypasses and replaces an existing value
+  ---
+  duration_ms: 0.7411
+  ...
+# Subtest: combined credential and region scopes invalidate intersections and aggregate views
+ok 9 - combined credential and region scopes invalidate intersections and aggregate views
+  ---
+  duration_ms: 2.7698
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 150.1867

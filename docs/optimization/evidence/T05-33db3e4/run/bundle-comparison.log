@@ -1,0 +1,15 @@
+{
+  "entry": "assets/index-BAORrcWf.js",
+  "static_entry_closure": {
+    "bytes": 786999,
+    "gzip_bytes": 258437
+  },
+  "dashboard_static_closure": {
+    "bytes": 930297,
+    "gzip_bytes": 306683
+  },
+  "all_js": {
+    "bytes": 1751343,
+    "gzip_bytes": 557371
+  }
+}

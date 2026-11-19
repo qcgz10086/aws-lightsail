@@ -1,0 +1,234 @@
+{
+  "source_sha256": "03c9a86335da372ead117a3ed12b90911de8aa51d8c04f1fc8d21f09364daa7b",
+  "query_cache_sha256": "e6630862b8d3bfdf7955c583fa749b5797353f65b9772fce04e61751b4d74ea3",
+  "scope": "Axios adapter only; no network",
+  "records": [
+    {
+      "scenario": "default_derived_tags",
+      "changed": {
+        "a_east": true,
+        "a_west": false,
+        "b_east": false,
+        "all": true,
+        "a_all": true,
+        "east_all": true
+      },
+      "checks": {
+        "changed_a_east": true,
+        "preserved_a_west": true,
+        "preserved_b_east": true,
+        "changed_all": true,
+        "changed_a_all": true,
+        "changed_east_all": true
+      },
+      "passed": true
+    },
+    {
+      "scenario": "page_explicit_domain_tags",
+      "changed": {
+        "a_east": true,
+        "a_west": false,
+        "b_east": false,
+        "all": true,
+        "a_all": true,
+        "east_all": true
+      },
+      "checks": {
+        "changed_a_east": true,
+        "preserved_a_west": true,
+        "preserved_b_east": true,
+        "changed_all": true,
+        "changed_a_all": true,
+        "changed_east_all": true
+      },
+      "passed": true
+    },
+    {
+      "scenario": "credential_mutation_invalidates_derived_instance_tags",
+      "passed": true
+    },
+    {
+      "scenario": "refreshing_response_not_frozen_by_success_ttl",
+      "markers": [
+        1,
+        2,
+        2
+      ],
+      "adapter_calls": 2,
+      "passed": true
+    }
+  ],
+  "calls": [
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 1,
+        "region": "us-east-1"
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 1,
+        "region": "us-west-2"
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 2,
+        "region": "us-east-1"
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {}
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 1
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "region": "us-east-1"
+      }
+    },
+    {
+      "method": "post",
+      "url": "/v2/refresh",
+      "body": "{\"kind\":\"instances\",\"credential_id\":1,\"region\":\"us-east-1\"}"
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 1,
+        "region": "us-east-1"
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {}
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 1
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "region": "us-east-1"
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 1,
+        "region": "us-east-1"
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 1,
+        "region": "us-west-2"
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 2,
+        "region": "us-east-1"
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {}
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 1
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "region": "us-east-1"
+      }
+    },
+    {
+      "method": "post",
+      "url": "/v2/refresh",
+      "body": "{\"kind\":\"instances\",\"credential_id\":1,\"region\":\"us-east-1\"}"
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 1,
+        "region": "us-east-1"
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {}
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 1
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "region": "us-east-1"
+      }
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 1
+      }
+    },
+    {
+      "method": "patch",
+      "url": "/credentials/1",
+      "body": "{\"proxy_url\":\"http://fixture.invalid:8888\"}"
+    },
+    {
+      "method": "get",
+      "url": "/v2/instances",
+      "params": {
+        "credential_id": 1
+      }
+    }
+  ],
+  "passed": 4,
+  "total": 4
+}

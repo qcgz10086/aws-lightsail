@@ -1,0 +1,435 @@
+{
+  "dist": "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\.baseline-runs\\T05-delivery-verify-33db3e4-final\\frontend-build",
+  "browser": "157.0.8103.79",
+  "scope": "Built frontend with local synthetic API responses; not production backend or AWS",
+  "results": [
+    {
+      "scenario": "cold_dashboard_continues_until_snapshot_data_available",
+      "observed_instance_count": "2",
+      "passed": true,
+      "snapshot_query_count": 2
+    },
+    {
+      "scenario": "slow_traffic_does_not_block_successful_instances",
+      "observed_instance_count": "2",
+      "passed": true
+    },
+    {
+      "scenario": "dashboard_to_instances_shared_query",
+      "before": 1,
+      "after": 1,
+      "additional_http_queries": 0
+    },
+    {
+      "scenario": "late_account_a_response_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "passed": true
+    },
+    {
+      "scenario": "account_a_operation_completes_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "selected": "BETA #2",
+      "passed": true
+    },
+    {
+      "scenario": "account_a_traffic_sync_completes_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "selected": "BETA #2",
+      "passed": true
+    },
+    {
+      "scenario": "account_a_billing_refresh_completes_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "selected": "BETA #2 · 210987654321",
+      "passed": true
+    },
+    {
+      "scenario": "create_catalog_account_a_late_response_does_not_replace_b",
+      "image_options": [
+        "US East (us-east-1)",
+        "Europe West (eu-west-1)",
+        "ALPHA #1 (默认) · AKIA***A",
+        "BETA #2 · AKIA***B",
+        "GAMMA #3 · AKIA***C",
+        "beta-image-only · 2026 · LINUX_UNIX  (beta-linux)"
+      ],
+      "passed": true
+    },
+    {
+      "scenario": "switch_create_credential_before_new_catalog_can_submit_old_values",
+      "captured_create_payload": null,
+      "create_button_disabled": true,
+      "passed": true
+    },
+    {
+      "scenario": "old_auth_me_response_after_logout_and_other_login",
+      "old_user_visible": false,
+      "new_user_visible": true,
+      "server_signed_in_user": "audit-other-user",
+      "passed": true
+    },
+    {
+      "scenario": "login_before_initial_auth_me_settles",
+      "url_path": "/",
+      "dashboard_visible": true,
+      "spinner_visible": false,
+      "passed": true
+    }
+  ],
+  "pageErrors": [],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "query": "",
+      "body": "",
+      "time": 4517.5357
+    },
+    {
+      "method": "GET",
+      "path": "/api/traffic/summary",
+      "query": "",
+      "body": "",
+      "time": 4676.4935
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/instances",
+      "query": "",
+      "body": "",
+      "time": 4676.8641
+    },
+    {
+      "method": "GET",
+      "path": "/api/credentials",
+      "query": "",
+      "body": "",
+      "time": 4885.0291
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/instances",
+      "query": "?credential_id=1",
+      "body": "",
+      "time": 5483.4796
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/instances",
+      "query": "?credential_id=2",
+      "body": "",
+      "time": 5962.6202
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/instances",
+      "query": "?credential_id=1",
+      "body": "",
+      "time": 7248.8314
+    },
+    {
+      "method": "POST",
+      "path": "/api/instances/us-east-1/alpha-resource-only/stop",
+      "query": "?credential_id=1",
+      "body": "",
+      "time": 7343.1712
+    },
+    {
+      "method": "GET",
+      "path": "/api/traffic/summary",
+      "query": "",
+      "body": "",
+      "time": 10548.2175
+    },
+    {
+      "method": "GET",
+      "path": "/api/traffic/summary",
+      "query": "?credential_id=1",
+      "body": "",
+      "time": 11030.9695
+    },
+    {
+      "method": "POST",
+      "path": "/api/traffic/sync",
+      "query": "?credential_id=1",
+      "body": "",
+      "time": 11148.327
+    },
+    {
+      "method": "GET",
+      "path": "/api/traffic/summary",
+      "query": "?credential_id=2",
+      "body": "",
+      "time": 11613.0888
+    },
+    {
+      "method": "GET",
+      "path": "/api/traffic/summary",
+      "query": "?credential_id=2",
+      "body": "",
+      "time": 11864.4174
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/billing/summary",
+      "query": "",
+      "body": "",
+      "time": 13017.7561
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/billing/summary",
+      "query": "?credential_id=1",
+      "body": "",
+      "time": 13690.5288
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/refresh",
+      "query": "",
+      "body": "{\"kind\":\"billing\",\"credential_id\":1}",
+      "time": 13808.1777
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/billing/summary",
+      "query": "?credential_id=2",
+      "body": "",
+      "time": 14297.5893
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/billing/summary",
+      "query": "?credential_id=2",
+      "body": "",
+      "time": 14539.5949
+    },
+    {
+      "method": "GET",
+      "path": "/api/credentials",
+      "query": "",
+      "body": "",
+      "time": 15657.3766
+    },
+    {
+      "method": "GET",
+      "path": "/api/catalog/regions",
+      "query": "?credential_id=1",
+      "body": "",
+      "time": 15679.4427
+    },
+    {
+      "method": "GET",
+      "path": "/api/catalog/bundles",
+      "query": "?region=us-east-1&credential_id=1",
+      "body": "",
+      "time": 16136.6086
+    },
+    {
+      "method": "GET",
+      "path": "/api/catalog/blueprints",
+      "query": "?region=us-east-1&credential_id=1",
+      "body": "",
+      "time": 16137.0548
+    },
+    {
+      "method": "GET",
+      "path": "/api/catalog/regions",
+      "query": "?credential_id=2",
+      "body": "",
+      "time": 16610.6154
+    },
+    {
+      "method": "GET",
+      "path": "/api/catalog/bundles",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "time": 17195.072
+    },
+    {
+      "method": "GET",
+      "path": "/api/catalog/blueprints",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "time": 17195.9533
+    },
+    {
+      "method": "GET",
+      "path": "/api/catalog/regions",
+      "query": "?credential_id=3",
+      "body": "",
+      "time": 19475.3143
+    },
+    {
+      "method": "POST",
+      "path": "/api/credentials/2/default",
+      "query": "",
+      "body": "",
+      "time": 21608.5749
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "query": "",
+      "body": "",
+      "time": 21624.2268
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "query": "",
+      "body": "",
+      "time": 21695.5444
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "query": "",
+      "body": "{\"username\":\"audit-other-user\",\"password\":\"FixturePass123!\"}",
+      "time": 21790.1036
+    },
+    {
+      "method": "GET",
+      "path": "/api/traffic/summary",
+      "query": "",
+      "body": "",
+      "time": 21838.8633
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/instances",
+      "query": "",
+      "body": "",
+      "time": 21846.2912
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "query": "",
+      "body": "",
+      "time": 23930.9759
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "query": "",
+      "body": "{\"username\":\"audit-other-user\",\"password\":\"FixturePass123!\"}",
+      "time": 24026.7985
+    },
+    {
+      "method": "GET",
+      "path": "/api/traffic/summary",
+      "query": "",
+      "body": "",
+      "time": 24147.5863
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/instances",
+      "query": "",
+      "body": "",
+      "time": 24148.0874
+    }
+  ],
+  "assets": [
+    {
+      "name": "Billing-B8-qlNg4.js",
+      "bytes": 117244,
+      "sha256": "26b0ec3855dabc8a40e84aa2b235bc58a68a98d51ace0964606f6996a1767358"
+    },
+    {
+      "name": "CreateInstance-Ddt2IkyZ.js",
+      "bytes": 10781,
+      "sha256": "258b0e105050710362ff6a8b773a8718391e0ba183211773eef0c2dc3361516e"
+    },
+    {
+      "name": "Credentials-0VcpA9An.js",
+      "bytes": 8169,
+      "sha256": "55466a60fc60c462f2a87b6b8803df03ec5d8940cba8a6b461b13daf0def63d5"
+    },
+    {
+      "name": "Dashboard-BHMPRnWm.js",
+      "bytes": 16588,
+      "sha256": "8bdbf276746acb8b4499b0f42a553b6513f640e10358448de5967ea4a7dbda01"
+    },
+    {
+      "name": "dayjs.min-Cea7-6AZ.js",
+      "bytes": 7154,
+      "sha256": "46507231018970aba9a08c2ec8e8f29b5a04da06749228a6b0e7a49696aee6c4"
+    },
+    {
+      "name": "index-BAORrcWf.js",
+      "bytes": 786999,
+      "sha256": "625d78ad8cf0475e7439cf51eeca98db42cb3d848fed3b0e1ea48a11de94b05a"
+    },
+    {
+      "name": "index-Ccfr7oNe.css",
+      "bytes": 238,
+      "sha256": "9cd9b75980fe12ebcfe541d3e86a407fbe18d892619e7dc3188f9ee05194ab93"
+    },
+    {
+      "name": "index-CdHGq1wn.js",
+      "bytes": 90983,
+      "sha256": "0ff45d9053b5a5481a4d05bcdd7c0c82b412eff07b2655f62a49227ab836a0a9"
+    },
+    {
+      "name": "index-CmuIDHIg.js",
+      "bytes": 7924,
+      "sha256": "e4829f61558dff12ff7353767436143b396ac1928383e45f4b1e470c3dc4b220"
+    },
+    {
+      "name": "index-DBu4l9iC.js",
+      "bytes": 4709,
+      "sha256": "e9ab8ebfcbbfba12a44ff75be4599410df700013e3f8573da2dec315800697ec"
+    },
+    {
+      "name": "index-DCGPV600.js",
+      "bytes": 38298,
+      "sha256": "555347b2cabd5da5dcdf16f02a39a678e2532ba66a7a2fa1cdbb168f23d6648d"
+    },
+    {
+      "name": "index-HOP6-kQ-.js",
+      "bytes": 6862,
+      "sha256": "dffdcd77d9d428458e17bde05551c5d48684929b794d157326808e1fb49dd6d9"
+    },
+    {
+      "name": "index-xKp25Jon.js",
+      "bytes": 24568,
+      "sha256": "683b1a84292fdbd6402e85b56f14bd2728fc6880d9b52f000f304ef99160f43f"
+    },
+    {
+      "name": "InstanceDetail-CAPSMMNr.js",
+      "bytes": 408838,
+      "sha256": "940da0152954bccd1eb3bd6c3e3c63ca75787ec0fca2e6ab4b4bb8b22adbf380"
+    },
+    {
+      "name": "Instances-G-P7Z7ew.js",
+      "bytes": 9931,
+      "sha256": "1c18777552ac9b8905ec9eb75290b1d324c61251a821e9cda773573521a46482"
+    },
+    {
+      "name": "Pagination-Coxa4Wmi.js",
+      "bytes": 24156,
+      "sha256": "60ff193b27c3c9293bc809110f05aa160b8021d4723cf9f37c587bbab5dba959"
+    },
+    {
+      "name": "Table-DEGuBFxt.js",
+      "bytes": 179690,
+      "sha256": "dc189b0e388a17ca4082efd7f6b6af4783195c875c3aacd22d75613b3cfdddd5"
+    },
+    {
+      "name": "Traffic-CwIO8njN.js",
+      "bytes": 4982,
+      "sha256": "d63df420bcba29f515d0f18e4ea752d28c0df7428522ef1b7d59781923d2f9b3"
+    },
+    {
+      "name": "Users-woiWxIdQ.js",
+      "bytes": 3467,
+      "sha256": "fbb2fc1986b7d02b817e70cbd824c835168fba7333bf2c3179cac7cd72ad3493"
+    }
+  ]
+}

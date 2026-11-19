@@ -1,0 +1,396 @@
+{
+  "projectBase": "234d1a91e8e24934d2730b4a5a88c8205ac1f649",
+  "productHead": "33db3e4f6b04653b93d60e9e88f53d11d785ec94",
+  "productTree": "9d4dd144c4fc3c6d426fd03c835b63099f5b47fd",
+  "productParent": "bcb2da62c8c2c1fd171c1c4673165c1a2d27969d",
+  "deliveryHead": "33db3e4f6b04653b93d60e9e88f53d11d785ec94",
+  "deliveryTree": "9d4dd144c4fc3c6d426fd03c835b63099f5b47fd",
+  "deliveryProductDirectoriesMatch": true,
+  "verifiedFrontendBlobs": 26,
+  "nodeVersion": "v20.11.1",
+  "sourceArchiveSha256": "28b88feb16d1eb1114dd2a36a478d8b59646224ec1a4648b42c400bde659f8e0",
+  "testRuns": [
+    {
+      "name": "cache-unit-tests",
+      "executable": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "--test",
+        "tests/queryCache.test.mjs"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\frontend",
+      "exitCode": 0,
+      "durationMs": 256,
+      "log": "cache-tests.log"
+    },
+    {
+      "name": "typescript",
+      "executable": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\frontend",
+      "exitCode": 0,
+      "durationMs": 4298,
+      "log": "typescript.log"
+    },
+    {
+      "name": "vite-build",
+      "executable": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "node_modules/vite/bin/vite.js",
+        "build",
+        "--outDir",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\.baseline-runs\\T05-delivery-verify-33db3e4-final\\frontend-build"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\frontend",
+      "exitCode": 0,
+      "durationMs": 12259,
+      "log": "build.log"
+    },
+    {
+      "name": "cache-deterministic-probes",
+      "executable": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\docs\\optimization\\evidence\\T05-33db3e4\\probe-tools\\probe_query_cache.mjs",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\frontend\\src\\api\\queryCache.mjs",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\.baseline-runs\\T05-delivery-verify-33db3e4-final\\query-cache-probe.json"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail",
+      "exitCode": 0,
+      "durationMs": 124,
+      "log": "query-cache-probe.log"
+    },
+    {
+      "name": "axios-adapter-probes",
+      "executable": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\docs\\optimization\\evidence\\T05-33db3e4\\probe-tools\\probe_api_cache.mjs",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\frontend",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\frontend\\node_modules",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\.baseline-runs\\T05-delivery-verify-33db3e4-final\\adapter"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail",
+      "exitCode": 0,
+      "durationMs": 646,
+      "log": "adapter.log"
+    },
+    {
+      "name": "catalog-browser",
+      "executable": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\docs\\optimization\\evidence\\T05-33db3e4\\probe-tools\\browser_catalog_probe.mjs",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\.baseline-runs\\T05-delivery-verify-33db3e4-final\\frontend-build",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\.baseline-runs\\T05-delivery-verify-33db3e4-final\\browser-catalog",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t05-playwright-02b35ba0-2a59-4df4-9241-a8994264e100\\node_modules\\playwright"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail",
+      "exitCode": 0,
+      "durationMs": 53385,
+      "log": "browser-catalog.log"
+    },
+    {
+      "name": "frontend-browser",
+      "executable": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\docs\\optimization\\evidence\\T05-33db3e4\\probe-tools\\browser_probe.mjs",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\.baseline-runs\\T05-delivery-verify-33db3e4-final\\frontend-build",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\.baseline-runs\\T05-delivery-verify-33db3e4-final\\browser-regression",
+        "C:\\Users\\liyang\\AppData\\Local\\Temp\\t05-playwright-02b35ba0-2a59-4df4-9241-a8994264e100\\node_modules\\playwright"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail",
+      "exitCode": 0,
+      "durationMs": 26621,
+      "log": "browser-regression.log"
+    },
+    {
+      "name": "bundle-comparison",
+      "executable": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\docs\\optimization\\evidence\\T05-33db3e4\\probe-tools\\compare_bundle.mjs",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\.baseline-runs\\T05-delivery-verify-33db3e4-final\\frontend-build",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\docs\\optimization\\evidence\\T05-33db3e4\\base-bundle-manifest.json",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\frontend\\node_modules",
+        "33db3e4f6b04653b93d60e9e88f53d11d785ec94",
+        "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\.baseline-runs\\T05-delivery-verify-33db3e4-final\\bundle-comparison.json"
+      ],
+      "cwd": "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail",
+      "exitCode": 0,
+      "durationMs": 1856,
+      "log": "bundle-comparison.log"
+    }
+  ],
+  "productFiles": [
+    {
+      "path": "frontend/Dockerfile",
+      "gitBlob": "ba14e3dc9e7815d9d2f0523510efb1dd249bdd3e",
+      "sha256": "00dd75088f37031eeb8fa089d89ca0259a9f24516b907094dcd7d7da38ede205"
+    },
+    {
+      "path": "frontend/index.html",
+      "gitBlob": "b9ff66a810bd98c2b2fe4ee1e7b0689e481995ea",
+      "sha256": "36992995f975c111778303ff202d5370166f845632bd850e2b97f7d4594abd22"
+    },
+    {
+      "path": "frontend/nginx.conf",
+      "gitBlob": "89971300964c7b05918c8742d1ab096eda24ab9a",
+      "sha256": "2a78c5e1fc3bfd42562fb4b5c18992b00a70c6021d4c75dccfa98b08e2fc50b7"
+    },
+    {
+      "path": "frontend/package.json",
+      "gitBlob": "3070dc4d1a9a210035bc33ae2807306d7699c2a3",
+      "sha256": "1356b97a7624b7bdc96c2488fbc08cd68b723a868664bcc93000e9473609e977"
+    },
+    {
+      "path": "frontend/src/App.tsx",
+      "gitBlob": "a96d915537c7d1afe293e1d73aeb8fa4aa552225",
+      "sha256": "1662f140c4d4525e63aa9551cd738b92d79c4cf82857414b298cd57668412dcf"
+    },
+    {
+      "path": "frontend/src/api/client.ts",
+      "gitBlob": "b41ca36790c231e71c83d08bbf6af28226017943",
+      "sha256": "f998baa93ad316707cac1a09d29a2cea17604679e58d9e13cc795a5faddcfccc"
+    },
+    {
+      "path": "frontend/src/api/queryCache.d.mts",
+      "gitBlob": "faab6992e6026d8d6f64360f6d80c453c81b05b4",
+      "sha256": "540e64f4116b0bd6945199288d7bf1b3ca1caaa1d7cfd23ae0128c006c4abf42"
+    },
+    {
+      "path": "frontend/src/api/queryCache.mjs",
+      "gitBlob": "3bb49de17bcbb461c5f815b918412d2a4f11c5ba",
+      "sha256": "7010750f9f52413e7bd2ef2df510f6fcc8db939751540c4b7b703c8b3c091bbd"
+    },
+    {
+      "path": "frontend/src/auth/AuthContext.tsx",
+      "gitBlob": "7acf265d61e520b7d6e379de9ce493d356b0f1b1",
+      "sha256": "e049e4b9c015d183555abd5329f8b715b2857406d81da1f88606b0d8ecbab275"
+    },
+    {
+      "path": "frontend/src/components/Layout.tsx",
+      "gitBlob": "c0325e5f8b3ef91b6955920d591be9065c11abde",
+      "sha256": "d8ef781990848e3ed6bba484a51d35fcc0fdd33efea83126e6a0040ff6f25488"
+    },
+    {
+      "path": "frontend/src/index.css",
+      "gitBlob": "73c52e242f36654b06d7d2422a994104002000f9",
+      "sha256": "4f00bc323d0b0031797f58bb281c22b4f1271da10667a49aeca9ae43a4746969"
+    },
+    {
+      "path": "frontend/src/main.tsx",
+      "gitBlob": "d56a7367e50af59ff67f891cb16de0ae1f8d39c3",
+      "sha256": "c4384a2c3afb7ce9b10042d8966f9d00572fb7e128711316eac1d018bcce684e"
+    },
+    {
+      "path": "frontend/src/pages/Billing.tsx",
+      "gitBlob": "e4249b7fa10e9c155fe6705da8dee64dc3892169",
+      "sha256": "199d733e17413f26683d72c4771cc054ba92d876aa20b1f6bbaa6f583f0b5ab6"
+    },
+    {
+      "path": "frontend/src/pages/CreateInstance.tsx",
+      "gitBlob": "722348a18aead02cbba0ee83c14d0d0571bbcd02",
+      "sha256": "0f160c4e620b06b28d9f42ca7ee5364a1628bf79c202e70a8c4aa7adbdd6f947"
+    },
+    {
+      "path": "frontend/src/pages/Credentials.tsx",
+      "gitBlob": "0f0f97efb28b4472d2f49271f6e92a66a5edbc95",
+      "sha256": "0e56a3199794b173b41b95faf96262990e4ba47a360d633b4c7240eea07ba15e"
+    },
+    {
+      "path": "frontend/src/pages/Dashboard.tsx",
+      "gitBlob": "5e9ffe5451c330f75c6bb44bd05e7e82d3e60e07",
+      "sha256": "9b3667723f8d97816cd21f26a4c5d6b15dde3776cfa830498c77b7d790b86d84"
+    },
+    {
+      "path": "frontend/src/pages/InstanceDetail.tsx",
+      "gitBlob": "59f452b1e4f2550f57a032584f586f5a78613b00",
+      "sha256": "cf3a574b69da244622636a39659534558a694dff97f8db88839a48f2c768573a"
+    },
+    {
+      "path": "frontend/src/pages/Instances.tsx",
+      "gitBlob": "535ffff3103986971a6b44c243aad0d1282acba3",
+      "sha256": "991a3f27d1328ef25e28a58a068f7674bb35087c2e023483759ae65a614595f2"
+    },
+    {
+      "path": "frontend/src/pages/Login.tsx",
+      "gitBlob": "64ad985084b4182f05b39003ba9a3e424817b0ac",
+      "sha256": "e987eff4bf5e90d64ec4049a4c765904cd92781e1313d0d7584ef6bc3be27999"
+    },
+    {
+      "path": "frontend/src/pages/Traffic.tsx",
+      "gitBlob": "485b44afc58c710f0eca785fb99ef58d3feaabde",
+      "sha256": "a2b1b0e93bd559c6e6975f65ed93eec30be14a99f7b5409e3357026c4a23b288"
+    },
+    {
+      "path": "frontend/src/pages/Users.tsx",
+      "gitBlob": "04c37deb52da39af8e0bad55e529e1e69e7d6b63",
+      "sha256": "0af4d3930ed4fa7b4db7a1698f5c109667dc144c3d7998de8fb5f6e15e290dd5"
+    },
+    {
+      "path": "frontend/src/vite-env.d.ts",
+      "gitBlob": "11f02fe2a0061d6e6e1f271b21da95423b448b32",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    },
+    {
+      "path": "frontend/tests/queryCache.test.mjs",
+      "gitBlob": "1232dd01dbaac7a5a66b48b9397626ea04a5decd",
+      "sha256": "25eb933605db96e6fb93d1f4e9657d4e0a996eb11e5f77668203b090762ff9d1"
+    },
+    {
+      "path": "frontend/tsconfig.json",
+      "gitBlob": "6bfa73afc5e59a2a66ea0dd53ca9beaa93cd2f5d",
+      "sha256": "83672d2660de080f79e2f9db04811760bc2b1ae475c3c6da33662e6b0de5a94c"
+    },
+    {
+      "path": "frontend/tsconfig.node.json",
+      "gitBlob": "3059800ee5cf7a66d2e053cf7c5820a0ef2509dd",
+      "sha256": "e1c75922fbc1430d4a5f13be8e01dcec0c3a3009f19ad995d9d25be98dbbe713"
+    },
+    {
+      "path": "frontend/vite.config.ts",
+      "gitBlob": "a70e25a84856d7a76796c1613c3b2d0921b8ad90",
+      "sha256": "e69060825fc91e74532ff5cdb12d62e685de19553b9a848cbf7eea4d3c788442"
+    }
+  ],
+  "buildAssets": [
+    {
+      "path": "assets/Billing-B8-qlNg4.js",
+      "bytes": 117244,
+      "sha256": "26b0ec3855dabc8a40e84aa2b235bc58a68a98d51ace0964606f6996a1767358"
+    },
+    {
+      "path": "assets/CreateInstance-Ddt2IkyZ.js",
+      "bytes": 10781,
+      "sha256": "258b0e105050710362ff6a8b773a8718391e0ba183211773eef0c2dc3361516e"
+    },
+    {
+      "path": "assets/Credentials-0VcpA9An.js",
+      "bytes": 8169,
+      "sha256": "55466a60fc60c462f2a87b6b8803df03ec5d8940cba8a6b461b13daf0def63d5"
+    },
+    {
+      "path": "assets/Dashboard-BHMPRnWm.js",
+      "bytes": 16588,
+      "sha256": "8bdbf276746acb8b4499b0f42a553b6513f640e10358448de5967ea4a7dbda01"
+    },
+    {
+      "path": "assets/dayjs.min-Cea7-6AZ.js",
+      "bytes": 7154,
+      "sha256": "46507231018970aba9a08c2ec8e8f29b5a04da06749228a6b0e7a49696aee6c4"
+    },
+    {
+      "path": "assets/index-BAORrcWf.js",
+      "bytes": 786999,
+      "sha256": "625d78ad8cf0475e7439cf51eeca98db42cb3d848fed3b0e1ea48a11de94b05a"
+    },
+    {
+      "path": "assets/index-Ccfr7oNe.css",
+      "bytes": 238,
+      "sha256": "9cd9b75980fe12ebcfe541d3e86a407fbe18d892619e7dc3188f9ee05194ab93"
+    },
+    {
+      "path": "assets/index-CdHGq1wn.js",
+      "bytes": 90983,
+      "sha256": "0ff45d9053b5a5481a4d05bcdd7c0c82b412eff07b2655f62a49227ab836a0a9"
+    },
+    {
+      "path": "assets/index-CmuIDHIg.js",
+      "bytes": 7924,
+      "sha256": "e4829f61558dff12ff7353767436143b396ac1928383e45f4b1e470c3dc4b220"
+    },
+    {
+      "path": "assets/index-DBu4l9iC.js",
+      "bytes": 4709,
+      "sha256": "e9ab8ebfcbbfba12a44ff75be4599410df700013e3f8573da2dec315800697ec"
+    },
+    {
+      "path": "assets/index-DCGPV600.js",
+      "bytes": 38298,
+      "sha256": "555347b2cabd5da5dcdf16f02a39a678e2532ba66a7a2fa1cdbb168f23d6648d"
+    },
+    {
+      "path": "assets/index-HOP6-kQ-.js",
+      "bytes": 6862,
+      "sha256": "dffdcd77d9d428458e17bde05551c5d48684929b794d157326808e1fb49dd6d9"
+    },
+    {
+      "path": "assets/index-xKp25Jon.js",
+      "bytes": 24568,
+      "sha256": "683b1a84292fdbd6402e85b56f14bd2728fc6880d9b52f000f304ef99160f43f"
+    },
+    {
+      "path": "assets/InstanceDetail-CAPSMMNr.js",
+      "bytes": 408838,
+      "sha256": "940da0152954bccd1eb3bd6c3e3c63ca75787ec0fca2e6ab4b4bb8b22adbf380"
+    },
+    {
+      "path": "assets/Instances-G-P7Z7ew.js",
+      "bytes": 9931,
+      "sha256": "1c18777552ac9b8905ec9eb75290b1d324c61251a821e9cda773573521a46482"
+    },
+    {
+      "path": "assets/Pagination-Coxa4Wmi.js",
+      "bytes": 24156,
+      "sha256": "60ff193b27c3c9293bc809110f05aa160b8021d4723cf9f37c587bbab5dba959"
+    },
+    {
+      "path": "assets/Table-DEGuBFxt.js",
+      "bytes": 179690,
+      "sha256": "dc189b0e388a17ca4082efd7f6b6af4783195c875c3aacd22d75613b3cfdddd5"
+    },
+    {
+      "path": "assets/Traffic-CwIO8njN.js",
+      "bytes": 4982,
+      "sha256": "d63df420bcba29f515d0f18e4ea752d28c0df7428522ef1b7d59781923d2f9b3"
+    },
+    {
+      "path": "assets/Users-woiWxIdQ.js",
+      "bytes": 3467,
+      "sha256": "fbb2fc1986b7d02b817e70cbd824c835168fba7333bf2c3179cac7cd72ad3493"
+    },
+    {
+      "path": "index.html",
+      "bytes": 422,
+      "sha256": "bbc75f960e9a4ccdf0b780d532aa6eba99a5164a6cbee881c7f03e80d327a5d1"
+    }
+  ],
+  "probeTools": [
+    {
+      "path": "docs/optimization/evidence/T05-33db3e4/probe-tools/browser_catalog_probe.mjs",
+      "sha256": "6c07ed367906fd6cdf72fca880270972039e74e23eac75128846d8681499b233"
+    },
+    {
+      "path": "docs/optimization/evidence/T05-33db3e4/probe-tools/browser_probe.mjs",
+      "sha256": "21e12acca9d5417bf67eca41156cfd642a57e77b5ccea4ee6ba3b19999d400b5"
+    },
+    {
+      "path": "docs/optimization/evidence/T05-33db3e4/probe-tools/compare_bundle.mjs",
+      "sha256": "b5d43753912db8a35b64f2511ce6ec487bd44b120ad399c9b9d1089d59f539c9"
+    },
+    {
+      "path": "docs/optimization/evidence/T05-33db3e4/probe-tools/probe_api_cache.mjs",
+      "sha256": "0fb6721bc46eff19bcd2881453e63520c2b260403fac7f0db0653c7e0b3d5370"
+    },
+    {
+      "path": "docs/optimization/evidence/T05-33db3e4/probe-tools/probe_query_cache.mjs",
+      "sha256": "d98043ddfb0a1b390e2585fffa60a0421afeb601834375779a05e2d2bfcbb8aa"
+    },
+    {
+      "path": "tools/optimization/verify_t05_frontend.mjs",
+      "sha256": "b9ffbbb232aee7943f5a4a40531e3753440d9359b6d01692876f63e0783ce64d"
+    },
+    {
+      "path": "tools/optimization/verify_t05_frontend.mjs",
+      "sha256": "b9ffbbb232aee7943f5a4a40531e3753440d9359b6d01692876f63e0783ce64d"
+    },
+    {
+      "path": "docs/optimization/evidence/T05-33db3e4/base-bundle-manifest.json",
+      "sha256": "e0436118bc857ef672bfebc8fec8b01ce0eb1043483a3d809c5c9a5b71d988f8"
+    }
+  ],
+  "limits": [
+    "Browser scenarios use localhost synthetic API data and intercept resource creation; no real AWS transport runs.",
+    "Backend/T04 suites were not rerun: BASE..product changes no backend/tools; final integration must rerun them.",
+    "Vite retains a >500 kB shared chunk warning; no production timing, image, CPU, or memory claim is made."
+  ]
+}

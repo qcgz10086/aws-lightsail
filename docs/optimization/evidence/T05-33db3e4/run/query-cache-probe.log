@@ -1,0 +1,48 @@
+{
+  "module_sha256": "e6630862b8d3bfdf7955c583fa749b5797353f65b9772fce04e61751b4d74ea3",
+  "source": "C:\\Users\\liyang\\.codex\\worktrees\\t05-frontend-performance\\aws-lightsail\\frontend\\src\\api\\queryCache.mjs",
+  "records": [
+    {
+      "scenario": "scope_change_late_uncancellable_response",
+      "observed": {
+        "kind": "rejected",
+        "name": "AbortError"
+      },
+      "passed": true
+    },
+    {
+      "scenario": "last_subscriber_abort_immediate_new_subscriber",
+      "observed": {
+        "kind": "resolved",
+        "value": "replacement-value"
+      },
+      "loader_calls": 2,
+      "passed": true
+    },
+    {
+      "scenario": "mutation_invalidates_uncancellable_inflight_response",
+      "observed": {
+        "old": {
+          "kind": "rejected",
+          "name": "AbortError"
+        },
+        "current": {
+          "kind": "resolved",
+          "value": "new-billing-value"
+        }
+      },
+      "passed": true
+    },
+    {
+      "scenario": "ttl_boundary_no_real_time_wait",
+      "observed": [
+        1,
+        1,
+        2
+      ],
+      "passed": true
+    }
+  ],
+  "passed": 4,
+  "total": 4
+}

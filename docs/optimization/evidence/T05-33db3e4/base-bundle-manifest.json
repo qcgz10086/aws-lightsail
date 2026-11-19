@@ -1,0 +1,43 @@
+{
+  "base_ref": "234d1a91e8e24934d2730b4a5a88c8205ac1f649",
+  "method": "TypeScript parser static import closure; gzip each asset separately; same dependency junction",
+  "base": {
+    "entry": "assets/index-BXflHE8G.js",
+    "static_entry_closure": {
+      "bytes": 1732502,
+      "gzip_bytes": 535739,
+      "files": [
+        {
+          "name": "assets/index-BXflHE8G.js",
+          "bytes": 1732502,
+          "gzip_bytes": 535739,
+          "sha256": "aa13774f14616afa789167b5fcc01c43ab8a3b30741a9661f1f5ed6ca05c38e8"
+        }
+      ]
+    },
+    "dashboard_static_closure": {
+      "bytes": 1732502,
+      "gzip_bytes": 535739,
+      "files": [
+        {
+          "name": "assets/index-BXflHE8G.js",
+          "bytes": 1732502,
+          "gzip_bytes": 535739,
+          "sha256": "aa13774f14616afa789167b5fcc01c43ab8a3b30741a9661f1f5ed6ca05c38e8"
+        }
+      ]
+    },
+    "all_js": {
+      "bytes": 1732502,
+      "gzip_bytes": 535739,
+      "files": [
+        {
+          "name": "assets/index-BXflHE8G.js",
+          "bytes": 1732502,
+          "gzip_bytes": 535739,
+          "sha256": "aa13774f14616afa789167b5fcc01c43ab8a3b30741a9661f1f5ed6ca05c38e8"
+        }
+      ]
+    }
+  }
+}
