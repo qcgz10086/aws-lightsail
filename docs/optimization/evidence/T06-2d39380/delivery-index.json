@@ -2,8 +2,8 @@
   "product": "2d39380d54f071965db85697e90963d748701a78",
   "files": {
     "product-source.tar": {
-      "bytes": 1157120,
-      "sha256": "28992d5536d1a11fd713259cfc66b84b0884ad6667c813568ede8e10bfc25e3b"
+      "bytes": 1126400,
+      "sha256": "9375d55ba258fe35e464a38a02cc995870be7886db65ea3b146fbd19eaa25c2e"
     },
     "run/browser/browser.json": {
       "bytes": 5179,
@@ -158,8 +158,8 @@
       "sha256": "50e295b379ff0aac39207e2287ce927afa0919908981b3555c91a7fe855d133b"
     },
     "source-manifest.json": {
-      "bytes": 40585,
-      "sha256": "2fc02af76e294d3e7e97fe3d2c05ff628838ea0a8623434e3293523de9ef9400"
+      "bytes": 40667,
+      "sha256": "5e7c7756d29492dfd3456ccda2a8dc695747d729ea031ccd1ace0b96ce8b851e"
     }
   }
 }
