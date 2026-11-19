@@ -1,0 +1,233 @@
+{
+  "dist": "C:\\Users\\liyang\\.codex\\worktrees\\t07-build-integration\\aws-lightsail\\frontend\\dist",
+  "browser": "157.0.8103.79",
+  "scope": "Built frontend with local synthetic API responses; not production backend or AWS",
+  "results": [
+    {
+      "scenario": "cold_dashboard_continues_until_snapshot_data_available",
+      "observed_instance_count": "2",
+      "passed": true,
+      "snapshot_query_count": 3
+    },
+    {
+      "scenario": "slow_traffic_does_not_block_successful_instances",
+      "observed_instance_count": "2",
+      "passed": true
+    },
+    {
+      "scenario": "dashboard_to_instances_shared_query",
+      "before": 1,
+      "after": 1,
+      "additional_http_queries": 0
+    },
+    {
+      "scenario": "late_account_a_response_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "passed": true
+    },
+    {
+      "scenario": "account_a_operation_completes_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "selected": "BETA #2",
+      "passed": true
+    },
+    {
+      "scenario": "probe_execution",
+      "error": "Error: Delayed traffic sync did not start\n    at file:///C:/Users/liyang/.codex/worktrees/t07-build-integration/aws-lightsail/tools/optimization/integration_ui_races.mjs:264:27"
+    }
+  ],
+  "pageErrors": [],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "query": "",
+      "body": "",
+      "time": 6031.6124
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/instances",
+      "query": "",
+      "body": "",
+      "time": 6114.5385
+    },
+    {
+      "method": "GET",
+      "path": "/api/traffic/summary",
+      "query": "",
+      "body": "",
+      "time": 6322.6074
+    },
+    {
+      "method": "GET",
+      "path": "/api/credentials",
+      "query": "",
+      "body": "",
+      "time": 6684.5361
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/instances",
+      "query": "?credential_id=1",
+      "body": "",
+      "time": 7099.6549
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/instances",
+      "query": "?credential_id=2",
+      "body": "",
+      "time": 7882.6559
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/tasks",
+      "query": "",
+      "body": "{\"kind\":\"stop\",\"credential_id\":1,\"region\":\"us-east-1\",\"resource_name\":\"alpha-resource-only\"}",
+      "time": 9291.9846
+    },
+    {
+      "method": "GET",
+      "path": "/api/traffic/summary",
+      "query": "",
+      "body": "",
+      "time": 12259.307
+    },
+    {
+      "method": "GET",
+      "path": "/api/traffic/summary",
+      "query": "?credential_id=1",
+      "body": "",
+      "time": 12467.4546
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/tasks",
+      "query": "",
+      "body": "{\"kind\":\"traffic_sync\",\"credential_id\":1}",
+      "time": 12568.2554
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks",
+      "query": "?limit=100&offset=0",
+      "body": "",
+      "time": 13398.2506
+    }
+  ],
+  "assets": [
+    {
+      "name": "Billing-DUOA4Mzd.js",
+      "bytes": 117333,
+      "sha256": "f1cbc52329a09574bc84b0497794845a8f790361bf6708764052a3217e073938"
+    },
+    {
+      "name": "CreateInstance-PhtywC7f.js",
+      "bytes": 11008,
+      "sha256": "c82b4b1a50025cd0eb8ec985c5214d527331782a0d935026145b878f60b9c787"
+    },
+    {
+      "name": "Credentials-pIPrX0b4.js",
+      "bytes": 8204,
+      "sha256": "916298cc180c20963a5ba38472723fb56bfa060499dfdb715b61647a691b1d01"
+    },
+    {
+      "name": "Dashboard-wHhQ7Xv4.js",
+      "bytes": 16649,
+      "sha256": "9fbd61373d1817dcb20c1e50cbd7dc7e491eb61e3242085ad5675e734112d207"
+    },
+    {
+      "name": "dayjs.min-YNgI2_BD.js",
+      "bytes": 7154,
+      "sha256": "8725e0fab6095bbf24a9d178f332f7da2128fb81a71f4d85e92fa0e3c2e5ba10"
+    },
+    {
+      "name": "index-5U4r1dW8.js",
+      "bytes": 28837,
+      "sha256": "179fee811c99424d389541d004aadd6336a4d85546984b112346e0d54d0e3d16"
+    },
+    {
+      "name": "index-BZohHXJp.js",
+      "bytes": 9630,
+      "sha256": "cab455fb7da94969ff70ae43506a9823c71e3b7ddb1ddaf817c1ec02503181ce"
+    },
+    {
+      "name": "index-C7Tr7gKZ.js",
+      "bytes": 7923,
+      "sha256": "0b4cc2bafbd8530ce069aac688ea8e916a46b7237d61eb0061137c78f96e8fd4"
+    },
+    {
+      "name": "index-Ccfr7oNe.css",
+      "bytes": 238,
+      "sha256": "9cd9b75980fe12ebcfe541d3e86a407fbe18d892619e7dc3188f9ee05194ab93"
+    },
+    {
+      "name": "index-CfZzCj2F.js",
+      "bytes": 6861,
+      "sha256": "a742383e2aab1d84938f1f5f2f6488e077f7ac51839eb665bf13cf5eafb2362e"
+    },
+    {
+      "name": "index-CgdoFclL.js",
+      "bytes": 4705,
+      "sha256": "14388118c522131a03ce9bda7441ad83617428bfaf4afad74beeed0fff0fe1ef"
+    },
+    {
+      "name": "index-CGLsH7pZ.js",
+      "bytes": 790469,
+      "sha256": "64df144580bac25bcd2d421eb3cb045a70be727023602d6b1dbdce3cd5aaa782"
+    },
+    {
+      "name": "index-CjVqbZIU.js",
+      "bytes": 24565,
+      "sha256": "e04f270b8a2c71cce440813421b50ee809c7ff5d012dfbc75d2840a6a3415c4d"
+    },
+    {
+      "name": "index-CXqWyHLI.js",
+      "bytes": 90977,
+      "sha256": "2eb4c87c99f30708a65c8575f79f9674a81edc708da3d9692283a114c47fc4c3"
+    },
+    {
+      "name": "InstanceDetail-B74-PVpH.js",
+      "bytes": 408842,
+      "sha256": "7e631912d703fd4bc99dc92725370459f5fe2943e7d97240d4aabab9fbdc7a60"
+    },
+    {
+      "name": "Instances-DdTi4ARd.js",
+      "bytes": 9703,
+      "sha256": "c4de9f517afe378c72b661b417dd06257266751c216adf570fa1e38e372545d9"
+    },
+    {
+      "name": "Pagination-DzwySNvM.js",
+      "bytes": 24156,
+      "sha256": "c268d9c5dc70c808dc4e774cba3c384bd8d2ffd9d44f1d544e89d5c1d166aebf"
+    },
+    {
+      "name": "snapshotPolling-DBbVmqXj.js",
+      "bytes": 61,
+      "sha256": "8b0cb218afcdb11be2ce61ced14a0dc9f09d8eddad4acc18a59879fe6e56292e"
+    },
+    {
+      "name": "Table-De6_lr-_.js",
+      "bytes": 179686,
+      "sha256": "e0af9a8f7433cfa47b8dabeece3dc4dfaa78a6fb90eec035b2e8fba85d54fa4e"
+    },
+    {
+      "name": "Tasks-OyVYkf5X.js",
+      "bytes": 14678,
+      "sha256": "9c8ff19d179a875ec6a97a8b222ff5bdcbdd7a0e963256531489073600491e1a"
+    },
+    {
+      "name": "Traffic-B6kAw6np.js",
+      "bytes": 5247,
+      "sha256": "17f0c8157a432877b7bfbbac00dfdd4343707631af0ea6dad483201d1ebceb6f"
+    },
+    {
+      "name": "Users-CV75FQwy.js",
+      "bytes": 3500,
+      "sha256": "32943d67ba43069e1cabe5c905de48b55e531e008a571e62eb2afa07dc95fde0"
+    }
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "results": [
+    {
+      "scenario": "new_credential_pending_clears_values_and_blocks_submit_then_valid_reselection",
+      "passed": true,
+      "disabled": true,
+      "pendingValues": {
+        "region": [],
+        "blueprint_id": [],
+        "bundle_id": []
+      },
+      "pendingPostCount": 0,
+      "payloads": [
+        {
+          "credential_id": 3,
+          "region": "eu-west-1",
+          "instance_name": "audit-intercepted-create",
+          "blueprint_id": "3-eu-west-1-image",
+          "bundle_id": "3-eu-west-1-bundle",
+          "open_all_ports": false,
+          "allocate_static_ip": true,
+          "platform": "LINUX_UNIX"
+        }
+      ],
+      "request_start": 0,
+      "request_end": 10
+    },
+    {
+      "scenario": "failed_credential_regions_do_not_allow_old_catalog_submission",
+      "passed": true,
+      "afterFailure": {
+        "region": [],
+        "blueprint_id": [],
+        "bundle_id": []
+      },
+      "disabled": true,
+      "count": 0,
+      "request_start": 10,
+      "request_end": 17
+    },
+    {
+      "scenario": "cached_credential_switch_still_requires_explicit_reselection",
+      "passed": true,
+      "afterSwitch": {
+        "region": [],
+        "blueprint_id": [],
+        "bundle_id": []
+      },
+      "disabled": true,
+      "count": 0,
+      "request_start": 17,
+      "request_end": 25
+    },
+    {
+      "scenario": "region_change_pending_and_failure_clear_old_choices",
+      "passed": true,
+      "pending": {
+        "region": [
+          "us-east-1 (us-east-1)"
+        ],
+        "blueprint_id": [],
+        "bundle_id": []
+      },
+      "failed": {
+        "region": [
+          "us-east-1 (us-east-1)"
+        ],
+        "blueprint_id": [],
+        "bundle_id": []
+      },
+      "disabled": true,
+      "request_start": 25,
+      "request_end": 33
+    },
+    {
+      "scenario": "old_region_status_does_not_add_issue_to_new_credential",
+      "passed": true,
+      "old_issue_visible": false,
+      "state": {
+        "region": [
+          "eu-west-1 (eu-west-1)"
+        ],
+        "blueprint_id": [
+          "2-eu-west-1-image · LINUX_UNIX  (2-eu-west-1-image)"
+        ],
+        "bundle_id": [
+          "2-eu-west-1-bundle · $3/月 · ? vCPU · ? GB · 流量 ? GB"
+        ]
+      },
+      "unintendedEnable": [],
+      "request_start": 33,
+      "request_end": 42
+    },
+    {
+      "scenario": "old_region_enable_callback_does_not_clear_new_credential_selection",
+      "passed": true,
+      "state": {
+        "region": [
+          "eu-west-1 (eu-west-1)"
+        ],
+        "blueprint_id": [
+          "2-eu-west-1-image · LINUX_UNIX  (2-eu-west-1-image)"
+        ],
+        "bundle_id": [
+          "2-eu-west-1-bundle · $3/月 · ? vCPU · ? GB · 流量 ? GB"
+        ]
+      },
+      "request_start": 42,
+      "request_end": 52
+    },
+    {
+      "scenario": "metrics_slow_old_period_does_not_replace_new_period",
+      "passed": true,
+      "axis": "10-22 09:00",
+      "request_start": 52,
+      "request_end": 57
+    },
+    {
+      "scenario": "dashboard_preserves_snapshot_stale_status",
+      "passed": true,
+      "dashboard": {
+        "errorVisible": true,
+        "lastSuccessVisible": true,
+        "instanceCount": "1"
+      },
+      "instancePageControlErrorVisible": true,
+      "instancePageControlLastSuccessVisible": true,
+      "request_start": 57,
+      "request_end": 61
+    },
+    {
+      "scenario": "dashboard_preserves_snapshot_no_permission_status",
+      "passed": true,
+      "dashboard": {
+        "errorVisible": true,
+        "lastSuccessVisible": false,
+        "instanceCount": "—"
+      },
+      "instancePageControlErrorVisible": true,
+      "instancePageControlLastSuccessVisible": false,
+      "request_start": 61,
+      "request_end": 65
+    },
+    {
+      "scenario": "dashboard_preserves_snapshot_catalog_failure_status",
+      "passed": true,
+      "dashboard": {
+        "errorVisible": true,
+        "lastSuccessVisible": false,
+        "instanceCount": "—"
+      },
+      "instancePageControlErrorVisible": true,
+      "instancePageControlLastSuccessVisible": false,
+      "request_start": 65,
+      "request_end": 69
+    },
+    {
+      "scenario": "same_scope_region_enable_allows_successful_catalog_reselection",
+      "passed": true,
+      "payloads": [
+        {
+          "credential_id": 1,
+          "region": "us-east-1",
+          "instance_name": "audit-valid-enabled-region",
+          "blueprint_id": "1-us-east-1-image",
+          "bundle_id": "1-us-east-1-bundle",
+          "open_all_ports": false,
+          "allocate_static_ip": true,
+          "platform": "WINDOWS"
+        }
+      ],
+      "request_start": 69,
+      "request_end": 79
+    },
+    {
+      "scenario": "inflight_region_poll_after_credential_switch_cannot_clear_new_choices",
+      "passed": true,
+      "state": {
+        "region": [
+          "eu-west-1 (eu-west-1)"
+        ],
+        "blueprint_id": [
+          "2-eu-west-1-image · LINUX_UNIX  (2-eu-west-1-image)"
+        ],
+        "bundle_id": [
+          "2-eu-west-1-bundle · $3/月 · ? vCPU · ? GB · 流量 ? GB"
+        ]
+      },
+      "pollRequests": 2,
+      "request_start": 79,
+      "request_end": 89
+    }
+  ],
+  "errors": []
+}

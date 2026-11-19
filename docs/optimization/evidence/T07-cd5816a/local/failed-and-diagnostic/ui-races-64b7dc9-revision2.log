@@ -1,0 +1,39 @@
+{
+  "results": [
+    {
+      "scenario": "cold_dashboard_continues_until_snapshot_data_available",
+      "observed_instance_count": "2",
+      "passed": true,
+      "snapshot_query_count": 3
+    },
+    {
+      "scenario": "slow_traffic_does_not_block_successful_instances",
+      "observed_instance_count": "2",
+      "passed": true
+    },
+    {
+      "scenario": "dashboard_to_instances_shared_query",
+      "before": 1,
+      "after": 1,
+      "additional_http_queries": 0
+    },
+    {
+      "scenario": "late_account_a_response_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "passed": true
+    },
+    {
+      "scenario": "account_a_operation_completes_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "selected": "BETA #2",
+      "passed": true
+    },
+    {
+      "scenario": "probe_execution",
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.ant-select-item-option').filter({ hasText: 'BETA' }).first()\u001b[22m\n\u001b[2m    - locator resolved to <div title=\"BETA #2\" aria-selected=\"false\" class=\"ant-select-item ant-select-item-option\">…</div>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not stable\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not stable\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m  - element was detached from the DOM, retrying\u001b[22m\n\n    at C:\\Users\\liyang\\.codex\\worktrees\\t07-build-integration\\aws-lightsail\\tools\\optimization\\integration_ui_races.mjs:268:85"
+    }
+  ],
+  "pageErrors": []
+}

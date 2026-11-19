@@ -1,0 +1,5 @@
+
+> lightsail-manager-ui@1.0.0 test
+> node --test tests/*.test.mjs
+
+Could not find 'C:\Users\liyang\.codex\worktrees\t07-build-integration\aws-lightsail\frontend\tests\*.test.mjs'

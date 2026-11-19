@@ -1,0 +1,534 @@
+{
+  "status": "completed",
+  "old": {
+    "backend": {
+      "tag": "lightsail-t00-backend:024d9d5664fa",
+      "id": "sha256:4591ba0f1959e3c26d04e49ef00e44afa9c729e7c2defee625fe4ce5a90ae6a2",
+      "size_bytes": 601138554,
+      "layers": [
+        "sha256:dd57f90311a2567b55ff22eeacff1602fd04ad7566e315957731359eab173b90",
+        "sha256:3dc3efdf011007403514ffd3b699da9deef847535ae30a3639ef3fee93c1375e",
+        "sha256:96a69f98ae076bdff5264720ee922820291d658c6a2df97f7c4899864ceb7ea8",
+        "sha256:340931a1d98607a7f1319082179f82ba477f1a1de6e3ecf2ea11f4cc0fe454c3",
+        "sha256:e9a8750335146ca970e0ae3ea6e1dbaf2c4eacf3884bfad7b7d024e0653020fc",
+        "sha256:dfa0e1ab1ef8b13fc8ba41186144cd2372f1c6588978dcc2cb2ecd5eacac3536",
+        "sha256:e3ccaf645c36ec617d6173f789d207a657bf1289dcbf32c13c193d82a357fb1b",
+        "sha256:056a0ab881e5c27506ff5580d07310e04f6418390b1fc5aa8f1cf5b08a04f98e",
+        "sha256:89be3ccc72abbb74555357789b24261df823aaabfa665f9c8f58613159eb3944",
+        "sha256:3cf045252eeea65aa9701eb82b2f21f4e5a5cc8e20d968eeb90b2d513681f210"
+      ],
+      "dockerfile": "FROM python@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b\n\nWORKDIR /app\n\nENV PYTHONDONTWRITEBYTECODE=1 \\\n    PYTHONUNBUFFERED=1\n\nRUN apt-get update && apt-get install -y --no-install-recommends \\\n    gcc \\\n    && rm -rf /var/lib/apt/lists/*\n\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\n\nCOPY app ./app\n\n# R-7：非 root 运行；/app 与 /data 归 appuser 所有\nRUN groupadd -r appuser && useradd -r -g appuser -d /app appuser \\\n    && mkdir -p /data && chown -R appuser:appuser /app /data\n\nEXPOSE 8000\n\nUSER appuser\n\n# SQLite 下保持单 worker，避免写锁冲突\nCMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\", \"--workers\", \"1\"]\n",
+      "original_dockerfile_sha256": "cbd09b184efd23c36a565ef5de18b9c85109db5a79254f5172976b7321f95845"
+    },
+    "frontend": {
+      "tag": "lightsail-t00-frontend:024d9d5664fa",
+      "id": "sha256:f64be66bafad63bcc91fea27ab56b696719db81ae87b75bbb456f4d288f399d7",
+      "size_bytes": 75987447,
+      "layers": [
+        "sha256:08000c18d16dadf9553d747a58cf44023423a9ab010aab96cf263d2216b8b350",
+        "sha256:d250ba61f88e97cc9637c8191eac8a17804598a76792b32cd3b5ab2c4d085132",
+        "sha256:1dc2eb4d4442a5fdc55bef45b97c7b67e1c5bcb5b5d2e77bcd4128d28af40158",
+        "sha256:6d6c487831a4bb24f46fdb2ceb241afac9f754b0e9ee12ff7f643a3e65dfc677",
+        "sha256:df8de83f869f56cc49ae8441a8f5c53e931a9248ec641257a40a715da9432e62",
+        "sha256:a58f96716bca2d38c286a49e69f284031e0bef4213710ecd76a9a9d0efd03d6a",
+        "sha256:2a34f0eb0786b92bb6c03984237525e781e46595327ed106a27b684764ebb7f7",
+        "sha256:da73c9adc02953ee6eb5d167c3cfed0346a2b659c4e9de6d4aca4eb7caf1cc18",
+        "sha256:c5b2dfcc7ced4485ca40d2e6258f958c40a789f7bff4128952699131d9f6d252",
+        "sha256:189bd42656bd3a4cce41c9fa30321a7623247ebb98da33dc1d9b2b57829a2cfc",
+        "sha256:4e24080d3471eff7c7731b2eba74ce453fa80cb0909fb20d0f5bc0ce1931c08c"
+      ],
+      "dockerfile": "# build stage\nFROM node@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 AS build\nWORKDIR /app\nCOPY package.json ./\nRUN npm install\nCOPY . .\nRUN npm run build\n\n# production stage：R-7 非 root nginx（监听 8080，不用 root 占 80 端口）\nFROM nginxinc/nginx-unprivileged@sha256:65e3e85dbaed8ba248841d9d58a899b6197106c23cb0ff1a132b7bfe0547e4c0\nCOPY nginx.conf /etc/nginx/conf.d/default.conf\nCOPY --from=build /app/dist /usr/share/nginx/html\nEXPOSE 8080\nCMD [\"nginx\", \"-g\", \"daemon off;\"]\n",
+      "original_dockerfile_sha256": "00dd75088f37031eeb8fa089d89ca0259a9f24516b907094dcd7d7da38ede205"
+    }
+  },
+  "candidate": {
+    "backend": {
+      "tag": "lightsail-t00-backend:cd5816aa0ab2",
+      "id": "sha256:3268474131a02dbb96cfab7413272fa56b80ecebd0c59f32f5e03436dbeea481",
+      "size_bytes": 358722758,
+      "layers": [
+        "sha256:dd57f90311a2567b55ff22eeacff1602fd04ad7566e315957731359eab173b90",
+        "sha256:3dc3efdf011007403514ffd3b699da9deef847535ae30a3639ef3fee93c1375e",
+        "sha256:96a69f98ae076bdff5264720ee922820291d658c6a2df97f7c4899864ceb7ea8",
+        "sha256:340931a1d98607a7f1319082179f82ba477f1a1de6e3ecf2ea11f4cc0fe454c3",
+        "sha256:e9a8750335146ca970e0ae3ea6e1dbaf2c4eacf3884bfad7b7d024e0653020fc",
+        "sha256:cfa7e8f260b3d4c84ed1c1e2414bb2b9dd7a7d2a8a31d383f81de2c40f28e40f",
+        "sha256:f667c92e7535010e6195590f1bcf49a9cf294d655da3bfbd40f0b699f780c9f1",
+        "sha256:005aa38eaccd57878175e3917cfa62163043351cffb858bc3e3c6e3e52c10abe",
+        "sha256:de255b89d47770e9fc1d1bc2b9ccbf8ac6ac130a02d615d0f1c82e643bc710eb"
+      ],
+      "dockerfile": "FROM python@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b AS wheels\n\nWORKDIR /build\nRUN apt-get update && apt-get install -y --no-install-recommends gcc \\\n    && rm -rf /var/lib/apt/lists/*\nCOPY requirements.txt .\nRUN pip wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt\n\nFROM python@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b\n\nWORKDIR /app\n\nENV PYTHONDONTWRITEBYTECODE=1 \\\n    PYTHONUNBUFFERED=1\n\nCOPY requirements.txt .\nRUN --mount=type=bind,from=wheels,source=/wheels,target=/wheels \\\n    pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.txt\n\nCOPY app ./app\n\n# R-7：非 root 运行；/app 与 /data 归 appuser 所有\nRUN groupadd -r appuser && useradd -r -g appuser -d /app appuser \\\n    && mkdir -p /data && chown -R appuser:appuser /app /data\n\nEXPOSE 8000\n\nUSER appuser\n\n# SQLite 下保持单 worker，避免写锁冲突\nCMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\", \"--workers\", \"1\"]\n",
+      "original_dockerfile_sha256": "5685854b5443d459b759e9a1f6a39b2bb1a7edc2a65b84f481866ef1ce1b8280"
+    },
+    "frontend": {
+      "tag": "lightsail-t00-frontend:cd5816aa0ab2",
+      "id": "sha256:d9696a213e47cedb661729b3269ae6baad273e9d679fe0fd39f9788449dbc7ae",
+      "size_bytes": 76066087,
+      "layers": [
+        "sha256:08000c18d16dadf9553d747a58cf44023423a9ab010aab96cf263d2216b8b350",
+        "sha256:d250ba61f88e97cc9637c8191eac8a17804598a76792b32cd3b5ab2c4d085132",
+        "sha256:1dc2eb4d4442a5fdc55bef45b97c7b67e1c5bcb5b5d2e77bcd4128d28af40158",
+        "sha256:6d6c487831a4bb24f46fdb2ceb241afac9f754b0e9ee12ff7f643a3e65dfc677",
+        "sha256:df8de83f869f56cc49ae8441a8f5c53e931a9248ec641257a40a715da9432e62",
+        "sha256:a58f96716bca2d38c286a49e69f284031e0bef4213710ecd76a9a9d0efd03d6a",
+        "sha256:2a34f0eb0786b92bb6c03984237525e781e46595327ed106a27b684764ebb7f7",
+        "sha256:da73c9adc02953ee6eb5d167c3cfed0346a2b659c4e9de6d4aca4eb7caf1cc18",
+        "sha256:c5b2dfcc7ced4485ca40d2e6258f958c40a789f7bff4128952699131d9f6d252",
+        "sha256:f349fbd2029d966ee58c2563c9ca328d0065f0be5d3680d6993894dbaec3df6b",
+        "sha256:1db05d22e86e0fa638a88a344a1c2cb1536caec88630e8a01e7916a841593822"
+      ],
+      "dockerfile": "# build stage\nFROM node@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 AS build\nWORKDIR /app\nCOPY package.json package-lock.json ./\nRUN npm ci\nCOPY . .\nRUN npm run build\n\n# production stage：R-7 非 root nginx（监听 8080，不用 root 占 80 端口）\nFROM nginxinc/nginx-unprivileged@sha256:65e3e85dbaed8ba248841d9d58a899b6197106c23cb0ff1a132b7bfe0547e4c0\nCOPY nginx.conf /etc/nginx/conf.d/default.conf\nCOPY --from=build /app/dist /usr/share/nginx/html\nEXPOSE 8080\nCMD [\"nginx\", \"-g\", \"daemon off;\"]\n",
+      "original_dockerfile_sha256": "6f09e111dc0f2d2fcc884367eb69cd1d292f7adb68572b417064608baf10ba66"
+    }
+  },
+  "steps": [
+    {
+      "step": "seed",
+      "image_id": "sha256:4591ba0f1959e3c26d04e49ef00e44afa9c729e7c2defee625fe4ce5a90ae6a2",
+      "result": {
+        "mode": "seed",
+        "database": {
+          "integrity": "ok",
+          "foreign_keys": [],
+          "traffic": [
+            [
+              36028797018963985,
+              18014398509482007
+            ]
+          ],
+          "policy": [
+            [
+              "historic",
+              123.5,
+              0,
+              "retain-policy"
+            ]
+          ],
+          "credit": [
+            [
+              "historic-credit",
+              0.12345678912345678,
+              "USD"
+            ]
+          ],
+          "tasks": [],
+          "steps": [],
+          "locks": [],
+          "has_task_schema": false
+        },
+        "wal_bytes": 65952,
+        "transport_attempts": 0
+      }
+    },
+    {
+      "step": "fail_upgrade",
+      "image_id": "sha256:3268474131a02dbb96cfab7413272fa56b80ecebd0c59f32f5e03436dbeea481",
+      "result": {
+        "mode": "fail_upgrade",
+        "backup": {
+          "path": "/data/legacy.db",
+          "sha256": "7f25f8077c99afd0a057c256451ecdce4b576d5d06c6890aaf08f3d461162fd8",
+          "created_at_utc": "2026-11-19T13:27:44.981205+00:00"
+        },
+        "injected_v5_calls": 1,
+        "injected_cause": "injected after task DDL",
+        "unchanged_business_and_schema": true,
+        "database": {
+          "integrity": "ok",
+          "foreign_keys": [],
+          "traffic": [
+            [
+              36028797018963985,
+              18014398509482007
+            ]
+          ],
+          "policy": [
+            [
+              "historic",
+              123.5,
+              0,
+              "retain-policy"
+            ]
+          ],
+          "credit": [
+            [
+              "historic-credit",
+              0.12345678912345678,
+              "USD"
+            ]
+          ],
+          "tasks": [],
+          "steps": [],
+          "locks": [],
+          "has_task_schema": false
+        },
+        "transport_attempts": 0
+      }
+    },
+    {
+      "step": "tasks",
+      "image_id": "sha256:3268474131a02dbb96cfab7413272fa56b80ecebd0c59f32f5e03436dbeea481",
+      "result": {
+        "mode": "tasks",
+        "before_backup_task": "5d45b8f4-c354-4bf7-af59-d644235dbd5c",
+        "after_backup_task": "e067f8f7-dbb5-41a8-bdb9-f5d68fbb5b7b",
+        "wal_bytes": 333752,
+        "current_restore": {
+          "path": "/data/drill.db",
+          "restored_from": "/data/current.db",
+          "sha256": "6b8b3abdd1d48a95f1f81ab2ba1ad1e1498e9e2f6464be77046b462314bea90c",
+          "safety_backup": {
+            "path": "/data/drill.db.pre-restore-963cf51a6fde4c85a9ea57e2efb32453.db",
+            "sha256": "adfb1f91053197626f4c86d2fc2359603add71a8b7acef4db3114b74b655256c",
+            "created_at_utc": "2026-11-19T13:27:46.434953+00:00"
+          },
+          "requires_paired_images_and_task_reconciliation": true
+        },
+        "safety_inventory": {
+          "integrity": "ok",
+          "foreign_keys": [],
+          "traffic": [
+            [
+              36028797018963985,
+              18014398509482007
+            ]
+          ],
+          "policy": [
+            [
+              "historic",
+              123.5,
+              0,
+              "retain-policy"
+            ]
+          ],
+          "credit": [
+            [
+              "historic-credit",
+              0.12345678912345678,
+              "USD"
+            ]
+          ],
+          "tasks": [
+            [
+              "5d45b8f4-c354-4bf7-af59-d644235dbd5c",
+              "running"
+            ],
+            [
+              "e067f8f7-dbb5-41a8-bdb9-f5d68fbb5b7b",
+              "running"
+            ]
+          ],
+          "steps": [
+            [
+              "5d45b8f4-c354-4bf7-af59-d644235dbd5c",
+              "reboot",
+              "unknown",
+              "{\"arn\":\"arn:aws:lightsail:us-east-1:111111111111:Instance/before-backup\",\"mutation\":true,\"name\":\"before-backup\"}"
+            ],
+            [
+              "e067f8f7-dbb5-41a8-bdb9-f5d68fbb5b7b",
+              "reboot",
+              "unknown",
+              "{\"arn\":\"arn:aws:lightsail:us-east-1:111111111111:Instance/after-backup\",\"mutation\":true,\"name\":\"after-backup\"}"
+            ]
+          ],
+          "locks": [
+            [
+              "5d45b8f4-c354-4bf7-af59-d644235dbd5c"
+            ],
+            [
+              "e067f8f7-dbb5-41a8-bdb9-f5d68fbb5b7b"
+            ]
+          ],
+          "has_task_schema": true
+        },
+        "restored_inventory": {
+          "integrity": "ok",
+          "foreign_keys": [],
+          "traffic": [
+            [
+              36028797018963985,
+              18014398509482007
+            ]
+          ],
+          "policy": [
+            [
+              "historic",
+              123.5,
+              0,
+              "retain-policy"
+            ]
+          ],
+          "credit": [
+            [
+              "historic-credit",
+              0.12345678912345678,
+              "USD"
+            ]
+          ],
+          "tasks": [
+            [
+              "5d45b8f4-c354-4bf7-af59-d644235dbd5c",
+              "running"
+            ]
+          ],
+          "steps": [
+            [
+              "5d45b8f4-c354-4bf7-af59-d644235dbd5c",
+              "reboot",
+              "unknown",
+              "{\"arn\":\"arn:aws:lightsail:us-east-1:111111111111:Instance/before-backup\",\"mutation\":true,\"name\":\"before-backup\"}"
+            ]
+          ],
+          "locks": [
+            [
+              "5d45b8f4-c354-4bf7-af59-d644235dbd5c"
+            ]
+          ],
+          "has_task_schema": true
+        },
+        "recovered_inventory": {
+          "integrity": "ok",
+          "foreign_keys": [],
+          "traffic": [
+            [
+              36028797018963985,
+              18014398509482007
+            ]
+          ],
+          "policy": [
+            [
+              "historic",
+              123.5,
+              0,
+              "retain-policy"
+            ]
+          ],
+          "credit": [
+            [
+              "historic-credit",
+              0.12345678912345678,
+              "USD"
+            ]
+          ],
+          "tasks": [
+            [
+              "5d45b8f4-c354-4bf7-af59-d644235dbd5c",
+              "reconciliation_required"
+            ]
+          ],
+          "steps": [
+            [
+              "5d45b8f4-c354-4bf7-af59-d644235dbd5c",
+              "reboot",
+              "unknown",
+              "{\"arn\":\"arn:aws:lightsail:us-east-1:111111111111:Instance/before-backup\",\"mutation\":true,\"name\":\"before-backup\"}"
+            ]
+          ],
+          "locks": [
+            [
+              "5d45b8f4-c354-4bf7-af59-d644235dbd5c"
+            ]
+          ],
+          "has_task_schema": true
+        },
+        "return_to_safety": {
+          "path": "/data/drill.db",
+          "restored_from": "/data/drill.db.pre-restore-963cf51a6fde4c85a9ea57e2efb32453.db",
+          "sha256": "adfb1f91053197626f4c86d2fc2359603add71a8b7acef4db3114b74b655256c",
+          "safety_backup": {
+            "path": "/data/drill.db.pre-restore-95fee72e67424d4a9cd9a0b879e203fa.db",
+            "sha256": "124fb7a9601c47dc05e13c583b38317de8e558b84c7400984af0184884ccdfe8",
+            "created_at_utc": "2026-11-19T13:27:46.455468+00:00"
+          },
+          "requires_paired_images_and_task_reconciliation": true
+        },
+        "service_may_resume": false,
+        "restart_schedules": 0,
+        "transport_attempts": 0
+      }
+    },
+    {
+      "step": "restore_legacy",
+      "image_id": "sha256:3268474131a02dbb96cfab7413272fa56b80ecebd0c59f32f5e03436dbeea481",
+      "result": {
+        "mode": "restore_legacy",
+        "receipt": {
+          "path": "/data/drill.db",
+          "restored_from": "/data/legacy.db",
+          "sha256": "7f25f8077c99afd0a057c256451ecdce4b576d5d06c6890aaf08f3d461162fd8",
+          "safety_backup": {
+            "path": "/data/drill.db.pre-restore-a9828e294730480da6b71c7b5e2a0b2a.db",
+            "sha256": "adfb1f91053197626f4c86d2fc2359603add71a8b7acef4db3114b74b655256c",
+            "created_at_utc": "2026-11-19T13:27:47.792861+00:00"
+          },
+          "requires_paired_images_and_task_reconciliation": true
+        },
+        "safety_inventory": {
+          "integrity": "ok",
+          "foreign_keys": [],
+          "traffic": [
+            [
+              36028797018963985,
+              18014398509482007
+            ]
+          ],
+          "policy": [
+            [
+              "historic",
+              123.5,
+              0,
+              "retain-policy"
+            ]
+          ],
+          "credit": [
+            [
+              "historic-credit",
+              0.12345678912345678,
+              "USD"
+            ]
+          ],
+          "tasks": [
+            [
+              "5d45b8f4-c354-4bf7-af59-d644235dbd5c",
+              "running"
+            ],
+            [
+              "e067f8f7-dbb5-41a8-bdb9-f5d68fbb5b7b",
+              "running"
+            ]
+          ],
+          "steps": [
+            [
+              "5d45b8f4-c354-4bf7-af59-d644235dbd5c",
+              "reboot",
+              "unknown",
+              "{\"arn\":\"arn:aws:lightsail:us-east-1:111111111111:Instance/before-backup\",\"mutation\":true,\"name\":\"before-backup\"}"
+            ],
+            [
+              "e067f8f7-dbb5-41a8-bdb9-f5d68fbb5b7b",
+              "reboot",
+              "unknown",
+              "{\"arn\":\"arn:aws:lightsail:us-east-1:111111111111:Instance/after-backup\",\"mutation\":true,\"name\":\"after-backup\"}"
+            ]
+          ],
+          "locks": [
+            [
+              "5d45b8f4-c354-4bf7-af59-d644235dbd5c"
+            ],
+            [
+              "e067f8f7-dbb5-41a8-bdb9-f5d68fbb5b7b"
+            ]
+          ],
+          "has_task_schema": true
+        },
+        "restored_inventory": {
+          "integrity": "ok",
+          "foreign_keys": [],
+          "traffic": [
+            [
+              36028797018963985,
+              18014398509482007
+            ]
+          ],
+          "policy": [
+            [
+              "historic",
+              123.5,
+              0,
+              "retain-policy"
+            ]
+          ],
+          "credit": [
+            [
+              "historic-credit",
+              0.12345678912345678,
+              "USD"
+            ]
+          ],
+          "tasks": [],
+          "steps": [],
+          "locks": [],
+          "has_task_schema": false
+        },
+        "unresolved_tasks": [
+          [
+            "5d45b8f4-c354-4bf7-af59-d644235dbd5c",
+            "running"
+          ],
+          [
+            "e067f8f7-dbb5-41a8-bdb9-f5d68fbb5b7b",
+            "running"
+          ]
+        ],
+        "service_may_resume": false,
+        "reason": "Legacy schema has no task locks; unresolved effects remain in safety snapshot. Only isolated read inspection allowed.",
+        "transport_attempts": 0
+      }
+    }
+  ],
+  "service_may_resume": false,
+  "old_pair_http": {
+    "index_status": 200,
+    "login_status": 200,
+    "reads": {
+      "/api/auth/me": {
+        "id": 1,
+        "username": "rollback-fixture",
+        "is_admin": false,
+        "monthly_limit_gb": null,
+        "auto_stop_on_limit_default": false,
+        "created_at": "2026-11-19T13:27:43.634506",
+        "has_credentials": true,
+        "credential_count": 1
+      },
+      "/api/billing/credits": [
+        {
+          "id": 1,
+          "name": "historic-credit",
+          "credit_id": null,
+          "total_amount": 0.12345678912345678,
+          "currency": "USD",
+          "start_date": "2026-01-01",
+          "expires_at": null,
+          "note": null,
+          "credential_id": 1,
+          "created_at": "2026-11-19T13:27:43.639491",
+          "remaining_estimate": null,
+          "credits_applied_since_start": null
+        }
+      ],
+      "/api/traffic/summary": {
+        "year_month": "2026-11",
+        "instances": [
+          {
+            "region": "us-east-1",
+            "name": "historic",
+            "credential_id": 1,
+            "account_label": null,
+            "in_gb": 33554432.0,
+            "out_gb": 16777216.0,
+            "total_gb": 50331648.0,
+            "limit_gb": 123.5,
+            "over_limit": true,
+            "auto_stop_on_limit": false,
+            "year_month": "2026-11"
+          }
+        ],
+        "by_region": [
+          {
+            "region": "us-east-1",
+            "total_gb": 50331648.0,
+            "instance_count": 1
+          }
+        ],
+        "note": "流量基于 Lightsail NetworkIn/NetworkOut 指标估算，与账单可能存在差异"
+      }
+    },
+    "mutation_rejected_status": 503,
+    "frontend_image": "sha256:f64be66bafad63bcc91fea27ab56b696719db81ae87b75bbb456f4d288f399d7",
+    "backend_image": "sha256:4591ba0f1959e3c26d04e49ef00e44afa9c729e7c2defee625fe4ce5a90ae6a2"
+  },
+  "all_passed": true,
+  "boundary": "Isolated inspection runs both old immutable images behind a fixture write gate. Old schema cannot inherit task locks; reconciliation is required before normal service restart."
+}

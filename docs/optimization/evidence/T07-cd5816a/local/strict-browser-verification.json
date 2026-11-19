@@ -1,0 +1,25 @@
+{
+  "product": "cd5816aa0ab29ca9d692537845687b1bc7060333",
+  "checks": {
+    "page_races": {
+      "expected": 11,
+      "actual": 11,
+      "all_passed": true,
+      "sha256": "d504a3bf2dada21d8d176f4336af6f623acad0eaa6bc4382026fe533fa6212ef"
+    },
+    "catalog": {
+      "expected": 12,
+      "actual": 12,
+      "all_passed": true,
+      "sha256": "33627394cd4fbefa64166706ae50c29c9ecb67881dc6891ee78f9eeb989bd163"
+    },
+    "tasks": {
+      "expected": 7,
+      "actual": 7,
+      "all_passed": true,
+      "sha256": "ae48343f4f6d18d4fa58574c640eeabb40d94436511acc609728a6fd73fe39b0"
+    }
+  },
+  "frontend_subtree": "4a7935a25154ee331bca80b007ca90688b4c9bf9",
+  "all_passed": true
+}

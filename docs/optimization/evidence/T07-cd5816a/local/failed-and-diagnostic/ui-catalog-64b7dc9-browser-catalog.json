@@ -1,0 +1,952 @@
+{
+  "dist": "C:\\Users\\liyang\\.codex\\worktrees\\t07-build-integration\\aws-lightsail\\frontend\\dist",
+  "scope": "Exact built frontend, synthetic local API, all create calls intercepted with 400, no AWS",
+  "browser": "157.0.8103.79",
+  "assets": [
+    {
+      "name": "index.html",
+      "bytes": 422,
+      "sha256": "fae27c0b2ab8ecc1c1d4b4e480660d0943f070df6cfe31042fdcce1320c51ffc"
+    },
+    {
+      "name": "assets/Billing-DUOA4Mzd.js",
+      "bytes": 117333,
+      "sha256": "f1cbc52329a09574bc84b0497794845a8f790361bf6708764052a3217e073938"
+    },
+    {
+      "name": "assets/CreateInstance-PhtywC7f.js",
+      "bytes": 11008,
+      "sha256": "c82b4b1a50025cd0eb8ec985c5214d527331782a0d935026145b878f60b9c787"
+    },
+    {
+      "name": "assets/Credentials-pIPrX0b4.js",
+      "bytes": 8204,
+      "sha256": "916298cc180c20963a5ba38472723fb56bfa060499dfdb715b61647a691b1d01"
+    },
+    {
+      "name": "assets/Dashboard-wHhQ7Xv4.js",
+      "bytes": 16649,
+      "sha256": "9fbd61373d1817dcb20c1e50cbd7dc7e491eb61e3242085ad5675e734112d207"
+    },
+    {
+      "name": "assets/dayjs.min-YNgI2_BD.js",
+      "bytes": 7154,
+      "sha256": "8725e0fab6095bbf24a9d178f332f7da2128fb81a71f4d85e92fa0e3c2e5ba10"
+    },
+    {
+      "name": "assets/index-5U4r1dW8.js",
+      "bytes": 28837,
+      "sha256": "179fee811c99424d389541d004aadd6336a4d85546984b112346e0d54d0e3d16"
+    },
+    {
+      "name": "assets/index-BZohHXJp.js",
+      "bytes": 9630,
+      "sha256": "cab455fb7da94969ff70ae43506a9823c71e3b7ddb1ddaf817c1ec02503181ce"
+    },
+    {
+      "name": "assets/index-C7Tr7gKZ.js",
+      "bytes": 7923,
+      "sha256": "0b4cc2bafbd8530ce069aac688ea8e916a46b7237d61eb0061137c78f96e8fd4"
+    },
+    {
+      "name": "assets/index-Ccfr7oNe.css",
+      "bytes": 238,
+      "sha256": "9cd9b75980fe12ebcfe541d3e86a407fbe18d892619e7dc3188f9ee05194ab93"
+    },
+    {
+      "name": "assets/index-CfZzCj2F.js",
+      "bytes": 6861,
+      "sha256": "a742383e2aab1d84938f1f5f2f6488e077f7ac51839eb665bf13cf5eafb2362e"
+    },
+    {
+      "name": "assets/index-CgdoFclL.js",
+      "bytes": 4705,
+      "sha256": "14388118c522131a03ce9bda7441ad83617428bfaf4afad74beeed0fff0fe1ef"
+    },
+    {
+      "name": "assets/index-CGLsH7pZ.js",
+      "bytes": 790469,
+      "sha256": "64df144580bac25bcd2d421eb3cb045a70be727023602d6b1dbdce3cd5aaa782"
+    },
+    {
+      "name": "assets/index-CjVqbZIU.js",
+      "bytes": 24565,
+      "sha256": "e04f270b8a2c71cce440813421b50ee809c7ff5d012dfbc75d2840a6a3415c4d"
+    },
+    {
+      "name": "assets/index-CXqWyHLI.js",
+      "bytes": 90977,
+      "sha256": "2eb4c87c99f30708a65c8575f79f9674a81edc708da3d9692283a114c47fc4c3"
+    },
+    {
+      "name": "assets/InstanceDetail-B74-PVpH.js",
+      "bytes": 408842,
+      "sha256": "7e631912d703fd4bc99dc92725370459f5fe2943e7d97240d4aabab9fbdc7a60"
+    },
+    {
+      "name": "assets/Instances-DdTi4ARd.js",
+      "bytes": 9703,
+      "sha256": "c4de9f517afe378c72b661b417dd06257266751c216adf570fa1e38e372545d9"
+    },
+    {
+      "name": "assets/Pagination-DzwySNvM.js",
+      "bytes": 24156,
+      "sha256": "c268d9c5dc70c808dc4e774cba3c384bd8d2ffd9d44f1d544e89d5c1d166aebf"
+    },
+    {
+      "name": "assets/snapshotPolling-DBbVmqXj.js",
+      "bytes": 61,
+      "sha256": "8b0cb218afcdb11be2ce61ced14a0dc9f09d8eddad4acc18a59879fe6e56292e"
+    },
+    {
+      "name": "assets/Table-De6_lr-_.js",
+      "bytes": 179686,
+      "sha256": "e0af9a8f7433cfa47b8dabeece3dc4dfaa78a6fb90eec035b2e8fba85d54fa4e"
+    },
+    {
+      "name": "assets/Tasks-OyVYkf5X.js",
+      "bytes": 14678,
+      "sha256": "9c8ff19d179a875ec6a97a8b222ff5bdcbdd7a0e963256531489073600491e1a"
+    },
+    {
+      "name": "assets/Traffic-B6kAw6np.js",
+      "bytes": 5247,
+      "sha256": "17f0c8157a432877b7bfbbac00dfdd4343707631af0ea6dad483201d1ebceb6f"
+    },
+    {
+      "name": "assets/Users-CV75FQwy.js",
+      "bytes": 3500,
+      "sha256": "32943d67ba43069e1cabe5c905de48b55e531e008a571e62eb2afa07dc95fde0"
+    }
+  ],
+  "results": [
+    {
+      "scenario": "new_credential_pending_clears_values_and_blocks_submit_then_valid_reselection",
+      "passed": false,
+      "disabled": true,
+      "pendingValues": {
+        "region": [],
+        "blueprint_id": [],
+        "bundle_id": []
+      },
+      "pendingPostCount": 0,
+      "payloads": [
+        {
+          "kind": "create",
+          "credential_id": 3,
+          "region": "eu-west-1",
+          "resource_name": "audit-intercepted-create",
+          "payload": {
+            "credential_id": 3,
+            "region": "eu-west-1",
+            "instance_name": "audit-intercepted-create",
+            "blueprint_id": "3-eu-west-1-image",
+            "bundle_id": "3-eu-west-1-bundle",
+            "open_all_ports": false,
+            "allocate_static_ip": true,
+            "platform": "LINUX_UNIX"
+          }
+        }
+      ],
+      "request_start": 0,
+      "request_end": 10
+    },
+    {
+      "scenario": "failed_credential_regions_do_not_allow_old_catalog_submission",
+      "passed": true,
+      "afterFailure": {
+        "region": [],
+        "blueprint_id": [],
+        "bundle_id": []
+      },
+      "disabled": true,
+      "count": 0,
+      "request_start": 10,
+      "request_end": 17
+    },
+    {
+      "scenario": "cached_credential_switch_still_requires_explicit_reselection",
+      "passed": true,
+      "afterSwitch": {
+        "region": [],
+        "blueprint_id": [],
+        "bundle_id": []
+      },
+      "disabled": true,
+      "count": 0,
+      "request_start": 17,
+      "request_end": 25
+    },
+    {
+      "scenario": "region_change_pending_and_failure_clear_old_choices",
+      "passed": true,
+      "pending": {
+        "region": [
+          "us-east-1 (us-east-1)"
+        ],
+        "blueprint_id": [],
+        "bundle_id": []
+      },
+      "failed": {
+        "region": [
+          "us-east-1 (us-east-1)"
+        ],
+        "blueprint_id": [],
+        "bundle_id": []
+      },
+      "disabled": true,
+      "request_start": 25,
+      "request_end": 33
+    },
+    {
+      "scenario": "old_region_status_does_not_add_issue_to_new_credential",
+      "passed": true,
+      "old_issue_visible": false,
+      "state": {
+        "region": [
+          "eu-west-1 (eu-west-1)"
+        ],
+        "blueprint_id": [
+          "2-eu-west-1-image · LINUX_UNIX  (2-eu-west-1-image)"
+        ],
+        "bundle_id": [
+          "2-eu-west-1-bundle · $3/月 · ? vCPU · ? GB · 流量 ? GB"
+        ]
+      },
+      "unintendedEnable": [],
+      "request_start": 33,
+      "request_end": 42
+    },
+    {
+      "scenario": "old_region_enable_callback_does_not_clear_new_credential_selection",
+      "passed": true,
+      "state": {
+        "region": [
+          "eu-west-1 (eu-west-1)"
+        ],
+        "blueprint_id": [
+          "2-eu-west-1-image · LINUX_UNIX  (2-eu-west-1-image)"
+        ],
+        "bundle_id": [
+          "2-eu-west-1-bundle · $3/月 · ? vCPU · ? GB · 流量 ? GB"
+        ]
+      },
+      "request_start": 42,
+      "request_end": 52
+    },
+    {
+      "scenario": "metrics_slow_old_period_does_not_replace_new_period",
+      "passed": true,
+      "axis": "10-22 09:00",
+      "request_start": 52,
+      "request_end": 57
+    },
+    {
+      "scenario": "dashboard_preserves_snapshot_stale_status",
+      "passed": true,
+      "dashboard": {
+        "errorVisible": true,
+        "lastSuccessVisible": true,
+        "instanceCount": "1"
+      },
+      "instancePageControlErrorVisible": true,
+      "instancePageControlLastSuccessVisible": true,
+      "request_start": 57,
+      "request_end": 61
+    },
+    {
+      "scenario": "dashboard_preserves_snapshot_no_permission_status",
+      "passed": true,
+      "dashboard": {
+        "errorVisible": true,
+        "lastSuccessVisible": false,
+        "instanceCount": "—"
+      },
+      "instancePageControlErrorVisible": true,
+      "instancePageControlLastSuccessVisible": false,
+      "request_start": 61,
+      "request_end": 65
+    },
+    {
+      "scenario": "dashboard_preserves_snapshot_catalog_failure_status",
+      "passed": true,
+      "dashboard": {
+        "errorVisible": true,
+        "lastSuccessVisible": false,
+        "instanceCount": "—"
+      },
+      "instancePageControlErrorVisible": true,
+      "instancePageControlLastSuccessVisible": false,
+      "request_start": 65,
+      "request_end": 69
+    },
+    {
+      "scenario": "same_scope_region_enable_allows_successful_catalog_reselection",
+      "passed": false,
+      "payloads": [
+        {
+          "kind": "create",
+          "credential_id": 1,
+          "region": "us-east-1",
+          "resource_name": "audit-valid-enabled-region",
+          "payload": {
+            "credential_id": 1,
+            "region": "us-east-1",
+            "instance_name": "audit-valid-enabled-region",
+            "blueprint_id": "1-us-east-1-image",
+            "bundle_id": "1-us-east-1-bundle",
+            "open_all_ports": false,
+            "allocate_static_ip": true,
+            "platform": "WINDOWS"
+          }
+        }
+      ],
+      "request_start": 69,
+      "request_end": 79
+    },
+    {
+      "scenario": "inflight_region_poll_after_credential_switch_cannot_clear_new_choices",
+      "passed": true,
+      "state": {
+        "region": [
+          "eu-west-1 (eu-west-1)"
+        ],
+        "blueprint_id": [
+          "2-eu-west-1-image · LINUX_UNIX  (2-eu-west-1-image)"
+        ],
+        "bundle_id": [
+          "2-eu-west-1-bundle · $3/月 · ? vCPU · ? GB · 流量 ? GB"
+        ]
+      },
+      "pollRequests": 2,
+      "request_start": 79,
+      "request_end": 89
+    }
+  ],
+  "errors": [],
+  "requests": [
+    {
+      "path": "/api/auth/me",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 1885.3087
+    },
+    {
+      "path": "/api/credentials",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 2252.7051
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=1",
+      "body": "",
+      "at": 2277.4308
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=2",
+      "body": "",
+      "at": 2799.4851
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 3020.6599
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 3021.5867
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=3",
+      "body": "",
+      "at": 3868.0934
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=3",
+      "body": "",
+      "at": 6191.8223
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=3",
+      "body": "",
+      "at": 6193.2909
+    },
+    {
+      "path": "/api/v2/tasks",
+      "method": "POST",
+      "query": "",
+      "body": "{\"kind\":\"create\",\"credential_id\":3,\"region\":\"eu-west-1\",\"resource_name\":\"audit-intercepted-create\",\"payload\":{\"credential_id\":3,\"region\":\"eu-west-1\",\"instance_name\":\"audit-intercepted-create\",\"blueprint_id\":\"3-eu-west-1-image\",\"bundle_id\":\"3-eu-west-1-bundle\",\"open_all_ports\":false,\"allocate_static_ip\":true,\"platform\":\"LINUX_UNIX\"}}",
+      "at": 7300.2217
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 7927.095
+    },
+    {
+      "path": "/api/credentials",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 8325.0506
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=1",
+      "body": "",
+      "at": 8355.5266
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=2",
+      "body": "",
+      "at": 8766.4938
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 8973.2966
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 8974.0096
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=3",
+      "body": "",
+      "at": 9783.3267
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 10638.3249
+    },
+    {
+      "path": "/api/credentials",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 10965.4033
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=1",
+      "body": "",
+      "at": 10997.2639
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=1",
+      "body": "",
+      "at": 11384.7377
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=1",
+      "body": "",
+      "at": 11385.1361
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=2",
+      "body": "",
+      "at": 12530.6648
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 13029.7566
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 13030.494
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 14940.0565
+    },
+    {
+      "path": "/api/credentials",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 15366.2358
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=1",
+      "body": "",
+      "at": 15404.0628
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=2",
+      "body": "",
+      "at": 15865.5157
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 16338.4349
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 16339.1205
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=us-east-1&credential_id=2",
+      "body": "",
+      "at": 17553.2871
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=us-east-1&credential_id=2",
+      "body": "",
+      "at": 17562.8143
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 20617.5668
+    },
+    {
+      "path": "/api/credentials",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 21042.9323
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=1",
+      "body": "",
+      "at": 21075.8262
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=us-east-1&credential_id=1",
+      "body": "",
+      "at": 21663.3438
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=us-east-1&credential_id=1",
+      "body": "",
+      "at": 21664.3702
+    },
+    {
+      "path": "/api/credentials/1/regions/us-east-1/status",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 21675.1915
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=2",
+      "body": "",
+      "at": 22201.1637
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 22766.3282
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 22780.6531
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 26350.1407
+    },
+    {
+      "path": "/api/credentials",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 26805.1204
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=1",
+      "body": "",
+      "at": 26836.4671
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=us-east-1&credential_id=1",
+      "body": "",
+      "at": 27379.3712
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=us-east-1&credential_id=1",
+      "body": "",
+      "at": 27379.8783
+    },
+    {
+      "path": "/api/credentials/1/regions/us-east-1/status",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 27395.302
+    },
+    {
+      "path": "/api/credentials/1/regions/us-east-1/enable",
+      "method": "POST",
+      "query": "",
+      "body": "",
+      "at": 27573.3926
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=2",
+      "body": "",
+      "at": 28113.8286
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 28583.057
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 28587.0416
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 32925.0916
+    },
+    {
+      "path": "/api/instances/us-east-1/audit-detail",
+      "method": "GET",
+      "query": "?credential_id=1",
+      "body": "",
+      "at": 33212.2761
+    },
+    {
+      "path": "/api/metrics/us-east-1/audit-detail",
+      "method": "GET",
+      "query": "?period=day&credential_id=1",
+      "body": "",
+      "at": 33212.9241
+    },
+    {
+      "path": "/api/metrics/us-east-1/audit-detail",
+      "method": "GET",
+      "query": "?period=week&credential_id=1",
+      "body": "",
+      "at": 33803.6889
+    },
+    {
+      "path": "/api/metrics/us-east-1/audit-detail",
+      "method": "GET",
+      "query": "?period=month&credential_id=1",
+      "body": "",
+      "at": 34380.8993
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 36671.1864
+    },
+    {
+      "path": "/api/v2/instances",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 36740.4431
+    },
+    {
+      "path": "/api/traffic/summary",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 36960.4604
+    },
+    {
+      "path": "/api/credentials",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 37533.3367
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 38079.0701
+    },
+    {
+      "path": "/api/v2/instances",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 38141.9988
+    },
+    {
+      "path": "/api/traffic/summary",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 38311.2091
+    },
+    {
+      "path": "/api/credentials",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 38888.9842
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 39447.7798
+    },
+    {
+      "path": "/api/v2/instances",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 39511.7606
+    },
+    {
+      "path": "/api/traffic/summary",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 39680.6586
+    },
+    {
+      "path": "/api/credentials",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 40265.3747
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 40761.688
+    },
+    {
+      "path": "/api/credentials",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 41241.9445
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=1",
+      "body": "",
+      "at": 41296.4813
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=us-east-1&credential_id=1",
+      "body": "",
+      "at": 41738.7156
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=us-east-1&credential_id=1",
+      "body": "",
+      "at": 41739.3924
+    },
+    {
+      "path": "/api/credentials/1/regions/us-east-1/status",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 41747.3289
+    },
+    {
+      "path": "/api/credentials/1/regions/us-east-1/enable",
+      "method": "POST",
+      "query": "",
+      "body": "",
+      "at": 41870.522
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=us-east-1&credential_id=1",
+      "body": "",
+      "at": 41904.8246
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=us-east-1&credential_id=1",
+      "body": "",
+      "at": 41910.7571
+    },
+    {
+      "path": "/api/v2/tasks",
+      "method": "POST",
+      "query": "",
+      "body": "{\"kind\":\"create\",\"credential_id\":1,\"region\":\"us-east-1\",\"resource_name\":\"audit-valid-enabled-region\",\"payload\":{\"credential_id\":1,\"region\":\"us-east-1\",\"instance_name\":\"audit-valid-enabled-region\",\"blueprint_id\":\"1-us-east-1-image\",\"bundle_id\":\"1-us-east-1-bundle\",\"open_all_ports\":false,\"allocate_static_ip\":true,\"platform\":\"WINDOWS\"}}",
+      "at": 42411.8025
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 43157.9498
+    },
+    {
+      "path": "/api/credentials",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 43605.9601
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=1",
+      "body": "",
+      "at": 43646.8105
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=us-east-1&credential_id=1",
+      "body": "",
+      "at": 44119.1204
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=us-east-1&credential_id=1",
+      "body": "",
+      "at": 44124.3705
+    },
+    {
+      "path": "/api/credentials/1/regions/us-east-1/status",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 44130.3001
+    },
+    {
+      "path": "/api/credentials/1/regions/us-east-1/status",
+      "method": "GET",
+      "query": "",
+      "body": "",
+      "at": 54145.5504
+    },
+    {
+      "path": "/api/catalog/regions",
+      "method": "GET",
+      "query": "?credential_id=2",
+      "body": "",
+      "at": 54615.1882
+    },
+    {
+      "path": "/api/catalog/bundles",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 55092.0589
+    },
+    {
+      "path": "/api/catalog/blueprints",
+      "method": "GET",
+      "query": "?region=eu-west-1&credential_id=2",
+      "body": "",
+      "at": 55092.6869
+    }
+  ]
+}

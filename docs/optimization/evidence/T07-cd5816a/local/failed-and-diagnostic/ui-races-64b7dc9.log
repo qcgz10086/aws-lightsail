@@ -1,0 +1,39 @@
+{
+  "results": [
+    {
+      "scenario": "cold_dashboard_continues_until_snapshot_data_available",
+      "observed_instance_count": "2",
+      "passed": true,
+      "snapshot_query_count": 3
+    },
+    {
+      "scenario": "slow_traffic_does_not_block_successful_instances",
+      "observed_instance_count": "2",
+      "passed": true
+    },
+    {
+      "scenario": "dashboard_to_instances_shared_query",
+      "before": 1,
+      "after": 1,
+      "additional_http_queries": 0
+    },
+    {
+      "scenario": "late_account_a_response_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "passed": true
+    },
+    {
+      "scenario": "account_a_operation_completes_after_selecting_b",
+      "alpha_visible": false,
+      "beta_visible": true,
+      "selected": "BETA #2",
+      "passed": true
+    },
+    {
+      "scenario": "probe_execution",
+      "error": "Error: Delayed traffic sync did not start\n    at file:///C:/Users/liyang/.codex/worktrees/t07-build-integration/aws-lightsail/tools/optimization/integration_ui_races.mjs:264:27"
+    }
+  ],
+  "pageErrors": []
+}

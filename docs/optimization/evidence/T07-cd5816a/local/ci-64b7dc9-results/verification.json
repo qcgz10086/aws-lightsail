@@ -1,0 +1,61 @@
+{
+  "source": "64b7dc90a5d365646da0561fc3cbf8a0a7cd3bda",
+  "runs": [
+    {
+      "name": "npm-ci",
+      "argv": [
+        "npm.cmd",
+        "ci",
+        "--prefix",
+        "frontend"
+      ],
+      "exit": 0,
+      "seconds": 25.14100000000326
+    },
+    {
+      "name": "npm-test",
+      "argv": [
+        "npm.cmd",
+        "test",
+        "--prefix",
+        "frontend"
+      ],
+      "exit": 0,
+      "seconds": 2.327999999994063
+    },
+    {
+      "name": "npm-build",
+      "argv": [
+        "npm.cmd",
+        "run",
+        "build",
+        "--prefix",
+        "frontend"
+      ],
+      "exit": 0,
+      "seconds": 29.10899999999674
+    },
+    {
+      "name": "backend",
+      "argv": [
+        "C:/Users/liyang/.codex/worktrees/lightsail-t00-baseline/aws-lightsail/backend/.venv/Scripts/python.exe",
+        "tools/optimization/test_backend_offline.py"
+      ],
+      "exit": 0,
+      "seconds": 103.76600000000326
+    },
+    {
+      "name": "compileall",
+      "argv": [
+        "C:/Users/liyang/.codex/worktrees/lightsail-t00-baseline/aws-lightsail/backend/.venv/Scripts/python.exe",
+        "-m",
+        "compileall",
+        "-q",
+        "backend/app"
+      ],
+      "exit": 0,
+      "seconds": 0.6410000000032596
+    }
+  ],
+  "scope": "Fresh Git checkout; empty frontend dependencies; existing Python 3.12 environment with declared requirements."
+}

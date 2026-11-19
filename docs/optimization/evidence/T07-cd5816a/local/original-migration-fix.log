@@ -1,0 +1,7 @@
+test_unversioned_original_database_upgrades_and_v5_failure_rolls_back (test_migration_original.OriginalMigrationTests.test_unversioned_original_database_upgrades_and_v5_failure_rolls_back) ... Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpj8yao972\backups\original.db.pre-v1-a201c90853ed877ff7033692167164b944c3c5f96106e7ae55205d9c541817c4.db
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.576s
+
+OK

@@ -1,0 +1,691 @@
+C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+test_get_credits_access_denied_maps_to_no_permission (test_billing.TestAwsCredits.test_get_credits_access_denied_maps_to_no_permission) ... ok
+test_get_credits_calls_with_account_from_sts_and_start_within_one_year (test_billing.TestAwsCredits.test_get_credits_calls_with_account_from_sts_and_start_within_one_year) ... ok
+test_get_credits_empty_returns_empty_list (test_billing.TestAwsCredits.test_get_credits_empty_returns_empty_list) ... ok
+test_get_credits_epoch_and_missing_amounts (test_billing.TestAwsCredits.test_get_credits_epoch_and_missing_amounts) ... ok
+test_get_credits_parses_remaining_estimated_initial (test_billing.TestAwsCredits.test_get_credits_parses_remaining_estimated_initial) ... ok
+test_get_credits_sts_failure_maps_to_unavailable (test_billing.TestAwsCredits.test_get_credits_sts_failure_maps_to_unavailable) ... ok
+test_get_credits_validation_maps_to_validation_error (test_billing.TestAwsCredits.test_get_credits_validation_maps_to_validation_error) ... ok
+test_forecast_success_and_failure_returns_none (test_billing.TestBillingSummary.test_forecast_success_and_failure_returns_none) ... ok
+test_summary_access_denied_maps_to_no_permission (test_billing.TestBillingSummary.test_summary_access_denied_maps_to_no_permission) ... ok
+test_summary_data_unavailable_maps_to_unavailable (test_billing.TestBillingSummary.test_summary_data_unavailable_maps_to_unavailable) ... ok
+test_summary_no_results_is_unavailable (test_billing.TestBillingSummary.test_summary_no_results_is_unavailable) ... ok
+test_summary_parses_costs_and_lightsail (test_billing.TestBillingSummary.test_summary_parses_costs_and_lightsail) ... ok
+test_credit_record_roundtrip_in_memory_db (test_billing.TestCreditRecordModel.test_credit_record_roundtrip_in_memory_db) ... ok
+test_applied_no_permission_propagates (test_billing.TestCreditsAppliedSince.test_applied_no_permission_propagates) ... ok
+test_applied_sums_months (test_billing.TestCreditsAppliedSince.test_applied_sums_months) ... ok
+test_future_start_date_returns_zero_and_no_call (test_billing.TestCreditsAppliedSince.test_future_start_date_returns_zero_and_no_call) ... ok
+test_ambiguous_unique_rule_is_not_silently_removed_or_replayed (test_migration_boundaries.BoundaryTests.test_ambiguous_unique_rule_is_not_silently_removed_or_replayed) ... ok
+test_autoincrement_rejection_preserves_sequence_high_water_mark (test_migration_boundaries.BoundaryTests.test_autoincrement_rejection_preserves_sequence_high_water_mark) ... ok
+test_cli_rejects_occupied_output_without_touching_any_original_file (test_migration_boundaries.BoundaryTests.test_cli_rejects_occupied_output_without_touching_any_original_file) ... ok
+test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup (test_migration_boundaries.BoundaryTests.test_extra_or_changed_foreign_key_rejects_rebuild_with_original_schema_and_backup) ... ok
+test_failed_publication_leaves_a_replacement_file_untouched (test_migration_boundaries.BoundaryTests.test_failed_publication_leaves_a_replacement_file_untouched) ... ok
+test_rebuild_refuses_non_rowid_primary_key (test_migration_boundaries.BoundaryTests.test_rebuild_refuses_non_rowid_primary_key) ... ok
+test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1 (test_migration_boundaries.BoundaryTests.test_restart_refuses_each_residual_legacy_unique_key_without_rewriting_v1) ... 2026-11-19 21:03:35,172 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+2026-11-19 21:03:35,249 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+ok
+test_restart_rejects_missing_ledger_metadata_or_primary_key (test_migration_boundaries.BoundaryTests.test_restart_rejects_missing_ledger_metadata_or_primary_key) ... 2026-11-19 21:03:35,315 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+2026-11-19 21:03:35,361 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+ok
+test_sidecar_appearing_at_publication_does_not_get_a_success_receipt (test_migration_boundaries.BoundaryTests.test_sidecar_appearing_at_publication_does_not_get_a_success_receipt) ... ok
+test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms (test_migration_boundaries.BoundaryTests.test_unique_rules_scope_writes_to_each_credential_for_both_legacy_forms) ... 2026-11-19 21:03:35,504 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmptmvo7nx3\backups\explicit.db.pre-v1-3ccd952064dd38c8956efcfef04ed497154a4fbd67eb174334a7a46a685821fe.db SHA256=3ccd952064dd38c8956efcfef04ed497154a4fbd67eb174334a7a46a685821fe
+2026-11-19 21:03:35,653 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmptmvo7nx3\backups\inline.db.pre-v1-8a24e6a68eb3ba4f254dc1b6639e6e55ad19a70920a27b7f8dd66c4cbe018241.db SHA256=8a24e6a68eb3ba4f254dc1b6639e6e55ad19a70920a27b7f8dd66c4cbe018241
+ok
+test_wal_snapshot_verifies_and_restores_without_creating_source_sidecars (test_migration_boundaries.BoundaryTests.test_wal_snapshot_verifies_and_restores_without_creating_source_sidecars) ... ok
+test_contaminated_or_replaced_retry_snapshot_is_not_trusted_or_overwritten (test_migration_retries.RetryTests.test_contaminated_or_replaced_retry_snapshot_is_not_trusted_or_overwritten) ... 2026-11-19 21:03:35,876 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmp93ude2ts\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+2026-11-19 21:03:35,878 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp93ude2ts\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+2026-11-19 21:03:35,902 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+2026-11-19 21:03:35,932 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+ok
+test_custom_column_in_each_child_is_classified_before_application_ddl (test_migration_retries.RetryTests.test_custom_column_in_each_child_is_classified_before_application_ddl) ... 2026-11-19 21:03:36,025 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmp0spkyhwj\backups\child-0.db.pre-v1-a4c708cf708b41626aecbc0f9362b955d7e7e6649bfd47d64e9bd82f58fd4b46.db SHA256=a4c708cf708b41626aecbc0f9362b955d7e7e6649bfd47d64e9bd82f58fd4b46
+2026-11-19 21:03:36,025 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp0spkyhwj\backups\child-0.db.pre-v1-a4c708cf708b41626aecbc0f9362b955d7e7e6649bfd47d64e9bd82f58fd4b46.db
+2026-11-19 21:03:36,110 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmp0spkyhwj\backups\child-1.db.pre-v1-4ba6a98f90f816188b8b5f0fe0bac1844d1941033e9739beb77fde9615756a7a.db SHA256=4ba6a98f90f816188b8b5f0fe0bac1844d1941033e9739beb77fde9615756a7a
+2026-11-19 21:03:36,110 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp0spkyhwj\backups\child-1.db.pre-v1-4ba6a98f90f816188b8b5f0fe0bac1844d1941033e9739beb77fde9615756a7a.db
+ok
+test_custom_column_rules_are_refused_with_verified_original_and_no_ledger (test_migration_retries.RetryTests.test_custom_column_rules_are_refused_with_verified_original_and_no_ledger) ... 2026-11-19 21:03:36,200 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpms49hay0\backups\case-0.db.pre-v1-19792235213e0d07178483865039fb117cff287b7a60cfd84098f28e56dd510a.db SHA256=19792235213e0d07178483865039fb117cff287b7a60cfd84098f28e56dd510a
+2026-11-19 21:03:36,200 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpms49hay0\backups\case-0.db.pre-v1-19792235213e0d07178483865039fb117cff287b7a60cfd84098f28e56dd510a.db
+2026-11-19 21:03:36,291 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpms49hay0\backups\case-1.db.pre-v1-271c9ca918f10e4e216bbfce934509cb2aeb4760e2db244e14679e7c556161fc.db SHA256=271c9ca918f10e4e216bbfce934509cb2aeb4760e2db244e14679e7c556161fc
+2026-11-19 21:03:36,291 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpms49hay0\backups\case-1.db.pre-v1-271c9ca918f10e4e216bbfce934509cb2aeb4760e2db244e14679e7c556161fc.db
+2026-11-19 21:03:36,376 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpms49hay0\backups\case-2.db.pre-v1-4df01211148be1559ace1d428fc60d0e7751299dfeebf6a62fa9c413ddc05388.db SHA256=4df01211148be1559ace1d428fc60d0e7751299dfeebf6a62fa9c413ddc05388
+2026-11-19 21:03:36,376 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpms49hay0\backups\case-2.db.pre-v1-4df01211148be1559ace1d428fc60d0e7751299dfeebf6a62fa9c413ddc05388.db
+2026-11-19 21:03:36,463 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpms49hay0\backups\case-3.db.pre-v1-d551d3a0cca059219c364ed51fc8a5bc95f51ba33feba8b41e01d75b669a5d87.db SHA256=d551d3a0cca059219c364ed51fc8a5bc95f51ba33feba8b41e01d75b669a5d87
+2026-11-19 21:03:36,463 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpms49hay0\backups\case-3.db.pre-v1-d551d3a0cca059219c364ed51fc8a5bc95f51ba33feba8b41e01d75b669a5d87.db
+2026-11-19 21:03:36,568 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpms49hay0\backups\case-4.db.pre-v1-22ab7d6d70174ec63053141fbe38dfa2ace41ea9989e9e1ce41252080ec7dee4.db SHA256=22ab7d6d70174ec63053141fbe38dfa2ace41ea9989e9e1ce41252080ec7dee4
+2026-11-19 21:03:36,568 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpms49hay0\backups\case-4.db.pre-v1-22ab7d6d70174ec63053141fbe38dfa2ace41ea9989e9e1ce41252080ec7dee4.db
+ok
+test_failed_retries_reuse_first_verified_snapshot_without_creating_another (test_migration_retries.RetryTests.test_failed_retries_reuse_first_verified_snapshot_without_creating_another) ... 2026-11-19 21:03:36,668 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpbau901vt\backups\app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db SHA256=c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb
+2026-11-19 21:03:36,668 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpbau901vt\backups\app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db
+2026-11-19 21:03:36,680 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpbau901vt\backups\app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db SHA256=c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb
+2026-11-19 21:03:36,681 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpbau901vt\backups\app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db
+2026-11-19 21:03:36,692 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpbau901vt\backups\app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db SHA256=c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb
+2026-11-19 21:03:36,692 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpbau901vt\backups\app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db
+2026-11-19 21:03:36,702 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpbau901vt\backups\app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db SHA256=c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb
+2026-11-19 21:03:36,702 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpbau901vt\backups\app.db.pre-v1-c8fe5eddb38a61c19b409a06fda1a9ca069c35a56a6a0c38797f89620b76ebeb.db
+ok
+test_generated_known_column_is_not_rebuilt_as_a_plain_column (test_migration_retries.RetryTests.test_generated_known_column_is_not_rebuilt_as_a_plain_column) ... 2026-11-19 21:03:36,790 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpfe8s2g0s\backups\app.db.pre-v1-e8026b8648b2884738d78d054ecef7e98a06af38c87699f56bc8bcb96676b0b5.db SHA256=e8026b8648b2884738d78d054ecef7e98a06af38c87699f56bc8bcb96676b0b5
+2026-11-19 21:03:36,790 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpfe8s2g0s\backups\app.db.pre-v1-e8026b8648b2884738d78d054ecef7e98a06af38c87699f56bc8bcb96676b0b5.db
+ok
+test_historical_zero_server_defaults_still_apply_to_omitted_columns (test_migration_retries.RetryTests.test_historical_zero_server_defaults_still_apply_to_omitted_columns) ... 2026-11-19 21:03:36,881 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpn1vq33s6\backups\app.db.pre-v1-6268afc442ebdf4454dd7377aeb850a9802a04d9137bf075c786cce535c31cb5.db SHA256=6268afc442ebdf4454dd7377aeb850a9802a04d9137bf075c786cce535c31cb5
+ok
+test_malformed_receipt_or_missing_recorded_snapshot_stops_before_ddl (test_migration_retries.RetryTests.test_malformed_receipt_or_missing_recorded_snapshot_stops_before_ddl) ... 2026-11-19 21:03:36,994 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpnfuq8g7g\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+2026-11-19 21:03:36,996 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpnfuq8g7g\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+2026-11-19 21:03:37,016 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+2026-11-19 21:03:37,030 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+2026-11-19 21:03:37,045 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+2026-11-19 21:03:37,062 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+2026-11-19 21:03:37,078 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+ok
+test_new_wal_commit_gets_its_own_snapshot_but_rollback_and_checkpoint_reuse_it (test_migration_retries.RetryTests.test_new_wal_commit_gets_its_own_snapshot_but_rollback_and_checkpoint_reuse_it) ... 2026-11-19 21:03:37,170 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmppi9wczj8\backups\app.db.pre-v1-5054f4ec5ca3ae3525ab98b06cf1673994ef6f3fc90f9e824f51521faf590c47.db SHA256=5054f4ec5ca3ae3525ab98b06cf1673994ef6f3fc90f9e824f51521faf590c47
+2026-11-19 21:03:37,170 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmppi9wczj8\backups\app.db.pre-v1-5054f4ec5ca3ae3525ab98b06cf1673994ef6f3fc90f9e824f51521faf590c47.db
+2026-11-19 21:03:37,218 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmppi9wczj8\backups\app.db.pre-v1-991ff0b8b8e348e3dbcadccb076746d5d1c7344ebbd0477c66be84daba489997.db SHA256=991ff0b8b8e348e3dbcadccb076746d5d1c7344ebbd0477c66be84daba489997
+2026-11-19 21:03:37,218 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmppi9wczj8\backups\app.db.pre-v1-991ff0b8b8e348e3dbcadccb076746d5d1c7344ebbd0477c66be84daba489997.db
+2026-11-19 21:03:37,240 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmppi9wczj8\backups\app.db.pre-v1-991ff0b8b8e348e3dbcadccb076746d5d1c7344ebbd0477c66be84daba489997.db SHA256=991ff0b8b8e348e3dbcadccb076746d5d1c7344ebbd0477c66be84daba489997
+2026-11-19 21:03:37,240 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmppi9wczj8\backups\app.db.pre-v1-991ff0b8b8e348e3dbcadccb076746d5d1c7344ebbd0477c66be84daba489997.db
+2026-11-19 21:03:37,282 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmppi9wczj8\backups\app.db.pre-v1-991ff0b8b8e348e3dbcadccb076746d5d1c7344ebbd0477c66be84daba489997.db SHA256=991ff0b8b8e348e3dbcadccb076746d5d1c7344ebbd0477c66be84daba489997
+2026-11-19 21:03:37,282 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmppi9wczj8\backups\app.db.pre-v1-991ff0b8b8e348e3dbcadccb076746d5d1c7344ebbd0477c66be84daba489997.db
+ok
+test_retry_rejects_a_hard_link_to_the_live_database (test_migration_retries.RetryTests.test_retry_rejects_a_hard_link_to_the_live_database) ... 2026-11-19 21:03:37,381 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpdlswflzp\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+2026-11-19 21:03:37,383 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpdlswflzp\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+2026-11-19 21:03:37,410 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+ok
+test_retry_rejects_a_link_in_place_of_the_receipt_or_recorded_snapshot (test_migration_retries.RetryTests.test_retry_rejects_a_link_in_place_of_the_receipt_or_recorded_snapshot) ... 2026-11-19 21:03:37,507 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpoes24v9q\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+2026-11-19 21:03:37,509 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpoes24v9q\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+skipped "symlink unavailable: [WinError 1314] 客户端没有所需的特权。: 'C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmpoes24v9q\\\\backups\\\\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.saved-db' -> 'C:\\\\Users\\\\liyang\\\\AppData\\\\Local\\\\Temp\\\\tmpoes24v9q\\\\backups\\\\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db'"
+test_snapshot_creation_and_reuse_hold_the_sqlite_writer_lock (test_migration_retries.RetryTests.test_snapshot_creation_and_reuse_hold_the_sqlite_writer_lock) ... 2026-11-19 21:03:37,688 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpytfztyl0\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+2026-11-19 21:03:37,690 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpytfztyl0\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+2026-11-19 21:03:37,794 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpytfztyl0\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+ok
+test_snapshot_survives_failure_between_publication_and_retry_receipt (test_migration_retries.RetryTests.test_snapshot_survives_failure_between_publication_and_retry_receipt) ... 2026-11-19 21:03:37,956 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+2026-11-19 21:03:38,007 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmplbfsm9zv\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+ok
+test_transient_failure_then_success_records_original_path_and_sha (test_migration_retries.RetryTests.test_transient_failure_then_success_records_original_path_and_sha) ... 2026-11-19 21:03:38,152 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmp1t795p4i\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+2026-11-19 21:03:38,154 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp1t795p4i\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+2026-11-19 21:03:38,181 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmp1t795p4i\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+ok
+test_ambiguous_legacy_owner_stops_instead_of_choosing_a_key (test_migrations.MigrationTests.test_ambiguous_legacy_owner_stops_instead_of_choosing_a_key) ... 2026-11-19 21:03:38,337 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpss84i7xp\backups\app.db.pre-v1-7012155b7fb902ce54a83570eddc717a1658a807cb20d108e201731d23f186cd.db SHA256=7012155b7fb902ce54a83570eddc717a1658a807cb20d108e201731d23f186cd
+2026-11-19 21:03:38,339 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpss84i7xp\backups\app.db.pre-v1-7012155b7fb902ce54a83570eddc717a1658a807cb20d108e201731d23f186cd.db
+ok
+test_backup_failure_prevents_any_schema_change (test_migrations.MigrationTests.test_backup_failure_prevents_any_schema_change) ... 2026-11-19 21:03:38,403 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+ok
+test_current_multi_key_data_is_unchanged (test_migrations.MigrationTests.test_current_multi_key_data_is_unchanged) ... 2026-11-19 21:03:38,521 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpq9332pn5\backups\app.db.pre-v1-564ba342c63c0107ae5a8db94490ba0bc0c15d1b99ad5c762981108d5bc82d70.db SHA256=564ba342c63c0107ae5a8db94490ba0bc0c15d1b99ad5c762981108d5bc82d70
+ok
+test_false_legacy_policy_remains_off_after_upgrade_with_user_default_on (test_migrations.MigrationTests.test_false_legacy_policy_remains_off_after_upgrade_with_user_default_on) ... 2026-11-19 21:03:38,647 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmplgm_wwda\backups\app.db.pre-v1-340e1d68c8cd4eb17ec7ec73a70ce9ca0de60a8480a4a84d09996accf553983b.db SHA256=340e1d68c8cd4eb17ec7ec73a70ce9ca0de60a8480a4a84d09996accf553983b
+2026-11-19 21:03:38,776 INFO [app.migrations] Migration v2 backup: C:\Users\liyang\AppData\Local\Temp\tmplgm_wwda\backups\app.db.pre-v2-53bb3675a36725e242322b34f4554d7ee62444c9650733752160a0f784b49ad8.db SHA256=53bb3675a36725e242322b34f4554d7ee62444c9650733752160a0f784b49ad8
+ok
+test_future_version_and_versioned_schema_drift_stop_startup (test_migrations.MigrationTests.test_future_version_and_versioned_schema_drift_stop_startup) ... 2026-11-19 21:03:39,040 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+2026-11-19 21:03:39,058 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+ok
+test_integrity_or_fk_error_is_not_versioned (test_migrations.MigrationTests.test_integrity_or_fk_error_is_not_versioned) ... 2026-11-19 21:03:39,130 ERROR [app.migrations] Database migration failed; startup stopped. Backup: none
+ok
+test_legacy_binding_stays_with_each_panel_user (test_migrations.MigrationTests.test_legacy_binding_stays_with_each_panel_user) ... 2026-11-19 21:03:39,214 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmphmjubzek\backups\app.db.pre-v1-241d1419bb57f77a6468c8c68b6faaecc6862c87d800e18d8179cf530969d441.db SHA256=241d1419bb57f77a6468c8c68b6faaecc6862c87d800e18d8179cf530969d441
+ok
+test_legacy_rebuild_preserves_all_credential_fields_and_children (test_migrations.MigrationTests.test_legacy_rebuild_preserves_all_credential_fields_and_children) ... 2026-11-19 21:03:39,331 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpzwxi40vs\backups\app.db.pre-v1-f465b9896d139b6e3a714b6ab4182821961563736b8bb07ac7df3cd933362a71.db SHA256=f465b9896d139b6e3a714b6ab4182821961563736b8bb07ac7df3cd933362a71
+ok
+test_migration_crash_during_ddl_rolls_back_on_next_connection (test_migrations.MigrationTests.test_migration_crash_during_ddl_rolls_back_on_next_connection) ... 2026-11-19 21:03:41,009 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpnh8lhm41\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+ok
+test_migration_failure_rolls_back_ddl_and_keeps_verified_original_backup (test_migrations.MigrationTests.test_migration_failure_rolls_back_ddl_and_keeps_verified_original_backup) ... 2026-11-19 21:03:41,128 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpr14pa6ft\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+2026-11-19 21:03:41,134 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpr14pa6ft\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db
+2026-11-19 21:03:41,169 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpr14pa6ft\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+ok
+test_minimal_legacy_preserves_auto_stop_and_assigns_only_owner_key (test_migrations.MigrationTests.test_minimal_legacy_preserves_auto_stop_and_assigns_only_owner_key) ... 2026-11-19 21:03:41,291 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpri4n7tye\backups\app.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+ok
+test_new_database_has_version_and_repeated_start_is_idempotent (test_migrations.MigrationTests.test_new_database_has_version_and_repeated_start_is_idempotent) ... ok
+test_rebuild_preserves_explicit_indexes_triggers_and_delete_rules (test_migrations.MigrationTests.test_rebuild_preserves_explicit_indexes_triggers_and_delete_rules) ... 2026-11-19 21:03:41,485 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpmysd2mnm\backups\app.db.pre-v1-adcf1bf946b874f764d3a2396a170319f93b967276e06ffff28ad83bd318357b.db SHA256=adcf1bf946b874f764d3a2396a170319f93b967276e06ffff28ad83bd318357b
+ok
+test_rebuild_refuses_unknown_inline_unique_constraints_without_loss (test_migrations.MigrationTests.test_rebuild_refuses_unknown_inline_unique_constraints_without_loss) ... 2026-11-19 21:03:41,592 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmps6t2tjei\backups\app.db.pre-v1-ea5a483aa8ae8038b229ad7e1aa25848242604384c6142f2e9f5704a7244ab0f.db SHA256=ea5a483aa8ae8038b229ad7e1aa25848242604384c6142f2e9f5704a7244ab0f
+2026-11-19 21:03:41,592 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmps6t2tjei\backups\app.db.pre-v1-ea5a483aa8ae8038b229ad7e1aa25848242604384c6142f2e9f5704a7244ab0f.db
+ok
+test_restart_does_not_create_more_backups_or_change_version_time (test_migrations.MigrationTests.test_restart_does_not_create_more_backups_or_change_version_time) ... 2026-11-19 21:03:41,690 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpg_wm0zi3\backups\app.db.pre-v1-340e1d68c8cd4eb17ec7ec73a70ce9ca0de60a8480a4a84d09996accf553983b.db SHA256=340e1d68c8cd4eb17ec7ec73a70ce9ca0de60a8480a4a84d09996accf553983b
+ok
+test_roundtrip_backup_upgrade_restore_for_three_database_generations (test_migrations.MigrationTests.test_roundtrip_backup_upgrade_restore_for_three_database_generations) ... 2026-11-19 21:03:41,898 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmp2b743_t0\backups\single.db.pre-v1-2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6.db SHA256=2b4875ae157d68a355a0cf82b4cd3aadf7b561c5f573a750046b91b1fd5db4d6
+2026-11-19 21:03:42,072 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmp2b743_t0\backups\multi.db.pre-v1-340e1d68c8cd4eb17ec7ec73a70ce9ca0de60a8480a4a84d09996accf553983b.db SHA256=340e1d68c8cd4eb17ec7ec73a70ce9ca0de60a8480a4a84d09996accf553983b
+ok
+test_startup_failure_does_not_seed_or_start_scheduler (test_migrations.MigrationTests.test_startup_failure_does_not_seed_or_start_scheduler) ... ok
+test_t01_database_upgrades_atomically_to_t02_with_paired_snapshot (test_migrations.MigrationTests.test_t01_database_upgrades_atomically_to_t02_with_paired_snapshot) ... 2026-11-19 21:03:42,227 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpa190vcx2\backups\app.db.pre-v1-340e1d68c8cd4eb17ec7ec73a70ce9ca0de60a8480a4a84d09996accf553983b.db SHA256=340e1d68c8cd4eb17ec7ec73a70ce9ca0de60a8480a4a84d09996accf553983b
+2026-11-19 21:03:42,337 INFO [app.migrations] Migration v2 backup: C:\Users\liyang\AppData\Local\Temp\tmpa190vcx2\backups\app.db.pre-v2-9ce5293f78cfaad55c305254837ddd2b5c28654deb03cb6efa103d40b33a5d05.db SHA256=9ce5293f78cfaad55c305254837ddd2b5c28654deb03cb6efa103d40b33a5d05
+ok
+test_unowned_legacy_records_abort_instead_of_being_dropped (test_migrations.MigrationTests.test_unowned_legacy_records_abort_instead_of_being_dropped) ... 2026-11-19 21:03:42,486 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmptk0lpuqc\backups\app.db.pre-v1-173670660c81218a15087196c5745009bcb02e214cf0dd642363da6a4fbceaf1.db SHA256=173670660c81218a15087196c5745009bcb02e214cf0dd642363da6a4fbceaf1
+2026-11-19 21:03:42,489 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmptk0lpuqc\backups\app.db.pre-v1-173670660c81218a15087196c5745009bcb02e214cf0dd642363da6a4fbceaf1.db
+ok
+test_upgrade_snapshot_includes_uncheckpointed_wal (test_migrations.MigrationTests.test_upgrade_snapshot_includes_uncheckpointed_wal) ... 2026-11-19 21:03:42,606 INFO [app.migrations] Migration backup: C:\Users\liyang\AppData\Local\Temp\tmpc5sa0sj4\backups\app.db.pre-v1-273c844d104a3c7a89c725241a465510c15769073488fb6cb819990ffe748cc6.db SHA256=273c844d104a3c7a89c725241a465510c15769073488fb6cb819990ffe748cc6
+ok
+test_v4_upgrade_snapshots_wal_and_adds_v5_tables_atomically (test_migrations.MigrationTests.test_v4_upgrade_snapshots_wal_and_adds_v5_tables_atomically) ... ok
+test_v5_ddl_failure_rolls_back_and_can_retry (test_migrations.MigrationTests.test_v5_ddl_failure_rolls_back_and_can_retry) ... 2026-11-19 21:03:43,186 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpbawwdgo6\backups\app.db.pre-v5-e09c711317d2211032ec4a80a25e321ad33e043698699fe8d952acd28346750a.db
+ok
+test_backup_includes_committed_wal_excludes_uncommitted_and_does_not_overwrite (test_migrations.RecoveryTests.test_backup_includes_committed_wal_excludes_uncommitted_and_does_not_overwrite) ... ok
+test_restore_rejects_active_wal_reader_without_removing_sidecars (test_migrations.RecoveryTests.test_restore_rejects_active_wal_reader_without_removing_sidecars) ... ok
+test_restore_rejects_hash_mismatch_corruption_and_same_path (test_migrations.RecoveryTests.test_restore_rejects_hash_mismatch_corruption_and_same_path) ... ok
+test_restore_reverts_data_preserves_safety_backup_and_requires_offline (test_migrations.RecoveryTests.test_restore_reverts_data_preserves_safety_backup_and_requires_offline) ... ok
+test_restore_to_new_database_and_wal_destination (test_migrations.RecoveryTests.test_restore_to_new_database_and_wal_destination) ... ok
+test_http_behavior_unchanged (test_proxy.TestBotocoreSocksPatch.test_http_behavior_unchanged) ... ok
+test_patch_applied_flag (test_proxy.TestBotocoreSocksPatch.test_patch_applied_flag) ... ok
+test_socks_manager_uses_socks_pools (test_proxy.TestBotocoreSocksPatch.test_socks_manager_uses_socks_pools)
+_get_proxy_manager 对 socks 建 SOCKSProxyManager，且不被 AWS 池覆盖。 ... ok
+test_socks_url_passes_through_unchanged (test_proxy.TestBotocoreSocksPatch.test_socks_url_passes_through_unchanged) ... ok
+test_create_with_bad_proxy_400_and_not_saved (test_proxy.TestCredentialProxyApi.test_create_with_bad_proxy_400_and_not_saved) ... 2026-11-19 21:03:45,248 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:03:45,282 INFO [httpx] HTTP Request: POST http://testserver/api/credentials "HTTP/1.1 400 Bad Request"
+2026-11-19 21:03:45,290 INFO [httpx] HTTP Request: POST http://testserver/api/credentials "HTTP/1.1 400 Bad Request"
+2026-11-19 21:03:45,298 INFO [httpx] HTTP Request: POST http://testserver/api/credentials "HTTP/1.1 400 Bad Request"
+ok
+test_create_with_proxy_stores_encrypted_and_masks (test_proxy.TestCredentialProxyApi.test_create_with_proxy_stores_encrypted_and_masks) ... 2026-11-19 21:03:45,781 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:03:45,797 INFO [httpx] HTTP Request: POST http://testserver/api/credentials "HTTP/1.1 201 Created"
+ok
+test_create_with_socks5_proxy (test_proxy.TestCredentialProxyApi.test_create_with_socks5_proxy) ... 2026-11-19 21:03:46,273 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:03:46,291 INFO [httpx] HTTP Request: POST http://testserver/api/credentials "HTTP/1.1 201 Created"
+ok
+test_create_without_proxy_is_direct (test_proxy.TestCredentialProxyApi.test_create_without_proxy_is_direct) ... 2026-11-19 21:03:46,765 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:03:46,778 INFO [httpx] HTTP Request: POST http://testserver/api/credentials "HTTP/1.1 201 Created"
+ok
+test_update_proxy_set_clear_keep (test_proxy.TestCredentialProxyApi.test_update_proxy_set_clear_keep) ... 2026-11-19 21:03:47,255 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:03:47,271 INFO [httpx] HTTP Request: POST http://testserver/api/credentials "HTTP/1.1 201 Created"
+2026-11-19 21:03:47,288 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials/1 "HTTP/1.1 200 OK"
+2026-11-19 21:03:47,300 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials/1 "HTTP/1.1 200 OK"
+2026-11-19 21:03:47,313 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials/1 "HTTP/1.1 200 OK"
+ok
+test_update_with_unreachable_proxy_fails_and_keeps_old (test_proxy.TestCredentialProxyApi.test_update_with_unreachable_proxy_fails_and_keeps_old) ... 2026-11-19 21:03:47,853 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:03:47,897 INFO [httpx] HTTP Request: POST http://testserver/api/credentials "HTTP/1.1 201 Created"
+2026-11-19 21:03:48,029 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials/1 "HTTP/1.1 400 Bad Request"
+ok
+test_encrypted_roundtrip_and_no_plaintext (test_proxy.TestCredentialProxyStorage.test_encrypted_roundtrip_and_no_plaintext) ... ok
+test_billing_factories (test_proxy.TestFactoriesPassProxy.test_billing_factories) ... ok
+test_lightsail_factory (test_proxy.TestFactoriesPassProxy.test_lightsail_factory) ... ok
+test_masks_password_only (test_proxy.TestMaskProxyUrl.test_masks_password_only) ... ok
+test_none (test_proxy.TestMaskProxyUrl.test_none) ... ok
+test_allows_public_hosts (test_proxy.TestParseProxyUrl.test_allows_public_hosts) ... ok
+test_empty_means_direct (test_proxy.TestParseProxyUrl.test_empty_means_direct) ... ok
+test_invalid_url_value_error_becomes_proxy_error (test_proxy.TestParseProxyUrl.test_invalid_url_value_error_becomes_proxy_error) ... ok
+test_normalizes_scheme_to_lowercase (test_proxy.TestParseProxyUrl.test_normalizes_scheme_to_lowercase) ... ok
+test_rejects_internal_hosts (test_proxy.TestParseProxyUrl.test_rejects_internal_hosts) ... ok
+test_rejects_unsupported (test_proxy.TestParseProxyUrl.test_rejects_unsupported) ... ok
+test_valid (test_proxy.TestParseProxyUrl.test_valid) ... ok
+test_none_means_direct (test_proxy.TestProxyConfig.test_none_means_direct) ... ok
+test_proxies_dict (test_proxy.TestProxyConfig.test_proxies_dict) ... ok
+test_normalizes_legacy_uppercase_scheme (test_proxy.TestProxyConfigDegradation.test_normalizes_legacy_uppercase_scheme) ... ok
+test_socks_fails_explicitly_when_patch_missing (test_proxy.TestProxyConfigDegradation.test_socks_fails_explicitly_when_patch_missing) ... ok
+test_allows_dns_resolving_to_public (test_proxy.TestProxyHostDnsCheck.test_allows_dns_resolving_to_public) ... ok
+test_rejects_dns_resolving_to_private (test_proxy.TestProxyHostDnsCheck.test_rejects_dns_resolving_to_private) ... ok
+test_rejects_nat64_dns_resolution (test_proxy.TestProxyHostDnsCheck.test_rejects_nat64_dns_resolution) ... ok
+test_rejects_nat64_embedding_private_ipv4 (test_proxy.TestProxyHostDnsCheck.test_rejects_nat64_embedding_private_ipv4) ... ok
+test_rejects_unresolvable_host (test_proxy.TestProxyHostDnsCheck.test_rejects_unresolvable_host) ... ok
+test_passes_public_and_empty (test_proxy.TestRecheckProxyUrl.test_passes_public_and_empty) ... ok
+test_rejects_dns_rebinding (test_proxy.TestRecheckProxyUrl.test_rejects_dns_rebinding) ... ok
+test_rejects_nat64_resolution (test_proxy.TestRecheckProxyUrl.test_rejects_nat64_resolution) ... ok
+test_rejects_private_resolution (test_proxy.TestRecheckProxyUrl.test_rejects_private_resolution) ... ok
+test_returns_all_addresses (test_proxy.TestResolveHostIps.test_returns_all_addresses) ... ok
+test_timeout_raises (test_proxy.TestResolveHostIps.test_timeout_raises) ... ok
+test_unresolvable_raises (test_proxy.TestResolveHostIps.test_unresolvable_raises) ... ok
+test_leaves_plain_text_alone (test_proxy.TestSanitizeErrorMessage.test_leaves_plain_text_alone) ... ok
+test_masks_password_containing_at_sign (test_proxy.TestSanitizeErrorMessage.test_masks_password_containing_at_sign) ... ok
+test_masks_proxy_password_in_error (test_proxy.TestSanitizeErrorMessage.test_masks_proxy_password_in_error) ... ok
+test_masks_socks_url (test_proxy.TestSanitizeErrorMessage.test_masks_socks_url) ... ok
+test_get_aws_credits_forwards_proxy (test_proxy.TestServiceForwarding.test_get_aws_credits_forwards_proxy) ... ok
+test_validate_credentials_forwards_proxy (test_proxy.TestServiceForwarding.test_validate_credentials_forwards_proxy) ... ok
+test_low_entropy_secret_keys_rejected (test_rate_limit_password.TestConfigStrength.test_low_entropy_secret_keys_rejected) ... ok
+test_strong_admin_password_accepted (test_rate_limit_password.TestConfigStrength.test_strong_admin_password_accepted) ... ok
+test_strong_secret_key_accepted (test_rate_limit_password.TestConfigStrength.test_strong_secret_key_accepted) ... ok
+test_weak_admin_passwords_rejected (test_rate_limit_password.TestConfigStrength.test_weak_admin_passwords_rejected) ... ok
+test_change_password_rate_limit (test_rate_limit_password.TestLoginRateLimit.test_change_password_rate_limit) ... 2026-11-19 21:03:49,091 INFO [httpx] HTTP Request: POST http://testserver/api/auth/change-password "HTTP/1.1 400 Bad Request"
+2026-11-19 21:03:49,416 INFO [httpx] HTTP Request: POST http://testserver/api/auth/change-password "HTTP/1.1 400 Bad Request"
+2026-11-19 21:03:49,674 INFO [httpx] HTTP Request: POST http://testserver/api/auth/change-password "HTTP/1.1 400 Bad Request"
+2026-11-19 21:03:49,915 INFO [httpx] HTTP Request: POST http://testserver/api/auth/change-password "HTTP/1.1 400 Bad Request"
+2026-11-19 21:03:50,170 INFO [httpx] HTTP Request: POST http://testserver/api/auth/change-password "HTTP/1.1 400 Bad Request"
+2026-11-19 21:03:50,179 INFO [httpx] HTTP Request: POST http://testserver/api/auth/change-password "HTTP/1.1 429 Too Many Requests"
+2026-11-19 21:03:50,187 INFO [httpx] HTTP Request: POST http://testserver/api/auth/change-password "HTTP/1.1 429 Too Many Requests"
+ok
+test_five_failures_then_429_and_unlock (test_rate_limit_password.TestLoginRateLimit.test_five_failures_then_429_and_unlock) ... 2026-11-19 21:03:50,429 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 401 Unauthorized"
+2026-11-19 21:03:50,719 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 401 Unauthorized"
+2026-11-19 21:03:51,067 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 401 Unauthorized"
+2026-11-19 21:03:51,435 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 401 Unauthorized"
+2026-11-19 21:03:51,742 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 401 Unauthorized"
+2026-11-19 21:03:51,761 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 429 Too Many Requests"
+2026-11-19 21:03:51,774 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 429 Too Many Requests"
+2026-11-19 21:03:54,519 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_success_resets_failure_count (test_rate_limit_password.TestLoginRateLimit.test_success_resets_failure_count) ... 2026-11-19 21:03:54,786 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 401 Unauthorized"
+2026-11-19 21:03:55,035 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 401 Unauthorized"
+2026-11-19 21:03:55,296 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 401 Unauthorized"
+2026-11-19 21:03:55,561 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 401 Unauthorized"
+2026-11-19 21:03:55,812 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:03:56,073 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 401 Unauthorized"
+ok
+test_secret_key_entropy (test_rate_limit_password.TestSharedPasswordValidator.test_secret_key_entropy) ... ok
+test_strong_accepted (test_rate_limit_password.TestSharedPasswordValidator.test_strong_accepted) ... ok
+test_weak_rejected (test_rate_limit_password.TestSharedPasswordValidator.test_weak_rejected) ... ok
+test_change_password_weak_new_returns_400 (test_rate_limit_password.TestUserPasswordHttp.test_change_password_weak_new_returns_400) ... 2026-11-19 21:03:57,022 INFO [httpx] HTTP Request: POST http://testserver/api/auth/change-password "HTTP/1.1 400 Bad Request"
+2026-11-19 21:03:57,533 INFO [httpx] HTTP Request: POST http://testserver/api/auth/change-password "HTTP/1.1 200 OK"
+ok
+test_create_user_strong_password_returns_201 (test_rate_limit_password.TestUserPasswordHttp.test_create_user_strong_password_returns_201) ... 2026-11-19 21:03:57,798 INFO [httpx] HTTP Request: POST http://testserver/api/users "HTTP/1.1 201 Created"
+ok
+test_create_user_weak_password_returns_400 (test_rate_limit_password.TestUserPasswordHttp.test_create_user_weak_password_returns_400) ... 2026-11-19 21:03:57,810 INFO [httpx] HTTP Request: POST http://testserver/api/users "HTTP/1.1 400 Bad Request"
+2026-11-19 21:03:57,819 INFO [httpx] HTTP Request: POST http://testserver/api/users "HTTP/1.1 400 Bad Request"
+ok
+test_update_user_weak_password_returns_400 (test_rate_limit_password.TestUserPasswordHttp.test_update_user_weak_password_returns_400) ... 2026-11-19 21:03:57,827 INFO [httpx] HTTP Request: PATCH http://testserver/api/users/2 "HTTP/1.1 400 Bad Request"
+2026-11-19 21:03:58,063 INFO [httpx] HTTP Request: PATCH http://testserver/api/users/2 "HTTP/1.1 200 OK"
+ok
+test_access_denied_friendly (test_regions.TestEnableRegion.test_access_denied_friendly) ... ok
+test_already_enabled_returns_without_calling (test_regions.TestEnableRegion.test_already_enabled_returns_without_calling) ... ok
+test_conflict_treated_as_enabling (test_regions.TestEnableRegion.test_conflict_treated_as_enabling) ... ok
+test_disabled_enables_and_confirms (test_regions.TestEnableRegion.test_disabled_enables_and_confirms) ... ok
+test_disabled_enables_to_enabled (test_regions.TestEnableRegion.test_disabled_enables_to_enabled) ... ok
+test_enabling_returns_enabling (test_regions.TestEnableRegion.test_enabling_returns_enabling) ... ok
+test_status_check_denied_then_enable_proceeds (test_regions.TestEnableRegion.test_status_check_denied_then_enable_proceeds) ... ok
+test_validation_error_rechecks_status (test_regions.TestEnableRegion.test_validation_error_rechecks_status) ... ok
+test_access_denied_friendly (test_regions.TestGetRegionOptStatus.test_access_denied_friendly) ... ok
+test_client_error_message_masks_proxy_password (test_regions.TestGetRegionOptStatus.test_client_error_message_masks_proxy_password) ... ok
+test_connection_error (test_regions.TestGetRegionOptStatus.test_connection_error) ... ok
+test_connection_error_masks_proxy_password (test_regions.TestGetRegionOptStatus.test_connection_error_masks_proxy_password) ... ok
+test_generic_error_masks_proxy_password (test_regions.TestGetRegionOptStatus.test_generic_error_masks_proxy_password) ... ok
+test_invalid_credentials_friendly (test_regions.TestGetRegionOptStatus.test_invalid_credentials_friendly) ... ok
+test_returns_status (test_regions.TestGetRegionOptStatus.test_returns_status) ... ok
+test_fixed_us_east_1_and_proxy_passthrough (test_regions.TestMakeAccountClient.test_fixed_us_east_1_and_proxy_passthrough) ... ok
+test_enable_404_and_bad_region (test_regions.TestRegionEndpoints.test_enable_404_and_bad_region) ... 2026-11-19 21:03:58,595 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:03:58,610 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/9999/regions/ap-east-1/enable "HTTP/1.1 404 Not Found"
+2026-11-19 21:03:58,618 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/bad_region/enable "HTTP/1.1 400 Bad Request"
+ok
+test_enable_access_denied_400 (test_regions.TestRegionEndpoints.test_enable_access_denied_400) ... 2026-11-19 21:03:59,105 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:03:59,119 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/ap-east-1/enable "HTTP/1.1 400 Bad Request"
+ok
+test_enable_enabled (test_regions.TestRegionEndpoints.test_enable_enabled) ... 2026-11-19 21:03:59,609 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:03:59,626 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/ap-east-1/enable "HTTP/1.1 200 OK"
+ok
+test_enable_enabling (test_regions.TestRegionEndpoints.test_enable_enabling) ... 2026-11-19 21:04:00,126 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:00,150 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/ap-east-1/enable "HTTP/1.1 200 OK"
+ok
+test_enable_failure_logs_operation (test_regions.TestRegionEndpoints.test_enable_failure_logs_operation) ... 2026-11-19 21:04:00,846 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:00,865 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/ap-east-1/enable "HTTP/1.1 400 Bad Request"
+ok
+test_enable_generic_error_is_sanitized (test_regions.TestRegionEndpoints.test_enable_generic_error_is_sanitized) ... 2026-11-19 21:04:01,378 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:01,422 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/ap-east-1/enable "HTTP/1.1 400 Bad Request"
+ok
+test_enable_logs_operation (test_regions.TestRegionEndpoints.test_enable_logs_operation) ... 2026-11-19 21:04:01,942 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:01,956 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/ap-east-1/enable "HTTP/1.1 200 OK"
+ok
+test_enable_rate_limited (test_regions.TestRegionEndpoints.test_enable_rate_limited) ... 2026-11-19 21:04:02,443 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:02,458 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/ap-east-1/enable "HTTP/1.1 200 OK"
+2026-11-19 21:04:02,469 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/ap-east-1/enable "HTTP/1.1 200 OK"
+2026-11-19 21:04:02,478 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/ap-east-1/enable "HTTP/1.1 200 OK"
+2026-11-19 21:04:02,489 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/ap-east-1/enable "HTTP/1.1 200 OK"
+2026-11-19 21:04:02,500 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/ap-east-1/enable "HTTP/1.1 200 OK"
+2026-11-19 21:04:02,508 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/regions/ap-east-1/enable "HTTP/1.1 429 Too Many Requests"
+ok
+test_status_404 (test_regions.TestRegionEndpoints.test_status_404) ... 2026-11-19 21:04:03,011 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:03,026 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/9999/regions/ap-east-1/status "HTTP/1.1 404 Not Found"
+ok
+test_status_bad_region (test_regions.TestRegionEndpoints.test_status_bad_region) ... 2026-11-19 21:04:03,556 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:03,581 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/not-a-region/status "HTTP/1.1 400 Bad Request"
+2026-11-19 21:04:03,591 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/us_east_1/status "HTTP/1.1 400 Bad Request"
+2026-11-19 21:04:03,602 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/AP-EAST-1/status "HTTP/1.1 400 Bad Request"
+ok
+test_status_blocked_stored_proxy_400 (test_regions.TestRegionEndpoints.test_status_blocked_stored_proxy_400) ... 2026-11-19 21:04:04,185 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:04,205 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 400 Bad Request"
+ok
+test_status_disabled (test_regions.TestRegionEndpoints.test_status_disabled) ... 2026-11-19 21:04:04,734 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:04,757 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+ok
+test_status_generic_error_is_sanitized (test_regions.TestRegionEndpoints.test_status_generic_error_is_sanitized) ... 2026-11-19 21:04:05,308 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:05,325 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+ok
+test_status_rate_limited (test_regions.TestRegionEndpoints.test_status_rate_limited) ... 2026-11-19 21:04:05,926 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:05,948 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+2026-11-19 21:04:05,961 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+2026-11-19 21:04:05,972 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+2026-11-19 21:04:05,984 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+2026-11-19 21:04:05,997 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+2026-11-19 21:04:06,008 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+2026-11-19 21:04:06,021 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+2026-11-19 21:04:06,032 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+2026-11-19 21:04:06,044 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+2026-11-19 21:04:06,059 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+2026-11-19 21:04:06,070 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 429 Too Many Requests"
+ok
+test_status_stored_proxy_rechecked_and_passes (test_regions.TestRegionEndpoints.test_status_stored_proxy_rechecked_and_passes) ... 2026-11-19 21:04:06,813 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:06,839 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+ok
+test_status_unknown_on_account_error (test_regions.TestRegionEndpoints.test_status_unknown_on_account_error) ... 2026-11-19 21:04:07,435 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:07,467 INFO [httpx] HTTP Request: GET http://testserver/api/credentials/1/regions/ap-east-1/status "HTTP/1.1 200 OK"
+ok
+test_cookie_login_and_logout (test_remaining_fixes.TestCookieAuth.test_cookie_login_and_logout) ... 2026-11-19 21:04:08,139 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:08,165 INFO [httpx] HTTP Request: GET http://testserver/api/auth/me "HTTP/1.1 200 OK"
+2026-11-19 21:04:08,202 INFO [httpx] HTTP Request: POST http://testserver/api/auth/logout "HTTP/1.1 200 OK"
+2026-11-19 21:04:08,237 INFO [httpx] HTTP Request: GET http://testserver/api/auth/me "HTTP/1.1 401 Unauthorized"
+2026-11-19 21:04:08,248 INFO [httpx] HTTP Request: GET http://testserver/api/auth/me "HTTP/1.1 401 Unauthorized"
+ok
+test_requirements_pins (test_remaining_fixes.TestDependencyPins.test_requirements_pins) ... ok
+test_docs_endpoints_404_by_default (test_remaining_fixes.TestDocsDisabled.test_docs_endpoints_404_by_default) ... 2026-11-19 21:04:08,401 INFO [httpx] HTTP Request: GET http://testserver/docs "HTTP/1.1 404 Not Found"
+2026-11-19 21:04:08,413 INFO [httpx] HTTP Request: GET http://testserver/redoc "HTTP/1.1 404 Not Found"
+2026-11-19 21:04:08,424 INFO [httpx] HTTP Request: GET http://testserver/openapi.json "HTTP/1.1 404 Not Found"
+ok
+test_unknown_user_login_401_with_dummy_check (test_remaining_fixes.TestLoginTiming.test_unknown_user_login_401_with_dummy_check) ... 2026-11-19 21:04:08,979 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 401 Unauthorized"
+2026-11-19 21:04:09,246 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 401 Unauthorized"
+ok
+test_cors_default_closed (test_remaining_fixes.TestSecurityHeadersAndCors.test_cors_default_closed) ... 2026-11-19 21:04:09,266 INFO [httpx] HTTP Request: OPTIONS http://testserver/api/health "HTTP/1.1 400 Bad Request"
+ok
+test_cors_origin_list_settings (test_remaining_fixes.TestSecurityHeadersAndCors.test_cors_origin_list_settings) ... ok
+test_security_headers_present_no_hsts (test_remaining_fixes.TestSecurityHeadersAndCors.test_security_headers_present_no_hsts) ... 2026-11-19 21:04:09,305 INFO [httpx] HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
+ok
+test_change_password_revokes_old_token (test_remaining_fixes.TestTokenRevocation.test_change_password_revokes_old_token) ... 2026-11-19 21:04:09,897 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:10,409 INFO [httpx] HTTP Request: POST http://testserver/api/auth/change-password "HTTP/1.1 200 OK"
+2026-11-19 21:04:10,417 INFO [httpx] HTTP Request: GET http://testserver/api/auth/me "HTTP/1.1 401 Unauthorized"
+2026-11-19 21:04:10,670 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:10,680 INFO [httpx] HTTP Request: GET http://testserver/api/auth/me "HTTP/1.1 200 OK"
+ok
+test_default_admin_password_rejected (test_security_config.TestConfigFailFast.test_default_admin_password_rejected) ... ok
+test_empty_encryption_key_rejected (test_security_config.TestConfigFailFast.test_empty_encryption_key_rejected) ... ok
+test_invalid_fernet_key_rejected (test_security_config.TestConfigFailFast.test_invalid_fernet_key_rejected) ... ok
+test_missing_all_three_rejected (test_security_config.TestConfigFailFast.test_missing_all_three_rejected) ... ok
+test_public_default_secret_key_rejected (test_security_config.TestConfigFailFast.test_public_default_secret_key_rejected) ... ok
+test_short_secret_key_rejected (test_security_config.TestConfigFailFast.test_short_secret_key_rejected) ... ok
+test_valid_settings_accepted (test_security_config.TestConfigFailFast.test_valid_settings_accepted) ... ok
+test_short_password_returns_400 (test_security_config.TestCreateInstanceHttp400.test_short_password_returns_400) ... 2026-11-19 21:04:10,951 INFO [httpx] HTTP Request: POST http://testserver/api/instances "HTTP/1.1 400 Bad Request"
+ok
+test_strong_password_returns_200_and_ports_closed_by_default (test_security_config.TestCreateInstanceHttp400.test_strong_password_returns_200_and_ports_closed_by_default) ... 2026-11-19 21:04:11,160 INFO [httpx] HTTP Request: POST http://testserver/api/instances "HTTP/1.1 200 OK"
+ok
+test_weak_password_returns_400 (test_security_config.TestCreateInstanceHttp400.test_weak_password_returns_400) ... 2026-11-19 21:04:11,169 INFO [httpx] HTTP Request: POST http://testserver/api/instances "HTTP/1.1 400 Bad Request"
+ok
+test_no_password_no_user_data_and_no_open_ports (test_security_config.TestCreateInstanceNoPassword.test_no_password_no_user_data_and_no_open_ports) ... ok
+test_strong_password_and_explicit_open_ports (test_security_config.TestCreateInstanceNoPassword.test_strong_password_and_explicit_open_ports) ... ok
+test_weak_password_rejected_before_aws_call (test_security_config.TestCreateInstanceNoPassword.test_weak_password_rejected_before_aws_call) ... ok
+test_open_all_ports_defaults_to_false (test_security_config.TestInstanceDefaults.test_open_all_ports_defaults_to_false) ... ok
+test_password_defaults_to_none (test_security_config.TestInstanceDefaults.test_password_defaults_to_none) ... ok
+test_missing_digit_rejected (test_security_config.TestInstancePasswordStrength.test_missing_digit_rejected) ... ok
+test_missing_lowercase_rejected (test_security_config.TestInstancePasswordStrength.test_missing_lowercase_rejected) ... ok
+test_missing_symbol_rejected (test_security_config.TestInstancePasswordStrength.test_missing_symbol_rejected) ... ok
+test_missing_uppercase_rejected (test_security_config.TestInstancePasswordStrength.test_missing_uppercase_rejected) ... ok
+test_short_password_rejected (test_security_config.TestInstancePasswordStrength.test_short_password_rejected) ... ok
+test_strong_password_accepted (test_security_config.TestInstancePasswordStrength.test_strong_password_accepted) ... ok
+test_account_id_change_pauses_old_strategy_without_moving_it (test_t02_identity_proxy.T02Tests.test_account_id_change_pauses_old_strategy_without_moving_it) ... 2026-11-19 21:04:11,921 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:12,210 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_account_id_is_persisted_and_exposed_without_access_key_material (test_t02_identity_proxy.T02Tests.test_account_id_is_persisted_and_exposed_without_access_key_material) ... 2026-11-19 21:04:13,003 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:13,247 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:13,264 INFO [httpx] HTTP Request: POST http://testserver/api/credentials "HTTP/1.1 201 Created"
+ok
+test_all_service_factories_delegate_to_common_session_factory (test_t02_identity_proxy.T02Tests.test_all_service_factories_delegate_to_common_session_factory) ... 2026-11-19 21:04:14,018 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:14,310 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_automatic_conflicting_strategies_are_preserved_but_paused (test_t02_identity_proxy.T02Tests.test_automatic_conflicting_strategies_are_preserved_but_paused) ... 2026-11-19 21:04:15,155 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:15,442 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_changed_account_does_not_apply_old_limit_to_instance_traffic (test_t02_identity_proxy.T02Tests.test_changed_account_does_not_apply_old_limit_to_instance_traffic) ... 2026-11-19 21:04:16,217 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:16,463 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:16,493 INFO [httpx] HTTP Request: GET http://testserver/api/instances/us-east-1/server?credential_id=1 "HTTP/1.1 200 OK"
+ok
+test_compat_update_rejects_omitted_corrupt_proxy (test_t02_identity_proxy.T02Tests.test_compat_update_rejects_omitted_corrupt_proxy) ... 2026-11-19 21:04:17,252 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:17,550 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:17,565 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials "HTTP/1.1 400 Bad Request"
+ok
+test_conflict_acknowledgement_rejects_uncoordinated_unknown_or_foreign_policies (test_t02_identity_proxy.T02Tests.test_conflict_acknowledgement_rejects_uncoordinated_unknown_or_foreign_policies) ... 2026-11-19 21:04:18,291 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:18,532 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:18,567 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 409 Conflict"
+2026-11-19 21:04:18,580 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 409 Conflict"
+2026-11-19 21:04:18,598 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 409 Conflict"
+2026-11-19 21:04:18,607 INFO [httpx] HTTP Request: GET http://testserver/api/instances/us-east-1/server/policy-conflict?credential_id=1 "HTTP/1.1 400 Bad Request"
+ok
+test_conflict_is_credential_identity_based_and_different_aws_accounts_do_not_conflict (test_t02_identity_proxy.T02Tests.test_conflict_is_credential_identity_based_and_different_aws_accounts_do_not_conflict) ... 2026-11-19 21:04:19,329 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:19,582 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_corrupt_stored_proxy_rejects_key_rotation_without_falling_back_to_direct (test_t02_identity_proxy.T02Tests.test_corrupt_stored_proxy_rejects_key_rotation_without_falling_back_to_direct) ... 2026-11-19 21:04:20,352 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:20,597 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:20,616 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials/1 "HTTP/1.1 400 Bad Request"
+ok
+test_credentials_are_scoped_to_user_and_account_identity (test_t02_identity_proxy.T02Tests.test_credentials_are_scoped_to_user_and_account_identity) ... 2026-11-19 21:04:21,351 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:21,599 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_default_switch_does_not_bypass_policy_conflict_and_scan_once (test_t02_identity_proxy.T02Tests.test_default_switch_does_not_bypass_policy_conflict_and_scan_once) ... 2026-11-19 21:04:22,324 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:22,565 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:22,654 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/2/default "HTTP/1.1 200 OK"
+ok
+test_explicit_true_vs_false_conflicts_but_missing_strategy_does_not (test_t02_identity_proxy.T02Tests.test_explicit_true_vs_false_conflicts_but_missing_strategy_does_not) ... 2026-11-19 21:04:23,389 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:23,629 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_explicitly_clearing_proxy_allows_direct_validation_but_omitting_it_does_not (test_t02_identity_proxy.T02Tests.test_explicitly_clearing_proxy_allows_direct_validation_but_omitting_it_does_not) ... 2026-11-19 21:04:24,356 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:24,595 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:24,609 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials/1 "HTTP/1.1 400 Bad Request"
+2026-11-19 21:04:24,623 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials/1 "HTTP/1.1 200 OK"
+ok
+test_identity_failure_saves_credential_as_unknown_without_reusing_old_identity (test_t02_identity_proxy.T02Tests.test_identity_failure_saves_credential_as_unknown_without_reusing_old_identity) ... 2026-11-19 21:04:25,330 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:25,573 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:25,588 INFO [app.routers.credentials] STS 身份尚未确认：STS offline
+2026-11-19 21:04:25,594 INFO [httpx] HTTP Request: PUT http://testserver/api/credentials/1 "HTTP/1.1 200 OK"
+ok
+test_instance_list_deduplicates_account_and_batches_database_reads (test_t02_identity_proxy.T02Tests.test_instance_list_deduplicates_account_and_batches_database_reads) ... 2026-11-19 21:04:26,304 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:26,539 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:27,117 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+2026-11-19 21:04:27,128 INFO [httpx] HTTP Request: GET http://testserver/api/instances "HTTP/1.1 200 OK"
+ok
+test_manual_validation_refreshes_sts_identity (test_t02_identity_proxy.T02Tests.test_manual_validation_refreshes_sts_identity) ... 2026-11-19 21:04:27,859 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:28,146 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:28,165 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/1/validate "HTTP/1.1 200 OK"
+ok
+test_one_client_factory_passes_same_explicit_credentials_and_proxy_to_all_services (test_t02_identity_proxy.T02Tests.test_one_client_factory_passes_same_explicit_credentials_and_proxy_to_all_services) ... 2026-11-19 21:04:28,986 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:29,242 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_patch_cannot_silently_release_conflict_and_collector_stays_paused (test_t02_identity_proxy.T02Tests.test_patch_cannot_silently_release_conflict_and_collector_stays_paused) ... 2026-11-19 21:04:30,012 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:30,264 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:30,300 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 21:04:30,514 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 21:04:30,598 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=2 "HTTP/1.1 200 OK"
+2026-11-19 21:04:30,672 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 409 Conflict"
+2026-11-19 21:04:30,682 INFO [httpx] HTTP Request: GET http://testserver/api/instances/us-east-1/server/policy-conflict?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 21:04:30,695 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 409 Conflict"
+2026-11-19 21:04:30,717 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 200 OK"
+ok
+test_paused_policy_response_keeps_saved_value_and_note_edit_does_not_disable_it (test_t02_identity_proxy.T02Tests.test_paused_policy_response_keeps_saved_value_and_note_edit_does_not_disable_it) ... 2026-11-19 21:04:31,546 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:31,805 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:31,833 INFO [httpx] HTTP Request: GET http://testserver/api/instances/us-east-1/server?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 21:04:31,853 INFO [httpx] HTTP Request: PATCH http://testserver/api/instances/us-east-1/server/settings?credential_id=1 "HTTP/1.1 200 OK"
+ok
+test_same_label_in_different_panel_users_never_conflicts (test_t02_identity_proxy.T02Tests.test_same_label_in_different_panel_users_never_conflicts) ... 2026-11-19 21:04:32,586 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:32,834 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_sts_outage_preserves_last_known_conflict_and_blocks_other_key_stop (test_t02_identity_proxy.T02Tests.test_sts_outage_preserves_last_known_conflict_and_blocks_other_key_stop) ... 2026-11-19 21:04:33,576 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:33,873 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:34,034 INFO [app.routers.credentials] STS 身份尚未确认：temporary STS failure
+2026-11-19 21:04:34,039 INFO [httpx] HTTP Request: POST http://testserver/api/credentials/2/validate "HTTP/1.1 200 OK"
+ok
+test_traffic_history_stays_bound_to_observed_account_after_key_identity_change (test_t02_identity_proxy.T02Tests.test_traffic_history_stays_bound_to_observed_account_after_key_identity_change) ... 2026-11-19 21:04:34,967 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:35,282 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_traffic_summary_query_count_is_constant_as_instance_count_grows (test_t02_identity_proxy.T02Tests.test_traffic_summary_query_count_is_constant_as_instance_count_grows) ... 2026-11-19 21:04:36,128 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:36,372 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_traffic_summary_respects_explicit_credential_filter (test_t02_identity_proxy.T02Tests.test_traffic_summary_respects_explicit_credential_filter) ... 2026-11-19 21:04:37,337 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:37,622 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_two_enabled_different_effective_thresholds_conflict_but_equal_thresholds_do_not (test_t02_identity_proxy.T02Tests.test_two_enabled_different_effective_thresholds_conflict_but_equal_thresholds_do_not) ... 2026-11-19 21:04:38,362 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:38,603 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_two_explicitly_disabled_strategies_and_absent_record_are_distinct (test_t02_identity_proxy.T02Tests.test_two_explicitly_disabled_strategies_and_absent_record_are_distinct) ... 2026-11-19 21:04:39,333 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:39,578 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_unknown_identity_keeps_settings_isolated (test_t02_identity_proxy.T02Tests.test_unknown_identity_keeps_settings_isolated) ... 2026-11-19 21:04:40,307 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:40,546 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_unknown_traffic_is_visible_but_excluded_from_confirmed_total (test_t02_identity_proxy.T02Tests.test_unknown_traffic_is_visible_but_excluded_from_confirmed_total) ... 2026-11-19 21:04:41,283 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+2026-11-19 21:04:41,523 INFO [httpx] HTTP Request: POST http://testserver/api/auth/login "HTTP/1.1 200 OK"
+ok
+test_aggregate_marks_missing_balance_and_partial_results_without_fake_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_aggregate_marks_missing_balance_and_partial_results_without_fake_zero) ... ok
+test_credit_reversal_refund_and_discount_are_separate_decimal_records (test_t03_billing_accuracy.BillingAccuracyTests.test_credit_reversal_refund_and_discount_are_separate_decimal_records) ... ok
+test_forecast_rejects_missing_daily_coverage_and_excludes_today_on_last_day (test_t03_billing_accuracy.BillingAccuracyTests.test_forecast_rejects_missing_daily_coverage_and_excludes_today_on_last_day) ... ok
+test_getcredits_explicit_self_scope_and_forecast_scope (test_t03_billing_accuracy.BillingAccuracyTests.test_getcredits_explicit_self_scope_and_forecast_scope) ... ok
+test_missing_invalid_or_nonfinite_money_never_becomes_zero (test_t03_billing_accuracy.BillingAccuracyTests.test_missing_invalid_or_nonfinite_money_never_becomes_zero) ... ok
+test_official_duplicates_do_not_inflate_balance_and_other_account_is_rejected (test_t03_billing_accuracy.BillingAccuracyTests.test_official_duplicates_do_not_inflate_balance_and_other_account_is_rejected) ... ok
+test_pages_and_periods_are_all_counted_without_combining_currencies (test_t03_billing_accuracy.BillingAccuracyTests.test_pages_and_periods_are_all_counted_without_combining_currencies) ... ok
+test_repeated_page_token_is_rejected_instead_of_counted_twice (test_t03_billing_accuracy.BillingAccuracyTests.test_repeated_page_token_is_rejected_instead_of_counted_twice) ... ok
+test_unknown_identity_makes_no_organization_wide_request (test_t03_billing_accuracy.BillingAccuracyTests.test_unknown_identity_makes_no_organization_wide_request) ... ok
+test_account_filter_cross_user_and_partial_states (test_t03_billing_accuracy.BillingRouteTests.test_account_filter_cross_user_and_partial_states) ... 2026-11-19 21:04:41,960 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true&credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 21:04:41,977 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true&credential_id=4 "HTTP/1.1 400 Bad Request"
+ok
+test_changed_identity_never_queries_old_account_costs (test_t03_billing_accuracy.BillingRouteTests.test_changed_identity_never_queries_old_account_costs) ... 2026-11-19 21:04:42,281 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true&credential_id=1 "HTTP/1.1 200 OK"
+ok
+test_forecast_decimal_addition_is_exact_before_legacy_float_adapter (test_t03_billing_accuracy.BillingRouteTests.test_forecast_decimal_addition_is_exact_before_legacy_float_adapter) ... 2026-11-19 21:04:42,613 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true&credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 21:04:42,633 INFO [httpx] HTTP Request: GET http://testserver/api/billing/summary?credential_id=1 "HTTP/1.1 200 OK"
+ok
+test_full_month_forecast_requires_successful_matching_currency_costs (test_t03_billing_accuracy.BillingRouteTests.test_full_month_forecast_requires_successful_matching_currency_costs) ... 2026-11-19 21:04:42,951 INFO [httpx] HTTP Request: GET http://testserver/api/billing/summary?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 21:04:43,031 INFO [httpx] HTTP Request: GET http://testserver/api/billing/summary?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 21:04:43,113 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true&credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 21:04:43,191 INFO [httpx] HTTP Request: GET http://testserver/api/billing/summary?credential_id=1 "HTTP/1.1 200 OK"
+ok
+test_legacy_precision_marker_is_visible_in_api_without_remaining_estimate (test_t03_billing_accuracy.BillingRouteTests.test_legacy_precision_marker_is_visible_in_api_without_remaining_estimate) ... 2026-11-19 21:04:43,550 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true&credential_id=1 "HTTP/1.1 200 OK"
+ok
+test_legacy_summary_preserves_shape_and_does_not_leak_foreign_manual_rows (test_t03_billing_accuracy.BillingRouteTests.test_legacy_summary_preserves_shape_and_does_not_leak_foreign_manual_rows) ... 2026-11-19 21:04:43,896 INFO [httpx] HTTP Request: GET http://testserver/api/billing/summary?credential_id=1 "HTTP/1.1 200 OK"
+ok
+test_precise_manual_create_and_explicit_assignment_are_user_scoped (test_t03_billing_accuracy.BillingRouteTests.test_precise_manual_create_and_explicit_assignment_are_user_scoped) ... 2026-11-19 21:04:44,166 INFO [httpx] HTTP Request: POST http://testserver/api/v2/billing/credits "HTTP/1.1 201 Created"
+2026-11-19 21:04:44,190 INFO [httpx] HTTP Request: PATCH http://testserver/api/v2/billing/credits/2/assign "HTTP/1.1 400 Bad Request"
+2026-11-19 21:04:44,205 INFO [httpx] HTTP Request: PATCH http://testserver/api/v2/billing/credits/2/assign "HTTP/1.1 200 OK"
+ok
+test_unknown_manual_credentials_and_reassignment_cannot_move_existing_account (test_t03_billing_accuracy.BillingRouteTests.test_unknown_manual_credentials_and_reassignment_cannot_move_existing_account) ... 2026-11-19 21:04:44,553 INFO [httpx] HTTP Request: POST http://testserver/api/v2/billing/credits "HTTP/1.1 409 Conflict"
+2026-11-19 21:04:44,572 INFO [httpx] HTTP Request: PATCH http://testserver/api/v2/billing/credits/1/assign "HTTP/1.1 409 Conflict"
+ok
+test_v2_deduplicates_accounts_and_does_not_allocate_manual_consumption (test_t03_billing_accuracy.BillingRouteTests.test_v2_deduplicates_accounts_and_does_not_allocate_manual_consumption) ... 2026-11-19 21:04:44,969 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+ok
+test_real_v2_source_upgrade_failure_and_restore (test_t03_billing_accuracy.MigrationV3Tests.test_real_v2_source_upgrade_failure_and_restore) ... 2026-11-19 21:04:46,381 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpp2vvliq7\backups\v2.db.pre-v3-058e52522792e9b7e5bfe3cb14217bfd801d3b6c3cafdc46d5abbbeae3dc5bcd.db
+ok
+test_all_clients_share_five_calls_two_mutations_and_one_same_instance (test_t04_cache.AwsLimitTests.test_all_clients_share_five_calls_two_mutations_and_one_same_instance) ... ok
+test_actual_instances_route_rechecks_views_after_late_credential_invalidation (test_t04_cache.CacheRouteTests.test_actual_instances_route_rechecks_views_after_late_credential_invalidation) ... 2026-11-19 21:04:47,585 INFO [httpx] HTTP Request: GET http://testserver/api/catalog/regions?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 21:04:47,631 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?wait=true "HTTP/1.1 200 OK"
+2026-11-19 21:04:47,706 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?wait=true "HTTP/1.1 200 OK"
+ok
+test_billing_hot_cache_and_independent_failure_preserve_last_success (test_t04_cache.CacheRouteTests.test_billing_hot_cache_and_independent_failure_preserve_last_success) ... 2026-11-19 21:04:48,023 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 21:04:48,038 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 21:04:48,069 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 21:04:48,092 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 21:04:48,100 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 404 Not Found"
+ok
+test_billing_summary_outer_account_gather_revalidates_invalidated_account (test_t04_cache.CacheRouteTests.test_billing_summary_outer_account_gather_revalidates_invalidated_account) ... 2026-11-19 21:04:48,486 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+ok
+test_instance_hot_cache_avoids_aws_and_slow_region_does_not_hide_success (test_t04_cache.CacheRouteTests.test_instance_hot_cache_avoids_aws_and_slow_region_does_not_hide_success) ... 2026-11-19 21:04:48,773 INFO [httpx] HTTP Request: GET http://testserver/api/catalog/regions?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 21:04:48,807 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 21:04:48,852 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 21:04:48,878 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 21:04:48,892 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+ok
+test_invalid_region_creates_no_scope_or_aws_call_and_valid_region_reuses_cache (test_t04_cache.CacheRouteTests.test_invalid_region_creates_no_scope_or_aws_call_and_valid_region_reuses_cache) ... 2026-11-19 21:04:49,132 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=moon-1 "HTTP/1.1 400 Bad Request"
+2026-11-19 21:04:49,139 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 400 Bad Request"
+2026-11-19 21:04:49,149 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 21:04:49,154 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 21:04:49,161 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=https%3A%2F%2F127.0.0.1 "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 21:04:49,167 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 21:04:49,198 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=eu-west-1&wait=true "HTTP/1.1 400 Bad Request"
+2026-11-19 21:04:49,230 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=us-east-1&wait=true "HTTP/1.1 200 OK"
+2026-11-19 21:04:49,244 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=us-east-1 "HTTP/1.1 200 OK"
+ok
+test_outer_credential_gather_revalidation_keeps_healthy_credential (test_t04_cache.CacheRouteTests.test_outer_credential_gather_revalidation_keeps_healthy_credential) ... 2026-11-19 21:04:49,525 INFO [httpx] HTTP Request: GET http://testserver/api/catalog/regions?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 21:04:49,548 INFO [httpx] HTTP Request: GET http://testserver/api/catalog/regions?credential_id=3 "HTTP/1.1 200 OK"
+2026-11-19 21:04:49,608 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?wait=true "HTTP/1.1 200 OK"
+2026-11-19 21:04:49,666 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?wait=true "HTTP/1.1 200 OK"
+ok
+test_raw_sts_authentication_failure_invalidates_all_credential_snapshots (test_t04_cache.CacheRouteTests.test_raw_sts_authentication_failure_invalidates_all_credential_snapshots) ... 2026-11-19 21:04:49,992 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 21:04:50,038 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 21:04:50,051 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+ok
+test_real_cost_explorer_expired_token_invalidates_credential (test_t04_cache.CacheRouteTests.test_real_cost_explorer_expired_token_invalidates_credential) ... 2026-11-19 21:04:50,365 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+ok
+test_sts_access_denied_preserves_confirmed_billing_and_regions (test_t04_cache.CacheRouteTests.test_sts_access_denied_preserves_confirmed_billing_and_regions) ... 2026-11-19 21:04:50,752 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 21:04:50,813 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?wait=true "HTTP/1.1 200 OK"
+2026-11-19 21:04:50,853 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 21:04:50,881 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+ok
+test_successful_stop_expires_snapshot_and_prevents_older_refresh_publish (test_t04_cache.CacheRouteTests.test_successful_stop_expires_snapshot_and_prevents_older_refresh_publish) ... 2026-11-19 21:04:51,473 INFO [httpx] HTTP Request: POST http://testserver/api/instances/us-east-1/fixed/stop?credential_id=1 "HTTP/1.1 200 OK"
+ok
+test_temporary_identity_failure_preserves_all_stale_billing_sections (test_t04_cache.CacheRouteTests.test_temporary_identity_failure_preserves_all_stale_billing_sections) ... 2026-11-19 21:04:51,799 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 21:04:51,872 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 21:04:51,922 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+ok
+test_real_base_v3_upgrade_rollback_and_restore (test_t04_cache.SnapshotMigrationTests.test_real_base_v3_upgrade_rollback_and_restore) ... 2026-11-19 21:04:53,329 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp8yd6ovpl\backups\v3.db.pre-v4-9f4a823f05521c824a0414ccee251329eda9518a61d586bf99e5bc7e6a3d84c2.db
+ok
+test_batch_credential_failure_clears_and_suppresses_sibling_results (test_t04_cache.SnapshotTests.test_batch_credential_failure_clears_and_suppresses_sibling_results) ... ok
+test_batch_region_permission_failure_does_not_clear_successful_region (test_t04_cache.SnapshotTests.test_batch_region_permission_failure_does_not_clear_successful_region) ... ok
+test_changed_secret_during_refresh_cannot_publish_old_result (test_t04_cache.SnapshotTests.test_changed_secret_during_refresh_cannot_publish_old_result) ... ok
+test_cold_get_returns_promptly_and_failed_load_finishes (test_t04_cache.SnapshotTests.test_cold_get_returns_promptly_and_failed_load_finishes) ... ok
+test_different_user_account_and_proxy_versions_have_distinct_keys (test_t04_cache.SnapshotTests.test_different_user_account_and_proxy_versions_have_distinct_keys) ... ok
+test_expired_refresh_lease_can_recover_after_restart_and_cache_is_persistent (test_t04_cache.SnapshotTests.test_expired_refresh_lease_can_recover_after_restart_and_cache_is_persistent) ... ok
+test_hot_snapshot_and_concurrent_refresh_share_one_loader (test_t04_cache.SnapshotTests.test_hot_snapshot_and_concurrent_refresh_share_one_loader) ... ok
+test_initial_dependency_follows_fast_result_but_bounds_slow_work (test_t04_cache.SnapshotTests.test_initial_dependency_follows_fast_result_but_bounds_slow_work) ... ok
+test_initial_dependency_rechecks_credential_identity (test_t04_cache.SnapshotTests.test_initial_dependency_rechecks_credential_identity) ... ok
+test_payload_budget_evicts_old_values_and_rejects_oversized_payload (test_t04_cache.SnapshotTests.test_payload_budget_evicts_old_values_and_rejects_oversized_payload) ... ok
+test_publish_batch_rechecks_each_lease_and_keeps_payload_budget (test_t04_cache.SnapshotTests.test_publish_batch_rechecks_each_lease_and_keeps_payload_budget) ... ok
+test_ready_scopes_share_publish_transaction_without_waiting_for_slow_scope (test_t04_cache.SnapshotTests.test_ready_scopes_share_publish_transaction_without_waiting_for_slow_scope) ... ok
+test_revoked_auth_lease_cannot_suppress_valid_sibling_publish (test_t04_cache.SnapshotTests.test_revoked_auth_lease_cannot_suppress_valid_sibling_publish) ... ok
+test_transient_failure_preserves_old_success_permission_failure_drops_it (test_t04_cache.SnapshotTests.test_transient_failure_preserves_old_success_permission_failure_drops_it) ... ok
+test_202_recovery_and_conflicting_envelope (test_t06_api.TaskApiTests.test_202_recovery_and_conflicting_envelope) ... 2026-11-19 21:04:57,751 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 202 Accepted"
+2026-11-19 21:04:57,761 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 202 Accepted"
+2026-11-19 21:04:57,772 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 409 Conflict"
+2026-11-19 21:04:57,781 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks/by-key?key=browser-key "HTTP/1.1 200 OK"
+2026-11-19 21:04:57,952 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks/85f22c8c-f058-43e1-8e02-c7aa1509b3c1/cancel "HTTP/1.1 200 OK"
+ok
+test_delete_gates_hold_until_unstarted_task_cancelled (test_t06_api.TaskApiTests.test_delete_gates_hold_until_unstarted_task_cancelled) ... 2026-11-19 21:04:58,321 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 202 Accepted"
+2026-11-19 21:04:58,332 INFO [httpx] HTTP Request: DELETE http://testserver/api/credentials/1 "HTTP/1.1 409 Conflict"
+2026-11-19 21:04:58,345 INFO [httpx] HTTP Request: DELETE http://testserver/api/users/1 "HTTP/1.1 409 Conflict"
+2026-11-19 21:04:58,362 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks/612736fc-e5aa-4ba3-b710-c9d37a1285b7/cancel "HTTP/1.1 200 OK"
+2026-11-19 21:04:58,385 INFO [httpx] HTTP Request: DELETE http://testserver/api/credentials/1 "HTTP/1.1 200 OK"
+ok
+test_every_task_route_hides_foreign_owner (test_t06_api.TaskApiTests.test_every_task_route_hides_foreign_owner) ... 2026-11-19 21:04:58,641 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 202 Accepted"
+2026-11-19 21:04:58,652 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks "HTTP/1.1 200 OK"
+2026-11-19 21:04:58,661 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks/by-key?key=browser-key "HTTP/1.1 404 Not Found"
+2026-11-19 21:04:58,673 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks/542d620c-9a14-4ab5-a9dc-fdc0dbe1a7b1 "HTTP/1.1 404 Not Found"
+2026-11-19 21:04:58,685 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks/542d620c-9a14-4ab5-a9dc-fdc0dbe1a7b1/cancel "HTTP/1.1 404 Not Found"
+2026-11-19 21:04:58,695 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks/542d620c-9a14-4ab5-a9dc-fdc0dbe1a7b1/reconcile "HTTP/1.1 404 Not Found"
+2026-11-19 21:04:58,706 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks/542d620c-9a14-4ab5-a9dc-fdc0dbe1a7b1/retry "HTTP/1.1 404 Not Found"
+2026-11-19 21:04:58,715 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks/542d620c-9a14-4ab5-a9dc-fdc0dbe1a7b1/resolve "HTTP/1.1 404 Not Found"
+2026-11-19 21:04:58,725 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 404 Not Found"
+ok
+test_legacy_timeout_returns_task_identity_without_false_success (test_t06_api.TaskApiTests.test_legacy_timeout_returns_task_identity_without_false_success) ... 2026-11-19 21:04:58,979 INFO [httpx] HTTP Request: POST http://testserver/api/instances/us-east-1/web/stop?credential_id=1 "HTTP/1.1 202 Accepted"
+2026-11-19 21:04:58,989 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks/b0c46994-8b0f-448e-a991-a1d93970e2e4 "HTTP/1.1 200 OK"
+ok
+test_unresolved_tasks_precede_new_terminal_history_with_paging (test_t06_api.TaskApiTests.test_unresolved_tasks_precede_new_terminal_history_with_paging) ... 2026-11-19 21:04:59,243 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 202 Accepted"
+2026-11-19 21:04:59,307 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks?limit=100 "HTTP/1.1 200 OK"
+2026-11-19 21:04:59,317 INFO [httpx] HTTP Request: GET http://testserver/api/v2/tasks?limit=100&offset=100 "HTTP/1.1 200 OK"
+ok
+test_validation_does_not_echo_password_or_userdata (test_t06_api.TaskApiTests.test_validation_does_not_echo_password_or_userdata) ... 2026-11-19 21:04:59,559 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 21:04:59,570 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 21:04:59,579 INFO [httpx] HTTP Request: POST http://testserver/api/v2/tasks "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 21:04:59,587 INFO [httpx] HTTP Request: POST http://testserver/api/instances "HTTP/1.1 422 Unprocessable Entity"
+ok
+test_default_az_lookup_and_create_share_proxy (test_t06_proxy_workflow.CreateInstanceProxyInheritanceTests.test_default_az_lookup_and_create_share_proxy) ... ok
+test_explicit_az_uses_one_proxied_client (test_t06_proxy_workflow.CreateInstanceProxyInheritanceTests.test_explicit_az_uses_one_proxied_client) ... ok
+test_cancel_requires_atomic_queued_transition_and_keeps_running_lock (test_t06_task_queue.DurableTaskQueueTests.test_cancel_requires_atomic_queued_transition_and_keeps_running_lock) ... ok
+test_idempotency_returns_same_task_and_rejects_different_envelope (test_t06_task_queue.DurableTaskQueueTests.test_idempotency_returns_same_task_and_rejects_different_envelope) ... ok
+test_same_confirmed_account_lock_conflicts_across_credentials (test_t06_task_queue.DurableTaskQueueTests.test_same_confirmed_account_lock_conflicts_across_credentials) ... ok
+test_schedule_callback_does_not_deadlock_when_future_already_finished (test_t06_task_queue.DurableTaskQueueTests.test_schedule_callback_does_not_deadlock_when_future_already_finished) ... ok
+test_task_payload_is_encrypted_and_intents_are_scrubbed (test_t06_task_queue.DurableTaskQueueTests.test_task_payload_is_encrypted_and_intents_are_scrubbed) ... ok
+test_attach_started_keeps_old_ip_and_lock (test_t06_workflows.WorkflowTests.test_attach_started_keeps_old_ip_and_lock) ... 2026-11-19 21:05:01,654 WARNING [app.services.task_queue] operation task stopped id=b66976de-781f-4d86-bfec-0810c4842542 kind=change_ip error=AWS 写请求未确认，等待事实核对
+ok
+test_changed_credential_at_transport_gate_prevents_write (test_t06_workflows.WorkflowTests.test_changed_credential_at_transport_gate_prevents_write) ... ok
+test_create_ip_compensated_failure_reports_existing_instance_as_partial (test_t06_workflows.WorkflowTests.test_create_ip_compensated_failure_reports_existing_instance_as_partial) ... ok
+test_create_lost_allocate_second_precision_and_proxy (test_t06_workflows.WorkflowTests.test_create_lost_allocate_second_precision_and_proxy) ... 2026-11-19 21:05:03,696 WARNING [app.services.task_queue] operation task stopped id=e5d044bb-aa85-4a58-aa4e-a9f034584de3 kind=create error=AWS 写请求未确认，等待事实核对
+ok
+test_credential_rotation_before_effect_releases_lock_as_known_failure (test_t06_workflows.WorkflowTests.test_credential_rotation_before_effect_releases_lock_as_known_failure) ... ok
+test_delete_lost_response_only_releases_recorded_association (test_t06_workflows.WorkflowTests.test_delete_lost_response_only_releases_recorded_association) ... 2026-11-19 21:05:04,703 WARNING [app.services.task_queue] operation task stopped id=31f5a31b-b7e7-4eee-8ec6-97990dd11d79 kind=delete error=AWS 写请求未确认，等待事实核对
+ok
+test_delete_pending_never_cleans_ips (test_t06_workflows.WorkflowTests.test_delete_pending_never_cleans_ips) ... 2026-11-19 21:05:05,402 WARNING [app.services.task_queue] operation task stopped id=f71f48fb-a7fd-465d-95a7-c9d07856ea36 kind=delete error=AWS 写请求未确认，等待事实核对
+ok
+test_explicit_resolution_preserves_unknown_evidence_and_requires_owner (test_t06_workflows.WorkflowTests.test_explicit_resolution_preserves_unknown_evidence_and_requires_owner) ... 2026-11-19 21:05:05,921 WARNING [app.services.task_queue] operation task stopped id=3d5fe586-a359-4011-acd0-917d8c86df84 kind=reboot error=AWS 写请求未确认，等待事实核对
+ok
+test_firewall_failure_can_resume_without_repeating_create (test_t06_workflows.WorkflowTests.test_firewall_failure_can_resume_without_repeating_create) ... 2026-11-19 21:05:06,450 WARNING [app.services.task_queue] operation task stopped id=2ee3914b-6e74-4045-8788-8cdb71fdf123 kind=create error=实例已创建，防火墙设置明确失败；可核对后仅重试剩余步骤
+ok
+test_interrupted_read_plan_can_resume (test_t06_workflows.WorkflowTests.test_interrupted_read_plan_can_resume) ... ok
+test_lost_attach_resumes_cleanup_only (test_t06_workflows.WorkflowTests.test_lost_attach_resumes_cleanup_only) ... 2026-11-19 21:05:08,089 WARNING [app.services.task_queue] operation task stopped id=31f89d7d-8a96-43f8-8db4-d5ac285ab61f kind=change_ip error=AWS 写请求未确认，等待事实核对
+ok
+test_lost_stop_does_not_claim_same_name_replacement (test_t06_workflows.WorkflowTests.test_lost_stop_does_not_claim_same_name_replacement) ... 2026-11-19 21:05:08,902 WARNING [app.services.task_queue] operation task stopped id=2bc1ce93-d854-4e4f-be61-ffd0630dab02 kind=stop error=AWS 写请求未确认，等待事实核对
+ok
+test_old_lease_cannot_write_result_or_release_lock (test_t06_workflows.WorkflowTests.test_old_lease_cannot_write_result_or_release_lock) ... ok
+test_old_traffic_window_cannot_overwrite_newer_cumulative_observation (test_t06_workflows.WorkflowTests.test_old_traffic_window_cannot_overwrite_newer_cumulative_observation) ... ok
+test_owner_scope_and_retention_never_remove_unresolved (test_t06_workflows.WorkflowTests.test_owner_scope_and_retention_never_remove_unresolved) ... 2026-11-19 21:05:10,012 WARNING [app.services.task_queue] operation task stopped id=c79f699e-790c-41c8-8771-0a320ca6a00e kind=reboot error=AWS 写请求未确认，等待事实核对
+ok
+test_policy_disabled_during_prewrite_read_stops_auto_shutdown (test_t06_workflows.WorkflowTests.test_policy_disabled_during_prewrite_read_stops_auto_shutdown) ... ok
+test_prewrite_recreated_resource_is_rejected (test_t06_workflows.WorkflowTests.test_prewrite_recreated_resource_is_rejected) ... 2026-11-19 21:05:10,840 WARNING [app.services.task_queue] operation task stopped id=a4a61f5d-f625-4402-b690-0417d3d38ce3 kind=stop error=副作用前资源 ARN 已变化，未提交写请求
+ok
+test_reboot_running_does_not_prove_lost_response (test_t06_workflows.WorkflowTests.test_reboot_running_does_not_prove_lost_response) ... 2026-11-19 21:05:11,203 WARNING [app.services.task_queue] operation task stopped id=2f0c16eb-ac2e-4150-87d2-9fca9f2149eb kind=reboot error=AWS 写请求未确认，等待事实核对
+ok
+test_resumed_queued_task_cannot_be_cancelled_and_release_effect_locks (test_t06_workflows.WorkflowTests.test_resumed_queued_task_cannot_be_cancelled_and_release_effect_locks) ... 2026-11-19 21:05:11,649 WARNING [app.services.task_queue] operation task stopped id=e34f4c73-d1c6-4233-8f98-ea69b2851233 kind=stop error=AWS 写请求未确认，等待事实核对
+ok
+test_stop_lost_response_reconciles_without_replay (test_t06_workflows.WorkflowTests.test_stop_lost_response_reconciles_without_replay) ... 2026-11-19 21:05:12,115 WARNING [app.services.task_queue] operation task stopped id=50f7ecfc-5f72-4fed-be76-e1f0adc098ad kind=stop error=AWS 写请求未确认，等待事实核对
+ok
+
+----------------------------------------------------------------------
+Ran 293 tests in 99.184s
+
+OK (skipped=1)
+AWS_TRANSPORT_ATTEMPTS 0

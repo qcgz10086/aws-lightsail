@@ -1,0 +1,51 @@
+{
+  "scope": "Correction after reading scenario JSON; exit0 alone was insufficient",
+  "original_runner": "work\\frontend-regression-4f224e2\\verification.json",
+  "checks": [
+    {
+      "name": "t05-browser",
+      "rows": 5,
+      "passed": 3,
+      "failed_or_incomplete": [
+        {
+          "scenario": "probe_execution",
+          "error": "Error: Delayed mutation did not start\n    at file:///C:/Users/liyang/.codex/worktrees/t07-build-integration/aws-lightsail/docs/optimization/evidence/T05-33db3e4/probe-tools/browser_probe.mjs:239:31"
+        }
+      ]
+    },
+    {
+      "name": "t05-catalog",
+      "rows": 12,
+      "passed": 10,
+      "failed_or_incomplete": [
+        {
+          "scenario": "new_credential_pending_clears_values_and_blocks_submit_then_valid_reselection",
+          "passed": false,
+          "disabled": true,
+          "pendingValues": {
+            "region": [],
+            "blueprint_id": [],
+            "bundle_id": []
+          },
+          "pendingPostCount": 0,
+          "payloads": [],
+          "request_start": 0,
+          "request_end": 10
+        },
+        {
+          "scenario": "same_scope_region_enable_allows_successful_catalog_reselection",
+          "passed": false,
+          "payloads": [],
+          "request_start": 69,
+          "request_end": 79
+        }
+      ]
+    },
+    {
+      "name": "t06-browser",
+      "rows": 7,
+      "passed": 7,
+      "failed_or_incomplete": []
+    }
+  ]
+}

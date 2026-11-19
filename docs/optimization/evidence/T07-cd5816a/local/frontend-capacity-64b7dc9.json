@@ -1,0 +1,44 @@
+{
+  "source": ".",
+  "all_passed": true,
+  "records": [
+    {
+      "scenario": "1000_distinct_queries",
+      "cached": 256,
+      "inFlight": 0
+    },
+    {
+      "scenario": "recent_hit_old_evicted",
+      "reloads": 1
+    },
+    {
+      "scenario": "cancel_all_subscribers",
+      "cycle": 0,
+      "started": 200,
+      "aborted": 200,
+      "cached": 256,
+      "inFlight": 0
+    },
+    {
+      "scenario": "cancel_all_subscribers",
+      "cycle": 1,
+      "started": 200,
+      "aborted": 200,
+      "cached": 256,
+      "inFlight": 0
+    },
+    {
+      "scenario": "cancel_all_subscribers",
+      "cycle": 2,
+      "started": 200,
+      "aborted": 200,
+      "cached": 256,
+      "inFlight": 0
+    },
+    {
+      "scenario": "owner_scope_clears_all",
+      "cached": 0,
+      "inFlight": 0
+    }
+  ]
+}

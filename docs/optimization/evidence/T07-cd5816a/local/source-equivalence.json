@@ -1,0 +1,18 @@
+{
+  "subtrees": {
+    "64b7dc9": {
+      "frontend": "4a7935a25154ee331bca80b007ca90688b4c9bf9",
+      "backend/app": "3156a215c7311db4c18fe58bc62ccc54655867e8"
+    },
+    "5df7967": {
+      "frontend": "4a7935a25154ee331bca80b007ca90688b4c9bf9",
+      "backend/app": "c699115e372ff0d2075efe81d61ed2c3d33d4598"
+    },
+    "cd5816aa0ab29ca9d692537845687b1bc7060333": {
+      "frontend": "4a7935a25154ee331bca80b007ca90688b4c9bf9",
+      "backend/app": "c699115e372ff0d2075efe81d61ed2c3d33d4598"
+    }
+  },
+  "frontend_reuse": "Exact frontend Git subtree unchanged from 64b7dc9 through final product.",
+  "ci_final_backend": "Fresh clone checked out final cd5816a, test_backend_offline 294, one Windows symlink skip, transport0; frontend ci/test/build originally run at64b7dc9 same subtree."
+}

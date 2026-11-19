@@ -1,0 +1,266 @@
+{
+  "scope": "Implementation production build, local API fixtures only; no real AWS",
+  "results": [
+    {
+      "scenario": "instance_write_submits_task_with_key_and_opens_progress",
+      "passed": true
+    },
+    {
+      "scenario": "direct_task_reload_retains_id",
+      "passed": true,
+      "detail_gets": 2
+    },
+    {
+      "scenario": "polls_running_until_confirmed",
+      "passed": true,
+      "reads": 3,
+      "stopped_polling": true
+    },
+    {
+      "scenario": "all_task_states_distinct",
+      "passed": true,
+      "checks": [
+        {
+          "text": "已接受，等待执行",
+          "visible": true
+        },
+        {
+          "text": "执行中",
+          "visible": true
+        },
+        {
+          "text": "已确认完成",
+          "visible": true
+        },
+        {
+          "text": "明确失败",
+          "visible": true
+        },
+        {
+          "text": "部分完成",
+          "visible": true
+        },
+        {
+          "text": "待核对，资源锁保留",
+          "visible": true
+        },
+        {
+          "text": "已人工决议，AWS 结果未确认",
+          "visible": true
+        }
+      ]
+    },
+    {
+      "scenario": "late_detail_after_navigating_list",
+      "passed": true,
+      "url": "http://127.0.0.1:39054/tasks"
+    },
+    {
+      "scenario": "pending_intent_restores_after_reload",
+      "passed": true,
+      "pending_removed": true
+    },
+    {
+      "scenario": "late_old_user_task_after_login",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/credentials",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/instances",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/tasks",
+      "owner": 1,
+      "body": "{\"kind\":\"stop\",\"credential_id\":1,\"region\":\"us-east-1\",\"resource_name\":\"web\"}",
+      "idempotency_key": "d13a72845c25a8468496ee569727941609de3966dd30d0d3"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks/submitted",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks/reload",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks/reload",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks/progress",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks/progress",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks/progress",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks/old",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks/by-key",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks/old",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "owner": 1,
+      "body": ""
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "owner": 1,
+      "body": "{\"username\":\"fixture-user-2\",\"password\":\"FictionalLoginPass123!\"}"
+    },
+    {
+      "method": "GET",
+      "path": "/api/traffic/summary",
+      "owner": 2,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/instances",
+      "owner": 2,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/tasks",
+      "owner": 2,
+      "body": ""
+    }
+  ],
+  "passed": 7,
+  "total": 7
+}
