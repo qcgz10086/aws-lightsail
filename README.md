@@ -1,5 +1,7 @@
 # AWS Lightsail 管理平台
 
+> **优化测试分支**：测试部署请先阅读 [TEST-RELEASE.md](TEST-RELEASE.md)，使用 `docker-compose.test.yml` 和独立数据库卷。下文默认 Compose 使用的 `latest` 仍是原正式版，不是本次测试镜像。
+
 通过 Docker 一键部署的多用户 Lightsail 管理网站。
 
 ## 功能
