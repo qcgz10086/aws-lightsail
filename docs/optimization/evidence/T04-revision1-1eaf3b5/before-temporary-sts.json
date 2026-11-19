@@ -1,0 +1,113 @@
+{
+  "head": "34f57dc0deb1cff95702f69b9a8d993858667e21",
+  "warm_currencies": [
+    {
+      "currency": "USD",
+      "costs_complete": true,
+      "forecast_complete": true,
+      "credits_complete": true,
+      "total_cost": "10",
+      "net_cost": "8",
+      "credits_applied": "2",
+      "refunds": "0",
+      "discounts": "0",
+      "lightsail_cost": "10",
+      "forecast_remaining": "5",
+      "official_remaining": null,
+      "official_estimated": null,
+      "forecast_month_total": "13"
+    }
+  ],
+  "pending_currencies": [
+    {
+      "currency": "USD",
+      "costs_complete": true,
+      "forecast_complete": true,
+      "credits_complete": true,
+      "total_cost": "10",
+      "net_cost": "8",
+      "credits_applied": "2",
+      "refunds": "0",
+      "discounts": "0",
+      "lightsail_cost": "10",
+      "forecast_remaining": "5",
+      "official_remaining": null,
+      "official_estimated": null,
+      "forecast_month_total": "13"
+    }
+  ],
+  "after_currencies": [],
+  "after_accounts": [
+    {
+      "account_id": "123456789012",
+      "credential_id": 1,
+      "account_label": null,
+      "costs": {
+        "status": "unavailable",
+        "error": "身份校验失败，停止本次刷新",
+        "cache": {
+          "status": "error",
+          "stale": false,
+          "refreshing": false,
+          "last_success_at": null,
+          "expires_at": "1970-01-01T00:00:00+00:00",
+          "error": "身份校验失败，停止本次刷新",
+          "error_status": "unavailable"
+        }
+      },
+      "forecast": {
+        "status": "unavailable",
+        "error": "身份校验失败，停止本次刷新",
+        "cache": {
+          "status": "error",
+          "stale": false,
+          "refreshing": false,
+          "last_success_at": null,
+          "expires_at": "1970-01-01T00:00:00+00:00",
+          "error": "身份校验失败，停止本次刷新",
+          "error_status": "unavailable"
+        }
+      },
+      "credits": {
+        "status": "unavailable",
+        "error": "身份校验失败，停止本次刷新",
+        "cache": {
+          "status": "error",
+          "stale": false,
+          "refreshing": false,
+          "last_success_at": null,
+          "expires_at": "1970-01-01T00:00:00+00:00",
+          "error": "身份校验失败，停止本次刷新",
+          "error_status": "unavailable"
+        }
+      }
+    }
+  ],
+  "rows": [
+    {
+      "kind": "billing-identity",
+      "payload_present": true,
+      "error": "temporary STS outage",
+      "last_success": 1795048982.6312943
+    },
+    {
+      "kind": "billing-costs",
+      "payload_present": false,
+      "error": "身份校验失败，停止本次刷新",
+      "last_success": null
+    },
+    {
+      "kind": "billing-forecast",
+      "payload_present": false,
+      "error": "身份校验失败，停止本次刷新",
+      "last_success": null
+    },
+    {
+      "kind": "billing-credits",
+      "payload_present": false,
+      "error": "身份校验失败，停止本次刷新",
+      "last_success": null
+    }
+  ],
+  "aws_transport_attempts": 0
+}

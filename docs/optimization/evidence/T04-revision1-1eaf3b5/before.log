@@ -1,0 +1,50 @@
+.C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+2026-11-19 08:43:51,179 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 08:43:51,194 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 08:43:51,226 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 08:43:51,247 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 08:43:51,257 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 404 Not Found"
+.2026-11-19 08:43:51,453 INFO [httpx] HTTP Request: GET http://testserver/api/catalog/regions?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 08:43:51,751 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 08:43:51,765 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 08:43:51,803 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 08:43:51,818 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+.2026-11-19 08:43:51,967 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=moon-1 "HTTP/1.1 400 Bad Request"
+2026-11-19 08:43:51,976 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 400 Bad Request"
+2026-11-19 08:43:51,988 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 08:43:51,995 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 08:43:52,004 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=https%3A%2F%2F127.0.0.1 "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 08:43:52,011 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 08:43:52,050 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=eu-west-1&wait=true "HTTP/1.1 400 Bad Request"
+2026-11-19 08:43:52,083 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=us-east-1&wait=true "HTTP/1.1 200 OK"
+2026-11-19 08:43:52,098 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=us-east-1 "HTTP/1.1 200 OK"
+.2026-11-19 08:43:52,335 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 08:43:52,509 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+F2026-11-19 08:43:52,766 INFO [httpx] HTTP Request: POST http://testserver/api/instances/us-east-1/fixed/stop?credential_id=1 "HTTP/1.1 200 OK"
+.2026-11-19 08:43:53,010 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 08:43:53,082 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 08:43:53,140 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+E2026-11-19 08:43:54,395 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpab6xwsed\backups\v3.db.pre-v4-4e4618d620cb00ffdf1b18aa01f723b9838442cbf0a9fb87b42628d51d3668a5.db
+........
+======================================================================
+ERROR: test_temporary_identity_failure_preserves_all_stale_billing_sections (test_t04_cache.CacheRouteTests.test_temporary_identity_failure_preserves_all_stale_billing_sections)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\tests\test_t04_cache.py", line 330, in test_temporary_identity_failure_preserves_all_stale_billing_sections
+    self.assertEqual(after["currencies"][0]["net_cost"], "8")
+                     ~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+======================================================================
+FAIL: test_raw_sts_authentication_failure_invalidates_all_credential_snapshots (test_t04_cache.CacheRouteTests.test_raw_sts_authentication_failure_invalidates_all_credential_snapshots)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\tests\test_t04_cache.py", line 358, in test_raw_sts_authentication_failure_invalidates_all_credential_snapshots
+    self.assertTrue(all(row.payload is None for row in self.db.query(DataSnapshot).all()))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 15 tests in 7.612s
+
+FAILED (failures=1, errors=1)
