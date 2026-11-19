@@ -1,7 +1,7 @@
 import { Alert, Button, Card, Form, Input, Select, Switch, Typography, message, Space } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import api, { CredentialItem, CredentialOut, getErrorMessage } from '../api/client'
+import api, { CredentialItem, CredentialOut, getErrorMessage, invalidateQueryTags, readApi } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 
 interface Region {
@@ -46,7 +46,7 @@ function blueprintLabel(b: Blueprint): string {
 }
 
 export default function CreateInstancePage() {
-  const { user } = useAuth()
+  const { user, sessionKey } = useAuth()
   const [form] = Form.useForm()
   const [creds, setCreds] = useState<CredentialItem[]>([])
   const [regions, setRegions] = useState<Region[]>([])
@@ -64,6 +64,10 @@ export default function CreateInstancePage() {
   // 只清 timeout 不够：在途请求返回后还会重新 setTimeout 并继续
   // 改状态，代次让它直接返回。
   const pollSeqRef = useRef(0)
+  const catalogSeqRef = useRef(0)
+  const catalogController = useRef<AbortController | null>(null)
+  const credentialLoadSeq = useRef(0)
+  const credentialLoadController = useRef<AbortController | null>(null)
   const stopRegionPolling = () => {
     pollSeqRef.current += 1
     if (pollTimerRef.current !== null) {
@@ -71,15 +75,30 @@ export default function CreateInstancePage() {
       pollTimerRef.current = null
     }
   }
-  useEffect(() => () => stopRegionPolling(), [])
+  useEffect(() => () => {
+    stopRegionPolling()
+    catalogController.current?.abort()
+    credentialLoadController.current?.abort()
+    credentialLoadSeq.current += 1
+  }, [])
   const navigate = useNavigate()
 
   useEffect(() => {
     if (!user?.has_credentials) return
+    form.resetFields()
+    setCreds([])
+    setRegions([])
+    setBundles([])
+    setBlueprints([])
+    const seq = ++credentialLoadSeq.current
+    credentialLoadController.current?.abort()
+    const controller = new AbortController()
+    credentialLoadController.current = controller
     void (async () => {
       try {
-        const cRes = await api.get<CredentialOut>('/credentials')
-        const items = cRes.data.items || []
+        const cRes = await readApi<CredentialOut>('/credentials', {}, { signal: controller.signal })
+        if (seq !== credentialLoadSeq.current || controller.signal.aborted) return
+        const items = cRes.items || []
         setCreds(items)
         const defaultId = items.find((c) => c.is_default)?.id || items[0]?.id
         if (defaultId) {
@@ -87,40 +106,56 @@ export default function CreateInstancePage() {
           await loadRegions(defaultId)
         }
       } catch (err) {
-        message.error(getErrorMessage(err))
+        if (!controller.signal.aborted && seq === credentialLoadSeq.current) message.error(getErrorMessage(err))
       }
     })()
-  }, [user?.has_credentials])
+    return () => {
+      credentialLoadSeq.current += 1
+      controller.abort()
+      stopRegionPolling()
+      catalogSeqRef.current += 1
+      catalogController.current?.abort()
+    }
+  }, [user?.has_credentials, user?.id, sessionKey])
 
   const loadRegions = async (credentialId: number) => {
+    const seq = ++catalogSeqRef.current
+    catalogController.current?.abort()
+    const controller = new AbortController()
+    catalogController.current = controller
     try {
-      const res = await api.get<Region[]>('/catalog/regions', {
-        params: { credential_id: credentialId },
+      const res = await readApi<Region[]>('/catalog/regions', { credential_id: credentialId }, {
+        signal: controller.signal,
       })
-      setRegions(res.data)
+      if (seq !== catalogSeqRef.current || form.getFieldValue('credential_id') !== credentialId) return
+      setRegions(res)
       setBundles([])
       setBlueprints([])
       form.setFieldsValue({ region: undefined, blueprint_id: undefined, bundle_id: undefined })
     } catch (err) {
-      message.error(getErrorMessage(err))
+      if (!controller.signal.aborted) message.error(getErrorMessage(err))
     }
   }
 
   const loadCatalog = async (region: string, credentialId: number) => {
     stopRegionPolling()
+    const seq = ++catalogSeqRef.current
+    catalogController.current?.abort()
+    const controller = new AbortController()
+    catalogController.current = controller
     setLoadingMeta(true)
     setRegionIssue(null)
     form.setFieldsValue({ blueprint_id: undefined, bundle_id: undefined, password: undefined, password_confirm: undefined })
     setSelectedPlatform(undefined)
     try {
-      const [bRes, pRes] = await Promise.all([
-        api.get<Bundle[]>('/catalog/bundles', { params: { region, credential_id: credentialId } }),
-        api.get<Blueprint[]>('/catalog/blueprints', {
-          params: { region, credential_id: credentialId },
-        }),
+      const [bundles, blueprints] = await Promise.all([
+        readApi<Bundle[]>('/catalog/bundles', { region, credential_id: credentialId }, { signal: controller.signal }),
+        readApi<Blueprint[]>('/catalog/blueprints', { region, credential_id: credentialId }, { signal: controller.signal }),
       ])
-      setBundles(bRes.data.filter((b) => b.is_active !== false))
-      const bps = pRes.data.filter((b) => b.is_active !== false)
+      if (seq !== catalogSeqRef.current || form.getFieldValue('region') !== region
+        || form.getFieldValue('credential_id') !== credentialId) return
+      setBundles(bundles.filter((b) => b.is_active !== false))
+      const bps = blueprints.filter((b) => b.is_active !== false)
       bps.sort((a, c) => {
         // OS 优先，再按名称+版本
         const score = (x: Blueprint) => (x.type === 'os' ? 0 : 1)
@@ -132,6 +167,7 @@ export default function CreateInstancePage() {
       })
       setBlueprints(bps)
     } catch (err) {
+      if (controller.signal.aborted || seq !== catalogSeqRef.current) return
       const msg = getErrorMessage(err)
       if (msg.includes('UnrecognizedClientException')) {
         await checkRegionOptStatus(region, credentialId, msg)
@@ -139,7 +175,7 @@ export default function CreateInstancePage() {
         message.error(msg)
       }
     } finally {
-      setLoadingMeta(false)
+      if (seq === catalogSeqRef.current) setLoadingMeta(false)
     }
   }
 

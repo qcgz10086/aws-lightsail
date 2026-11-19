@@ -1,17 +1,18 @@
-import type { ReactNode } from 'react'
+import { lazy, Suspense, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Spin } from 'antd'
 import { useAuth } from './auth/AuthContext'
 import AppLayout from './components/Layout'
 import LoginPage from './pages/Login'
-import DashboardPage from './pages/Dashboard'
-import InstancesPage from './pages/Instances'
-import CreateInstancePage from './pages/CreateInstance'
-import InstanceDetailPage from './pages/InstanceDetail'
-import CredentialsPage from './pages/Credentials'
-import TrafficPage from './pages/Traffic'
-import BillingPage from './pages/Billing'
-import UsersPage from './pages/Users'
+
+const DashboardPage = lazy(() => import('./pages/Dashboard'))
+const InstancesPage = lazy(() => import('./pages/Instances'))
+const CreateInstancePage = lazy(() => import('./pages/CreateInstance'))
+const InstanceDetailPage = lazy(() => import('./pages/InstanceDetail'))
+const CredentialsPage = lazy(() => import('./pages/Credentials'))
+const TrafficPage = lazy(() => import('./pages/Traffic'))
+const BillingPage = lazy(() => import('./pages/Billing'))
+const UsersPage = lazy(() => import('./pages/Users'))
 
 function PrivateRoute({ children, adminOnly = false }: { children: ReactNode; adminOnly?: boolean }) {
   const { user, loading } = useAuth()
@@ -36,7 +37,9 @@ export default function App() {
           path="/"
           element={
             <PrivateRoute>
-              <AppLayout />
+              <Suspense fallback={<div style={{ padding: 24 }}><Spin /></div>}>
+                <AppLayout />
+              </Suspense>
             </PrivateRoute>
           }
         >

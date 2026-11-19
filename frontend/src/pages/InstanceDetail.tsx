@@ -1,5 +1,5 @@
 import { Alert, Button, Card, Col, Row, Space, Spin, Tag, Typography, message, Select } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import {
   CartesianGrid,
@@ -11,10 +11,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import api, { Instance, getErrorMessage } from '../api/client'
+import api, { Instance, readApi, getErrorMessage } from '../api/client'
+import { useAuth } from '../auth/AuthContext'
 import dayjs from 'dayjs'
 
 export default function InstanceDetailPage() {
+  const { sessionKey } = useAuth()
   const { region = '', name = '' } = useParams()
   const [search] = useSearchParams()
   const credentialId = search.get('credential_id') || undefined
@@ -22,28 +24,42 @@ export default function InstanceDetailPage() {
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState<'day' | 'week' | 'month'>('day')
   const [points, setPoints] = useState<{ time: string; in_mb: number; out_mb: number }[]>([])
+  const detailVersion = useRef(0)
+  const metricsVersion = useRef(0)
+  const detailController = useRef<AbortController | null>(null)
+  const metricsController = useRef<AbortController | null>(null)
 
   const params = credentialId ? { credential_id: credentialId } : {}
 
   const load = async () => {
+    detailController.current?.abort()
+    const controller = new AbortController()
+    detailController.current = controller
+    const version = ++detailVersion.current
     setLoading(true)
     try {
-      const res = await api.get<Instance>(`/instances/${region}/${name}`, { params })
-      setInst(res.data)
+      const result = await readApi<Instance>(`/instances/${region}/${name}`, params, {
+        signal: controller.signal, tags: ['instances'],
+      })
+      if (detailVersion.current === version) setInst(result)
     } catch (err) {
-      message.error(getErrorMessage(err))
+      if (!controller.signal.aborted && detailVersion.current === version) message.error(getErrorMessage(err))
     } finally {
-      setLoading(false)
+      if (detailVersion.current === version) setLoading(false)
     }
   }
 
   const loadMetrics = async (p: 'day' | 'week' | 'month') => {
+    metricsController.current?.abort()
+    const controller = new AbortController()
+    metricsController.current = controller
+    const version = ++metricsVersion.current
     try {
-      const res = await api.get(`/metrics/${region}/${name}`, {
-        params: { period: p, ...params },
-      })
+      const result = await readApi<{ points?: { timestamp: string; network_in_bytes: number; network_out_bytes: number }[] }>(
+        `/metrics/${region}/${name}`, { period: p, ...params }, { signal: controller.signal, tags: ['metrics'] })
+      if (metricsVersion.current !== version) return
       setPoints(
-        (res.data.points || []).map(
+        (result.points || []).map(
           (pt: { timestamp: string; network_in_bytes: number; network_out_bytes: number }) => ({
             time: dayjs(pt.timestamp).format(p === 'day' ? 'HH:mm' : 'MM-DD HH:mm'),
             in_mb: Number((pt.network_in_bytes / (1024 * 1024)).toFixed(2)),
@@ -52,17 +68,21 @@ export default function InstanceDetailPage() {
         ),
       )
     } catch (err) {
-      message.error(getErrorMessage(err))
+      if (!controller.signal.aborted && metricsVersion.current === version) message.error(getErrorMessage(err))
     }
   }
 
   useEffect(() => {
+    setInst(null)
+    setPoints([])
     void load()
-  }, [region, name, credentialId])
+    return () => { detailVersion.current += 1; detailController.current?.abort() }
+  }, [region, name, credentialId, sessionKey])
 
   useEffect(() => {
     void loadMetrics(period)
-  }, [region, name, period, credentialId])
+    return () => { metricsVersion.current += 1; metricsController.current?.abort() }
+  }, [region, name, period, credentialId, sessionKey])
 
   if (loading && !inst) return <Spin />
 

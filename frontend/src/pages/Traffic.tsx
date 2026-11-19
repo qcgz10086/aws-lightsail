@@ -1,43 +1,58 @@
 import { Alert, Button, Card, Col, Row, Space, Table, Tag, Typography, message, Statistic, Select } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import api, { CredentialItem, CredentialOut, TrafficSummary, getErrorMessage } from '../api/client'
+import api, { CredentialItem, CredentialOut, readApi, TrafficSummary, getErrorMessage,
+  invalidateQueryScope } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 
 export default function TrafficPage() {
-  const { user } = useAuth()
+  const { user, sessionKey } = useAuth()
   const [data, setData] = useState<TrafficSummary | null>(null)
   const [creds, setCreds] = useState<CredentialItem[]>([])
   const [filterCred, setFilterCred] = useState<number | 'all'>('all')
+  const filterCredRef = useRef(filterCred)
+  filterCredRef.current = filterCred
   const [loading, setLoading] = useState(false)
   const [syncing, setSyncing] = useState(false)
+  const requestVersion = useRef(0)
+  const readController = useRef<AbortController | null>(null)
+  const latestLoad = useRef<() => Promise<void>>(async () => {})
 
   const load = async () => {
+    readController.current?.abort()
+    const controller = new AbortController()
+    readController.current = controller
+    const version = ++requestVersion.current
     setLoading(true)
     try {
       const params = filterCred === 'all' ? {} : { credential_id: filterCred }
-      const res = await api.get<TrafficSummary>('/traffic/summary', { params })
-      setData(res.data)
+      const result = await readApi<TrafficSummary>('/traffic/summary', params, { signal: controller.signal, tags: ['traffic'] })
+      if (requestVersion.current === version) setData(result)
     } catch (err) {
-      message.error(getErrorMessage(err))
+      if (requestVersion.current === version && !controller.signal.aborted) message.error(getErrorMessage(err))
     } finally {
-      setLoading(false)
+      if (requestVersion.current === version) setLoading(false)
     }
   }
+  latestLoad.current = load
 
   useEffect(() => {
+    const credentialController = new AbortController()
     if (user?.has_credentials) {
+      setData(null)
+      setCreds([])
       void (async () => {
         try {
-          const res = await api.get<CredentialOut>('/credentials')
-          setCreds(res.data.items || [])
+          const res = await readApi<CredentialOut>('/credentials', {}, { signal: credentialController.signal })
+          if (!credentialController.signal.aborted) setCreds(res.items || [])
         } catch {
           /* ignore */
         }
       })()
       void load()
     }
-  }, [user?.has_credentials, filterCred])
+    return () => { requestVersion.current += 1; readController.current?.abort(); credentialController.abort() }
+  }, [user?.has_credentials, user?.id, sessionKey, filterCred])
 
   if (!user?.has_credentials) {
     return (
@@ -79,10 +94,13 @@ export default function TrafficPage() {
               setSyncing(true)
               try {
                 const res = await api.post('/traffic/sync', null, {
-                  params: filterCred === 'all' ? undefined : { credential_id: filterCred },
+                  params: filterCredRef.current === 'all' ? undefined : { credential_id: filterCredRef.current },
                 })
+                const credential_id = filterCredRef.current === 'all' ? undefined : filterCredRef.current
+                invalidateQueryScope('traffic', { credential_id })
+                invalidateQueryScope('instances', { credential_id })
                 message.success(res.data.message || '同步完成')
-                await load()
+                await latestLoad.current()
               } catch (err) {
                 message.error(getErrorMessage(err))
               } finally {
@@ -92,7 +110,11 @@ export default function TrafficPage() {
           >
             立即同步
           </Button>
-          <Button onClick={() => void load()} loading={loading}>
+          <Button onClick={() => {
+            const credential_id = filterCredRef.current === 'all' ? undefined : filterCredRef.current
+            invalidateQueryScope('traffic', { credential_id })
+            void latestLoad.current()
+          }} loading={loading}>
             刷新
           </Button>
         </Space>

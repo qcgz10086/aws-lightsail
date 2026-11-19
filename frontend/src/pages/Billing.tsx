@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { type Dayjs } from 'dayjs'
 import api, { BillingV2Summary, BillingCurrency, CredentialItem, CredentialOut,
-  ExactManualCredit, getErrorMessage } from '../api/client'
+  ExactManualCredit, getErrorMessage, invalidateQueryTags, readApi } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 
 const money = (value: string | null | undefined, currency: string) =>
@@ -12,46 +12,61 @@ const money = (value: string | null | undefined, currency: string) =>
 const statusTag = (status: string) => <Tag color={status === 'ok' ? 'green' : 'gold'}>{status}</Tag>
 
 export default function BillingPage() {
-  const { user } = useAuth()
+  const { user, sessionKey } = useAuth()
   const [summary, setSummary] = useState<BillingV2Summary | null>(null)
   const [creds, setCreds] = useState<CredentialItem[]>([])
   const [filterCred, setFilterCred] = useState<number | 'all'>('all')
+  const filterCredRef = useRef(filterCred)
+  filterCredRef.current = filterCred
   const [loading, setLoading] = useState(false)
   const [form] = Form.useForm()
   const requestVersion = useRef(0)
   const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pollStarted = useRef(0)
+  const readController = useRef<AbortController | null>(null)
+  const latestLoad = useRef<() => Promise<void>>(async () => {})
   const load = async () => {
+    readController.current?.abort()
+    const controller = new AbortController()
+    readController.current = controller
     const version = ++requestVersion.current
     setLoading(true)
     try {
       const params = filterCred === 'all' ? {} : { credential_id: filterCred }
-      const res = await api.get<BillingV2Summary>('/v2/billing/summary', { params })
+      const data = await readApi<BillingV2Summary>('/v2/billing/summary', params, {
+        signal: controller.signal, tags: ['billing'], cacheIf: (value) => !value.refreshing,
+      })
       if (version === requestVersion.current) {
-        setSummary(res.data)
-        if (res.data.refreshing && Date.now() - pollStarted.current < 30000) {
+        setSummary(data)
+        if (data.refreshing && Date.now() - pollStarted.current < 30000) {
           pollTimer.current = setTimeout(() => void load(), 500)
         }
       }
     } catch (error) {
-      if (version === requestVersion.current) message.error(getErrorMessage(error))
+      if (version === requestVersion.current && !controller.signal.aborted) message.error(getErrorMessage(error))
     } finally {
       if (version === requestVersion.current) setLoading(false)
     }
   }
+  latestLoad.current = load
   useEffect(() => {
+    const credentialController = new AbortController()
     if (user?.has_credentials) {
       setSummary(null)
+      setCreds([])
       pollStarted.current = Date.now()
-      void load()
-      void api.get<CredentialOut>('/credentials').then((res) => setCreds(res.data.items || []))
-        .catch((error) => message.error(getErrorMessage(error)))
+      void latestLoad.current()
+      void readApi<CredentialOut>('/credentials', {}, { signal: credentialController.signal })
+        .then((res) => { if (!credentialController.signal.aborted) setCreds(res.items || []) })
+        .catch((error) => { if (!credentialController.signal.aborted) message.error(getErrorMessage(error)) })
     }
     return () => {
       requestVersion.current += 1
+      readController.current?.abort()
+      credentialController.abort()
       if (pollTimer.current) clearTimeout(pollTimer.current)
     }
-  }, [user?.has_credentials, filterCred])
+  }, [user?.has_credentials, user?.id, sessionKey, filterCred])
 
   if (!user?.has_credentials) return <Alert type="info" showIcon message="请先绑定 AWS 凭证"
     description={<Link to="/credentials">前往绑定</Link>} />
@@ -59,8 +74,9 @@ export default function BillingPage() {
   const remove = async (record: ExactManualCredit) => {
     try {
       await api.delete(`/billing/credits/${record.id}`)
+      invalidateQueryTags('billing')
       message.success('已删除')
-      void load()
+      void latestLoad.current()
     } catch (error) { message.error(getErrorMessage(error)) }
   }
   const manualColumns = [
@@ -95,8 +111,9 @@ export default function BillingPage() {
             if (pollTimer.current) clearTimeout(pollTimer.current)
             pollStarted.current = Date.now()
             await api.post('/v2/refresh', { kind: 'billing',
-              credential_id: filterCred === 'all' ? null : filterCred })
-            void load()
+              credential_id: filterCredRef.current === 'all' ? null : filterCredRef.current })
+            invalidateQueryTags('billing')
+            void latestLoad.current()
           } catch (error) { message.error(getErrorMessage(error)) }
         }}>刷新</Button></Space>
     </Space>
@@ -158,7 +175,7 @@ export default function BillingPage() {
             Modal.confirm({ title: `确认记录属于 ${credential?.account_id}？`,
               content: '这会给该历史记录保存明确的账号归属，不会推算其剩余金额。',
               onOk: async () => {
-                try { await api.patch(`/v2/billing/credits/${row.id}/assign`, { credential_id }); void load() }
+            try { await api.patch(`/v2/billing/credits/${row.id}/assign`, { credential_id }); invalidateQueryTags('billing'); void latestLoad.current() }
                 catch (error) { message.error(getErrorMessage(error)); throw error }
               } })
           }} /> }]} /></Card>
@@ -169,7 +186,8 @@ export default function BillingPage() {
       try {
         await api.post('/v2/billing/credits', { ...values, start_date: values.start_date.format('YYYY-MM-DD'),
           expires_at: values.expires_at?.format('YYYY-MM-DD') || null })
-        message.success('记录已添加'); form.resetFields(); void load()
+        invalidateQueryTags('billing')
+        message.success('记录已添加'); form.resetFields(); void latestLoad.current()
       } catch (error) { message.error(getErrorMessage(error)) }
     }} initialValues={{ currency: 'USD' }}>
       <Form.Item name="name" label="名称" rules={[{ required: true }]}><Input /></Form.Item>

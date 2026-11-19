@@ -1,17 +1,29 @@
 import { Alert, Button, Card, Col, List, Row, Statistic, Tag, Typography, Spin, Space } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import api, { Instance, TrafficSummary, getErrorMessage } from '../api/client'
+import api, { CachedInstancesResponse, Instance, readApi, TrafficSummary, getErrorMessage,
+  invalidateQueryScope } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 
 export default function DashboardPage() {
-  const { user } = useAuth()
+  const { user, sessionKey } = useAuth()
   const [instances, setInstances] = useState<Instance[]>([])
   const [traffic, setTraffic] = useState<TrafficSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [instancesRefreshing, setInstancesRefreshing] = useState(false)
+  const requestVersion = useRef(0)
+  const activeRead = useRef<AbortController | null>(null)
+  const trafficRead = useRef<AbortController | null>(null)
+  const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pollStarted = useRef(0)
+  const trafficVersion = useRef(0)
 
-  const load = async () => {
+  const load = async (force = false, refreshTraffic = true) => {
+    activeRead.current?.abort()
+    const controller = new AbortController()
+    activeRead.current = controller
+    const version = ++requestVersion.current
     setLoading(true)
     setError(null)
     try {
@@ -20,22 +32,54 @@ export default function DashboardPage() {
         setTraffic(null)
         return
       }
-      const [instRes, trafRes] = await Promise.all([
-        api.get<Instance[]>('/instances'),
-        api.get<TrafficSummary>('/traffic/summary'),
-      ])
-      setInstances(instRes.data)
-      setTraffic(trafRes.data)
+      if (refreshTraffic) void loadTraffic(force)
+      const nextInstances = await readApi<CachedInstancesResponse>('/v2/instances', {}, {
+        signal: controller.signal, tags: ['instances'], force, cacheIf: (value) => !value.refreshing,
+      })
+      if (requestVersion.current === version) {
+        setInstances(nextInstances.instances)
+        setInstancesRefreshing(nextInstances.refreshing)
+        if (nextInstances.refreshing && Date.now() - pollStarted.current < 30000) {
+          if (pollTimer.current) clearTimeout(pollTimer.current)
+          pollTimer.current = setTimeout(() => void load(false, false), 500)
+        }
+      }
     } catch (err) {
-      setError(getErrorMessage(err))
+      if (requestVersion.current === version && !controller.signal.aborted) setError(getErrorMessage(err))
     } finally {
-      setLoading(false)
+      if (requestVersion.current === version) setLoading(false)
+    }
+  }
+
+  const loadTraffic = async (force = false) => {
+    trafficRead.current?.abort()
+    const controller = new AbortController()
+    trafficRead.current = controller
+    const version = ++trafficVersion.current
+    try {
+      const nextTraffic = await readApi<TrafficSummary>('/traffic/summary', {}, {
+        signal: controller.signal, tags: ['traffic'], force,
+      })
+      if (trafficVersion.current === version) setTraffic(nextTraffic)
+    } catch (err) {
+      if (trafficVersion.current === version && !controller.signal.aborted) setError(getErrorMessage(err))
     }
   }
 
   useEffect(() => {
+    setInstances([])
+    setTraffic(null)
+    setInstancesRefreshing(false)
+    pollStarted.current = Date.now()
     void load()
-  }, [user?.has_credentials])
+    return () => {
+      requestVersion.current += 1
+      trafficVersion.current += 1
+      if (pollTimer.current) clearTimeout(pollTimer.current)
+      activeRead.current?.abort()
+      trafficRead.current?.abort()
+    }
+  }, [user?.has_credentials, user?.id, sessionKey])
 
   if (!user?.has_credentials) {
     return (
@@ -64,10 +108,19 @@ export default function DashboardPage() {
           <Typography.Title level={3} style={{ margin: 0 }}>
             总览
           </Typography.Title>
-          <Button onClick={() => void load()}>刷新</Button>
+          <Button onClick={async () => {
+            try {
+              await api.post('/v2/refresh', { kind: 'instances' })
+              invalidateQueryScope('instances')
+              invalidateQueryScope('traffic')
+              pollStarted.current = Date.now()
+              void load(true)
+            } catch (err) { setError(getErrorMessage(err)) }
+          }}>刷新</Button>
         </div>
 
         {error && <Alert type="error" showIcon message={error} />}
+        {instancesRefreshing && <Alert type="info" showIcon message="实例快照后台刷新中，成功区域先行显示" />}
 
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={6}>

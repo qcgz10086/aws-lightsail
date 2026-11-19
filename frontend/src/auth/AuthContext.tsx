@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import api, { User, getErrorMessage } from '../api/client'
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import api, { establishQueryCacheScope, User, getErrorMessage } from '../api/client'
 
 interface AuthState {
   user: User | null
   loading: boolean
+  sessionKey: number
   login: (username: string, password: string) => Promise<void>
   logout: () => Promise<void>
   refreshMe: () => Promise<void>
@@ -15,43 +16,75 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // R-5：登录态只保存在内存与 HttpOnly Cookie 里，不再写 localStorage。
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [sessionKey, setSessionKey] = useState(0)
+  const sessionGeneration = useRef(0)
+  const authReadController = useRef<AbortController | null>(null)
+
+  const applyCurrentUser = async (generation: number, signal: AbortSignal) => {
+    const res = await api.get<User>('/auth/me', { signal })
+    if (generation !== sessionGeneration.current) return
+    establishQueryCacheScope(`${res.data.id}:${generation}`)
+    setUser(res.data)
+    setSessionKey(generation)
+  }
 
   const refreshMe = async () => {
-    const res = await api.get<User>('/auth/me')
-    setUser(res.data)
+    const generation = ++sessionGeneration.current
+    authReadController.current?.abort()
+    const controller = new AbortController()
+    authReadController.current = controller
+    await applyCurrentUser(generation, controller.signal)
   }
 
   useEffect(() => {
     const boot = async () => {
+      const generation = ++sessionGeneration.current
+      const controller = new AbortController()
+      authReadController.current = controller
       try {
-        await refreshMe()
+        await applyCurrentUser(generation, controller.signal)
       } catch {
-        setUser(null)
+        if (generation === sessionGeneration.current) {
+          establishQueryCacheScope(null)
+          setUser(null)
+          setSessionKey(generation)
+        }
       } finally {
-        setLoading(false)
+        if (generation === sessionGeneration.current) setLoading(false)
       }
     }
     void boot()
   }, [])
 
   const login = async (username: string, password: string) => {
-    const res = await api.post('/auth/login', { username, password })
-    setUser(res.data.user)
-  }
-
-  const logout = async () => {
+    const generation = ++sessionGeneration.current
+    authReadController.current?.abort()
+    authReadController.current = null
     try {
-      await api.post('/auth/logout')
-    } catch {
-      // 登出失败也不阻塞本地退出
+      const res = await api.post('/auth/login', { username, password })
+      if (generation !== sessionGeneration.current) return
+      establishQueryCacheScope(`${res.data.user.id}:${generation}`)
+      setUser(res.data.user)
+      setSessionKey(generation)
     } finally {
-      setUser(null)
+      if (generation === sessionGeneration.current) setLoading(false)
     }
   }
 
+  const logout = async () => {
+    const generation = ++sessionGeneration.current
+    authReadController.current?.abort()
+    authReadController.current = null
+    establishQueryCacheScope(null)
+    setUser(null)
+    setSessionKey(generation)
+    setLoading(false)
+    try { await api.post('/auth/logout') } catch { /* 本地退出不依赖服务端响应 */ }
+  }
+
   const value = useMemo(
-    () => ({ user, loading, login, logout, refreshMe }),
-    [user, loading],
+    () => ({ user, loading, sessionKey, login, logout, refreshMe }),
+    [user, loading, sessionKey],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

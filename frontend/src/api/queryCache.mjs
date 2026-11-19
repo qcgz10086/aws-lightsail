@@ -1,25 +1,64 @@
 const cache = new Map()
 const inFlight = new Map()
+const MAX_CACHED_QUERIES = 256
 let scope = 'anonymous'
 
 function abortError() {
   return new DOMException('Request cancelled', 'AbortError')
 }
 
+function trimExpired(now = Date.now()) {
+  for (const [key, entry] of cache) {
+    if (entry.expiresAt <= now) cache.delete(key)
+  }
+}
+
 function hasTag(entry, tags) {
-  return tags.some((tag) => entry.tags.includes(tag))
+  return tags.some((tag) => {
+    if (entry.tags.includes(tag)
+      || (!tag.includes(':') && entry.tags.some((candidate) => candidate.startsWith(`${tag}:`)))) return true
+
+    const target = parseScopeTag(tag)
+    if (!target) return false
+    return entry.tags.some((candidate) => {
+      const cached = parseScopeTag(candidate)
+      return cached && cached.domain === target.domain
+        && (cached.credential === '*' || target.credential === '*' || cached.credential === target.credential)
+        && (cached.region === '*' || target.region === '*' || cached.region === target.region)
+    })
+  })
+}
+
+function parseScopeTag(tag) {
+  const match = tag.match(/^([^:]+):scope:([^:]+):([^:]+)$/)
+  if (!match) return null
+  return { domain: match[1], credential: match[2], region: match[3] }
+}
+
+function storeValue(key, value, expiresAt, tags) {
+  trimExpired()
+  cache.delete(key)
+  cache.set(key, { value, expiresAt, tags })
+  while (cache.size > MAX_CACHED_QUERIES) cache.delete(cache.keys().next().value)
+}
+
+function retireEntry(key, entry) {
+  if (inFlight.get(key) === entry) inFlight.delete(key)
+  if (entry.invalidated) return
+  entry.invalidated = true
+  entry.controller.abort()
+  for (const rejectSubscriber of [...entry.subscribers]) rejectSubscriber()
 }
 
 function subscribe(entry, signal) {
   if (signal?.aborted) return Promise.reject(abortError())
-  const subscriber = {}
-  entry.subscribers.add(subscriber)
-
   return new Promise((resolve, reject) => {
     let done = false
+    const rejectSubscriber = () => finish(reject, abortError())
+    entry.subscribers.add(rejectSubscriber)
     const release = () => {
-      entry.subscribers.delete(subscriber)
-      if (!entry.settled && entry.subscribers.size === 0) entry.controller.abort()
+      entry.subscribers.delete(rejectSubscriber)
+      if (!entry.settled && entry.subscribers.size === 0) retireEntry(entry.key, entry)
     }
     const finish = (callback, value) => {
       if (done) return
@@ -53,25 +92,36 @@ export function queryCacheKey(url, params) {
   return `${scope}|${url}|${JSON.stringify(normalized ?? null)}`
 }
 
-export function queryGet(key, loader, { ttlMs = 0, tags = [], signal, force = false } = {}) {
+export function queryGet(key, loader, { ttlMs = 0, tags = [], signal, force = false,
+  cacheIf = () => true } = {}) {
   if (signal?.aborted) return Promise.reject(abortError())
   const now = Date.now()
-  if (force) cache.delete(key)
+  if (force) {
+    cache.delete(key)
+    const previous = inFlight.get(key)
+    if (previous) retireEntry(key, previous)
+  }
+  trimExpired(now)
   const cached = cache.get(key)
-  if (cached && cached.expiresAt > now) return Promise.resolve(cached.value)
+  if (cached && cached.expiresAt > now) {
+    cache.delete(key)
+    cache.set(key, cached)
+    return Promise.resolve(cached.value)
+  }
   if (cached) cache.delete(key)
 
   let entry = inFlight.get(key)
   if (!entry) {
     const controller = new AbortController()
-    entry = { controller, subscribers: new Set(), tags, settled: false, promise: null }
+    entry = { key, controller, subscribers: new Set(), tags, settled: false, invalidated: false, promise: null }
     inFlight.set(key, entry)
     const current = entry
     entry.promise = Promise.resolve()
       .then(() => loader(controller.signal))
       .then((value) => {
-        if (!controller.signal.aborted && inFlight.get(key) === current && ttlMs > 0) {
-          cache.set(key, { value, expiresAt: Date.now() + ttlMs, tags })
+        if (!current.invalidated && !controller.signal.aborted && inFlight.get(key) === current
+          && ttlMs > 0 && cacheIf(value)) {
+          storeValue(key, value, Date.now() + ttlMs, tags)
         }
         return value
       })
@@ -92,17 +142,13 @@ export function invalidateQueryTags(...tags) {
     if (hasTag(entry, tags)) cache.delete(key)
   }
   for (const [key, entry] of inFlight) {
-    if (hasTag(entry, tags)) {
-      inFlight.delete(key)
-      entry.controller.abort()
-    }
+    if (hasTag(entry, tags)) retireEntry(key, entry)
   }
 }
 
 export function clearQueryCache() {
   cache.clear()
-  for (const entry of inFlight.values()) entry.controller.abort()
-  inFlight.clear()
+  for (const [key, entry] of [...inFlight]) retireEntry(key, entry)
 }
 
 export function queryCacheStats() {

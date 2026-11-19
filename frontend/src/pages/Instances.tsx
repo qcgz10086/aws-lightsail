@@ -17,7 +17,8 @@ import {
 } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import api, { CredentialItem, CredentialOut, Instance, SnapshotMetadata, getErrorMessage } from '../api/client'
+import api, { CachedInstancesResponse, CredentialItem, CredentialOut, Instance, readApi,
+  SnapshotMetadata, getErrorMessage, invalidateQueryScope, invalidateQueryTags } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 
 const stateColor: Record<string, string> = {
@@ -29,11 +30,12 @@ const stateColor: Record<string, string> = {
 }
 
 export default function InstancesPage() {
-  const { user } = useAuth()
+  const { user, sessionKey } = useAuth()
   const navigate = useNavigate()
   const [data, setData] = useState<Instance[]>([])
   const [creds, setCreds] = useState<CredentialItem[]>([])
   const [filterCred, setFilterCred] = useState<number | 'all'>('all')
+  const [filterRegion, setFilterRegion] = useState<string | 'all'>('all')
   const [loading, setLoading] = useState(false)
   const [snapshotScopes, setSnapshotScopes] = useState<(SnapshotMetadata & { region: string | null; credential_id: number })[]>([])
   const [acting, setActing] = useState<string | null>(null)
@@ -43,59 +45,85 @@ export default function InstancesPage() {
   const requestVersion = useRef(0)
   const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pollStarted = useRef(0)
+  const readController = useRef<AbortController | null>(null)
+  const actionRefreshTimers = useRef(new Set<ReturnType<typeof setTimeout>>())
+  const latestLoad = useRef<() => Promise<void>>(async () => {})
 
-  const loadCreds = async () => {
+  const loadCreds = async (signal?: AbortSignal) => {
     try {
-      const res = await api.get<CredentialOut>('/credentials')
-      setCreds(res.data.items || [])
+      const res = await readApi<CredentialOut>('/credentials', {}, { signal })
+      if (!signal?.aborted) setCreds(res.items || [])
     } catch {
       /* ignore */
     }
   }
 
   const load = async () => {
+    readController.current?.abort()
+    const controller = new AbortController()
+    readController.current = controller
     const version = ++requestVersion.current
     setLoading(true)
     try {
-      const params =
-        filterCred === 'all' ? {} : { credential_id: filterCred }
-      const res = await api.get<{ instances: Instance[]; scopes: typeof snapshotScopes; refreshing: boolean }>(
-        '/v2/instances', { params })
+      const params = {
+        ...(filterCred === 'all' ? {} : { credential_id: filterCred }),
+        ...(filterRegion === 'all' ? {} : { region: filterRegion }),
+      }
+      const res = await readApi<CachedInstancesResponse>('/v2/instances', params, {
+        signal: controller.signal,
+        tags: ['instances'],
+        cacheIf: (value) => !value.refreshing,
+      })
       if (version === requestVersion.current) {
-        setData(res.data.instances)
-        setSnapshotScopes(res.data.scopes)
-        if (res.data.refreshing && Date.now() - pollStarted.current < 30000) {
+        setData(res.instances)
+        setSnapshotScopes(res.scopes)
+        if (res.refreshing && Date.now() - pollStarted.current < 30000) {
           pollTimer.current = setTimeout(() => void load(), 500)
         }
       }
     } catch (err) {
-      if (version === requestVersion.current) message.error(getErrorMessage(err))
+      if (version === requestVersion.current && !controller.signal.aborted) message.error(getErrorMessage(err))
     } finally {
       if (version === requestVersion.current) setLoading(false)
     }
   }
+  latestLoad.current = load
 
   useEffect(() => {
+    const credentialController = new AbortController()
     if (user?.has_credentials) {
       setData([])
       setSnapshotScopes([])
+      setCreds([])
       pollStarted.current = Date.now()
-      void loadCreds()
+      void loadCreds(credentialController.signal)
       void load()
     }
     return () => {
       requestVersion.current += 1
+      readController.current?.abort()
+      credentialController.abort()
       if (pollTimer.current) clearTimeout(pollTimer.current)
     }
-  }, [user?.has_credentials, filterCred])
+  }, [user?.has_credentials, user?.id, sessionKey, filterCred, filterRegion])
+
+  useEffect(() => () => {
+    for (const timer of actionRefreshTimers.current) clearTimeout(timer)
+    actionRefreshTimers.current.clear()
+  }, [user?.id])
 
   const refresh = async () => {
     try {
       if (pollTimer.current) clearTimeout(pollTimer.current)
       pollStarted.current = Date.now()
       await api.post('/v2/refresh', { kind: 'instances',
-        credential_id: filterCred === 'all' ? null : filterCred })
-      void load()
+        credential_id: filterCred === 'all' ? null : filterCred,
+        region: filterRegion === 'all' ? null : filterRegion })
+      invalidateQueryScope('instances', {
+        ...(filterCred === 'all' ? {} : { credential_id: filterCred }),
+        ...(filterRegion === 'all' ? {} : { region: filterRegion }),
+      })
+      await latestLoad.current()
     } catch (error) { message.error(getErrorMessage(error)) }
   }
 
@@ -120,7 +148,14 @@ export default function InstancesPage() {
         })
         message.success(res.data.message || '操作已提交')
       }
-      setTimeout(() => void refresh(), 1500)
+      invalidateQueryScope('instances', { credential_id: inst.credential_id, region: inst.region })
+      invalidateQueryScope('traffic', { credential_id: inst.credential_id, region: inst.region })
+      invalidateQueryScope('metrics', { credential_id: inst.credential_id, region: inst.region })
+      const timer = setTimeout(() => {
+        actionRefreshTimers.current.delete(timer)
+        void latestLoad.current()
+      }, 1500)
+      actionRefreshTimers.current.add(timer)
     } catch (err) {
       message.error(getErrorMessage(err))
     } finally {
@@ -157,6 +192,15 @@ export default function InstancesPage() {
                 label: `${c.account_label || '凭证'} #${c.id}${c.is_default ? ' (默认)' : ''}`,
               })),
             ]}
+          />
+          <Select
+            style={{ minWidth: 160 }}
+            value={filterRegion}
+            onChange={(value) => { pollStarted.current = Date.now(); setFilterRegion(value) }}
+            options={[{ value: 'all', label: '全部地区' }, ...[...new Set([
+              ...data.map((item) => item.region),
+              ...snapshotScopes.map((item) => item.region).filter((item): item is string => Boolean(item)),
+            ])].sort().map((region) => ({ value: region, label: region }))]}
           />
           <Button type="primary" onClick={() => navigate('/create')}>
             开通实例
@@ -312,9 +356,11 @@ export default function InstancesPage() {
               Object.fromEntries(Object.entries(values).filter(([key]) => editedLimitFields.current.has(key))),
               { params: { credential_id: limitModal.credential_id || undefined } },
             )
+            invalidateQueryScope('instances', { credential_id: limitModal.credential_id, region: limitModal.region })
+            invalidateQueryScope('traffic', { credential_id: limitModal.credential_id, region: limitModal.region })
             message.success('已保存')
             setLimitModal(null)
-            void load()
+            void latestLoad.current()
           } catch (err) {
             message.error(getErrorMessage(err))
           }
@@ -354,9 +400,11 @@ export default function InstancesPage() {
                       resolve_conflict_credential_ids: strategies.map((strategy) => strategy.credential_id),
                       resolve_conflict_token: res.data.confirmation_token,
                     }, { params })
+                    invalidateQueryScope('instances', { credential_id: limitModal.credential_id, region: limitModal.region })
+                    invalidateQueryScope('traffic', { credential_id: limitModal.credential_id, region: limitModal.region })
                     message.success('全部策略已确认，冲突暂停已解除')
                     setLimitModal(null)
-                    void load()
+                    void latestLoad.current()
                   } catch (err) {
                     message.error(getErrorMessage(err))
                     throw err

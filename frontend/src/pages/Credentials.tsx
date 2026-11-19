@@ -14,8 +14,8 @@ import {
   Typography,
   message,
 } from 'antd'
-import { useEffect, useState } from 'react'
-import api, { CredentialItem, CredentialOut, getErrorMessage } from '../api/client'
+import { useEffect, useRef, useState } from 'react'
+import api, { CredentialItem, CredentialOut, getErrorMessage, invalidateQueryTags, readApi } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import dayjs from 'dayjs'
 
@@ -31,7 +31,7 @@ function tierColor(tier?: string | null): string {
 }
 
 export default function CredentialsPage() {
-  const { refreshMe } = useAuth()
+  const { user, sessionKey, refreshMe } = useAuth()
   const [items, setItems] = useState<CredentialItem[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -40,22 +40,30 @@ export default function CredentialsPage() {
   const [proxyModal, setProxyModal] = useState<{ id: number; masked?: string | null } | null>(null)
   const [proxyInput, setProxyInput] = useState('')
   const [proxySaving, setProxySaving] = useState(false)
+  const requestVersion = useRef(0)
+  const readController = useRef<AbortController | null>(null)
 
   const load = async () => {
+    readController.current?.abort()
+    const controller = new AbortController()
+    readController.current = controller
+    const version = ++requestVersion.current
     setLoading(true)
     try {
-      const res = await api.get<CredentialOut>('/credentials')
-      setItems(res.data.items || [])
+      const res = await readApi<CredentialOut>('/credentials', {}, { signal: controller.signal, tags: ['credentials'] })
+      if (requestVersion.current === version) setItems(res.items || [])
     } catch (err) {
-      message.error(getErrorMessage(err))
+      if (!controller.signal.aborted && requestVersion.current === version) message.error(getErrorMessage(err))
     } finally {
-      setLoading(false)
+      if (requestVersion.current === version) setLoading(false)
     }
   }
 
   useEffect(() => {
+    setItems([])
     void load()
-  }, [])
+    return () => { requestVersion.current += 1; readController.current?.abort() }
+  }, [user?.id, sessionKey])
 
   const refreshQuota = async (id: number) => {
     setQuotaLoadingId(id)
@@ -182,6 +190,7 @@ export default function CredentialsPage() {
                       onClick={async () => {
                         try {
                           const res = await api.post<CredentialOut>(`/credentials/${row.id}/default`)
+                          invalidateQueryTags('credentials', 'catalog', 'billing', 'instances', 'traffic')
                           setItems(res.data.items || [])
                           message.success('已设为默认')
                           await refreshMe()
@@ -207,6 +216,7 @@ export default function CredentialsPage() {
                     onClick={async () => {
                       try {
                         await api.post(`/credentials/${row.id}/validate`)
+                        invalidateQueryTags('credentials', 'catalog', 'billing', 'instances', 'traffic')
                         message.success('校验成功（已同步配额）')
                         void load()
                       } catch (err) {
@@ -231,6 +241,7 @@ export default function CredentialsPage() {
                     onConfirm={async () => {
                       try {
                         await api.delete(`/credentials/${row.id}`)
+                        invalidateQueryTags('credentials', 'catalog', 'billing', 'instances', 'traffic')
                         message.success('已删除')
                         await load()
                         await refreshMe()
@@ -259,6 +270,7 @@ export default function CredentialsPage() {
             setSaving(true)
             try {
               const res = await api.post<CredentialOut>('/credentials', values)
+              invalidateQueryTags('credentials', 'catalog', 'billing', 'instances', 'traffic')
               setItems(res.data.items || [])
               const latest = res.data.items?.[res.data.items.length - 1]
               const tier = latest?.vcpu_tier
@@ -330,6 +342,7 @@ export default function CredentialsPage() {
                 const res = await api.put<CredentialOut>(`/credentials/${proxyModal.id}`, {
                   proxy_url: proxyInput,
                 })
+                invalidateQueryTags('credentials', 'catalog', 'billing', 'instances', 'traffic')
                 setItems(res.data.items || [])
                 message.success(proxyInput ? '代理已更新（已用新代理校验通过）' : '代理已清除，恢复直连')
                 setProxyModal(null)

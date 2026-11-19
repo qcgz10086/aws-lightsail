@@ -12,8 +12,9 @@ import {
   Typography,
   message,
 } from 'antd'
-import { useEffect, useState } from 'react'
-import api, { User, getErrorMessage } from '../api/client'
+import { useEffect, useRef, useState } from 'react'
+import api, { User, getErrorMessage, readApi } from '../api/client'
+import { useAuth } from '../auth/AuthContext'
 
 // 与后端 app.password_strength 同一标准：12-64 位，含大小写字母、数字、符号。
 function validateStrongPassword(pwd: string): string | null {
@@ -26,26 +27,35 @@ function validateStrongPassword(pwd: string): string | null {
 }
 
 export default function UsersPage() {
+  const { sessionKey } = useAuth()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
   const [form] = Form.useForm()
+  const requestVersion = useRef(0)
+  const controllerRef = useRef<AbortController | null>(null)
 
   const load = async () => {
+    controllerRef.current?.abort()
+    const controller = new AbortController()
+    controllerRef.current = controller
+    const version = ++requestVersion.current
     setLoading(true)
     try {
-      const res = await api.get<User[]>('/users')
-      setUsers(res.data)
+      const rows = await readApi<User[]>('/users', {}, { signal: controller.signal, tags: ['users'] })
+      if (version === requestVersion.current) setUsers(rows)
     } catch (err) {
-      message.error(getErrorMessage(err))
+      if (!controller.signal.aborted && version === requestVersion.current) message.error(getErrorMessage(err))
     } finally {
-      setLoading(false)
+      if (version === requestVersion.current) setLoading(false)
     }
   }
 
   useEffect(() => {
+    setUsers([])
     void load()
-  }, [])
+    return () => { requestVersion.current += 1; controllerRef.current?.abort() }
+  }, [sessionKey])
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
