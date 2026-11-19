@@ -106,6 +106,8 @@ def run(args):
             finally:
                 stop.set(); sampler.join(3)
             if failures: raise RuntimeError(failures)
+            if not (output / 'browser.json').exists():
+                raise RuntimeError(f'Browser process exited {result.returncode} without a report; see browser-process.log')
             report = json.loads((output / 'browser.json').read_text())
             def window(start, end, name):
                 samples = [start[name]] + [r[name] for r in raw if start['time'] < r['time'] < end['time']] + [end[name]]

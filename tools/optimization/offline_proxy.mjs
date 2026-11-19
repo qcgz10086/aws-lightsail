@@ -20,6 +20,7 @@ export async function startOfflineProxy(baseUrl) {
       method: req.method, headers: { ...req.headers, host: target.host },
     }, upstream => {
       res.writeHead(upstream.statusCode, upstream.headers);
+      upstream.on('error', () => res.destroy());
       upstream.pipe(res);
     });
     forward.on('error', () => {
@@ -27,8 +28,14 @@ export async function startOfflineProxy(baseUrl) {
       res.end('fixture upstream unavailable');
     });
     req.on('aborted', () => forward.destroy());
+    req.on('error', () => forward.destroy());
+    res.on('error', () => forward.destroy());
+    res.on('close', () => { if (!res.writableFinished) forward.destroy(); });
     req.pipe(forward);
   });
+  // Chrome closes rejected/background connections, sometimes with an RST.
+  // Register before the CONNECT allowlist can return so resets cannot escape.
+  server.on('connection', socket => socket.on('error', () => socket.destroy()));
   server.on('connect', (req, socket, head) => {
     if (req.url !== base.host) {
       socket.end('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
