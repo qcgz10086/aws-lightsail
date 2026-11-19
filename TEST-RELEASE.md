@@ -6,10 +6,10 @@
 
 - 已审正式交付：`6d5483e2ff6dde075a3c0b22fc21a6f089464c97`
 - 产品、测试与工具：`cd5816aa0ab29ca9d692537845687b1bc7060333`
-- 后端镜像 config ID：`sha256:3268474131a02dbb96cfab7413272fa56b80ecebd0c59f32f5e03436dbeea481`
-- 前端镜像 config ID：`sha256:d9696a213e47cedb661729b3269ae6baad273e9d679fe0fd39f9788449dbc7ae`
+- 后端已审 Docker 镜像 ID：`sha256:3268474131a02dbb96cfab7413272fa56b80ecebd0c59f32f5e03436dbeea481`
+- 前端已审 Docker 镜像 ID：`sha256:d9696a213e47cedb661729b3269ae6baad273e9d679fe0fd39f9788449dbc7ae`
 
-镜像 config ID 不等同于 registry manifest digest。此分支增加测试部署配置和说明，backend/frontend/tools 保持已审版本内容。
+这里的 Docker 镜像 ID 来自审计环境的 image inspect；该环境使用 OCI image index ID，并非底层 config digest。发布校验解析 linux/amd64 平台 manifest，核对 config、文件系统层及运行配置与已审镜像一致。此分支增加测试部署配置和说明，backend/frontend/tools 保持已审版本内容。
 
 ## 独立测试启动
 
