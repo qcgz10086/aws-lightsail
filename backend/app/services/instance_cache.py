@@ -5,7 +5,7 @@ from functools import lru_cache
 import botocore.session
 
 from app.services import lightsail as ls
-from app.services.snapshots import SnapshotError, permission_failure, read_many, read_snapshot, scope_for
+from app.services.snapshots import SnapshotError, credential_failure, permission_failure, read_many, read_snapshot, scope_for
 from app.services.traffic import get_credential_keys, get_credential_proxy_url
 
 
@@ -39,7 +39,8 @@ async def cached_call(engine, user, credential, kind, scope, ttl, method, *args,
             data = await asyncio.to_thread(method, inputs.access_key, inputs.secret_key, *args, proxy_url=inputs.proxy)
             return data
         except Exception as exc:
-            raise SnapshotError(str(exc), invalidate=permission_failure(exc)) from exc
+            raise SnapshotError(str(exc), invalidate=permission_failure(exc),
+                                invalidate_credential=credential_failure(exc)) from exc
     return await read_snapshot(engine, scope_for(user, credential, kind, scope), ttl, loader, wait, force)
 
 
@@ -68,7 +69,8 @@ async def instance_scopes(engine, user, credentials, wait=False, force=False, re
                     return await asyncio.to_thread(ls.list_instances_in_region, inputs.access_key, inputs.secret_key,
                                                    name, proxy_url=inputs.proxy)
                 except Exception as exc:
-                    raise SnapshotError(str(exc), invalidate=permission_failure(exc)) from exc
+                    raise SnapshotError(str(exc), invalidate=permission_failure(exc),
+                                        invalidate_credential=credential_failure(exc)) from exc
             requests.append((scope_for(user, credential, "instances", name), 60, loader))
             names.append(name)
         views = await read_many(engine, requests, wait=wait, force=force)

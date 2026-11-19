@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 
 from app.services import billing as service
-from app.services.snapshots import SnapshotError, permission_failure, read_snapshot, scope_for
+from app.services.snapshots import SnapshotError, credential_failure, permission_failure, read_snapshot, scope_for
 from app.services.traffic import get_credential_keys, get_credential_proxy_url
 
 TTL = 1800
@@ -49,10 +49,13 @@ async def cached_account(engine, user, credential, wait=False, force=False):
         try:
             identity = await asyncio.to_thread(service.get_sts_identity, inputs.access_key, inputs.secret_key, inputs.proxy)
             if identity != inputs.account_id:
-                raise SnapshotError("STS 身份未知或变化，请重新校验凭证", invalidate=True)
+                raise SnapshotError("STS 身份未知或变化，请重新校验凭证", invalidate=True,
+                                    invalidate_credential=True)
             return {"account_id": identity}
         except Exception as exc:
-            raise SnapshotError(str(exc), invalidate=getattr(exc, "invalidate", False) or permission_failure(exc)) from exc
+            invalid = getattr(exc, "invalidate", False) or permission_failure(exc)
+            raise SnapshotError(str(exc), invalidate=invalid,
+                                invalidate_credential=invalid or credential_failure(exc)) from exc
 
     identity = await read_snapshot(engine, identity_scope, TTL, identity_loader, wait=wait, force=force)
     if identity["data"] is None:
@@ -80,7 +83,8 @@ async def cached_account(engine, user, credential, wait=False, force=False):
                 if ready:
                     break
                 if not running:
-                    raise SnapshotError("身份校验失败，停止本次刷新", invalidate=invalidated)
+                    raise SnapshotError("身份校验失败，停止本次刷新", invalidate=invalidated,
+                                        invalidate_credential=invalidated)
                 await asyncio.sleep(0.01)
             else:
                 raise SnapshotError("身份校验等待超时，保留最近成功快照")
@@ -96,7 +100,9 @@ async def cached_account(engine, user, credential, wait=False, force=False):
         except Exception as exc:
             status = ("no_permission" if isinstance(exc, service.BillingNoPermissionError)
                       else "invalid" if isinstance(exc, service.BillingValidationError) else "unavailable")
-            raise SnapshotError(str(exc), invalidate=permission_failure(exc), status=status) from exc
+            invalid = permission_failure(exc)
+            raise SnapshotError(str(exc), invalidate=invalid, status=status,
+                                invalidate_credential=invalid and credential_failure(exc)) from exc
 
     async def section(name):
         view = await read_snapshot(engine, scope_for(user, credential, "billing-" + name, as_of), TTL,

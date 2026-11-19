@@ -232,6 +232,30 @@ class SnapshotTests(unittest.TestCase):
         with Session(self.engine) as db:
             self.assertEqual(db.query(DataSnapshot).count(), 0)
 
+    def test_batch_region_permission_failure_does_not_clear_successful_region(self):
+        from sqlalchemy.orm import Session
+        from app.models import DataSnapshot
+        from app.services.snapshots import _read_or_claim, _publish_batch
+        scopes = [{**self.scope, "key": str(index + 5) * 64, "scope": region}
+                  for index, region in enumerate(("us-east-1", "eu-west-1"))]
+        tokens = [_read_or_claim(self.engine, scope, False)[1] for scope in scopes]
+        outputs = _publish_batch(self.engine, [
+            (scopes[0], tokens[0], 60, {"data": {"instances": ["healthy"]}}),
+            (scopes[1], tokens[1], 60, {"error": "AccessDenied", "invalidate": True,
+                                        "error_status": "no_permission"}),
+        ])
+        self.assertIsNotNone(outputs[0])
+        self.assertIsNone(outputs[1])
+        with Session(self.engine) as db:
+            healthy, denied = (db.get(DataSnapshot, scope["key"]) for scope in scopes)
+            self.assertEqual(healthy.scope, "us-east-1")
+            self.assertEqual(healthy.payload_bytes, len(healthy.payload.encode()))
+            self.assertIn("healthy", healthy.payload)
+            self.assertIsNone(healthy.error)
+            self.assertIsNone(denied.payload)
+            self.assertEqual(denied.error_status, "no_permission")
+            self.assertEqual(denied.error, "AccessDenied")
+
 
 class AwsLimitTests(unittest.TestCase):
     def test_all_clients_share_five_calls_two_mutations_and_one_same_instance(self):

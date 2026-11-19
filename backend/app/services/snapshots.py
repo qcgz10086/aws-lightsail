@@ -26,10 +26,11 @@ logger = logging.getLogger(__name__)
 
 
 class SnapshotError(Exception):
-    def __init__(self, message, invalidate=False, status="unavailable"):
+    def __init__(self, message, invalidate=False, status="unavailable", invalidate_credential=False):
         super().__init__(message)
         self.invalidate = invalidate
         self.status = status
+        self.invalidate_credential = invalidate_credential
 
 
 def version_for(user, credential):
@@ -100,6 +101,15 @@ def permission_failure(exc):
             or code in {"AccessDenied", "AccessDeniedException", "UnauthorizedException",
                 "AuthFailure", "InvalidClientTokenId", "UnrecognizedClientException", "SignatureDoesNotMatch",
                 "ExpiredToken", "ExpiredTokenException", "InvalidAccessKeyId", "InvalidSignatureException"})
+
+
+def credential_failure(exc):
+    from botocore.exceptions import ClientError
+    code = (exc.response.get("Error", {}).get("Code", "")
+            if isinstance(exc, ClientError) else getattr(exc, "code", ""))
+    return code in {
+        "AuthFailure", "InvalidClientTokenId", "UnrecognizedClientException", "SignatureDoesNotMatch",
+        "ExpiredToken", "ExpiredTokenException", "InvalidAccessKeyId", "InvalidSignatureException"}
 
 
 def _read_or_claim(engine, scope, force):
@@ -175,15 +185,14 @@ def _publish_batch(engine, entries):
             if error:
                 values["next_retry_at"] = now + RETRY_SECONDS
                 if result.get("invalidate", False):
-                    where = "credential_id=:credential_id"
-                    parameters = {**values, "credential_id": scope["credential_id"]}
-                    if scope["kind"] != "billing-identity":
-                        where += " AND kind=:kind"
-                        parameters["kind"] = scope["kind"]
-                    connection.exec_driver_sql("""UPDATE data_snapshots SET payload=NULL,payload_bytes=0,
-                        last_success=NULL,expires_at=0,lease_token=NULL,lease_until=0,updated_at=:updated_at,
-                        error=:error,error_status=:error_status,next_retry_at=:next_retry_at WHERE """ + where, parameters)
-                    values.update(payload=None, payload_bytes=0, last_success=None, expires_at=0)
+                    if scope["kind"] == "billing-identity" or result.get("invalidate_credential", False):
+                        connection.exec_driver_sql("""UPDATE data_snapshots SET payload=NULL,payload_bytes=0,
+                            last_success=NULL,expires_at=0,lease_token=NULL,lease_until=0,updated_at=:updated_at,
+                            error=:error,error_status=:error_status,next_retry_at=:next_retry_at
+                            WHERE credential_id=:credential_id""",
+                            {**values, "credential_id": scope["credential_id"]})
+                    else:
+                        values.update(payload=None, payload_bytes=0, last_success=None, expires_at=0)
             else:
                 needed = len(payload.encode())
                 total = connection.exec_driver_sql("SELECT COALESCE(SUM(payload_bytes),0) FROM data_snapshots").scalar_one() - row[7]
@@ -259,6 +268,7 @@ async def _work(engine, scope, token, ttl, loader):
     except Exception as exc:
         try:
             _publish(engine, scope, token, ttl, error=str(exc), invalidate=getattr(exc, "invalidate", False),
+                     invalidate_credential=getattr(exc, "invalidate_credential", False),
                      error_status=getattr(exc, "status", "unavailable"))
         except Exception:
             logger.exception("Snapshot refresh failure could not be recorded")
@@ -284,6 +294,7 @@ async def finish_snapshot(engine, scope, ttl, loader, wait, view, token):
                     return published
             except Exception as exc:
                 _publish(engine, scope, token, ttl, error=str(exc), invalidate=getattr(exc, "invalidate", False),
+                         invalidate_credential=getattr(exc, "invalidate_credential", False),
                          error_status=getattr(exc, "status", "unavailable"))
         else:
             with _guard:
