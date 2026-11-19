@@ -1,4 +1,10 @@
 import axios, { AxiosError } from 'axios'
+import {
+  invalidateQueryTags,
+  queryCacheKey,
+  queryGet,
+  setQueryCacheScope,
+} from './queryCache.mjs'
 
 const api = axios.create({
   baseURL: '/api',
@@ -22,6 +28,7 @@ api.interceptors.response.use(
 )
 
 export function getErrorMessage(err: unknown, fallback = '请求失败'): string {
+  if (axios.isCancel(err) || (err instanceof DOMException && err.name === 'AbortError')) return ''
   if (axios.isAxiosError(err)) {
     const detail = err.response?.data?.detail
     if (typeof detail === 'string') return detail
@@ -31,6 +38,40 @@ export function getErrorMessage(err: unknown, fallback = '请求失败'): string
   if (err instanceof Error) return err.message
   return fallback
 }
+
+export function readApi<T>(
+  url: string,
+  params: Record<string, unknown> = {},
+  options: { signal?: AbortSignal; ttlMs?: number; tags?: string[]; force?: boolean } = {},
+): Promise<T> {
+  const key = queryCacheKey(url, params)
+  return queryGet(key, async (signal) => {
+    const response = await api.get<T>(url, { params, signal })
+    return response.data
+  }, { ...options, tags: options.tags ?? queryTagsFor(url) })
+}
+
+export function establishQueryCacheScope(scope: string | number | null | undefined): void {
+  setQueryCacheScope(scope == null ? 'anonymous' : String(scope))
+}
+
+export function invalidateQueryTags(...tags: string[]): void {
+  invalidateCacheTags(...tags)
+}
+
+function queryTagsFor(url: string): string[] {
+  if (url.startsWith('/auth/')) return ['auth']
+  if (url.startsWith('/credentials')) return ['credentials', 'catalog', 'billing', 'instances', 'traffic']
+  if (url.startsWith('/catalog/')) return ['catalog']
+  if (url.startsWith('/v2/billing/') || url.startsWith('/billing/')) return ['billing']
+  if (url.startsWith('/v2/instances') || url === '/instances' || url.startsWith('/instances/')) return ['instances']
+  if (url.startsWith('/traffic/')) return ['traffic']
+  if (url.startsWith('/metrics/')) return ['metrics']
+  if (url.startsWith('/users')) return ['users']
+  return ['read-api']
+}
+
+import { invalidateQueryTags as invalidateCacheTags } from './queryCache.mjs'
 
 export interface User {
   id: number
