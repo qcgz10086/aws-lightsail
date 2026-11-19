@@ -57,6 +57,7 @@ def main(args):
     actual=json.loads((output/'runtime.log').read_text())
     assert actual['app_sha256']==expected, 'Image app differs from exported fixed source'
     mounts=['-v',f'{args.source.resolve()}/backend/tests:/verification/backend/tests:ro',
+        '-v',f'{args.source.resolve()}/backend/requirements.txt:/verification/backend/requirements.txt:ro',
         '-v',f'{args.history.resolve()}/.git:/verification/.git:ro','-w','/verification/backend',
         '-v','/usr/bin/git:/verify-bin/git:ro',
         '-v','/lib/x86_64-linux-gnu/libpcre2-8.so.0:/verify-lib/libpcre2-8.so.0:ro',
