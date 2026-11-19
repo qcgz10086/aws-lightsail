@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from datetime import timedelta
 
 from app.services import billing as service
-from app.services.snapshots import SnapshotError, credential_failure, permission_failure, read_snapshot, scope_for
+from app.services.snapshots import (SnapshotError, _row_current, _view, credential_failure,
+                                    permission_failure, read_snapshot, scope_for)
 from app.services.traffic import get_credential_keys, get_credential_proxy_url
 
 TTL = 1800
@@ -54,15 +55,32 @@ async def cached_account(engine, user, credential, wait=False, force=False):
             return {"account_id": identity}
         except Exception as exc:
             invalid = getattr(exc, "invalidate", False) or permission_failure(exc)
+            credential_invalid = (getattr(exc, "invalidate_credential", False)
+                                  or credential_failure(exc))
+            status = ("no_permission" if permission_failure(exc) and not credential_invalid
+                      else getattr(exc, "status", "unavailable"))
             raise SnapshotError(str(exc), invalidate=invalid,
-                                invalidate_credential=invalid or credential_failure(exc)) from exc
+                                status=status, invalidate_credential=credential_invalid) from exc
 
     identity = await read_snapshot(engine, identity_scope, TTL, identity_loader, wait=wait, force=force)
     if identity["data"] is None:
         metadata = {key: value for key, value in identity.items() if key != "data"}
-        return {**output, **{name: {"status": "refreshing" if identity["refreshing"] else "unavailable",
-                                  "error": identity["error"], "cache": metadata}
-                            for name in ("costs", "forecast", "credits")}}
+        output.update({name: {"status": "refreshing" if identity["refreshing"] else "unavailable",
+                              "error": identity["error"], "cache": metadata}
+                       for name in ("costs", "forecast", "credits")})
+        if identity.get("error_status") == "no_permission":
+            # STS action-level denial does not prove the credential or the
+            # already-confirmed CE/Billing snapshots are invalid. Show prior
+            # values as stale without launching dependent AWS refreshes.
+            for name in ("costs", "forecast", "credits"):
+                scope = scope_for(user, credential, "billing-" + name, as_of)
+                row, current = _row_current(engine, scope)
+                if row is None or not current or row.payload is None:
+                    continue
+                view = _view(row, time.time())
+                view.update(stale=True, error=identity["error"], error_status="no_permission")
+                output[name] = _section(view)
+        return output
 
     async def load(name):
         # A stale identity may be used only after its coalesced refresh completed.
@@ -79,7 +97,7 @@ async def cached_account(engine, user, credential, wait=False, force=False):
                     running = row and row.lease_token and row.lease_until > time.time()
                     # Confirmed identity/auth failure clears its payload. A
                     # temporary STS outage keeps it and must keep section values.
-                    invalidated = row is None or row.payload is None
+                    invalidated = row is None or row.error_status == "credential_invalid"
                 if ready:
                     break
                 if not running:

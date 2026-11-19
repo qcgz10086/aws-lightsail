@@ -160,6 +160,11 @@ def _publish_batch(engine, entries):
             except (TypeError, ValueError) as exc:
                 error = str(exc)
         prepared.append((scope, token, ttl, result, data, error, payload))
+    credential_failures = {
+        scope["credential_id"] for scope, _token, _ttl, result, _data, error, _payload in prepared
+        if error and result.get("invalidate", False)
+        and result.get("invalidate_credential", False)
+    }
     outputs = []
     # Publish only results already ready in this event-loop turn. Never wait
     # for another network result while holding the SQLite writer reservation.
@@ -167,6 +172,16 @@ def _publish_batch(engine, entries):
         connection.exec_driver_sql("BEGIN IMMEDIATE")
         for scope, token, ttl, result, data, error, payload in prepared:
             now = time.time()
+            if scope["credential_id"] in credential_failures and not (
+                    error and result.get("invalidate", False)
+                    and result.get("invalidate_credential", False)):
+                connection.exec_driver_sql("""UPDATE data_snapshots SET lease_token=NULL,lease_until=0,
+                    updated_at=?,error=?,error_status=?,next_retry_at=?
+                    WHERE key=? AND lease_token=?""",
+                    (now, "同批凭证认证已失效，结果已丢弃", "unavailable", now + RETRY_SECONDS,
+                     scope["key"], token))
+                outputs.append(None)
+                continue
             row = connection.exec_driver_sql("""SELECT u.id, u.token_version, c.id, c.account_id,
                 c.access_key_id_enc, c.secret_access_key_enc, c.proxy_url_enc, s.payload_bytes
                 FROM users AS u JOIN aws_credentials AS c ON c.user_id=u.id
@@ -181,11 +196,12 @@ def _publish_batch(engine, entries):
                 outputs.append(None); continue
             values = {"lease_token": None, "lease_until": 0, "updated_at": now,
                       "error": sanitize_error_message(error) if error else None,
-                      "error_status": result.get("error_status", "unavailable") if error else None}
+                      "error_status": ("credential_invalid" if result.get("invalidate_credential", False)
+                                       else result.get("error_status", "unavailable")) if error else None}
             if error:
                 values["next_retry_at"] = now + RETRY_SECONDS
                 if result.get("invalidate", False):
-                    if scope["kind"] == "billing-identity" or result.get("invalidate_credential", False):
+                    if result.get("invalidate_credential", False):
                         connection.exec_driver_sql("""UPDATE data_snapshots SET payload=NULL,payload_bytes=0,
                             last_success=NULL,expires_at=0,lease_token=NULL,lease_until=0,updated_at=:updated_at,
                             error=:error,error_status=:error_status,next_retry_at=:next_retry_at

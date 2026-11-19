@@ -256,6 +256,27 @@ class SnapshotTests(unittest.TestCase):
             self.assertEqual(denied.error_status, "no_permission")
             self.assertEqual(denied.error, "AccessDenied")
 
+    def test_batch_credential_failure_clears_and_suppresses_sibling_results(self):
+        from sqlalchemy.orm import Session
+        from app.models import DataSnapshot
+        from app.services.snapshots import _read_or_claim, _publish_batch
+        for index, results in enumerate((
+            ({"data": {"instances": ["stale"]}},
+             {"error": "ExpiredToken", "invalidate": True, "invalidate_credential": True}),
+            ({"error": "ExpiredToken", "invalidate": True, "invalidate_credential": True},
+             {"data": {"instances": ["stale"]}}),
+        )):
+            scopes = [{**self.scope, "key": f"wide-{index}-{region}".ljust(64, "x"), "scope": region}
+                      for region in ("us-east-1", "eu-west-1")]
+            tokens = [_read_or_claim(self.engine, scope, False)[1] for scope in scopes]
+            outputs = _publish_batch(self.engine, [
+                (scope, token, 60, result)
+                for scope, token, result in zip(scopes, tokens, results)
+            ])
+            self.assertEqual(outputs, [None, None])
+            with Session(self.engine) as db:
+                self.assertTrue(all(db.get(DataSnapshot, scope["key"]).payload is None for scope in scopes))
+
 
 class AwsLimitTests(unittest.TestCase):
     def test_all_clients_share_five_calls_two_mutations_and_one_same_instance(self):
@@ -460,6 +481,46 @@ class CacheRouteTests(unittest.TestCase):
             after = self.client.get("/api/v2/billing/summary").json()
             self.assertEqual(after["currencies"], [])
             self.assertEqual(cost_calls.call_count, 1)
+
+    def test_sts_access_denied_preserves_confirmed_billing_and_regions(self):
+        from app.services import billing as b
+        from app.services import lightsail as ls
+        from app.models import DataSnapshot
+        from sqlalchemy import update
+        from botocore.exceptions import ClientError
+        costs = {"year_month": "2026-11", "by_service": [], "currencies": [{"currency": "USD",
+            "total_cost": "10", "net_cost": "8", "credits_applied": "2", "refunds": "0", "discounts": "0", "lightsail_cost": "10"}]}
+        with patch.object(b, "get_sts_identity", return_value="123456789012") as identity, \
+             patch.object(b, "make_ce_client"), patch.object(b, "get_billing_summary", return_value=costs), \
+             patch.object(b, "get_forecast_result", return_value={"amount": "5", "currency": "USD"}), \
+             patch.object(b, "get_aws_credits", return_value={"credits": []}), \
+             patch.object(ls, "get_regions", return_value=[{"name": "us-east-1"}, {"name": "eu-west-1"}]), \
+             patch.object(ls, "list_instances_in_region", side_effect=lambda _ak, _sk, region, **_kw: [
+                 {"name": "kept-" + region, "region": region, "state": "running"}]):
+            warm = self.client.get("/api/v2/billing/summary?wait=true").json()
+            self.assertEqual(warm["currencies"][0]["net_cost"], "8")
+            instances = self.client.get("/api/v2/instances?wait=true")
+            self.assertEqual(instances.status_code, 200, instances.text)
+            self.assertEqual(len(instances.json()["instances"]), 2)
+            self.db.execute(update(DataSnapshot).where(DataSnapshot.kind == "billing-identity").values(expires_at=0))
+            self.db.commit()
+            identity.side_effect = ClientError({"Error": {"Code": "AccessDenied",
+                "Message": "not authorized to perform sts:GetCallerIdentity"}}, "GetCallerIdentity")
+            refreshed = self.client.get("/api/v2/billing/summary?wait=true")
+            self.assertEqual(refreshed.status_code, 200, refreshed.text)
+            self.assertEqual(refreshed.json()["currencies"][0]["net_cost"], "8")
+            self.assertTrue(refreshed.json()["stale"])
+            self.db.expire_all()
+            rows = self.db.query(DataSnapshot).filter(DataSnapshot.credential_id == self.credential.id).all()
+            self.assertEqual(len(rows), 7)
+            identity_row = next(row for row in rows if row.kind == "billing-identity")
+            self.assertIsNone(identity_row.payload)
+            self.assertEqual(identity_row.error_status, "no_permission")
+            preserved = [row for row in rows if row.kind != "billing-identity"]
+            self.assertEqual(len(preserved), 6)
+            self.assertTrue(all(row.payload is not None and row.last_success is not None for row in preserved))
+            self.assertEqual({row.scope for row in rows if row.kind == "instances"}, {"us-east-1", "eu-west-1"})
+            self.assertEqual(self.client.get("/api/v2/instances").json()["refreshing"], False)
 
     def test_successful_stop_expires_snapshot_and_prevents_older_refresh_publish(self):
         from app.models import DataSnapshot
