@@ -8,7 +8,7 @@ from threading import Event, Lock, Thread
 import time
 import uuid
 
-from sqlalchemy import delete, func, or_, select, update
+from sqlalchemy import delete, or_, select, update
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import Session
 
@@ -131,59 +131,105 @@ def _read_or_claim(engine, scope, force):
     return (_view(row, time.time()) if row and current else _view(None, now, True)), None
 
 
-def _publish(engine, scope, token, ttl, data=None, error=None, invalidate=False, error_status="unavailable"):
-    payload = None
-    if error is not None:
-        error = error or "刷新超时或未提供错误详情"
-    if error is None:
-        payload = json.dumps(data, ensure_ascii=False, separators=(",", ":"), allow_nan=False, default=_json_default)
-        if len(payload.encode()) > MAX_PAYLOAD_BYTES:
-            error = "刷新结果超过64 MiB有效载荷上限"
-    now = time.time()
-    # Validate under the writer reservation so a concurrent credential rotation
-    # cannot commit between identity checking and compare-and-publish.
-    with Session(engine) as db:
-        db.connection().exec_driver_sql("BEGIN IMMEDIATE")
-        row = db.execute(select(User.id, User.token_version, AwsCredential.id, AwsCredential.account_id,
-            AwsCredential.access_key_id_enc, AwsCredential.secret_access_key_enc, AwsCredential.proxy_url_enc,
-            DataSnapshot.payload_bytes).join(AwsCredential, AwsCredential.user_id == User.id).join(
-                DataSnapshot, DataSnapshot.key == scope["key"]).where(User.id == scope["user_id"],
-                AwsCredential.id == scope["credential_id"], DataSnapshot.lease_token == token)).first()
-        if row is None:
-            return
-        current_version = hashlib.sha256(json.dumps(list(row[:7]), separators=(",", ":")).encode()).hexdigest()
-        if current_version != scope["version"]:
-            db.execute(delete(DataSnapshot).where(DataSnapshot.key == scope["key"], DataSnapshot.lease_token == token))
-            db.commit(); return
-        values = {"lease_token": None, "lease_until": 0, "updated_at": now,
-                  "error": sanitize_error_message(error) if error else None,
-                  "error_status": error_status if error else None}
-        if error:
-            values["next_retry_at"] = now + RETRY_SECONDS
-            if invalidate:
-                invalid = update(DataSnapshot).where(DataSnapshot.credential_id == scope["credential_id"])
-                if scope["kind"] != "billing-identity":
-                    invalid = invalid.where(DataSnapshot.kind == scope["kind"])
-                db.execute(invalid.values(payload=None, payload_bytes=0, last_success=None, expires_at=0,
-                    **values))
-                values.update(payload=None, payload_bytes=0, last_success=None, expires_at=0)
+def _publish(engine, scope, token, ttl, **result):
+    return _publish_batch(engine, [(scope, token, ttl, result)])[0]
+
+
+def _publish_batch(engine, entries):
+    prepared = []
+    for scope, token, ttl, result in entries:
+        data, error = result.get("data"), result.get("error")
+        payload = None
+        if error is not None:
+            error = error or "刷新超时或未提供错误详情"
         else:
-            needed = len(payload.encode())
-            total = db.scalar(select(func.coalesce(func.sum(DataSnapshot.payload_bytes), 0))) - row[7]
-            if total + needed > MAX_PAYLOAD_BYTES:
-                victims = db.execute(select(DataSnapshot.key, DataSnapshot.payload_bytes).where(
-                    DataSnapshot.key != scope["key"], DataSnapshot.payload_bytes > 0).order_by(DataSnapshot.updated_at))
-                for victim_key, victim_bytes in victims:
-                    if total + needed <= MAX_PAYLOAD_BYTES:
-                        break
-                    total -= victim_bytes
-                    db.execute(update(DataSnapshot).where(DataSnapshot.key == victim_key).values(
-                        payload=None, payload_bytes=0, last_success=None, expires_at=0, error="缓存容量回收，请重新刷新"))
-            values.update(payload=payload, payload_bytes=needed, last_success=now, expires_at=now + ttl, next_retry_at=0)
-        db.execute(update(DataSnapshot).where(DataSnapshot.key == scope["key"], DataSnapshot.lease_token == token).values(**values))
-        db.commit()
-    return {"data": data, "status": "fresh", "stale": False, "refreshing": False,
-            "last_success_at": _iso(now), "expires_at": _iso(now + ttl), "error": None, "error_status": None} if error is None else None
+            try:
+                payload = json.dumps(data, ensure_ascii=False, separators=(",", ":"), allow_nan=False, default=_json_default)
+                if len(payload.encode()) > MAX_PAYLOAD_BYTES:
+                    error = "刷新结果超过64 MiB有效载荷上限"
+            except (TypeError, ValueError) as exc:
+                error = str(exc)
+        prepared.append((scope, token, ttl, result, data, error, payload))
+    outputs = []
+    # Publish only results already ready in this event-loop turn. Never wait
+    # for another network result while holding the SQLite writer reservation.
+    with engine.begin() as connection:
+        connection.exec_driver_sql("BEGIN IMMEDIATE")
+        for scope, token, ttl, result, data, error, payload in prepared:
+            now = time.time()
+            row = connection.exec_driver_sql("""SELECT u.id, u.token_version, c.id, c.account_id,
+                c.access_key_id_enc, c.secret_access_key_enc, c.proxy_url_enc, s.payload_bytes
+                FROM users AS u JOIN aws_credentials AS c ON c.user_id=u.id
+                JOIN data_snapshots AS s ON s.key=:key
+                WHERE u.id=:user_id AND c.id=:credential_id AND s.lease_token=:token""",
+                {"key": scope["key"], "user_id": scope["user_id"], "credential_id": scope["credential_id"], "token": token}).first()
+            if row is None:
+                outputs.append(None); continue
+            current_version = hashlib.sha256(json.dumps(list(row[:7]), separators=(",", ":")).encode()).hexdigest()
+            if current_version != scope["version"]:
+                connection.exec_driver_sql("DELETE FROM data_snapshots WHERE key=? AND lease_token=?", (scope["key"], token))
+                outputs.append(None); continue
+            values = {"lease_token": None, "lease_until": 0, "updated_at": now,
+                      "error": sanitize_error_message(error) if error else None,
+                      "error_status": result.get("error_status", "unavailable") if error else None}
+            if error:
+                values["next_retry_at"] = now + RETRY_SECONDS
+                if result.get("invalidate", False):
+                    where = "credential_id=:credential_id"
+                    parameters = {**values, "credential_id": scope["credential_id"]}
+                    if scope["kind"] != "billing-identity":
+                        where += " AND kind=:kind"
+                        parameters["kind"] = scope["kind"]
+                    connection.exec_driver_sql("""UPDATE data_snapshots SET payload=NULL,payload_bytes=0,
+                        last_success=NULL,expires_at=0,lease_token=NULL,lease_until=0,updated_at=:updated_at,
+                        error=:error,error_status=:error_status,next_retry_at=:next_retry_at WHERE """ + where, parameters)
+                    values.update(payload=None, payload_bytes=0, last_success=None, expires_at=0)
+            else:
+                needed = len(payload.encode())
+                total = connection.exec_driver_sql("SELECT COALESCE(SUM(payload_bytes),0) FROM data_snapshots").scalar_one() - row[7]
+                if total + needed > MAX_PAYLOAD_BYTES:
+                    victims = connection.exec_driver_sql("""SELECT key,payload_bytes FROM data_snapshots
+                        WHERE key<>? AND payload_bytes>0 ORDER BY updated_at""", (scope["key"],)).all()
+                    for victim_key, victim_bytes in victims:
+                        if total + needed <= MAX_PAYLOAD_BYTES:
+                            break
+                        total -= victim_bytes
+                        connection.exec_driver_sql("""UPDATE data_snapshots SET payload=NULL,payload_bytes=0,
+                            last_success=NULL,expires_at=0,error=? WHERE key=?""", ("缓存容量回收，请重新刷新", victim_key))
+                values.update(payload=payload, payload_bytes=needed, last_success=now, expires_at=now + ttl, next_retry_at=0)
+            # Column names are fixed internal keys; all runtime data is bound.
+            assignments = ",".join(name + "=:" + name for name in values)
+            connection.exec_driver_sql("UPDATE data_snapshots SET " + assignments + " WHERE key=:key AND lease_token=:expected_token",
+                {**values, "key": scope["key"], "expected_token": token})
+            outputs.append({"data": data, "status": "fresh", "stale": False, "refreshing": False,
+                "last_success_at": _iso(now), "expires_at": _iso(now + ttl), "error": None,
+                "error_status": None} if error is None else None)
+    return outputs
+
+
+async def _publish_ready(engine, scope, token, ttl, **result):
+    loop = asyncio.get_running_loop()
+    batches = getattr(loop, "_lightsail_snapshot_batches", None)
+    if batches is None:
+        batches = loop._lightsail_snapshot_batches = {}
+    future = loop.create_future()
+    if engine not in batches:
+        batches[engine] = []
+        def flush():
+            ready = batches.pop(engine)
+            try:
+                outputs = _publish_batch(engine, [entry for entry, _future in ready])
+            except Exception as exc:
+                for _entry, waiter in ready:
+                    if not waiter.done():
+                        waiter.set_exception(exc)
+            else:
+                for (_entry, waiter), output in zip(ready, outputs):
+                    if not waiter.done():
+                        waiter.set_result(output)
+        loop.call_soon(flush)
+    batches[engine].append(((scope, token, ttl, result), future))
+    return await future
 
 
 def _loop():
@@ -209,7 +255,7 @@ def _loop():
 async def _work(engine, scope, token, ttl, loader):
     try:
         data = await asyncio.wait_for(loader(), timeout=25)
-        _publish(engine, scope, token, ttl, data=data)
+        await _publish_ready(engine, scope, token, ttl, data=data)
     except Exception as exc:
         try:
             _publish(engine, scope, token, ttl, error=str(exc), invalidate=getattr(exc, "invalidate", False),
@@ -233,7 +279,7 @@ async def finish_snapshot(engine, scope, ttl, loader, wait, view, token):
         if run_here:
             try:
                 data = await asyncio.wait_for(loader(), timeout=25)
-                published = _publish(engine, scope, token, ttl, data=data)
+                published = await _publish_ready(engine, scope, token, ttl, data=data)
                 if published is not None:
                     return published
             except Exception as exc:

@@ -155,6 +155,83 @@ class SnapshotTests(unittest.TestCase):
             changed_user_version = scope_for(user, credential, "test", "region:us-east-1")
             self.assertEqual(len({row["key"] for row in (original, changed_proxy, changed_account, changed_user_version)}), 4)
 
+    def test_ready_scopes_share_publish_transaction_without_waiting_for_slow_scope(self):
+        from sqlalchemy import event
+        from sqlalchemy.orm import Session
+        from app.models import DataSnapshot
+        from app.services.snapshots import read_many
+        scopes = [{**self.scope, "key": str(index) * 64, "scope": f"batch-{index}"} for index in range(3)]
+        writes = []
+        def count(_connection, _cursor, statement, *_args):
+            if statement == "BEGIN IMMEDIATE":
+                writes.append(statement)
+        event.listen(self.engine, "before_cursor_execute", count)
+        self.addCleanup(lambda: event.remove(self.engine, "before_cursor_execute", count))
+        async def scenario():
+            slow_gate = asyncio.Event()
+            async def fast():
+                await asyncio.sleep(0.02)
+                return {"value": "ready"}
+            async def slow():
+                await slow_gate.wait()
+                return {"value": "later"}
+            task = asyncio.create_task(read_many(self.engine,
+                [(scope, 60, fast if index < 2 else slow) for index, scope in enumerate(scopes)], wait=True))
+            try:
+                for _ in range(200):
+                    with Session(self.engine) as db:
+                        if all((row := db.get(DataSnapshot, scope["key"])) is not None and row.payload
+                               for scope in scopes[:2]):
+                            self.assertIsNone(db.get(DataSnapshot, scopes[2]["key"]).payload)
+                            self.assertEqual(len(writes), 1)
+                            break
+                    await asyncio.sleep(0.005)
+                else:
+                    self.fail("Ready scopes were blocked by slow scope")
+            finally:
+                slow_gate.set()
+                result = await task
+            self.assertEqual([row["data"]["value"] for row in result], ["ready", "ready", "later"])
+        asyncio.run(scenario())
+
+    def test_publish_batch_rechecks_each_lease_and_keeps_payload_budget(self):
+        from sqlalchemy import select, func
+        from sqlalchemy.orm import Session
+        from app.models import DataSnapshot, AwsCredential
+        from app.services.snapshots import _read_or_claim, _publish_batch, _publish_ready, read_snapshot
+        scopes = [{**self.scope, "key": str(index + 3) * 64, "scope": f"publish-{index}"} for index in range(3)]
+        tokens = [_read_or_claim(self.engine, scope, False)[1] for scope in scopes]
+        with Session(self.engine) as db:
+            revoked = db.get(DataSnapshot, scopes[1]["key"])
+            revoked.lease_token = None; revoked.lease_until = 0
+            db.commit()
+        with patch("app.services.snapshots.MAX_PAYLOAD_BYTES", 120):
+            _publish_batch(self.engine, [(scope, token, 60, {"data": {"text": "a" * 70}})
+                                         for scope, token in zip(scopes, tokens)])
+            with Session(self.engine) as db:
+                self.assertLessEqual(db.scalar(select(func.sum(DataSnapshot.payload_bytes))), 120)
+                self.assertIsNone(db.get(DataSnapshot, scopes[1]["key"]).payload)
+                self.assertEqual(sum(row.payload is not None for row in db.query(DataSnapshot).all()), 1)
+        async def good(): return {"value": "valid"}
+        asyncio.run(read_snapshot(self.engine, scopes[0], 60, good, wait=True, force=True))
+        token = _read_or_claim(self.engine, scopes[0], True)[1]
+        async def malformed():
+            await _publish_ready(self.engine, scopes[0], token, 60, data={"value": object()})
+        asyncio.run(malformed())
+        with Session(self.engine) as db:
+            row = db.get(DataSnapshot, scopes[0]["key"])
+            self.assertIn('"valid"', row.payload)
+            self.assertTrue(row.error)
+        tokens = [_read_or_claim(self.engine, scope, True)[1] for scope in scopes]
+        with Session(self.engine) as db:
+            db.get(AwsCredential, self.scope["credential_id"]).secret_access_key_enc = "rotated"
+            db.commit()
+        result = _publish_batch(self.engine, [(scope, token, 60, {"data": {"value": "old"}})
+                                             for scope, token in zip(scopes, tokens)])
+        self.assertEqual(result, [None, None, None])
+        with Session(self.engine) as db:
+            self.assertEqual(db.query(DataSnapshot).count(), 0)
+
 
 class AwsLimitTests(unittest.TestCase):
     def test_all_clients_share_five_calls_two_mutations_and_one_same_instance(self):
