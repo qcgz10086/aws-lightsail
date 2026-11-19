@@ -1,0 +1,43 @@
+.C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+2026-11-19 09:19:03,639 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 09:19:03,654 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 09:19:03,685 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 09:19:03,724 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 09:19:03,737 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 404 Not Found"
+.2026-11-19 09:19:03,905 INFO [httpx] HTTP Request: GET http://testserver/api/catalog/regions?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 09:19:04,187 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 09:19:04,218 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 09:19:04,243 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 09:19:04,255 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+.2026-11-19 09:19:04,412 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=moon-1 "HTTP/1.1 400 Bad Request"
+2026-11-19 09:19:04,421 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 400 Bad Request"
+2026-11-19 09:19:04,431 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 09:19:04,438 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 09:19:04,446 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=https%3A%2F%2F127.0.0.1 "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 09:19:04,451 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 09:19:04,479 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=eu-west-1&wait=true "HTTP/1.1 400 Bad Request"
+2026-11-19 09:19:04,510 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=us-east-1&wait=true "HTTP/1.1 200 OK"
+2026-11-19 09:19:04,523 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=us-east-1 "HTTP/1.1 200 OK"
+.2026-11-19 09:19:04,736 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 09:19:04,772 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 09:19:04,783 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+.2026-11-19 09:19:04,966 INFO [httpx] HTTP Request: POST http://testserver/api/instances/us-east-1/fixed/stop?credential_id=1 "HTTP/1.1 200 OK"
+.2026-11-19 09:19:05,185 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 09:19:05,236 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 09:19:05,283 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+.2026-11-19 09:19:06,469 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmpqoyk50wc\backups\v3.db.pre-v4-0707283de057d95459f6336c30bfbebec0299ddf8814f13deb9da19504476dc6.db
+.E.........
+======================================================================
+ERROR: test_batch_region_permission_failure_does_not_clear_successful_region (test_t04_cache.SnapshotTests.test_batch_region_permission_failure_does_not_clear_successful_region)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\tests\test_t04_cache.py", line 252, in test_batch_region_permission_failure_does_not_clear_successful_region
+    self.assertEqual(healthy.payload_bytes, len(healthy.payload.encode()))
+                                                ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'encode'
+
+----------------------------------------------------------------------
+Ran 18 tests in 7.725s
+
+FAILED (errors=1)

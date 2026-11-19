@@ -1,0 +1,34 @@
+.C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+2026-11-19 08:59:46,507 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 08:59:46,520 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 08:59:46,548 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 08:59:46,575 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 08:59:46,588 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 404 Not Found"
+.2026-11-19 08:59:46,760 INFO [httpx] HTTP Request: GET http://testserver/api/catalog/regions?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 08:59:47,044 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 08:59:47,068 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 08:59:47,092 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 08:59:47,119 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+.2026-11-19 08:59:47,272 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=moon-1 "HTTP/1.1 400 Bad Request"
+2026-11-19 08:59:47,280 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 400 Bad Request"
+2026-11-19 08:59:47,291 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 08:59:47,296 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 08:59:47,304 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=https%3A%2F%2F127.0.0.1 "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 08:59:47,310 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 08:59:47,340 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=eu-west-1&wait=true "HTTP/1.1 400 Bad Request"
+2026-11-19 08:59:47,372 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=us-east-1&wait=true "HTTP/1.1 200 OK"
+2026-11-19 08:59:47,384 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=us-east-1 "HTTP/1.1 200 OK"
+.2026-11-19 08:59:47,601 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 08:59:47,634 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 08:59:47,647 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+.2026-11-19 08:59:47,837 INFO [httpx] HTTP Request: POST http://testserver/api/instances/us-east-1/fixed/stop?credential_id=1 "HTTP/1.1 200 OK"
+.2026-11-19 08:59:48,070 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 200 OK"
+2026-11-19 08:59:48,123 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+2026-11-19 08:59:48,172 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary "HTTP/1.1 200 OK"
+.2026-11-19 08:59:49,376 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp9rst5klc\backups\v3.db.pre-v4-6231d7c66cd531fc7c7b7cdf389a16fe99d8813bfaee5319a30aec949bec9d44.db
+.........
+----------------------------------------------------------------------
+Ran 16 tests in 7.590s
+
+OK

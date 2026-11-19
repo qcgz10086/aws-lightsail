@@ -1,0 +1,367 @@
+.C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+2026-11-19 09:20:28,321 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 500 Internal Server Error"
+E2026-11-19 09:20:28,501 INFO [httpx] HTTP Request: GET http://testserver/api/catalog/regions?credential_id=1 "HTTP/1.1 200 OK"
+2026-11-19 09:20:28,801 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 09:20:28,842 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 09:20:28,866 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+2026-11-19 09:20:28,878 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances "HTTP/1.1 200 OK"
+.2026-11-19 09:20:29,029 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=moon-1 "HTTP/1.1 400 Bad Request"
+2026-11-19 09:20:29,037 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 400 Bad Request"
+2026-11-19 09:20:29,048 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 09:20:29,054 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 09:20:29,062 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=https%3A%2F%2F127.0.0.1 "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 09:20:29,068 INFO [httpx] HTTP Request: POST http://testserver/api/v2/refresh "HTTP/1.1 422 Unprocessable Entity"
+2026-11-19 09:20:29,098 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=eu-west-1&wait=true "HTTP/1.1 400 Bad Request"
+2026-11-19 09:20:29,128 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=us-east-1&wait=true "HTTP/1.1 200 OK"
+2026-11-19 09:20:29,140 INFO [httpx] HTTP Request: GET http://testserver/api/v2/instances?region=us-east-1 "HTTP/1.1 200 OK"
+.2026-11-19 09:20:29,293 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 500 Internal Server Error"
+E2026-11-19 09:20:29,481 INFO [httpx] HTTP Request: POST http://testserver/api/instances/us-east-1/fixed/stop?credential_id=1 "HTTP/1.1 200 OK"
+.2026-11-19 09:20:29,641 INFO [httpx] HTTP Request: GET http://testserver/api/v2/billing/summary?wait=true "HTTP/1.1 500 Internal Server Error"
+E2026-11-19 09:20:30,816 ERROR [app.migrations] Database migration failed; startup stopped. Backup: C:\Users\liyang\AppData\Local\Temp\tmp61dfgaxd\backups\v3.db.pre-v4-f6041af84e03f043589953399e2a3add93dd91aedf836c25054b055b667b67bb.db
+...........
+======================================================================
+ERROR: test_billing_hot_cache_and_independent_failure_preserve_last_success (test_t04_cache.CacheRouteTests.test_billing_hot_cache_and_independent_failure_preserve_last_success)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\tests\test_t04_cache.py", line 363, in test_billing_hot_cache_and_independent_failure_preserve_last_success
+    cold = self.client.get("/api/v2/billing/summary?wait=true")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 1053, in get
+    return self.request(
+           ^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\testclient.py", line 518, in request
+    return super().request(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 928, in send
+    raise exc
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 922, in send
+    response.read()
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_models.py", line 881, in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_models.py", line 897, in iter_bytes
+    for raw_bytes in self.iter_raw():
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_models.py", line 951, in iter_raw
+    for raw_stream_bytes in self.stream:
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 153, in __iter__
+    for chunk in self._stream:
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\testclient.py", line 384, in iter_body
+    exit_stack.close()
+  File "C:\Users\liyang\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 618, in close
+    self.__exit__(None, None, None)
+  File "C:\Users\liyang\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 610, in __exit__
+    raise exc_details[1]
+  File "C:\Users\liyang\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 595, in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\testclient.py", line 399, in close_app
+    raise exception
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\anyio\from_thread.py", line 272, in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\testclient.py", line 366, in run_app
+    await self.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\applications.py", line 1194, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\telemetry\_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\app\main.py", line 66, in security_headers
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\routing.py", line 683, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 2811, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 1839, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 2894, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 1865, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 1328, in handle
+    await effective_context.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 372, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\app\routers\billing_v2.py", line 21, in billing_summary
+    return await summary(db, user, credential_id, cached=True, wait=wait)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\app\services\billing_summary.py", line 142, in summary
+    from app.services.billing_cache import cached_account
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\app\services\billing_cache.py", line 86
+    raise SnapshotError("����У��ʧ�ܣ�ֹͣ����ˢ��", invalidate=invalidated,
+    ^^^^^
+IndentationError: expected an indented block after 'if' statement on line 85
+
+======================================================================
+ERROR: test_raw_sts_authentication_failure_invalidates_all_credential_snapshots (test_t04_cache.CacheRouteTests.test_raw_sts_authentication_failure_invalidates_all_credential_snapshots)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\tests\test_t04_cache.py", line 451, in test_raw_sts_authentication_failure_invalidates_all_credential_snapshots
+    self.client.get("/api/v2/billing/summary?wait=true")
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 1053, in get
+    return self.request(
+           ^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\testclient.py", line 518, in request
+    return super().request(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 928, in send
+    raise exc
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 922, in send
+    response.read()
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_models.py", line 881, in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_models.py", line 897, in iter_bytes
+    for raw_bytes in self.iter_raw():
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_models.py", line 951, in iter_raw
+    for raw_stream_bytes in self.stream:
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 153, in __iter__
+    for chunk in self._stream:
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\testclient.py", line 384, in iter_body
+    exit_stack.close()
+  File "C:\Users\liyang\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 618, in close
+    self.__exit__(None, None, None)
+  File "C:\Users\liyang\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 610, in __exit__
+    raise exc_details[1]
+  File "C:\Users\liyang\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 595, in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\testclient.py", line 399, in close_app
+    raise exception
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\anyio\from_thread.py", line 272, in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\testclient.py", line 366, in run_app
+    await self.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\applications.py", line 1194, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\telemetry\_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\app\main.py", line 66, in security_headers
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\routing.py", line 683, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 2811, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 1839, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 2894, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 1865, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 1328, in handle
+    await effective_context.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 372, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\app\routers\billing_v2.py", line 21, in billing_summary
+    return await summary(db, user, credential_id, cached=True, wait=wait)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\app\services\billing_summary.py", line 142, in summary
+    from app.services.billing_cache import cached_account
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\app\services\billing_cache.py", line 86
+    raise SnapshotError("����У��ʧ�ܣ�ֹͣ����ˢ��", invalidate=invalidated,
+    ^^^^^
+IndentationError: expected an indented block after 'if' statement on line 85
+
+======================================================================
+ERROR: test_temporary_identity_failure_preserves_all_stale_billing_sections (test_t04_cache.CacheRouteTests.test_temporary_identity_failure_preserves_all_stale_billing_sections)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\tests\test_t04_cache.py", line 422, in test_temporary_identity_failure_preserves_all_stale_billing_sections
+    warm = self.client.get("/api/v2/billing/summary?wait=true").json()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 1053, in get
+    return self.request(
+           ^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\testclient.py", line 518, in request
+    return super().request(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 928, in send
+    raise exc
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 922, in send
+    response.read()
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_models.py", line 881, in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_models.py", line 897, in iter_bytes
+    for raw_bytes in self.iter_raw():
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_models.py", line 951, in iter_raw
+    for raw_stream_bytes in self.stream:
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\httpx\_client.py", line 153, in __iter__
+    for chunk in self._stream:
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\testclient.py", line 384, in iter_body
+    exit_stack.close()
+  File "C:\Users\liyang\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 618, in close
+    self.__exit__(None, None, None)
+  File "C:\Users\liyang\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 610, in __exit__
+    raise exc_details[1]
+  File "C:\Users\liyang\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 595, in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\testclient.py", line 399, in close_app
+    raise exception
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\anyio\from_thread.py", line 272, in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\testclient.py", line 366, in run_app
+    await self.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\applications.py", line 1194, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\telemetry\_asgi.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\base.py", line 203, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\app\main.py", line 66, in security_headers
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\base.py", line 179, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 149, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\routing.py", line 683, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 2811, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 1839, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 2894, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 1865, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 1328, in handle
+    await effective_context.app(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 166, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 152, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 745, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\lightsail-t00-baseline\aws-lightsail\backend\.venv\Lib\site-packages\fastapi\routing.py", line 372, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\app\routers\billing_v2.py", line 21, in billing_summary
+    return await summary(db, user, credential_id, cached=True, wait=wait)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\app\services\billing_summary.py", line 142, in summary
+    from app.services.billing_cache import cached_account
+  File "C:\Users\liyang\.codex\worktrees\t04-backend-cache\aws-lightsail\backend\app\services\billing_cache.py", line 86
+    raise SnapshotError("����У��ʧ�ܣ�ֹͣ����ˢ��", invalidate=invalidated,
+    ^^^^^
+IndentationError: expected an indented block after 'if' statement on line 85
+
+----------------------------------------------------------------------
+Ran 18 tests in 7.320s
+
+FAILED (errors=3)
