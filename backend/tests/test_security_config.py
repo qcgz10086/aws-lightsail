@@ -246,7 +246,18 @@ class TestCreateInstanceHttp400(unittest.TestCase):
         from task_fakes import FakeLightsail
         client = FakeLightsail(name=None)
         with client.installed():
-            return self.client.post("/api/instances", json=body), client
+            response = self.client.post("/api/instances", json=body)
+            if response.status_code == 202:
+                import time
+                deadline = time.monotonic() + 5
+                state = response.json()
+                while state['status'] in {'queued', 'running'} and time.monotonic() < deadline:
+                    time.sleep(0.02)
+                    final = self.client.get('/api/v2/tasks/' + state['task_id'])
+                    self.assertEqual(final.status_code, 200, final.text)
+                    state = final.json()
+                self.assertEqual(state['status'], 'succeeded', state)
+            return response, client
 
     def test_weak_password_returns_400(self):
         resp, client = self._post("weakpass1")
@@ -257,9 +268,9 @@ class TestCreateInstanceHttp400(unittest.TestCase):
         resp, _ = self._post("Ab1!")
         self.assertEqual(resp.status_code, 400, resp.text)
 
-    def test_strong_password_returns_200_and_ports_closed_by_default(self):
+    def test_strong_password_completes_and_ports_closed_by_default(self):
         resp, client = self._post("Abcdefgh123!")
-        self.assertEqual(resp.status_code, 200, resp.text)
+        self.assertIn(resp.status_code, (200, 202), resp.text)
         self.assertEqual(client.count("PutInstancePublicPorts"), 0)
         self.assertNotIn("已开放全部防火墙端口", resp.json()["message"])
 

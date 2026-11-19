@@ -86,12 +86,15 @@ def main(mode):
                 def fail(conn,metadata):
                     apply(conn,metadata)
                     raise RuntimeError('injected after task DDL')
-                with patch.object(migrations,'apply_v5',side_effect=fail):
+                with patch.object(migrations,'apply_v5',side_effect=fail) as injected:
                     try:init_db()
-                    except migrations.MigrationError:pass
+                    except migrations.MigrationError as exc:
+                        assert isinstance(exc.__cause__, RuntimeError) and str(exc.__cause__)=='injected after task DDL'
                     else:raise AssertionError('injected migration did not fail')
+                    assert injected.call_count==1
                 after=inspect(DB);assert after==before
-                report={'mode':mode,'backup':backup,'unchanged_business_and_schema':True,'database':after}
+                report={'mode':mode,'backup':backup,'injected_v5_calls':1,'injected_cause':'injected after task DDL',
+                    'unchanged_business_and_schema':True,'database':after}
             elif mode=='tasks':
                 init_db()
                 from app.services.task_queue import DurableTaskQueue
