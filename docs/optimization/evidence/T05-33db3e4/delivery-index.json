@@ -8,13 +8,13 @@
   "files": [
     {
       "path": ".gitattributes",
-      "size": 276,
-      "sha256": "9e2c2180e1742813b19ff002f254db52acdbfc199e0a4bedc4d041e56836c786"
+      "size": 281,
+      "sha256": "0720c310d5f4e85117b2379dc23246e78b2e891a8a1e96a0198afd46e02b59c0"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/base-bundle-manifest.json",
-      "size": 1198,
-      "sha256": "029a1175d1f28cd0a73932060d96f09ba6c0f5e67035a89d429859c148fe6fa0"
+      "size": 1241,
+      "sha256": "e0436118bc857ef672bfebc8fec8b01ce0eb1043483a3d809c5c9a5b71d988f8"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/independent-adapter-probe.log",
@@ -38,8 +38,8 @@
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/independent-review-verification.json",
-      "size": 2994,
-      "sha256": "e795717c8062f89aa7960fdf6a34fd54076a06bc673da991633ba3f482d25a25"
+      "size": 3079,
+      "sha256": "90d2d4177ced7dad03d512dc4979bd805bada0bc1dece442453a8315109c173d"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/probe-tools/browser_catalog_probe.mjs",
@@ -83,8 +83,8 @@
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/adapter/queryCache.mjs",
-      "size": 5002,
-      "sha256": "7010750f9f52413e7bd2ef2df510f6fcc8db939751540c4b7b703c8b3c091bbd"
+      "size": 5158,
+      "sha256": "e6630862b8d3bfdf7955c583fa749b5797353f65b9772fce04e61751b4d74ea3"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/adapter/result.json",
@@ -103,28 +103,28 @@
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/browser-catalog/dashboard-catalog_failure.png",
-      "size": 42500,
-      "sha256": "beb17a51e29dabbcfc67526a21383abcd7a6106adb47b85fb021e47620a81287"
+      "size": 42501,
+      "sha256": "23673191a2fda65dab550bbbf4c97a94ecec975e2c06e550939c284f226e8ffe"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/browser-catalog/dashboard-no_permission.png",
-      "size": 42416,
-      "sha256": "6e82515db67735290cc8242b8302ba4907305961da85266eb567b9bb20638d2a"
+      "size": 42417,
+      "sha256": "ede94c5325c8c2349e98e6ecb3282ff381fe88083cacb70fcf33ea625a135134"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/browser-catalog/dashboard-stale.png",
-      "size": 44761,
-      "sha256": "36dceb804d444879b63e21b7fb50d5f315de05010831a45da1528a575cd41834"
+      "size": 44762,
+      "sha256": "7c7a6b9664d61130f9540efcfee178af95925c5379e472b56591e223b32f013c"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/browser-catalog/late-enable-callback.png",
-      "size": 63800,
-      "sha256": "a58e1637f154ae8b830fcef775700d60e1aa7a3efa3484671a9f69ab07e5fc5f"
+      "size": 63801,
+      "sha256": "0d233c6c692d176afed7095992c6023cd451b86f1b5e64d0d559a78571512fe3"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/browser-catalog/pending-new-credential.png",
-      "size": 65375,
-      "sha256": "b52809567bfd200375b677e35879c90198f4259937888922976c12b58dddc614"
+      "size": 65377,
+      "sha256": "4735a140e87690acf61b573ac6d6d8985a8a2c35a83756d6d8a4868a1603d848"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/browser-regression.log",
@@ -138,33 +138,33 @@
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/browser-regression/cold-dashboard.png",
-      "size": 33380,
-      "sha256": "4a330ced4fe587049c671dfea02aec8fcf4b4866510832695c6e3107178a5044"
+      "size": 33382,
+      "sha256": "dc5882e313b569c86191bce3cb147f0c7ef14b5cf2d2a450a6b40e6f49ecef24"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/browser-regression/create-pending-switch.png",
-      "size": 65084,
-      "sha256": "eb7ebe96e7d281a30afb0bb166c8e936664e22057b6e5a90f59202edf0e35247"
+      "size": 65085,
+      "sha256": "eda2f8e35005466438e74b69367dc7ebf610c3c73d7e0fff9974af5f8c41e87b"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/browser-regression/final-page.png",
-      "size": 33337,
-      "sha256": "227ca366eb407605b6b89902738aa84fc951edc2bdc035bfcc7a9ddbc7ea0236"
+      "size": 33339,
+      "sha256": "cc83023dd435bcf6808106b99ca6baea9449dee4d6914dfe2d448b6412b54602"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/browser-regression/initial-login-race.png",
-      "size": 36989,
-      "sha256": "a0ba81934be9d20c58571c688d0f578d0a34bbec2a7141a94f95a8c14d8c0973"
+      "size": 36990,
+      "sha256": "98b846fc593395e262991d1675b86cce088f043ba43d6abb3a225c91d510723d"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/browser-regression/partial-dashboard.png",
-      "size": 32999,
-      "sha256": "0962030f49ca8d3b1663ff4b2983b3b2691d44f47701f81c217a1059967f4059"
+      "size": 33000,
+      "sha256": "a8412e386bbfcb3b9897dd6b946145e70c00d7db68c27eccbba558fb92a9abfa"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/browser-regression/traffic-page.png",
-      "size": 55978,
-      "sha256": "2893c718845a2b9bfeb8c89a998211ff6f4433aa571405ffb452bf7cd2f49584"
+      "size": 55979,
+      "sha256": "e32acfbd214e1f3239882bf53bfdee88894adff7a9e89de33bfdd7ac75232d93"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/build.log",
@@ -288,8 +288,8 @@
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/frontend-build/index.html",
-      "size": 411,
-      "sha256": "7f48d56bc84964a61adc3a4591efd4b91344d1ec3c2c32049772d3769069707d"
+      "size": 422,
+      "sha256": "bbc75f960e9a4ccdf0b780d532aa6eba99a5164a6cbee881c7f03e80d327a5d1"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/identity.json",
@@ -298,8 +298,8 @@
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/product-source.tar",
-      "size": 5904373,
-      "sha256": "a4f3bbf0551fdafb25dee5abd63549fbfd5d2aea85b332c329f6b3f91e4ebac8"
+      "size": 5969920,
+      "sha256": "28b88feb16d1eb1114dd2a36a478d8b59646224ec1a4648b42c400bde659f8e0"
     },
     {
       "path": "docs/optimization/evidence/T05-33db3e4/run/query-cache-probe.json",
