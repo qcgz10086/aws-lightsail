@@ -9,11 +9,10 @@ import uuid
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy.orm import Session
 
-from app.config import get_settings
-from app.database import SessionLocal
+from app import database
 from app.models import AwsCredential, User
-from app.services import lightsail as ls
 from app.services.aws_clients import select_scan_credentials
+from app.services.query_settings import claim_due_sync, finish_due_sync
 
 
 logger = logging.getLogger(__name__)
@@ -36,52 +35,68 @@ def sync_user_traffic(db: Session, user: User, credential_id: int | None = None,
 
 
 def sync_all_users() -> None:
-    # A deterministic interval bucket survives scheduler retries. The default
-    # traffic window is materialized once on acceptance, after idempotency lookup.
-    from app.services.task_queue import TaskConflict
+    from fastapi import HTTPException
     from app.services.task_submission import submit
-    interval = max(5, int(get_settings().collect_interval_minutes or 60)) * 60
-    bucket = int(datetime.now(timezone.utc).timestamp()) // interval
-    with SessionLocal() as db:
-        from app.services.task_queue import queue_for
-        queue_for(db.get_bind()).recover(expired_only=True)
-        users = db.query(User).filter(User.id.in_(db.query(AwsCredential.user_id))).all()
-        for user in users:
-            for cred in select_scan_credentials(user.credentials):
+
+    slot = claim_due_sync(database.engine)
+    if slot is None:
+        return
+    complete = True
+    with database.SessionLocal() as db:
+        scopes = [(user.id, cred.id, cred.account_id or f"credential-{cred.id}")
+                  for user in db.query(User).filter(User.id.in_(db.query(AwsCredential.user_id))).all()
+                  for cred in select_scan_credentials(user.credentials)]
+        db.commit()
+        for user_id, credential_id, identity in scopes:
+            user = db.get(User, user_id)
+            if user is not None:
                 try:
-                    submit(db, user, "traffic_sync", cred.id,
-                           idempotency_key=f"scheduler:{bucket}:{user.id}:{cred.id}")
+                    submit(db, user, "traffic_sync", credential_id,
+                           idempotency_key=f"scheduler:{slot.hex()}:{user_id}:{identity}")
+                except HTTPException as exc:
+                    db.rollback()
+                    if exc.status_code not in {404, 409}:
+                        complete = False
+                        logger.warning("流量任务未入队 user_id=%s credential_id=%s", user_id, credential_id)
                 except Exception:
                     db.rollback()
-                    logger.warning("流量任务未入队 user_id=%s credential_id=%s", user.id, cred.id)
+                    complete = False
+                    logger.warning("流量任务未入队 user_id=%s credential_id=%s", user_id, credential_id)
+    if complete:
+        finish_due_sync(database.engine, slot)
+
+
+def _recover_tasks() -> None:
+    from app.services.task_queue import queue_for
+
+    queue_for(database.engine).recover(expired_only=True)
 
 
 def start_scheduler() -> BackgroundScheduler:
     global _scheduler
     if _scheduler is not None:
         return _scheduler
-    settings = get_settings()
     scheduler = BackgroundScheduler(timezone="UTC")
     scheduler.add_job(
         sync_all_users,
         "interval",
-        minutes=max(5, int(settings.collect_interval_minutes or 60)),
+        seconds=1,
+        next_run_time=datetime.now(timezone.utc),
         id="traffic_collector",
         replace_existing=True,
         max_instances=1,
         coalesce=True,
     )
+    scheduler.add_job(_recover_tasks, "interval", minutes=1, id="task_recovery",
+                      max_instances=1, coalesce=True)
     scheduler.start()
     _scheduler = scheduler
-    logger.info(
-        "流量采集调度已启动，间隔 %s 分钟",
-        settings.collect_interval_minutes,
-    )
+    logger.info("流量采集调度已启动")
     return scheduler
 
 
 def stop_scheduler() -> None:
     global _scheduler
     if _scheduler is not None:
-        _scheduler.shutdown(wait=False)
+        _scheduler.shutdown(wait=True)
         _scheduler = None

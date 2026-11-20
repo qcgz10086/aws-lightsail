@@ -11,9 +11,9 @@ from sqlalchemy.orm import Session
 
 from app.database import engine, get_db
 from app.deps import get_current_user
-from app.models import AwsCredential, OperationTask, User
+from app.models import AwsCredential, User
 from app.schemas import InstanceCreate
-from app.services.task_queue import TaskConflict, TaskNotFound, queue_for, task_view
+from app.services.task_queue import TaskConflict, TaskNotFound, queue_for, task_for_key, task_view
 
 router = APIRouter(prefix="/v2/tasks", tags=["tasks"])
 
@@ -130,8 +130,7 @@ def list_tasks(limit: int = Query(50, ge=1, le=100), offset: int = Query(0, ge=0
 @router.get("/by-key")
 def task_by_key(key: str = Query(..., min_length=1, max_length=128),
                 user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> dict:
-    task = db.scalar(select(OperationTask).where(OperationTask.user_id == user.id,
-                                               OperationTask.idempotency_key == key))
+    task, _ = task_for_key(db, user.id, key)
     if task is None:
         raise HTTPException(status_code=404, detail="任务不存在")
     return task_view(db, task)

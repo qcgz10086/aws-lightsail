@@ -19,9 +19,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import api, { CachedInstancesResponse, CredentialItem, CredentialOut, Instance, readApi,
   SnapshotMetadata, getErrorMessage, invalidateQueryScope, invalidateQueryTags } from '../api/client'
+import type { QueryRoundProgress, RegionDiscovery } from '../api/client'
+import QueryProgress, { RetryCountdown } from '../components/QueryProgress'
 import { useAuth } from '../auth/AuthContext'
 import { submitTask, TaskKind } from '../api/tasks'
-import { snapshotPollDelay } from '../api/snapshotPolling'
 
 const stateColor: Record<string, string> = {
   running: 'green',
@@ -39,6 +40,9 @@ export default function InstancesPage() {
   const [filterCred, setFilterCred] = useState<number | 'all'>('all')
   const [filterRegion, setFilterRegion] = useState<string | 'all'>('all')
   const [loading, setLoading] = useState(false)
+  const [rounds, setRounds] = useState<QueryRoundProgress[]>([])
+  const [discovery, setDiscovery] = useState<RegionDiscovery[]>([])
+  const roundIds = useRef<string[]>([])
   const [snapshotScopes, setSnapshotScopes] = useState<(SnapshotMetadata & { region: string | null; credential_id: number })[]>([])
   const [acting, setActing] = useState<string | null>(null)
   const [limitModal, setLimitModal] = useState<Instance | null>(null)
@@ -73,8 +77,9 @@ export default function InstancesPage() {
       const params = {
         ...(filterCred === 'all' ? {} : { credential_id: filterCred }),
         ...(filterRegion === 'all' ? {} : { region: filterRegion }),
+        ...(roundIds.current.length ? { round_ids: roundIds.current.join(',') } : {}),
       }
-      const res = await readApi<CachedInstancesResponse>('/v2/instances', params, {
+      const res = await readApi<CachedInstancesResponse>('/v2/query-instances', params, {
         signal: controller.signal,
         tags: ['instances'],
         cacheIf: (value) => !value.refreshing,
@@ -82,8 +87,11 @@ export default function InstancesPage() {
       if (version === requestVersion.current) {
         setData(res.instances)
         setSnapshotScopes(res.scopes)
-        if (res.refreshing && Date.now() - pollStarted.current < 30000) {
-          pollTimer.current = setTimeout(() => void load(), snapshotPollDelay(pollStarted.current))
+        setRounds(res.rounds || [])
+        setDiscovery(res.discovery || [])
+        roundIds.current = (res.rounds || []).map((round) => round.id)
+        if (res.refreshing) {
+          pollTimer.current = setTimeout(() => void load(), 1000)
         }
       }
     } catch (err) {
@@ -99,6 +107,9 @@ export default function InstancesPage() {
     if (user?.has_credentials) {
       setData([])
       setSnapshotScopes([])
+      setRounds([])
+      setDiscovery([])
+      roundIds.current = []
       setCreds([])
       pollStarted.current = Date.now()
       void loadCreds(credentialController.signal)
@@ -117,13 +128,14 @@ export default function InstancesPage() {
     actionRefreshTimers.current.clear()
   }, [user?.id])
 
-  const refresh = async () => {
+  const refresh = async (mode: 'refresh' | 'global' = 'refresh') => {
     try {
       if (pollTimer.current) clearTimeout(pollTimer.current)
       pollStarted.current = Date.now()
-      await api.post('/v2/refresh', { kind: 'instances',
+      const response = await api.post<{ round_ids: string[] }>('/v2/queries', { mode,
         credential_id: filterCred === 'all' ? null : filterCred,
-        region: filterRegion === 'all' ? null : filterRegion })
+        region: mode === 'global' || filterRegion === 'all' ? null : filterRegion })
+      roundIds.current = response.data.round_ids
       invalidateQueryScope('instances', {
         ...(filterCred === 'all' ? {} : { credential_id: filterCred }),
         ...(filterRegion === 'all' ? {} : { region: filterRegion }),
@@ -195,15 +207,22 @@ export default function InstancesPage() {
           <Button onClick={() => void refresh()} loading={loading}>
             刷新
           </Button>
+          <Button onClick={() => void refresh('global')} title="扫描所选账号全部支持区域，不受地区筛选限制">
+            全局扫描
+          </Button>
         </Space>
       </div>
 
-      {snapshotScopes.some((scope) => scope.refreshing) ? <Alert type="info" showIcon
-        message="后台刷新中，成功账号和区域先行显示" description="本页最多自动跟进30秒；未完成可稍后刷新。" /> : null}
+      <QueryProgress rounds={rounds} discovery={discovery} scopes={snapshotScopes} onCancel={(id) => {
+        void api.post(`/v2/queries/${id}/cancel`).then(() => {
+          invalidateQueryTags('instances'); return latestLoad.current()
+        }).catch((error) => message.error(getErrorMessage(error)))
+      }} />
       {snapshotScopes.filter((scope) => scope.stale || scope.error).map((scope) => <Alert
         key={`${scope.credential_id}/${scope.region || 'regions'}`} type="warning" showIcon
         message={`凭证 #${scope.credential_id} / ${scope.region || '区域目录'}：${scope.stale ? '已过期快照' : '查询失败'}`}
-        description={`最近成功：${scope.last_success_at || '无'}；${scope.error || '正在刷新'}`} />)}
+        description={<span>最近成功：{scope.last_success_at || '无'}；{scope.error || '正在刷新'}
+          <RetryCountdown value={scope.next_retry_at} /></span>} />)}
       <Card>
         <Table
           rowKey={(r) => `${r.credential_id}/${r.region}/${r.name}`}

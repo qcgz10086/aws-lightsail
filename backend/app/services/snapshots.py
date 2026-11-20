@@ -5,20 +5,20 @@ import hashlib
 import json
 import logging
 from threading import Event, Lock, Thread
-from types import SimpleNamespace
 import time
 import uuid
 
 from sqlalchemy import delete, or_, select, update
 from sqlalchemy.dialects.sqlite import insert
-from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session, aliased
 
 from app.models import AwsCredential, DataSnapshot, User
 from app.proxy_config import sanitize_error_message
 
 MAX_PAYLOAD_BYTES = 64 * 1024 * 1024
 LEASE_SECONDS = 300
-RETRY_SECONDS = 15
+RETRY_SECONDS = 60
 _background_loop = None
 _background_thread = None
 _pending = set()
@@ -32,6 +32,49 @@ class SnapshotError(Exception):
         self.invalidate = invalidate
         self.status = status
         self.invalidate_credential = invalidate_credential
+
+
+class SnapshotReadStopped(SnapshotError):
+    """A revoked credential or refresh lease cannot send another read."""
+
+
+def check_snapshot_read(engine, scope, token):
+    with Session(engine) as db:
+        if not _current(db, scope):
+            raise SnapshotReadStopped("凭证、代理或身份版本已变化", status="invalidated")
+        row = db.get(DataSnapshot, scope["key"])
+        if row is None or row.lease_token != token:
+            raise SnapshotReadStopped("查询执行所有权已变化", status="invalidated")
+        blocked = db.scalar(select(DataSnapshot.key).where(
+            DataSnapshot.credential_id == scope["credential_id"],
+            DataSnapshot.version == scope["version"], DataSnapshot.kind == "billing-identity",
+            DataSnapshot.error_status == "credential_invalid"))
+        if blocked:
+            raise SnapshotReadStopped("凭证身份已确认失效", status="credential_invalid")
+        # A long throttle queue must not expire an otherwise live refresh. The
+        # conditional update also rejects workers superseded by a new owner.
+        updated = db.execute(update(DataSnapshot).where(DataSnapshot.key == scope["key"],
+            DataSnapshot.lease_token == token).values(lease_until=time.time() + LEASE_SECONDS)).rowcount
+        if not updated:
+            raise SnapshotReadStopped("查询执行所有权已变化", status="invalidated")
+        db.commit()
+
+
+async def _load_guarded(engine, scope, token, loader, check=None):
+    from app.services.read_throttle import read_context, read_scope
+    def gate():
+        check_snapshot_read(engine, scope, token)
+        if check is not None:
+            check()
+    gate()
+    with read_context(read_scope(scope["user_id"], scope["account_id"], scope["credential_id"]), gate):
+        return await loader()
+
+
+def _release_read(engine, scope, token):
+    with engine.begin() as connection:
+        connection.execute(update(DataSnapshot).where(DataSnapshot.key == scope["key"],
+            DataSnapshot.lease_token == token).values(lease_token=None, lease_until=0))
 
 
 def version_for(user, credential):
@@ -71,6 +114,37 @@ def _row_current(engine, scope):
         return row, True
 
 
+def _scope_states(db, scopes):
+    """Read payloads, current identities and revocation markers in one statement."""
+    blocked = aliased(DataSnapshot)
+    versions, rows, invalid = {}, {}, {}
+    for user, credential, snapshot, marker in db.execute(select(
+            User, AwsCredential, DataSnapshot, blocked).join(
+                AwsCredential, AwsCredential.user_id == User.id).outerjoin(
+                DataSnapshot, (DataSnapshot.credential_id == AwsCredential.id)
+                & DataSnapshot.key.in_([scope["key"] for scope in scopes])).outerjoin(
+                blocked, (blocked.credential_id == AwsCredential.id)
+                & (blocked.kind == "billing-identity")
+                & (blocked.error_status == "credential_invalid")).where(
+                AwsCredential.id.in_({scope["credential_id"] for scope in scopes}))):
+        versions[(user.id, credential.id)] = version_for(user, credential)
+        if snapshot is not None:
+            rows[snapshot.key] = snapshot
+        if marker is not None:
+            invalid[(credential.id, marker.version)] = marker
+    return versions, rows, invalid
+
+
+def _state_view(scope, now, versions, rows, invalid):
+    if versions.get((scope["user_id"], scope["credential_id"])) != scope["version"]:
+        return _view(None, now, True), None
+    marker = invalid.get((scope["credential_id"], scope["version"]))
+    if marker is not None:
+        return _view(marker, now), marker
+    row = rows.get(scope["key"])
+    return (_view(row, now) if row is not None else None), row
+
+
 def _iso(value):
     return datetime.fromtimestamp(value, timezone.utc).isoformat() if value is not None else None
 
@@ -90,7 +164,8 @@ def _view(row, now, invalidated=False):
     return {"data": json.loads(row.payload) if row.payload is not None else None,
             "status": "stale" if stale else "fresh" if row.payload is not None else "refreshing" if refreshing else "error",
             "stale": stale, "refreshing": refreshing, "last_success_at": _iso(row.last_success),
-            "expires_at": _iso(row.expires_at), "error": row.error, "error_status": row.error_status}
+            "expires_at": _iso(row.expires_at), "error": row.error, "error_status": row.error_status,
+            "next_retry_at": _iso(row.next_retry_at) if row.next_retry_at else None}
 
 
 def permission_failure(exc):
@@ -118,33 +193,89 @@ def _error_code(exc, client_error_type):
     code = getattr(exc, "code", "")
     if code:
         return code
+    failure = getattr(exc, "failure", None) or getattr(exc, "read_failure", None)
+    if failure and failure.get("code"):
+        return failure["code"]
     # Wrapped AWS failures keep their structured code. Do not infer identity
     # failure from a localized/free-form message.
     cause = getattr(exc, "__cause__", None)
     return _error_code(cause, client_error_type) if cause is not None and cause is not exc else ""
 
 
+def retry_seconds(exc):
+    """Keep a longer AWS Retry-After even when a service wraps ClientError."""
+    from email.utils import parsedate_to_datetime
+    current, seen, delay = exc, set(), RETRY_SECONDS
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        headers = getattr(current, "response", {}).get("ResponseMetadata", {}).get("HTTPHeaders", {})
+        value = headers.get("retry-after") or headers.get("Retry-After")
+        if value:
+            try:
+                delay = max(delay, float(value))
+            except (ValueError, TypeError):
+                try:
+                    delay = max(delay, parsedate_to_datetime(value).timestamp() - time.time())
+                except (ValueError, TypeError, OverflowError):
+                    pass
+        current = getattr(current, "__cause__", None)
+    return delay
+
+
+def retry_deadline(exc):
+    """Keep the absolute deadline of an already recorded read failure."""
+    current, seen = exc, set()
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        failure = getattr(current, "failure", None) or getattr(current, "read_failure", None)
+        if failure and failure.get("retry_at") is not None:
+            return failure["retry_at"]
+        current = getattr(current, "__cause__", None)
+    return None
+
+
 def _read_or_claim(engine, scope, force):
     now = time.time()
-    row, current = _row_current(engine, scope)
-    if not current:
-        return _view(None, now, True), None
+    with Session(engine) as db:
+        view, row = _state_view(scope, now, *_scope_states(db, [scope]))
+        if view and (view["status"] == "invalidated" or view.get("error_status") == "credential_invalid"):
+            return view, None
     if row is not None and row.lease_token and row.lease_until > now:
         return _view(row, now), None
-    if row is not None and not force and ((row.payload is not None and row.expires_at > now)
-                                          or row.next_retry_at > now):
+    if row is not None and (row.error_status == "credential_invalid" or row.next_retry_at > now
+                            or not force and row.payload is not None and row.expires_at > now):
         return _view(row, now), None
     candidate = uuid.uuid4().hex
     values = {**scope, "payload_bytes": 0, "expires_at": 0, "next_retry_at": 0,
               "lease_token": candidate, "lease_until": now + LEASE_SECONDS, "updated_at": now}
     statement = insert(DataSnapshot).values(**values)
-    condition = DataSnapshot.lease_until <= now
+    condition = ((DataSnapshot.lease_until <= now) & (DataSnapshot.next_retry_at <= now)
+                 & or_(DataSnapshot.error_status.is_(None), DataSnapshot.error_status != "credential_invalid"))
     if not force:
         condition = condition & or_(DataSnapshot.payload.is_(None), DataSnapshot.expires_at <= now) & (DataSnapshot.next_retry_at <= now)
     statement = statement.on_conflict_do_update(index_elements=["key"],
         set_={"lease_token": candidate, "lease_until": now + LEASE_SECONDS}, where=condition).returning(DataSnapshot)
     with Session(engine) as db:
-        claimed = db.scalars(statement).first()
+        try:
+            # Acquire SQLite's writer reservation before checking the version.
+            # Parent deletion/key rotation cannot commit between this check and
+            # lease insertion. The hot path above remains a single read.
+            db.execute(update(AwsCredential).where(AwsCredential.id == scope["credential_id"])
+                       .values(id=AwsCredential.id))
+            if not _current(db, scope):
+                return _view(None, time.time(), True), None
+            invalid_identity = db.scalar(select(DataSnapshot).where(
+                DataSnapshot.credential_id == scope["credential_id"],
+                DataSnapshot.version == scope["version"], DataSnapshot.kind == "billing-identity",
+                DataSnapshot.error_status == "credential_invalid"))
+            if invalid_identity is not None:
+                return _view(invalid_identity, time.time()), None
+            claimed = db.scalars(statement).first()
+        except IntegrityError:
+            db.rollback()
+            if not _current(db, scope):
+                return _view(None, time.time(), True), None
+            raise
         view = _view(claimed, now) if claimed else None
         db.commit()
     if view is not None:
@@ -217,12 +348,22 @@ def _publish_batch(engine, entries):
             if current_version != scope["version"]:
                 connection.exec_driver_sql("DELETE FROM data_snapshots WHERE key=? AND lease_token=?", (scope["key"], token))
                 outputs.append(None); continue
+            blocked = connection.exec_driver_sql("""SELECT key FROM data_snapshots
+                WHERE credential_id=? AND version=? AND kind='billing-identity'
+                AND error_status='credential_invalid' LIMIT 1""",
+                (scope["credential_id"], scope["version"])).first()
+            if blocked and not result.get("invalidate_credential", False):
+                connection.exec_driver_sql("UPDATE data_snapshots SET lease_token=NULL,lease_until=0 WHERE key=? AND lease_token=?",
+                                          (scope["key"], token))
+                outputs.append(None); continue
             values = {"lease_token": None, "lease_until": 0, "updated_at": now,
                       "error": sanitize_error_message(error) if error else None,
                       "error_status": ("credential_invalid" if result.get("invalidate_credential", False)
                                        else result.get("error_status", "unavailable")) if error else None}
             if error:
-                values["next_retry_at"] = now + RETRY_SECONDS
+                deadline = result.get("retry_at")
+                values["next_retry_at"] = (deadline if deadline is not None else
+                    now + max(RETRY_SECONDS, result.get("retry_after", RETRY_SECONDS)))
                 if result.get("invalidate", False):
                     if result.get("invalidate_credential", False):
                         connection.exec_driver_sql("""UPDATE data_snapshots SET payload=NULL,payload_bytes=0,
@@ -300,15 +441,18 @@ def _loop():
         return _background_loop
 
 
-async def _work(engine, scope, token, ttl, loader):
+async def _work(engine, scope, token, ttl, loader, check=None):
     try:
-        data = await asyncio.wait_for(loader(), timeout=25)
+        data = await _load_guarded(engine, scope, token, loader, check)
         await _publish_ready(engine, scope, token, ttl, data=data)
+    except SnapshotReadStopped:
+        _release_read(engine, scope, token)
     except Exception as exc:
         try:
             _publish(engine, scope, token, ttl, error=str(exc), invalidate=getattr(exc, "invalidate", False),
                      invalidate_credential=getattr(exc, "invalidate_credential", False),
-                     error_status=getattr(exc, "status", "unavailable"))
+                     error_status=getattr(exc, "status", "unavailable"), retry_after=retry_seconds(exc),
+                     retry_at=retry_deadline(exc))
         except Exception:
             logger.exception("Snapshot refresh failure could not be recorded")
     finally:
@@ -316,8 +460,9 @@ async def _work(engine, scope, token, ttl, loader):
             _pending.discard(scope["key"])
 
 
-async def read_snapshot(engine, scope, ttl, loader, wait=False, force=False):
-    return await finish_snapshot(engine, scope, ttl, loader, wait, *_read_or_claim(engine, scope, force))
+async def read_snapshot(engine, scope, ttl, loader, wait=False, force=False, *, check=None):
+    result = await finish_snapshot(engine, scope, ttl, loader, wait, *_read_or_claim(engine, scope, force), check=check)
+    return revalidate_snapshot_views(engine, [(scope, result)])[0]
 
 
 async def initial_dependency(engine, scope, view, budget=0.15):
@@ -334,21 +479,24 @@ async def initial_dependency(engine, scope, view, budget=0.15):
     return view
 
 
-async def finish_snapshot(engine, scope, ttl, loader, wait, view, token):
+async def finish_snapshot(engine, scope, ttl, loader, wait, view, token, *, check=None):
     if token is None and not view["refreshing"]:
         return view
     run_here = bool(token and wait)
     if token:
         if run_here:
             try:
-                data = await asyncio.wait_for(loader(), timeout=25)
+                data = await _load_guarded(engine, scope, token, loader, check)
                 published = await _publish_ready(engine, scope, token, ttl, data=data)
                 if published is not None:
                     return published
+            except SnapshotReadStopped:
+                _release_read(engine, scope, token)
             except Exception as exc:
                 _publish(engine, scope, token, ttl, error=str(exc), invalidate=getattr(exc, "invalidate", False),
                          invalidate_credential=getattr(exc, "invalidate_credential", False),
-                         error_status=getattr(exc, "status", "unavailable"))
+                         error_status=getattr(exc, "status", "unavailable"), retry_after=retry_seconds(exc),
+                         retry_at=retry_deadline(exc))
         else:
             with _guard:
                 queued = len(_pending) >= 128
@@ -357,7 +505,7 @@ async def finish_snapshot(engine, scope, ttl, loader, wait, view, token):
             if queued:
                 _publish(engine, scope, token, ttl, error="刷新队列已满，请稍后重试")
             else:
-                asyncio.run_coroutine_threadsafe(_work(engine, dict(scope), token, ttl, loader), _loop())
+                asyncio.run_coroutine_threadsafe(_work(engine, dict(scope), token, ttl, loader, check), _loop())
     if wait and token is not None:
         row, current = _row_current(engine, scope)
         return _view(row, time.time()) if row and current else _view(None, time.time(), True)
@@ -383,29 +531,44 @@ async def read_many(engine, requests, wait=False, force=False):
         return []
     now = time.time()
     with Session(engine) as db:
-        credentials = {credential.id: (user, credential) for user, credential in db.execute(
-            select(User, AwsCredential).join(AwsCredential, AwsCredential.user_id == User.id).where(
-                AwsCredential.id.in_({scope["credential_id"] for scope, _ttl, _loader in requests})))}
-        rows = {row.key: row for row in db.scalars(select(DataSnapshot).where(
-            DataSnapshot.key.in_([scope["key"] for scope, _ttl, _loader in requests])))}
+        scopes = [scope for scope, _ttl, _loader in requests]
+        states = _scope_states(db, scopes)
+        reserved = False
         views = []
         for scope, _ttl, _loader in requests:
-            pair = credentials.get(scope["credential_id"])
-            if not pair or pair[0].id != scope["user_id"] or version_for(*pair) != scope["version"]:
-                views.append((_view(None, now, True), None)); continue
-            row = rows.get(scope["key"])
-            if row and (row.lease_token and row.lease_until > now or not force and (
-                    row.payload is not None and row.expires_at > now or row.next_retry_at > now)):
+            view, row = _state_view(scope, now, *states)
+            if view and (view["status"] == "invalidated" or view.get("error_status") == "credential_invalid"):
+                views.append((view, None)); continue
+            if row and (row.lease_token and row.lease_until > now or row.next_retry_at > now
+                    or row.error_status == "credential_invalid"
+                    or not force and row.payload is not None and row.expires_at > now):
                 views.append((_view(row, now), None)); continue
             candidate = uuid.uuid4().hex
             values = {**scope, "payload_bytes": 0, "expires_at": 0, "next_retry_at": 0,
                       "lease_token": candidate, "lease_until": now + LEASE_SECONDS, "updated_at": now}
-            condition = DataSnapshot.lease_until <= now
+            condition = ((DataSnapshot.lease_until <= now) & (DataSnapshot.next_retry_at <= now)
+                         & or_(DataSnapshot.error_status.is_(None), DataSnapshot.error_status != "credential_invalid"))
             if not force:
                 condition = condition & or_(DataSnapshot.payload.is_(None), DataSnapshot.expires_at <= now) & (DataSnapshot.next_retry_at <= now)
             statement = insert(DataSnapshot).values(**values).on_conflict_do_update(index_elements=["key"],
                 set_={"lease_token": candidate, "lease_until": now + LEASE_SECONDS}, where=condition).returning(DataSnapshot)
-            claimed = db.scalars(statement.execution_options(populate_existing=True)).first()
+            if not reserved:
+                db.execute(update(AwsCredential).where(
+                    AwsCredential.id.in_({item["credential_id"] for item in scopes})).values(id=AwsCredential.id))
+                db.expire_all()
+                states = _scope_states(db, scopes)
+                reserved = True
+            view, row = _state_view(scope, now, *states)
+            if view and (view["status"] == "invalidated" or view.get("error_status") == "credential_invalid"):
+                views.append((view, None)); continue
+            try:
+                with db.begin_nested():
+                    claimed = db.scalars(statement.execution_options(populate_existing=True)).first()
+            except IntegrityError:
+                if not _current(db, scope):
+                    views.append((_view(None, time.time(), True), None))
+                    continue
+                raise
             if claimed:
                 views.append((_view(claimed, now), candidate))
             else:
@@ -426,45 +589,16 @@ def revalidate_snapshot_views(engine, scoped_views):
     """Return committed values at the response boundary, not stale in-memory views."""
     if not scoped_views:
         return []
-    credential_ids = {scope["credential_id"] for scope, _view_value in scoped_views}
-    keys = {scope["key"] for scope, _view_value in scoped_views}
-    # One SELECT supplies a consistent committed response boundary across all
-    # credentials and keys. Parameters are bound; no ORM/session state is reused.
-    all_credential_scopes = {scope["credential_id"] for scope, _previous in scoped_views
-                             if scope["kind"] == "billing-identity"}
-    key_slots = ",".join("?" for _key in keys)
-    credential_slots = ",".join("?" for _id in credential_ids)
-    auth_rows = {}
-    if all_credential_scopes:
-        auth_slots = ",".join("?" for _id in all_credential_scopes)
-        with engine.connect() as connection:
-            auth_rows = {row.credential_id: row for row in connection.exec_driver_sql(
-                "SELECT credential_id,error,error_status FROM data_snapshots "
-                "WHERE kind='billing-identity' AND credential_id IN (" + auth_slots + ")",
-                tuple(all_credential_scopes)).all()}
-    with engine.connect() as connection:
-        rows = connection.exec_driver_sql("""SELECT u.id,u.token_version,c.id,c.account_id,
-            c.access_key_id_enc,c.secret_access_key_enc,c.proxy_url_enc,
-            s.key,s.payload,s.lease_token,s.lease_until,s.expires_at,s.error,s.error_status,s.last_success
-            FROM users AS u JOIN aws_credentials AS c ON c.user_id=u.id
-            LEFT JOIN data_snapshots AS s ON s.credential_id=c.id AND s.key IN (""" + key_slots + ")"
-            + " WHERE c.id IN (" + credential_slots + ")", (*keys, *credential_ids)).all()
-    versions, live = {}, {}
-    for row in rows:
-        versions[row[2]] = hashlib.sha256(json.dumps(list(row[:7]), separators=(",", ":")).encode()).hexdigest()
-        if row[7] is not None:
-            live[row[7]] = SimpleNamespace(**dict(zip(
-                ("payload", "lease_token", "lease_until", "expires_at", "error", "error_status", "last_success"),
-                row[8:])))
+    with Session(engine) as db:
+        versions, live, auth_rows = _scope_states(db, [scope for scope, _previous in scoped_views])
+        db.expunge_all()
     refreshed = []
     now = time.time()
-    credential_invalid = {credential_id for credential_id, row in auth_rows.items()
-                          if row.error_status == "credential_invalid"}
     for scope, previous in scoped_views:
-        if versions.get(scope["credential_id"]) != scope["version"]:
+        if versions.get((scope["user_id"], scope["credential_id"])) != scope["version"]:
             refreshed.append(_view(None, now, True)); continue
-        if scope["credential_id"] in credential_invalid:
-            auth_row = auth_rows[scope["credential_id"]]
+        if (scope["credential_id"], scope["version"]) in auth_rows:
+            auth_row = auth_rows[(scope["credential_id"], scope["version"])]
             status = auth_row.error_status
             refreshed.append({"data": None, "status": status, "stale": False, "refreshing": False,
                               "last_success_at": None, "expires_at": None,

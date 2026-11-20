@@ -22,6 +22,7 @@ from app.schemas import (
 from app.services import lightsail as ls
 from app.services.task_submission import submit, legacy_result
 from app.services.aws_clients import select_scan_credentials
+from app.services.credential_reads import CredentialReadGuard
 from app.services.traffic import (
     NoCredentialsError,
     effective_auto_stop,
@@ -83,7 +84,7 @@ def _expire_instance_snapshots(db, user_id):
     # Existing write routes keep their response contract. The next query must
     # refresh state rather than presenting a minute-old pre-operation snapshot.
     db.execute(update(DataSnapshot).where(DataSnapshot.user_id == user_id,
-        DataSnapshot.kind == "instances").values(expires_at=0, lease_token=None, lease_until=0))
+        DataSnapshot.kind.in_(("instances", "query-instances"))).values(expires_at=0, lease_token=None, lease_until=0))
 
 
 def _to_out(
@@ -215,8 +216,10 @@ async def get_instance(
     db: Session = Depends(get_db),
 ) -> InstanceOut:
     ak, sk, cred, proxy_url = _keys(user, credential_id)
+    guard = CredentialReadGuard.capture(db.get_bind(), user, cred)
     try:
-        raw = await asyncio.to_thread(ls.get_instance, ak, sk, region, name, proxy_url=proxy_url)
+        with guard.context():
+            raw = await asyncio.to_thread(ls.get_instance, ak, sk, region, name, proxy_url=proxy_url)
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=exc.message)
     return _to_out(db, user, raw, cred.id, cred.account_label)
@@ -294,6 +297,7 @@ async def update_settings(
     db: Session = Depends(get_db),
 ) -> InstanceOut:
     ak, sk, cred, proxy_url = _keys(user, credential_id)
+    guard = CredentialReadGuard.capture(db.get_bind(), user, cred)
     # Capture an existing conflict before accepting changes to a single row.
     reconcile_auto_stop_conflicts(db, user)
     setting = get_setting(db, user.id, region, name, cred.id)
@@ -329,7 +333,8 @@ async def update_settings(
     db.commit()
 
     try:
-        raw = await asyncio.to_thread(ls.get_instance, ak, sk, region, name, proxy_url=proxy_url)
+        with guard.context():
+            raw = await asyncio.to_thread(ls.get_instance, ak, sk, region, name, proxy_url=proxy_url)
         return _to_out(db, user, raw, cred.id, cred.account_label)
     except ls.LightsailError:
         traffic = traffic_for_instance(db, user, region, name, cred.id, cred.account_id)

@@ -30,7 +30,6 @@ class Settings(BaseSettings):
     # 必填，无默认值：seed 只在提供了密码时才创建管理员。
     admin_password: str
     database_url: str = "sqlite:////data/app.db"
-    collect_interval_minutes: int = 60
     cors_origins: str = ""
     access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
     jwt_algorithm: str = "HS256"

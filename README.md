@@ -130,7 +130,6 @@ python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().d
 | `ADMIN_PASSWORD` | 是 | 无 | 管理员密码；12-64 位，须同时含大小写字母、数字、符号；禁止用默认密码 `admin123`；首次启动且用户表为空时创建管理员 |
 | `ADMIN_USERNAME` | 否 | `admin` | 管理员用户名 |
 | `DATABASE_URL` | 否 | `sqlite:////data/app.db` | SQLite 路径；`docker-compose.yml` 里已配好，一般不用改 |
-| `COLLECT_INTERVAL_MINUTES` | 否 | `60` | 流量自动采集间隔（分钟） |
 | `CORS_ORIGINS` | 否 | 空（不放行任何来源） | 允许跨域的来源，逗号分隔；生产走 nginx 同源反代不用填，本地开发需要时显式写明 |
 | `COOKIE_SECURE` | 否 | `false` | 登录 Cookie 是否带 Secure 标志；走 HTTPS 反代时设 `true` |
 | `ENABLE_DOCS` | 否 | `false` | 是否开启 `/docs`、`/redoc`、`/openapi.json`；仅调试时设 `true` |
@@ -237,7 +236,7 @@ Browser → frontend(nginx:8080) → /api 反代 → backend(FastAPI/uvicorn)
 ```
 
 - 后端单 worker（适配 SQLite）
-- 每小时自动采集流量（`COLLECT_INTERVAL_MINUTES`，可用「立即同步」手动触发）
+- 默认每 60 分钟自动采集流量。管理员可在「系统设置」调整采集周期（最短 5 分钟）和 AWS 读取间隔（默认 0.2 秒）；也可在流量页手动同步。
 
 ## 本地开发（可选）
 

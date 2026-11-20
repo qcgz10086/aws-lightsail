@@ -214,6 +214,7 @@ class TrafficSummary(BaseModel):
     year_month: str
     instances: list[TrafficInstanceRow]
     by_region: list[TrafficRegionRow]
+    latest_syncs: list[dict] = []
     note: str = "流量基于 Lightsail NetworkIn/NetworkOut 指标估算，与账单可能存在差异"
 
 

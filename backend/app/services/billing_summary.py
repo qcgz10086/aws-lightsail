@@ -13,7 +13,8 @@ from app.services.traffic import get_credential_keys, get_credential_proxy_url
 
 
 def status_error(exc):
-    status = ("no_permission" if isinstance(exc, service.BillingNoPermissionError)
+    status = ("insufficient_history" if isinstance(exc, service.BillingInsufficientHistoryError)
+              else "no_permission" if isinstance(exc, service.BillingNoPermissionError)
               else "invalid" if isinstance(exc, service.BillingValidationError) else "unavailable")
     return {"status": status, "error": sanitize_error_message(str(exc))}
 
@@ -87,7 +88,8 @@ def aggregate(accounts):
     with localcontext() as context:
         context.prec = 80
         for account in accounts:
-            if account["costs"]["status"] == "ok":
+            if account["costs"].get("currencies") and (account["costs"]["status"] == "ok"
+                    or account["costs"].get("cache", {}).get("stale")):
                 for row in account["costs"]["currencies"]:
                     target = buckets[row["currency"]]
                     for key in ("total_cost", "net_cost", "credits_applied", "refunds", "discounts", "lightsail_cost"):
@@ -96,7 +98,8 @@ def aggregate(accounts):
                 row = account["forecast"]
                 target = buckets[row["currency"]]
                 target["forecast_remaining"] = target.get("forecast_remaining", Decimal(0)) + service.decimal_amount(row["amount"])
-            if account["credits"]["status"] == "ok":
+            if account["credits"].get("credits") and (account["credits"]["status"] == "ok"
+                    or account["credits"].get("cache", {}).get("stale")):
                 for credit in account["credits"]["credits"]:
                     target = buckets[credit["currency"]]
                     for field, key in (("remaining_amount", "official_remaining"), ("estimated_amount", "official_estimated")):
@@ -144,7 +147,7 @@ async def summary(db, user, credential_id=None, cached=False, wait=False, force=
         accounts = await asyncio.gather(*(cached_account(db.get_bind(), user, credential, wait, force)
                                          for credential in credentials))
         credentials_by_id = {credential.id: credential for credential in credentials}
-        final_scopes, final_sections = [], []
+        final_scopes, final_sections, identity_indexes = [], [], {}
         as_of = service._today_utc().isoformat()
         for account in accounts:
             credential = credentials_by_id.get(account["credential_id"])
@@ -152,20 +155,27 @@ async def summary(db, user, credential_id=None, cached=False, wait=False, force=
                 continue
             for name in ("costs", "forecast", "credits"):
                 final_scopes.append((scope_for(user, credential, "billing-" + name, as_of),
-                                     account[name].get("cache", {})))
+                    {"data": None, "error": account[name].get("error"),
+                     "error_status": account[name].get("status"), "refreshing": False,
+                     "stale": False, "last_success_at": None, **account[name].get("cache", {})}))
                 final_sections.append((account, name))
+        from app.services.identity_validation import identity_scope_for
+        for account in accounts:
+            credential = credentials_by_id.get(account["credential_id"])
+            if credential is not None:
+                identity_indexes[credential.id] = len(final_scopes)
+                final_scopes.append((identity_scope_for(user, credential), {}))
         current_views = revalidate_snapshot_views(db.get_bind(), final_scopes)
         for (account, name), view in zip(final_sections, current_views):
-                previous = account[name]
-                metadata = {key: value for key, value in view.items() if key != "data"}
-                if view["data"] is None:
-                    if previous.get("status") == "ok":
-                        account[name] = {"status": view.get("error_status") or "unavailable",
-                                         "error": view.get("error"), "cache": metadata}
-                elif previous.get("status") == "ok" and (view["stale"] or view["refreshing"]):
-                    account[name] = {"status": previous["status"],
-                                     **{key: value for key, value in previous.items() if key != "cache"},
-                                     "cache": metadata}
+            from app.services.billing_cache import _section
+            index = identity_indexes.get(account["credential_id"])
+            identity = current_views[index] if index is not None else {}
+            if identity.get("error") and identity.get("error_status") != "credential_invalid" and not view.get("error"):
+                view = {**view, "error": identity["error"],
+                    "error_status": identity.get("error_status") or "unavailable",
+                    "stale": view.get("data") is not None}
+            if view.get("data") is not None or view.get("error"):
+                account[name] = _section(view)
     else:
         accounts = await asyncio.gather(*(account_summary(credential) for credential in credentials))
     rows = db.query(CreditRecord).filter(CreditRecord.user_id == user.id).order_by(

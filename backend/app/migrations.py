@@ -5,6 +5,7 @@ import logging
 import os
 import re
 import tempfile
+import time
 from contextlib import ExitStack
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
@@ -15,9 +16,15 @@ from sqlalchemy.schema import CreateIndex, CreateTable
 from sqlalchemy.dialects import sqlite
 
 from app.sqlite_backup import check_database, snapshot_database, sync_directory, verify_migration_snapshot
+from app import query_models  # noqa: F401 - register current metadata for direct upgrade callers
+from app.settings_models import initial_settings
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 T06_TABLES = {"operation_tasks", "operation_task_steps", "operation_task_locks"}
+V6_TABLES = {"query_settings", "query_setting_changes", "operation_task_requests",
+             "query_accounts", "query_regions", "query_rounds", "query_targets", "traffic_task_cancellations",
+             "traffic_read_failures"}
+V6_NAME = "Query settings, discovery and collection schedule"
 LEGACY_UNIQUE_KEYS = {
     "aws_credentials": ("user_id",),
     "instance_settings": ("user_id", "region", "instance_name"),
@@ -206,12 +213,26 @@ def apply_v5(conn, metadata):
                 conn.execute(str(CreateIndex(index, if_not_exists=True).compile(dialect=sqlite.dialect())))
 
 
+def apply_v6(conn, metadata):
+    existing = tables(conn)
+    for table in metadata.sorted_tables:
+        if table.name in V6_TABLES and table.name not in existing:
+            create_table(conn, table)
+            for index in table.indexes:
+                conn.execute(str(CreateIndex(index, if_not_exists=True).compile(dialect=sqlite.dialect())))
+    conn.execute("""INSERT INTO query_settings (id,query_interval_ms,traffic_interval_minutes,next_sync_at,updated_at)
+        VALUES (:id,:query_interval_ms,:traffic_interval_minutes,:next_sync_at,:updated_at)
+        ON CONFLICT(id) DO NOTHING""", initial_settings(time.time()))
+
+
 def metadata_for_version(metadata, version):
     selected = MetaData()
     for table in metadata.sorted_tables:
         if version < 4 and table.name == "data_snapshots":
             continue
         if version < 5 and table.name in T06_TABLES:
+            continue
+        if version < 6 and table.name in V6_TABLES:
             continue
         table.to_metadata(selected)
     return selected
@@ -300,7 +321,7 @@ def apply_v1(conn, metadata, rebuilds):
         # Historical manual records remain unassigned; T03 resolves ownership explicitly.
         add_columns(conn, "credit_records", {"credential_id": "INTEGER REFERENCES aws_credentials(id) ON DELETE SET NULL"})
     for table in metadata.sorted_tables:
-        if table.name in T06_TABLES:
+        if table.name in T06_TABLES or table.name in V6_TABLES:
             continue
         if table.name not in tables(conn):
             create_table(conn, table)
@@ -471,14 +492,14 @@ def upgrade_database(engine, metadata: MetaData) -> None:
                     if engine.url.query:
                         raise MigrationError("SQLite URI options are unsupported for automatic migration backup")
                     backup = migration_backup(conn, Path(path).resolve(), open_files, version=4)
-            elif current_version == 4:
+            elif current_version in (4, 5):
                 validate_schema(conn, validation_metadata)
                 path = engine.url.database
                 backup = None
                 if path and path != ":memory:":
                     if engine.url.query:
                         raise MigrationError("SQLite URI options are unsupported for automatic migration backup")
-                    backup = migration_backup(conn, Path(path).resolve(), open_files, version=5)
+                    backup = migration_backup(conn, Path(path).resolve(), open_files, version=current_version + 1)
             else:
                 validate_schema(conn, metadata)
             if current_version < 4:
@@ -489,9 +510,15 @@ def upgrade_database(engine, metadata: MetaData) -> None:
                     backup["path"] if backup else None, backup["sha256"] if backup else None))
             if current_version < 5:
                 apply_v5(conn, metadata)
-                validate_schema(conn, metadata)
+                validate_schema(conn, metadata_for_version(metadata, 5))
                 conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
                     5, "T06 durable operation tasks and recovery locks", datetime.now(timezone.utc).isoformat(),
+                    backup["path"] if backup else None, backup["sha256"] if backup else None))
+            if current_version < 6:
+                apply_v6(conn, metadata)
+                validate_schema(conn, metadata)
+                conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
+                    6, V6_NAME, datetime.now(timezone.utc).isoformat(),
                     backup["path"] if backup else None, backup["sha256"] if backup else None))
             conn.commit()
             return
@@ -518,6 +545,7 @@ def upgrade_database(engine, metadata: MetaData) -> None:
         apply_v3(conn, metadata)
         apply_v4(conn, metadata)
         apply_v5(conn, metadata)
+        apply_v6(conn, metadata)
         validate_schema(conn, metadata)
         conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
             1, "T01 baseline schema", datetime.now(timezone.utc).isoformat(),
@@ -534,6 +562,9 @@ def upgrade_database(engine, metadata: MetaData) -> None:
             backup["path"] if backup else None, backup["sha256"] if backup else None))
         conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
             5, "T06 durable operation tasks and recovery locks", datetime.now(timezone.utc).isoformat(),
+            backup["path"] if backup else None, backup["sha256"] if backup else None))
+        conn.execute("INSERT INTO schema_migrations VALUES (?,?,?,?,?)", (
+            6, V6_NAME, datetime.now(timezone.utc).isoformat(),
             backup["path"] if backup else None, backup["sha256"] if backup else None))
         conn.commit()
     except BaseException as exc:

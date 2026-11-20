@@ -2,49 +2,67 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import json
 import time
 
 from botocore.exceptions import ClientError
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import Session
 
 from app.models import (AwsCredential, DataSnapshot, InstanceSetting, OperationLog,
                         OperationTask, OperationTaskStep, TrafficUsage, User)
+from app.settings_models import TrafficReadFailure
 from app.services import lightsail as ls
 from app.services.aws_clients import make_client
+from app.services.snapshots import retry_seconds
+from app.services.read_cooldowns import ReadCooldownStore, ReadCooldownActive
 from app.services.task_queue import (TaskContext, TaskCredentialChanged, TaskKnownFailure,
-    TaskLeaseLost, TaskUnknownOutcome, _safe_error, load_task_credentials, register_handler)
+    TaskLeaseLost, TaskUnknownOutcome, TaskPaused, TrafficStopped, _safe_error, load_task_credentials, register_handler)
 
 WAIT_SECONDS = 120.0
 POLL_SECONDS = 1.0
 TASK_TAG = "lightsail-manager-task-id"
 
 
-def _client(context, region):
+def _client(context, region, *, read=False, gate=None):
     ak, sk, proxy = load_task_credentials(context.engine, context.task_id, context.token)
     # AWS retries of an unacknowledged mutation can repeat a side effect. The
     # durable executor performs reconciliation instead of transport replay.
-    return make_client("lightsail", ak, sk, region, proxy, total_max_attempts=1,
-                       before_call=context.check)
+    return make_client("lightsail", ak, sk, region, proxy, total_max_attempts=2 if read else 1,
+                       before_call=gate or context.check)
 
 
-def _call(context, region, method, **parameters):
-    return getattr(_client(context, region), method)(**parameters)
-
-
-def _read(context, region, method, *, absent=False, **parameters):
-    context.check()
+def _read(context, region, method, *, absent=False, draining=False, **parameters):
+    check = context.check_traffic if context.collecting_traffic and not draining else context.check
+    store = None
+    operation = "".join(part.title() for part in method.split("_"))
+    resource = parameters.get("instanceName") or ""
+    if context.collecting_traffic and not draining:
+        from app.services.snapshots import scope_for
+        with Session(context.engine) as db:
+            task = db.get(OperationTask, context.task_id)
+            user, credential = db.get(User, task.user_id), db.get(AwsCredential, task.credential_id)
+            store = ReadCooldownStore(context.engine, scope_for(user, credential, "traffic-read", region))
+    def gate():
+        check()
+        if store is not None:
+            store.require_available(region, "lightsail", operation, resource)
+    def failure(exc):
+        error = TaskKnownFailure(_safe_error(exc))
+        if store is not None:
+            error.read_failure = store.record(exc, region, "lightsail", operation, resource)
+        return error
     try:
-        return _call(context, region, method, **parameters)
+        return getattr(_client(context, region, read=True, gate=gate), method)(**parameters)
     except ClientError as exc:
         if absent and exc.response.get("Error", {}).get("Code") == "NotFoundException":
             return None
-        raise TaskKnownFailure(_safe_error(exc)) from None
-    except (TaskLeaseLost, TaskCredentialChanged):
+        raise failure(exc) from exc
+    except (TaskLeaseLost, TaskCredentialChanged, TaskPaused, TrafficStopped):
         raise
     except Exception as exc:
-        raise TaskKnownFailure(_safe_error(exc)) from None
+        raise failure(exc) from exc
 
 
 def _instance(context, region, name):
@@ -64,7 +82,7 @@ def _pages(context, region, method, member, **parameters):
         token = response.get("nextPageToken")
         if not token:
             return items
-        if token in seen:
+        if token in seen or len(seen) >= 1000:
             raise TaskKnownFailure("AWS 分页 token 重复")
         seen.add(token)
         parameters["pageToken"] = token
@@ -110,7 +128,7 @@ def _wait_instance(context, region, name, *, present):
 def _operations(context, region, ids):
     deadline = time.monotonic() + WAIT_SECONDS
     while True:
-        operations = [_read(context, region, "get_operation", operationId=oid).get("operation", {}) for oid in ids]
+        operations = [_read(context, region, "get_operation", draining=True, operationId=oid).get("operation", {}) for oid in ids]
         if all(op.get("id") == oid and op.get("isTerminal") for op, oid in zip(operations, ids)):
             return operations
         if time.monotonic() >= deadline:
@@ -195,12 +213,23 @@ def _mutate(context, name, region, method, *, retry_safe=False, before_write=Non
         raise TaskUnknownOutcome("副作用前资源 ARN 已变化，未提交写请求")
     if expected_instance and not _same_resource(intent.get("instance"), expected_instance):
         raise TaskUnknownOutcome("副作用前实例 ARN 已变化，未提交写请求")
-    client = _client(context, region)
     if before_write is not None:
         before_write()
+    def write_gate():
+        if context.collecting_traffic:
+            context.check_traffic()
+            if before_write is not None:
+                before_write()
+        else:
+            context.check()
+    client = _client(context, region, gate=write_gate)
     sequence = context.begin_step(name, intent)
     try:
-        response = getattr(client, method)(**parameters)
+        try:
+            response = getattr(client, method)(**parameters)
+        except (TrafficStopped, TaskPaused):
+            context.finish_step(sequence, status="failed", error="后续关机步骤未发送")
+            raise
         ids = context.record_operation(sequence, response)
         if not ids:
             raise TaskUnknownOutcome("AWS 写响应缺少 Operation ID")
@@ -211,7 +240,7 @@ def _mutate(context, name, region, method, *, retry_safe=False, before_write=Non
                             status="succeeded" if succeeded else "failed", operation_id=ids[0])
         if not succeeded:
             raise TaskKnownFailure("AWS Operation 明确失败")
-    except (TaskLeaseLost, TaskCredentialChanged):
+    except (TaskLeaseLost, TaskCredentialChanged, TaskPaused, TrafficStopped):
         raise
     except TaskKnownFailure:
         # Read failures during polling are still unknown writes; a recorded
@@ -228,8 +257,14 @@ def _mutate(context, name, region, method, *, retry_safe=False, before_write=Non
 
 def _invalidate(context):
     with context.transaction() as (db, task):
+        if task.kind == "traffic_sync" and not db.scalar(select(OperationTaskStep.id).where(
+                OperationTaskStep.task_id == task.id,
+                func.json_extract(OperationTaskStep.intent_json, "$.mutation") == 1,
+                OperationTaskStep.status != "failed").limit(1)):
+            return
         db.execute(update(DataSnapshot).where(DataSnapshot.user_id == task.user_id,
-            DataSnapshot.kind == "instances").values(expires_at=0, lease_token=None, lease_until=0))
+            DataSnapshot.kind.in_(("instances", "query-instances"))).values(
+                expires_at=0, lease_token=None, lease_until=0))
 
 
 def _create(context):
@@ -456,28 +491,143 @@ def _delete(context):
     return {"name": name, "region": region, "released_static_ips": released}
 
 
-def _traffic_sync(context):
+def _traffic_failure(exc, region, step, name=None):
+    saved = getattr(exc, "read_failure", None)
+    if saved:
+        denied = saved.get("code") in {"AccessDenied", "AccessDeniedException", "UnauthorizedException"}
+        identity = saved.get("code") in {"UnrecognizedClientException", "InvalidClientTokenId", "ExpiredToken",
+            "ExpiredTokenException", "AuthFailure", "SignatureDoesNotMatch", "InvalidAccessKeyId", "InvalidSignatureException"}
+        return {**saved, "region": region, "step": step,
+            "retry_condition": "补齐当前范围只读权限并等待冷却后重新同步" if denied else
+                "校验当前凭据身份和区域访问条件并等待冷却后重新同步" if identity else
+                "等待所示冷却时间后重新同步" if saved.get("shared") else
+                "处理当前读取故障并等待冷却后重新同步", **({"name": name} if name else {})}
+    cause = exc.__cause__ or exc
+    code = getattr(cause, "response", {}).get("Error", {}).get("Code", "")
+    code = code if isinstance(code, str) and code.isascii() and code.isalnum() and len(code) <= 80 else type(cause).__name__
+    if code in {"AccessDenied", "AccessDeniedException", "UnauthorizedException"}:
+        reason, retry = "当前区域的只读查询权限不足", "补齐该区域所需只读权限后重新同步"
+    elif code in {"UnrecognizedClientException", "InvalidClientTokenId", "ExpiredToken", "ExpiredTokenException",
+                  "AuthFailure", "SignatureDoesNotMatch"}:
+        reason, retry = "当前区域的身份认证未通过", "检查该区域访问条件并重新校验凭据后同步"
+    elif code in {"Throttling", "ThrottlingException", "TooManyRequestsException", "RequestLimitExceeded"}:
+        reason, retry = "AWS 请求频率受限", "等待至少 60 秒后重新同步；若 AWS 要求更长等待则按其提示重试"
+    elif code in {"TimeoutError", "ConnectTimeoutError", "ReadTimeoutError", "EndpointConnectionError",
+                  "ConnectionError", "ServiceUnavailable", "ServiceUnavailableException", "InternalFailure"}:
+        reason, retry = "网络超时或 AWS 服务暂不可用", "确认网络或服务恢复后重新同步"
+    elif step == "auto_stop":
+        reason, retry = "自动关机步骤未完成", "检查自动关机策略及任务步骤后重新同步"
+    else:
+        reason, retry = "当前步骤未完成", "检查区域访问条件和任务步骤后重新同步"
+    return {"region": region, "step": step, "code": code, "reason": reason,
+            "retry_condition": retry, **({"name": name} if name else {})}
+
+
+def _traffic_regions(context):
+    from app.query_models import QueryRound
+    from app.services.query_rounds import TERMINAL, region_plan, submit_query
+
+    def plan():
+        with Session(context.engine) as db:
+            task = db.get(OperationTask, context.task_id)
+            user, credential = db.get(User, task.user_id), db.get(AwsCredential, task.credential_id)
+            user_id, credential_id = user.id, credential.id
+            current = region_plan(db, user, credential)
+        if current["state"] == "pending":
+            round_id = submit_query(context.engine, user_id, credential_id,
+                                    subscriber=f"task:{context.task_id}")
+            while True:
+                context.check_traffic()
+                with Session(context.engine) as db:
+                    round_state = db.scalar(select(QueryRound.status).where(QueryRound.id == round_id))
+                    if round_state in TERMINAL or round_state is None:
+                        current = region_plan(db, db.get(User, user_id), db.get(AwsCredential, credential_id))
+                        if round_state in {"cancelled", "invalidated"}:
+                            raise TrafficStopped("区域发现已停止，未开始流量读取", cancelled=round_state == "cancelled")
+                        if round_state is None or round_state == "failed" and not current["regions"]:
+                            raise TaskKnownFailure("首次区域发现未完成，请查看全局扫描结果")
+                        break
+                time.sleep(.25)
+        return {"regions": current["regions"], "discovery_state": current["discovery_state"]}
+
+    return context.plan("traffic_regions", plan)
+
+
+def _traffic_cooldown(context, region):
+    # Current failures are checked per actual action in _read, including after
+    # transport queueing. A failed metric must not suppress GetInstances or a
+    # different metric, and another key cannot bypass an account throttle.
+    return None
+
+
+def _commit_traffic_failure(context, error, exc):
+    saved = getattr(exc, "read_failure", None)
+    if saved:
+        error.update(next_retry_at=saved["next_retry_at"])
+        return error
+    retry_at = time.time() + retry_seconds(exc)
+    error["next_retry_at"] = datetime.fromtimestamp(retry_at, timezone.utc).isoformat()
+    with context.transaction() as (db, task):
+        values = dict(user_id=task.user_id, credential_id=task.credential_id,
+                      credential_version=task.credential_version, region=error["region"],
+                      retry_at=retry_at, details=json.dumps(error, ensure_ascii=False))
+        stmt = insert(TrafficReadFailure).values(**values)
+        db.execute(stmt.on_conflict_do_update(index_elements=["user_id", "credential_id", "credential_version", "region"],
+            set_={"retry_at": stmt.excluded.retry_at, "details": stmt.excluded.details},
+            where=TrafficReadFailure.retry_at <= stmt.excluded.retry_at))
+    return error
+
+
+def _observed_traffic(db, task, region, name, period):
+    filters = [TrafficUsage.user_id == task.user_id, TrafficUsage.account_id == (task.account_id or ""),
+               TrafficUsage.region == region, TrafficUsage.instance_name == name, TrafficUsage.year_month == period]
+    if not task.account_id:
+        filters.append(TrafficUsage.credential_id == task.credential_id)
+    return db.scalar(select(TrafficUsage).where(*filters)
+                     .order_by(TrafficUsage.last_synced_at.desc(), TrafficUsage.id.desc()).limit(1))
+
+
+def _can_auto_stop(db, task, region, name, period, end):
     from app.services.traffic import resolve_auto_stop_policy
+    observed = _observed_traffic(db, task, region, name, period)
+    if (period != datetime.now(timezone.utc).strftime("%Y-%m") or observed is None or observed.last_synced_at is None
+            or observed.credential_id != task.credential_id or observed.last_synced_at.replace(tzinfo=timezone.utc) != end):
+        return False
+    user, cred = db.get(User, task.user_id), db.get(AwsCredential, task.credential_id)
+    enabled, limit, conflict, changed = resolve_auto_stop_policy(db, user, cred, region, name)
+    return (enabled and not conflict and not changed and limit is not None
+            and observed.network_in_bytes + observed.network_out_bytes > limit * 1024**3)
+
+
+def _traffic_sync(context):
+    context.collecting_traffic = True
+    context.check_traffic()
     p = context.payload
     start, end = (datetime.fromisoformat(p[key]) for key in ("window_start", "window_end"))
-    regions = _read(context, "us-east-1", "get_regions", includeAvailabilityZones=False).get("regions", [])
-    count, errors = 0, []
-    for entry in regions:
-        region = entry.get("name")
-        if not region:
+    plan = _traffic_regions(context)
+    regions = plan["regions"]
+    count, errors, completed_regions = 0, [], 0
+    for region in regions:
+        context.check_traffic()
+        cooldown = _traffic_cooldown(context, region)
+        if cooldown:
+            errors.append(cooldown)
             continue
         try:
             instances = _pages(context, region, "get_instances", "instances")
-        except TaskKnownFailure:
-            errors.append({"region": region, "step": "instances"})
+        except TaskKnownFailure as exc:
+            errors.append(_commit_traffic_failure(context, _traffic_failure(exc, region, "instances"), exc))
             continue
+        previous_errors = len(errors)
         for instance in instances:
             name = instance.get("name")
             if not name:
                 continue
+            step = "NetworkIn"
             try:
                 totals = []
                 for metric in ("NetworkIn", "NetworkOut"):
+                    step = metric
                     response = _read(context, region, "get_instance_metric_data", instanceName=name,
                         metricName=metric, period=86400, startTime=start, endTime=end,
                         unit="Bytes", statistics=["Sum"])
@@ -490,34 +640,43 @@ def _traffic_sync(context):
                            "network_in_bytes": totals[0], "network_out_bytes": totals[1],
                            "last_synced_at": end}
                     statement = insert(TrafficUsage).values(**row)
-                    db.execute(statement.on_conflict_do_update(index_elements=["user_id", "credential_id", "region",
+                    accepted = db.execute(statement.on_conflict_do_update(index_elements=["user_id", "credential_id", "region",
                         "instance_name", "year_month", "account_id"], set_={key: row[key] for key in
                         ("network_in_bytes", "network_out_bytes", "last_synced_at")},
-                        where=TrafficUsage.last_synced_at <= end))
+                        where=TrafficUsage.last_synced_at <= end)).rowcount
+                if not accepted:
+                    # Historical windows can be read but cannot supersede a
+                    # newer observation or authorize a fresh cloud mutation.
+                    continue
                 count += 1
                 # Reads, policy evaluation and stop remain inside this account
                 # task. No child task can deadlock on the parent's account lock.
-                current = _instance(context, region, name)
                 with Session(context.engine) as db:
                     task = db.get(OperationTask, context.task_id)
-                    user, cred = db.get(User, task.user_id), db.get(AwsCredential, task.credential_id)
-                    enabled, limit, conflict, changed = resolve_auto_stop_policy(db, user, cred, region, name)
-                    allowed = enabled and not conflict and not changed and limit is not None and (
-                        sum(totals) > limit * 1024**3) and current and (current.get("state") or {}).get("name") == "running"
-                if allowed and p["year_month"] == datetime.now(timezone.utc).strftime("%Y-%m"):
+                    if not _can_auto_stop(db, task, region, name, p["year_month"], end):
+                        continue
+                step = "instance_state"
+                current = _instance(context, region, name)
+                if _same_resource(current, _identity(instance)) and (current.get("state") or {}).get("name") == "running":
+                    step = "auto_stop"
                     def recheck_policy():
                         with context.transaction() as (db, task):
-                            user, cred = db.get(User, task.user_id), db.get(AwsCredential, task.credential_id)
-                            enabled, limit, conflict, changed = resolve_auto_stop_policy(db, user, cred, region, name)
-                            if not (enabled and not conflict and not changed and limit is not None and
-                                    sum(totals) > limit * 1024**3):
-                                raise TaskKnownFailure("自动关机策略已变化，未提交关机")
+                            if not _can_auto_stop(db, task, region, name, p["year_month"], end):
+                                raise TaskKnownFailure("流量观测或自动关机策略已变化，未提交关机")
                     _mutate(context, f"auto_stop:{region}:{name}", region, "stop_instance",
                             expected_resource=_identity(current), before_write=recheck_policy, instanceName=name)
-            except TaskKnownFailure:
-                errors.append({"region": region, "name": name, "step": "traffic_or_policy"})
+            except TaskKnownFailure as exc:
+                error = _traffic_failure(exc, region, step, name)
+                if step != "auto_stop":
+                    _commit_traffic_failure(context, error, exc)
+                errors.append(error)
+        if len(errors) == previous_errors:
+            completed_regions += 1
     _invalidate(context)
     return {"count": count, "partial": bool(errors), "errors": errors,
+            "successful_regions": completed_regions, "failed_regions": len({error["region"] for error in errors}),
+            **({"message": ("尚未发现活跃区域，部分区域未完成发现，可执行全局扫描"
+                            if plan["discovery_state"] == "partial" else "暂无活跃区域，可执行全局扫描")} if not regions else {}),
             "year_month": p["year_month"], "window_start": p["window_start"], "window_end": p["window_end"]}
 
 

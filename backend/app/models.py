@@ -99,8 +99,12 @@ class AwsCredential(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     user: Mapped[User] = relationship(back_populates="credentials")
-    instance_settings: Mapped[list["InstanceSetting"]] = relationship(back_populates="credential")
-    traffic_usages: Mapped[list["TrafficUsage"]] = relationship(back_populates="credential")
+    instance_settings: Mapped[list["InstanceSetting"]] = relationship(
+        back_populates="credential", cascade="all, delete-orphan", passive_deletes=True
+    )
+    traffic_usages: Mapped[list["TrafficUsage"]] = relationship(
+        back_populates="credential", cascade="all, delete-orphan", passive_deletes=True
+    )
 
 
 class InstanceSetting(Base):

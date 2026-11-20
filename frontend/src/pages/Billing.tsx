@@ -6,11 +6,13 @@ import { type Dayjs } from 'dayjs'
 import api, { BillingV2Summary, BillingCurrency, CredentialItem, CredentialOut,
   ExactManualCredit, getErrorMessage, invalidateQueryTags, readApi } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
-import { snapshotPollDelay } from '../api/snapshotPolling'
 
 const money = (value: string | null | undefined, currency: string) =>
   value == null ? '—（不可用或缺失）' : `${currency} ${value}`
-const statusTag = (status: string) => <Tag color={status === 'ok' ? 'green' : 'gold'}>{status}</Tag>
+const statusLabels: Record<string, string> = { ok: '成功', insufficient_history: '预测历史不足',
+  unavailable: '查询失败', no_permission: '权限不足', invalid: '参数无效',
+  refreshing: '查询中', unknown_identity: '身份待确认', credential_invalid: '凭据待校验' }
+const statusTag = (status: string) => <Tag color={status === 'ok' ? 'green' : 'gold'}>{statusLabels[status] || status}</Tag>
 
 export default function BillingPage() {
   const { user, sessionKey } = useAuth()
@@ -39,8 +41,8 @@ export default function BillingPage() {
       })
       if (version === requestVersion.current) {
         setSummary(data)
-        if (data.refreshing && Date.now() - pollStarted.current < 30000) {
-          pollTimer.current = setTimeout(() => void load(), snapshotPollDelay(pollStarted.current))
+        if (data.refreshing) {
+          pollTimer.current = setTimeout(() => void load(), 1000)
         }
       }
     } catch (error) {
@@ -120,12 +122,12 @@ export default function BillingPage() {
     </Space>
     <Alert type="info" showIcon message="金额按币种分别汇总；不做汇率换算"
       description="费用按 UnblendedCost 账单行和记录类型统计。Credit 冲正、退款和折扣分别显示；缺失不显示为零。官方余额和官方估算余额分开；手动记录不叠加官方余额，也不从账号总抵扣推算每笔剩余。" />
-    {summary && summary.status !== 'ok' ? <Alert type="warning" showIcon message="存在未知身份或部分查询失败"
-      description="下列汇总只包含成功返回的数据，不代表全部账号总额。请查看各账号费用、预测和赠金的独立状态。" /> : null}
+    {summary && summary.status !== 'ok' ? <Alert type="warning" showIcon message="部分账单数据暂不可用"
+      description="费用、预测和赠金分别显示查询状态；历史数据不足时保留实际费用和赠金，待后续数据积累后可重试预测。" /> : null}
     {summary?.stale ? <Alert type="warning" showIcon message="正在显示最近成功快照，部分数据已过期"
       description="保留的旧值不代表本次刷新成功；各账号分区显示最近成功时间和错误。" /> : null}
     {summary?.refreshing ? <Alert type="info" showIcon message="后台刷新中，已完成的数据先行显示"
-      description="本页最多自动跟进30秒；仍未完成时可稍后点击刷新。" /> : null}
+      description="排队时间随查询间隔变化，本页会继续跟进至本次刷新完成。" /> : null}
     <Card title={`费用汇总 · ${summary?.year_month || '—'}（成功数据小计）`}>
       <Table rowKey="currency" loading={loading} dataSource={summary?.currencies || []}
         columns={currencyColumns} pagination={false} scroll={{ x: 1200 }} />
@@ -147,11 +149,17 @@ export default function BillingPage() {
           {{ costs: '费用', forecast: '本月剩余期间预测', credits: '官方赠金' }[key]}：
           {statusTag(account[key].status)}{account[key].error || ''}
           {account[key].cache ? <Typography.Text type="secondary">
-            {account[key].cache?.stale ? ' · 已过期' : ''}
+            {account[key].cache?.stale ? ' · 当前展示上次成功数据' : ''}
+            {!account[key].cache?.last_success_at && !account[key].cache?.refreshing ? ' · 暂无成功数据' : ''}
             {account[key].cache?.refreshing ? ' · 刷新中' : ''}
             {` · 最近成功：${account[key].cache?.last_success_at || '无'}`}
-            {account[key].cache?.error ? ` · ${account[key].cache?.error}` : ''}
+            {account[key].cache?.next_retry_at ? ` · 可重试时间：${account[key].cache?.next_retry_at}` : ''}
+            {account[key].cache?.error && account[key].cache?.error !== account[key].error ? ` · ${account[key].cache?.error}` : ''}
           </Typography.Text> : null}</div>)}
+        {account.forecast.amount != null && <Typography.Text>
+          本月剩余期间预测{account.forecast.status !== 'ok' ? '（上次成功值）' : ''}：
+          {money(account.forecast.amount, account.forecast.currency || 'USD')}
+        </Typography.Text>}
         <Table rowKey={(row) => `${row.currency}/${row.service}`} dataSource={account.costs.by_service || []}
           pagination={false} scroll={{ x: 1000 }} columns={[{ title: '服务', dataIndex: 'service' }, ...currencyColumns]} />
         <Table rowKey={(row, index) => `${account.account_id}/${row.credit_id || index}`}

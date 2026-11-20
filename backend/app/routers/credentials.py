@@ -3,6 +3,7 @@ import re
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -35,6 +36,7 @@ from app.services import billing as billing_svc
 from app.services import lightsail as ls
 from app.services.traffic import get_credential_proxy_url, reconcile_auto_stop_conflicts
 from app.services.task_queue import has_unresolved_tasks
+from app.services.credential_reads import CredentialReadGuard
 
 router = APIRouter(prefix="/credentials", tags=["credentials"])
 logger = logging.getLogger(__name__)
@@ -179,9 +181,10 @@ def create_credential(
     ak = body.access_key_id.strip()
     sk = body.secret_access_key.strip()
     proxy_url = _parse_proxy_or_400(body.proxy_url)
+    guard = CredentialReadGuard.capture(db.get_bind(), user, allow_invalid=True)
     try:
         # 新建时就用该代理校验：代理不通当场报错，不等以后调用才发现。
-        ls.validate_credentials(ak, sk, proxy_url)
+        guard.call(ls.validate_credentials, ak, sk, proxy_url)
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=f"AWS 凭证校验失败: {exc.message}")
     except ProxyConfigError as exc:
@@ -189,8 +192,6 @@ def create_credential(
 
     now = datetime.now(timezone.utc)
     make_default = body.is_default or not user.credentials
-    if make_default:
-        _clear_other_defaults(db, user.id)
 
     cred = AwsCredential(
         user_id=user.id,
@@ -201,8 +202,11 @@ def create_credential(
         is_default=make_default,
         last_validated_at=now,
     )
-    _record_account_identity(cred, _account_identity(ak, sk, proxy_url))
-    _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
+    _record_account_identity(cred, guard.call(_account_identity, ak, sk, proxy_url))
+    guard.call(_apply_quota_to_cred, cred, ak, sk, proxy_url=proxy_url)
+    guard.reserve_write(db)
+    if make_default:
+        _clear_other_defaults(db, user.id)
     db.add(cred)
     db.flush()
     db.add(
@@ -233,6 +237,7 @@ def update_credential(
     )
     if not cred:
         raise HTTPException(status_code=404, detail="凭证不存在")
+    guard = CredentialReadGuard.capture(db.get_bind(), user, cred, allow_invalid=True, proposed=True)
 
     # 代理：字段未出现=保持；空串=清除（恢复直连）；有值=更新。
     # 换密钥或换代理都要用生效后的代理重新校验一次，不通当场报错。
@@ -252,7 +257,7 @@ def update_credential(
         ak = (body.access_key_id or old_ak).strip()
         sk = (body.secret_access_key or old_sk).strip()
         try:
-            ls.validate_credentials(ak, sk, effective_proxy)
+            guard.call(ls.validate_credentials, ak, sk, effective_proxy)
         except ls.LightsailError as exc:
             raise HTTPException(status_code=400, detail=f"AWS 凭证校验失败: {exc.message}")
         except ProxyConfigError as exc:
@@ -264,10 +269,11 @@ def update_credential(
         if body.secret_access_key:
             cred.secret_access_key_enc = encrypt_secret(body.secret_access_key.strip())
         if keys_updated or proxy_changed:
-            _record_account_identity(cred, _account_identity(ak, sk, effective_proxy))
+            _record_account_identity(cred, guard.call(_account_identity, ak, sk, effective_proxy))
             cred.last_validated_at = datetime.now(timezone.utc)
         if keys_updated:
-            _apply_quota_to_cred(cred, ak, sk, proxy_url=effective_proxy)
+            guard.call(_apply_quota_to_cred, cred, ak, sk, proxy_url=effective_proxy)
+    guard.reserve_write(db)
     if proxy_changed:
         cred.proxy_url_enc = encrypt_secret(new_proxy) if new_proxy else None
 
@@ -335,6 +341,7 @@ def validate_one(
     )
     if not cred:
         raise HTTPException(status_code=404, detail="凭证不存在")
+    guard = CredentialReadGuard.capture(db.get_bind(), user, cred, allow_invalid=True)
     try:
         ak = decrypt_secret(cred.access_key_id_enc)
         sk = decrypt_secret(cred.secret_access_key_enc)
@@ -344,22 +351,52 @@ def validate_one(
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=400, detail=f"解密凭证失败: {exc}") from exc
     try:
-        ls.validate_credentials(ak, sk, proxy_url)
+        guard.call(ls.validate_credentials, ak, sk, proxy_url)
+    except HTTPException:
+        raise
     except ls.LightsailError as exc:
-        _record_account_identity(cred, None)
-        _invalidate_snapshots(db, cred.id)
-        reconcile_auto_stop_conflicts(db, user)
-        db.commit()
+        from app.services.snapshots import credential_failure
+        if credential_failure(exc):
+            try:
+                confirmed = guard.call(billing_svc.get_sts_identity, ak, sk, proxy_url)
+            except HTTPException:
+                raise
+            except Exception as identity_exc:
+                if credential_failure(identity_exc):
+                    guard.reserve_write(db)
+                    _record_account_identity(cred, None)
+                    _invalidate_snapshots(db, cred.id)
+                    reconcile_auto_stop_conflicts(db, user)
+                    db.commit()
+            else:
+                if confirmed and cred.account_id and confirmed != cred.account_id:
+                    guard.reserve_write(db)
+                    _record_account_identity(cred, None)
+                    _invalidate_snapshots(db, cred.id)
+                    reconcile_auto_stop_conflicts(db, user)
+                    db.commit()
         raise HTTPException(status_code=400, detail=f"校验失败: {exc.message}")
     except Exception as exc:  # noqa: BLE001
-        _record_account_identity(cred, None)
-        _invalidate_snapshots(db, cred.id)
-        reconcile_auto_stop_conflicts(db, user)
-        db.commit()
         raise HTTPException(status_code=400, detail=sanitize_error_message(str(exc)))
-    _record_account_identity(cred, _account_identity(ak, sk, proxy_url))
+    try:
+        confirmed = guard.call(billing_svc.get_sts_identity, ak, sk, proxy_url)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        from app.services.snapshots import credential_failure
+        if credential_failure(exc):
+            guard.reserve_write(db)
+            _record_account_identity(cred, None)
+            _invalidate_snapshots(db, cred.id)
+            reconcile_auto_stop_conflicts(db, user)
+            db.commit()
+        raise HTTPException(status_code=400, detail="身份暂无法确认，请稍后重新校验") from exc
+    if not confirmed:
+        raise HTTPException(status_code=400, detail="身份暂无法确认，请稍后重新校验")
+    _record_account_identity(cred, confirmed)
     cred.last_validated_at = datetime.now(timezone.utc)
-    _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
+    guard.call(_apply_quota_to_cred, cred, ak, sk, proxy_url=proxy_url)
+    guard.reserve_write(db)
     _invalidate_snapshots(db, cred.id)
     db.add(cred)
     reconcile_auto_stop_conflicts(db, user)
@@ -409,6 +446,7 @@ def region_opt_status(
     """查询该账号下某区域的启用状态；凭证无效或缺权限时返回 UNKNOWN + 说明（200）。"""
     _check_region_or_400(region)
     cred = _get_cred_or_404(db, credential_id, user)
+    guard = CredentialReadGuard.capture(db.get_bind(), user, cred)
     if not region_limiter.allow(
         f"region-status:{user.id}:{credential_id}",
         REGION_STATUS_MAX_CALLS,
@@ -417,7 +455,9 @@ def region_opt_status(
         raise HTTPException(status_code=429, detail="区域状态查询过于频繁，请稍后再试")
     ak, sk, proxy_url = _decrypt_cred_keys(cred)
     try:
-        status = acct.get_region_opt_status(ak, sk, region, proxy_url)
+        status = guard.call(acct.get_region_opt_status, ak, sk, region, proxy_url)
+    except HTTPException:
+        raise
     except acct.AccountError as exc:
         return RegionOptStatusOut(region=region, status="UNKNOWN", message=exc.message)
     except Exception as exc:  # noqa: BLE001
@@ -437,6 +477,7 @@ def region_enable(
     """启用该账号下某区域（Account Management API）；返回启用后的即时状态。"""
     _check_region_or_400(region)
     cred = _get_cred_or_404(db, credential_id, user)
+    guard = CredentialReadGuard.capture(db.get_bind(), user, cred)
     if not region_limiter.allow(
         f"region-enable:{user.id}:{credential_id}",
         REGION_ENABLE_MAX_CALLS,
@@ -445,7 +486,9 @@ def region_enable(
         raise HTTPException(status_code=429, detail="区域启用请求过于频繁，请稍后再试")
     ak, sk, proxy_url = _decrypt_cred_keys(cred)
     try:
-        status = acct.enable_region(ak, sk, region, proxy_url)
+        status = guard.call(acct.enable_region, ak, sk, region, proxy_url)
+    except HTTPException:
+        raise
     except acct.AccountError as exc:
         db.add(
             OperationLog(
@@ -505,6 +548,7 @@ def refresh_quotas(
     )
     if not cred:
         raise HTTPException(status_code=404, detail="凭证不存在")
+    guard = CredentialReadGuard.capture(db.get_bind(), user, cred)
     try:
         ak = decrypt_secret(cred.access_key_id_enc)
         sk = decrypt_secret(cred.secret_access_key_enc)
@@ -513,7 +557,8 @@ def refresh_quotas(
         raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=400, detail=f"解密凭证失败: {exc}")
-    _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
+    guard.call(_apply_quota_to_cred, cred, ak, sk, proxy_url=proxy_url)
+    guard.reserve_write(db)
     db.add(cred)
     db.add(
         OperationLog(
@@ -534,39 +579,51 @@ def delete_credential(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> dict:
-    db.connection().exec_driver_sql("BEGIN IMMEDIATE")
-    cred = (
-        db.query(AwsCredential)
-        .filter(AwsCredential.id == credential_id, AwsCredential.user_id == user.id)
-        .first()
-    )
-    if not cred:
-        raise HTTPException(status_code=404, detail="凭证不存在")
-    if has_unresolved_tasks(db, credential_id=credential_id):
-        raise HTTPException(status_code=409, detail="该凭证仍有未完成或待核对任务，完成核对后才能删除")
-    was_default = cred.is_default
-    db.delete(cred)
-    db.flush()
-    if was_default:
-        other = (
+    try:
+        # Reserve the writer before checking tasks so task submission and deletion
+        # cannot both succeed against the same credential.
+        db.connection().exec_driver_sql("BEGIN IMMEDIATE")
+        cred = (
             db.query(AwsCredential)
-            .filter(AwsCredential.user_id == user.id)
-            .order_by(AwsCredential.id.asc())
+            .filter(AwsCredential.id == credential_id, AwsCredential.user_id == user.id)
             .first()
         )
-        if other:
-            other.is_default = True
-            db.add(other)
-    db.add(
-        OperationLog(
-            user_id=user.id,
-            action="delete_credentials",
-            status="success",
-            message=f"deleted credential #{credential_id}",
+        if not cred:
+            raise HTTPException(status_code=404, detail="凭证不存在")
+        if has_unresolved_tasks(db, credential_id=credential_id):
+            raise HTTPException(status_code=409, detail="该凭证仍有未完成或待核对任务，完成核对后才能删除")
+        was_default = cred.is_default
+        from app.services.query_rounds import cleanup_credential_queries
+        cleanup_credential_queries(db, user.id, cred)
+        db.delete(cred)
+        db.flush()
+        if was_default:
+            other = (
+                db.query(AwsCredential)
+                .filter(AwsCredential.user_id == user.id)
+                .order_by(AwsCredential.id.asc())
+                .first()
+            )
+            if other:
+                other.is_default = True
+                db.add(other)
+        db.add(
+            OperationLog(
+                user_id=user.id,
+                action="delete_credentials",
+                status="success",
+                message=f"deleted credential #{credential_id}",
+            )
         )
-    )
-    reconcile_auto_stop_conflicts(db, user)
-    db.commit()
+        reconcile_auto_stop_conflicts(db, user)
+        db.commit()
+    except HTTPException:
+        db.rollback()
+        raise
+    except SQLAlchemyError as exc:
+        db.rollback()
+        logger.error("Credential deletion rolled back: %s", type(exc).__name__)
+        raise HTTPException(status_code=500, detail="删除凭证失败，所有变更已回滚，请重试") from exc
     return {"message": "已删除凭证"}
 
 
@@ -584,6 +641,7 @@ def put_compat(
 
     now = datetime.now(timezone.utc)
     default = user.default_credential
+    guard = CredentialReadGuard.capture(db.get_bind(), user, default, allow_invalid=True, proposed=True)
     # 未传 proxy_url 时沿用默认凭证已存的代理；传了（哪怕空串）就按传的来。
     try:
         proxy_url = req_proxy if "proxy_url" in body.model_fields_set else (
@@ -592,13 +650,13 @@ def put_compat(
     except ProxyConfigError as exc:
         raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
     try:
-        ls.validate_credentials(ak, sk, proxy_url)
+        guard.call(ls.validate_credentials, ak, sk, proxy_url)
     except ls.LightsailError as exc:
         raise HTTPException(status_code=400, detail=f"AWS 凭证校验失败: {exc.message}")
     except ProxyConfigError as exc:
         raise HTTPException(status_code=400, detail=f"代理不可用: {exc}") from exc
 
-    identity = _account_identity(ak, sk, proxy_url)
+    identity = guard.call(_account_identity, ak, sk, proxy_url)
     if default is None:
         cred = AwsCredential(
             user_id=user.id,
@@ -611,7 +669,8 @@ def put_compat(
             account_id=identity,
             last_confirmed_account_id=identity,
         )
-        _apply_quota_to_cred(cred, ak, sk, proxy_url=proxy_url)
+        guard.call(_apply_quota_to_cred, cred, ak, sk, proxy_url=proxy_url)
+        guard.reserve_write(db)
         db.add(cred)
         action = "add_credentials"
     else:
@@ -624,7 +683,8 @@ def put_compat(
         if "proxy_url" in body.model_fields_set:
             default.proxy_url_enc = encrypt_secret(proxy_url) if proxy_url else None
         default.last_validated_at = now
-        _apply_quota_to_cred(default, ak, sk, proxy_url=proxy_url)
+        guard.call(_apply_quota_to_cred, default, ak, sk, proxy_url=proxy_url)
+        guard.reserve_write(db)
         db.add(default)
         action = "update_credentials"
     db.add(

@@ -367,7 +367,7 @@ engine.dispose()
             self.assertEqual(file_sha256(path), before)
             migrations.upgrade_database(engine, Base.metadata)
             with closing(sqlite3.connect(path)) as conn:
-                self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,), (2,), (3,), (4,), (5,)])
+                self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,), (2,), (3,), (4,), (5,), (6,)])
                 value, account, precision = conn.execute("SELECT total_amount_decimal,account_id,amount_precision FROM credit_records").fetchone()
                 self.assertEqual(value, "0.12345678912345678")
                 self.assertIsNone(account)

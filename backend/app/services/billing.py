@@ -63,6 +63,12 @@ class BillingUnavailableError(Exception):
         self.code = code
 
 
+class BillingInsufficientHistoryError(BillingUnavailableError):
+    """费用预测所需历史尚未积累完成。"""
+
+    status = "insufficient_history"
+
+
 class BillingNoPermissionError(Exception):
     """IAM 缺少 CE / Billing 权限。"""
 
@@ -151,11 +157,17 @@ def account_filter(account_id):
     return {"Dimensions": {"Key": "LINKED_ACCOUNT", "Values": [account_id]}}
 
 
-def _classify_client_error(exc: ClientError) -> Exception:
+def _classify_client_error(exc: ClientError, *, forecast=False) -> Exception:
     err = (exc.response or {}).get("Error") or {}
     code = str(err.get("Code") or "")
     message = sanitize_error_message(str(err.get("Message") or "") or str(exc))
     lowered = message.lower()
+    if forecast and code in {"DataUnavailableException", "ValidationException"} and (
+        "historical data" in lowered or "insufficient history" in lowered
+        or "not enough data" in lowered or "insufficient data" in lowered
+    ):
+        return BillingInsufficientHistoryError(
+            "历史数据不足，暂时无法生成费用预测；待后续数据积累后重试。", code=code)
     if code in {
         "AccessDeniedException",
         "AccessDenied",
@@ -263,6 +275,7 @@ def get_aws_credits(
     billing_client=None,
     proxy_url: str | None = None,
     expected_account_id: str | None = None,
+    verified_account_id: str | None = None,
 ) -> dict:
     """用 AWS Billing GetCredits 查官方赠金（真实余额，非估算）。
 
@@ -273,15 +286,17 @@ def get_aws_credits(
     BillingValidationError / BillingUnavailableError，调用方映射为状态。
     """
     today = _today_utc(now)
-    sts = sts_client or make_sts_client(access_key_id, secret_access_key, proxy_url)
-    try:
-        identity = sts.get_caller_identity()
-    except ClientError as exc:
-        raise _classify_billing_error(exc) from exc
-    except (BotoCoreError, Exception) as exc:  # noqa: BLE001
-        raise BillingUnavailableError(sanitize_error_message(f"STS 查询账号失败：{exc}"),
-                                      code=getattr(exc, "code", None)) from exc
-    account_id = (identity or {}).get("Account") or ""
+    account_id = verified_account_id
+    if account_id is None:
+        sts = sts_client or make_sts_client(access_key_id, secret_access_key, proxy_url)
+        try:
+            identity = sts.get_caller_identity()
+        except ClientError as exc:
+            raise _classify_billing_error(exc) from exc
+        except (BotoCoreError, Exception) as exc:  # noqa: BLE001
+            raise BillingUnavailableError(sanitize_error_message(f"STS 查询账号失败：{exc}"),
+                                          code=getattr(exc, "code", None)) from exc
+        account_id = (identity or {}).get("Account") or ""
     if not isinstance(account_id, str) or not account_id.isascii() or not account_id.isdigit() or len(account_id) != 12:
         raise BillingUnavailableError(
             "STS 返回的账号 ID 无效（应为 12 位数字），无法查询官方赠金。"
@@ -424,7 +439,7 @@ def get_forecast_result(client, now: datetime | None = None, account_id: str | N
     try:
         response = client.get_cost_forecast(**kwargs)
     except ClientError as exc:
-        raise _classify_client_error(exc) from exc
+        raise _classify_client_error(exc, forecast=True) from exc
     except Exception as exc:
         raise BillingUnavailableError(sanitize_error_message(f"费用预测不可用：{exc}"),
                                       code=getattr(exc, "code", None)) from exc

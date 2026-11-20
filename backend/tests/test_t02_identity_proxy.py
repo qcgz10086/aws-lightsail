@@ -118,10 +118,10 @@ class T02Tests(unittest.TestCase):
              patch("app.routers.credentials.billing_svc.get_sts_identity", side_effect=RuntimeError("temporary STS failure")), \
              patch("app.routers.credentials._apply_quota_to_cred"):
             response = self.client.post(f"/api/credentials/{disabled.id}/validate", headers=self.auth())
-        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.status_code, 400, response.text)
         self.db.refresh(disabled)
         self.db.refresh(disabled_setting)
-        self.assertIsNone(disabled.account_id)
+        self.assertEqual(disabled.account_id, "123456789012")
         self.assertEqual(disabled.last_confirmed_account_id, "123456789012")
         self.assertTrue(disabled_setting.auto_stop_conflict)
         self.assertTrue(enabled_setting.auto_stop_conflict)

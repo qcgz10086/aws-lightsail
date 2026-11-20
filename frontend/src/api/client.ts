@@ -121,7 +121,7 @@ function queryTagsFor(url: string, params: Record<string, unknown> = {}): string
   if (url.startsWith('/credentials')) return ['credentials', 'catalog', 'billing', 'instances', 'traffic']
   if (url.startsWith('/catalog/')) return scopedTags('catalog', params)
   if (url.startsWith('/v2/billing/') || url.startsWith('/billing/')) return scopedTags('billing', params)
-  if (url === '/v2/instances' || url === '/instances') return scopedTags('instances', params)
+  if (url === '/v2/instances' || url === '/v2/query-instances' || url === '/instances') return scopedTags('instances', params)
   const instanceMatch = url.match(/^\/(?:v2\/)?instances\/([^/?]+)\/([^/?]+)/)
   if (instanceMatch) return [
     ...scopedTags('instances', { ...params, region: instanceMatch[1] }),
@@ -387,16 +387,63 @@ export interface SnapshotMetadata {
   last_success_at: string | null
   expires_at?: string | null
   error: string | null
+  error_status?: string | null
+  next_retry_at?: string | null
+  opt_status?: string
+}
+
+export interface QueryRoundProgress {
+  id: string
+  credential_id: number
+  account_id: string | null
+  mode: 'refresh' | 'global'
+  status: string
+  targets_fixed: boolean
+  total: number | null
+  completed: number
+  succeeded: number
+  failed: number
+  cancelled: number
+  can_cancel: boolean
+  error: string | null
+}
+
+export interface RegionDiscovery {
+  credential_id: number
+  account_id: string | null
+  state: 'pending' | 'ready' | 'empty'
+  regions: string[]
+  discovery_state: string
+  undiscovered: number
+  last_global_started_at: string | null
+  last_global_finished_at: string | null
 }
 
 export interface CachedInstancesResponse {
   instances: Instance[]
   scopes: (SnapshotMetadata & { region: string | null; credential_id: number; account_id?: string | null })[]
   refreshing: boolean
+  rounds?: QueryRoundProgress[]
+  discovery?: RegionDiscovery[]
 }
 
 export interface TrafficSummary {
   year_month: string
+  latest_syncs?: {
+    task_id: string
+    credential_id: number
+    account_id: string | null
+    status: string
+    created_at: string
+    error: string | null
+    result: {
+      count?: number
+      message?: string
+      successful_regions?: number
+      failed_regions?: number
+      errors?: { region: string; name?: string; step: string; code?: string; reason?: string; retry_condition?: string }[]
+    } | null
+  }[]
   instances: {
     region: string
     name: string

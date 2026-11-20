@@ -6,6 +6,7 @@ import {
   PlusOutlined,
   TeamOutlined,
   LineChartOutlined,
+  SettingOutlined,
   WalletOutlined,
 } from '@ant-design/icons'
 import { Layout, Menu, Typography, theme } from 'antd'
@@ -30,6 +31,7 @@ export default function AppLayout() {
     { key: '/tasks', icon: <CloudServerOutlined />, label: <Link to="/tasks">任务中心</Link> },
     { key: '/billing', icon: <WalletOutlined />, label: <Link to="/billing">账单</Link> },
     { key: '/credentials', icon: <KeyOutlined />, label: <Link to="/credentials">AWS 凭证</Link> },
+    { key: '/settings', icon: <SettingOutlined />, label: <Link to="/settings">系统设置</Link> },
     ...(user?.is_admin
       ? [{ key: '/users', icon: <TeamOutlined />, label: <Link to="/users">用户管理</Link> }]
       : []),

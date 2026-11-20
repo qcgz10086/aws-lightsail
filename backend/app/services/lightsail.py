@@ -216,6 +216,11 @@ def _sum_vcpu_usage_in_region(
 
 
 def _raise_from_aws(exc: Exception) -> None:
+    from app.services.snapshots import SnapshotReadStopped
+    if isinstance(exc, SnapshotReadStopped):
+        raise exc
+    if isinstance(exc, LightsailError):
+        raise exc
     if isinstance(exc, ClientError):
         err = exc.response.get("Error", {})
         code = err.get("Code", "ClientError")
@@ -342,24 +347,31 @@ def get_bundles(
         return []
 
 
-def _paginate_instances(client) -> list[dict[str, Any]]:
+def _paginate_instances(client, before_read=None) -> list[dict[str, Any]]:
     items: list[dict[str, Any]] = []
     page_token = None
+    seen = set()
     while True:
         kwargs = {}
         if page_token:
             kwargs["pageToken"] = page_token
+        if before_read is not None:
+            before_read()
         resp = client.get_instances(**kwargs)
         items.extend(resp.get("instances", []))
         page_token = resp.get("nextPageToken")
         if not page_token:
             break
+        if page_token in seen or len(seen) >= 1000:
+            raise LightsailError("实例列表分页未完整结束", code="IncompletePagination")
+        seen.add(page_token)
     return items
 
 
 def _paginate_static_ips(client) -> list[dict[str, Any]]:
     items: list[dict[str, Any]] = []
     page_token = None
+    seen = set()
     while True:
         kwargs = {}
         if page_token:
@@ -369,16 +381,63 @@ def _paginate_static_ips(client) -> list[dict[str, Any]]:
         page_token = resp.get("nextPageToken")
         if not page_token:
             break
+        if page_token in seen or len(seen) >= 1000:
+            raise LightsailError("静态 IP 分页未完整结束", code="IncompletePagination")
+        seen.add(page_token)
     return items
 
 
 def list_instances_in_region(
     access_key_id: str, secret_access_key: str, region: str, proxy_url: str | None = None
 ) -> list[dict[str, Any]]:
+    return discover_instances_in_region(access_key_id, secret_access_key, region, proxy_url)["instances"]
+
+
+def discover_instances_in_region(
+    access_key_id: str, secret_access_key: str, region: str, proxy_url: str | None = None
+) -> dict[str, Any]:
     try:
         client = make_client(access_key_id, secret_access_key, region, proxy_url)
-        instances = _paginate_instances(client)
-        static_ips = _paginate_static_ips(client)
+        from app.services.read_cooldowns import current_cooldown_store, failure_details
+        cooldown = current_cooldown_store()
+        if cooldown is None:
+            instances = _paginate_instances(client)
+        else:
+            from app.services.read_throttle import read_context
+            def instance_gate():
+                cooldown.require_available(region, "lightsail", "GetInstances")
+            try:
+                # The context reaches every actual SDK retry and every page.
+                # The explicit page gate also covers non-SDK client adapters.
+                with read_context(check=instance_gate):
+                    instances = _paginate_instances(client, before_read=instance_gate)
+            except Exception as exc:
+                recorded = cooldown.record(exc, region, "lightsail", "GetInstances")
+                if recorded is not None:
+                    exc.read_failure = recorded
+                raise
+        auxiliary_error = None
+        auxiliary_failure = None
+        if cooldown is not None:
+            auxiliary_failure = cooldown.active(region, "lightsail", "GetStaticIps")
+        try:
+            if auxiliary_failure:
+                static_ips = []
+            elif cooldown is not None:
+                from app.services.read_throttle import read_context
+                with read_context(check=lambda: cooldown.require_available(region, "lightsail", "GetStaticIps")):
+                    static_ips = _paginate_static_ips(client)
+            else:
+                static_ips = _paginate_static_ips(client)
+        except Exception as exc:
+            from app.services.snapshots import SnapshotReadStopped
+            if isinstance(exc, SnapshotReadStopped):
+                raise
+            static_ips = []
+            auxiliary_failure = (cooldown.record(exc, region, "lightsail", "GetStaticIps")
+                                 if cooldown is not None else failure_details(exc, region, "lightsail", "GetStaticIps"))
+        if auxiliary_failure:
+            auxiliary_error = f"静态 IP 附属信息未完整读取 [{auxiliary_failure['code']}]"
         attached_map: dict[str, dict[str, Any]] = {}
         for sip in static_ips:
             if sip.get("isAttached") and sip.get("attachedTo"):
@@ -409,10 +468,20 @@ def list_instances_in_region(
                     "created_at": created,
                 }
             )
-        return result
+        return {"instances": result, "instances_complete": True, "auxiliary_error": auxiliary_error,
+                "auxiliary_failure": auxiliary_failure}
     except Exception as exc:  # noqa: BLE001
-        _raise_from_aws(exc)
-        return []
+        from app.services.snapshots import SnapshotReadStopped
+        from app.services.read_cooldowns import ReadCooldownActive
+        if isinstance(exc, (SnapshotReadStopped, ReadCooldownActive)):
+            raise
+        try:
+            _raise_from_aws(exc)
+        except LightsailError as wrapped:
+            if getattr(exc, "read_failure", None) is not None:
+                wrapped.read_failure = exc.read_failure
+            raise
+        return {"instances": [], "instances_complete": False, "auxiliary_error": None}
 
 
 def get_instance(

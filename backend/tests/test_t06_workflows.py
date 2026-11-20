@@ -7,7 +7,7 @@ from unittest.mock import patch
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from task_fakes import FakeLightsail
+from task_fakes import FakeLightsail, seed_discovered_regions
 import test_t06_task_queue as queue_tests
 import unittest
 from app.models import AwsCredential, OperationTask, OperationTaskLock, OperationTaskStep, User
@@ -107,7 +107,9 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(self.aws.count("AllocateStaticIp"), 1)
         self.assertTrue(all(c["config"].proxies == {"http": "http://alice:fake-password@proxy.example.com:8080",
             "https": "http://alice:fake-password@proxy.example.com:8080"} for c in self.aws.clients))
-        self.assertTrue(all(c["config"].retries["total_max_attempts"] == 1 for c in self.aws.clients))
+        for (operation, _parameters), config in zip(self.aws.calls, self.aws.call_configs):
+            expected_attempts = 1 if operation[:1] not in {"G", "L", "D", "H"} else 2
+            self.assertEqual(config.retries["total_max_attempts"], expected_attempts, operation)
         serialized = json.dumps(result)
         self.assertNotIn("SomePassword", serialized)
         self.assertNotIn("fake-password", serialized)
@@ -279,15 +281,20 @@ class WorkflowTests(unittest.TestCase):
         from app.models import TrafficUsage
         now = datetime.now(timezone.utc)
         with Session(self.engine) as db:
+            seed_discovered_regions(db, self.user_id, "123456789012", "us-east-1")
+            user = db.get(User, self.user_id)
+            user.auto_stop_on_limit_default, user.monthly_limit_gb = True, 1
             db.add(TrafficUsage(user_id=self.user_id, credential_id=1, account_id="123456789012",
                 region="us-east-1", instance_name="web", year_month=now.strftime("%Y-%m"),
                 network_in_bytes=900, network_out_bytes=900, last_synced_at=now))
             db.commit()
-        self.aws.metric = 100
+        self.aws.metric = 2 * 1024**3
         end = now - timedelta(seconds=1)
         result = self.submit("traffic_sync", {"window_start": now.replace(day=1, hour=0, minute=0, second=0,
             microsecond=0).isoformat(), "window_end": end.isoformat(), "year_month": now.strftime("%Y-%m")})
         self.assertEqual(result["status"], "succeeded")
+        self.assertEqual(result["result"]["count"], 0)
+        self.assertEqual(self.aws.count("StopInstance"), 0)
         with Session(self.engine) as db:
             row = db.scalar(select(TrafficUsage))
             self.assertEqual((row.network_in_bytes, row.network_out_bytes), (900, 900))
@@ -295,6 +302,7 @@ class WorkflowTests(unittest.TestCase):
     def test_policy_disabled_during_prewrite_read_stops_auto_shutdown(self):
         now = datetime.now(timezone.utc)
         with Session(self.engine) as db:
+            seed_discovered_regions(db, self.user_id, "123456789012", "us-east-1")
             user = db.get(User, self.user_id)
             user.auto_stop_on_limit_default, user.monthly_limit_gb = True, 1
             db.commit()

@@ -66,7 +66,8 @@ class SnapshotTests(unittest.TestCase):
         self.assertEqual(stale["last_success_at"], first["last_success_at"])
         self.assertEqual(stale["status"], "stale")
         async def denied(): raise SnapshotError("access denied", invalidate=True)
-        blocked = asyncio.run(read_snapshot(self.engine, self.scope, 60, denied, wait=True, force=True))
+        with patch("app.services.snapshots.time.time", return_value=time.time() + 61):
+            blocked = asyncio.run(read_snapshot(self.engine, self.scope, 60, denied, wait=True, force=True))
         self.assertIsNone(blocked["data"])
         self.assertEqual(blocked["status"], "error")
 
@@ -279,7 +280,8 @@ class SnapshotTests(unittest.TestCase):
             row = db.get(DataSnapshot, scopes[0]["key"])
             self.assertIn('"valid"', row.payload)
             self.assertTrue(row.error)
-        tokens = [_read_or_claim(self.engine, scope, True)[1] for scope in scopes]
+        with patch("app.services.snapshots.time.time", return_value=time.time() + 61):
+            tokens = [_read_or_claim(self.engine, scope, True)[1] for scope in scopes]
         with Session(self.engine) as db:
             db.get(AwsCredential, self.scope["credential_id"]).secret_access_key_enc = "rotated"
             db.commit()
@@ -454,6 +456,8 @@ class CacheRouteTests(unittest.TestCase):
             self.assertEqual(calls.call_count, before)
 
     def test_actual_instances_route_rechecks_views_after_late_credential_invalidation(self):
+        from app.services import billing
+        from botocore.exceptions import ClientError
         from app.models import DataSnapshot
         from app.services import lightsail as ls
         from sqlalchemy import update
@@ -488,6 +492,8 @@ class CacheRouteTests(unittest.TestCase):
                 raise ls.LightsailError("expired credential", code="ExpiredToken")
             with patch.object(ls, "get_regions", return_value=regions), \
                  patch.object(ls, "list_instances_in_region", side_effect=load), \
+                 patch.object(billing, "get_sts_identity", side_effect=ClientError(
+                     {"Error": {"Code": "ExpiredToken"}}, "GetCallerIdentity")), \
                  patch.object(Endpoint, "_send", side_effect=AssertionError("AWS transport forbidden")) as transport:
                 response = self.client.get("/api/v2/instances?wait=true")
             self.assertEqual(response.status_code, 200, response.text)
@@ -502,6 +508,8 @@ class CacheRouteTests(unittest.TestCase):
             self.assertTrue(all(row.payload is None and row.last_success is None for row in rows))
 
     def test_outer_credential_gather_revalidation_keeps_healthy_credential(self):
+        from app.services import billing
+        from botocore.exceptions import ClientError
         from app.models import AwsCredential, DataSnapshot
         from app.security import encrypt_secret
         from app.services import lightsail as ls
@@ -543,6 +551,8 @@ class CacheRouteTests(unittest.TestCase):
                 return [{"name": "healthy-secondary-" + region, "region": region, "state": "running"}]
             with patch.object(ls, "get_regions", return_value=regions), \
                  patch.object(ls, "list_instances_in_region", side_effect=load), \
+                 patch.object(billing, "get_sts_identity", side_effect=ClientError(
+                     {"Error": {"Code": "ExpiredToken"}}, "GetCallerIdentity")), \
                  patch.object(Endpoint, "_send", side_effect=AssertionError("AWS transport forbidden")) as transport:
                 response = self.client.get("/api/v2/instances?wait=true")
             self.assertEqual(response.status_code, 200, response.text)
@@ -588,7 +598,7 @@ class CacheRouteTests(unittest.TestCase):
         forbidden = self.client.post("/api/v2/refresh", json={"kind": "billing", "credential_id": self.foreign.id})
         self.assertEqual(forbidden.status_code, 404, forbidden.text)
 
-    def test_real_cost_explorer_expired_token_invalidates_credential(self):
+    def test_cost_explorer_expired_token_with_valid_sts_preserves_other_sections(self):
         from botocore.exceptions import ClientError
         from sqlalchemy.orm import Session
         from app.services import billing as b
@@ -611,10 +621,11 @@ class CacheRouteTests(unittest.TestCase):
         self.db.expire_all()
         rows = self.db.query(DataSnapshot).filter(DataSnapshot.credential_id == self.credential.id).all()
         self.assertEqual(len(rows), 4)
-        self.assertTrue(all(row.payload is None and row.last_success is None for row in rows))
+        self.assertTrue(all(row.payload is not None for row in rows if row.kind != "billing-costs"))
+        self.assertIsNone(next(row for row in rows if row.kind == "billing-costs").payload)
         self.assertNotEqual(result["costs"]["status"], "ok")
-        self.assertNotEqual(result["forecast"]["status"], "ok")
-        self.assertNotEqual(result["credits"]["status"], "ok")
+        self.assertEqual(result["forecast"]["status"], "ok")
+        self.assertEqual(result["credits"]["status"], "ok")
 
     def test_billing_summary_outer_account_gather_revalidates_invalidated_account(self):
         from app.models import AwsCredential, DataSnapshot
@@ -846,7 +857,7 @@ class SnapshotMigrationTests(unittest.TestCase):
             self.assertEqual(file_sha256(path), before)
             migrations.upgrade_database(engine, Base.metadata)
             with closing(sqlite3.connect(path)) as conn:
-                self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,), (2,), (3,), (4,), (5,)])
+                self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,), (2,), (3,), (4,), (5,), (6,)])
                 self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone(), ("ok",))
                 self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(), [])
                 backup, sha = conn.execute("SELECT backup_path,backup_sha256 FROM schema_migrations WHERE version=4").fetchone()

@@ -22,6 +22,7 @@ const TrafficPage = lazy(() => import('./pages/Traffic'))
 const BillingPage = lazy(initialPages['/billing'])
 const UsersPage = lazy(() => import('./pages/Users'))
 const TasksPage = lazy(() => import('./pages/Tasks'))
+const SettingsPage = lazy(() => import('./pages/Settings'))
 
 function PrivateRoute({ children, adminOnly = false }: { children: ReactNode; adminOnly?: boolean }) {
   const { user, loading } = useAuth()
@@ -61,6 +62,7 @@ export default function App() {
           <Route path="tasks/:taskId" element={<TasksPage />} />
           <Route path="billing" element={<BillingPage />} />
           <Route path="credentials" element={<CredentialsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
           <Route
             path="users"
             element={

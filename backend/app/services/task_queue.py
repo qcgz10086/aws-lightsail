@@ -19,6 +19,8 @@ from sqlalchemy.orm import Session
 from app.models import AwsCredential, DataSnapshot, OperationLog, OperationTask, OperationTaskLock, OperationTaskStep, User
 from app.proxy_config import sanitize_error_message
 from app.security import decrypt_secret, encrypt_secret
+from app.settings_models import OperationTaskRequest, TrafficTaskCancellation
+from app.services.read_throttle import read_context, read_scope
 from app.services.traffic import get_credential_keys, get_credential_proxy_url
 
 logger = logging.getLogger(__name__)
@@ -32,6 +34,7 @@ MAX_ACTIVE_PER_USER = 100
 MAX_ACTIVE_GLOBAL = 1000
 MAX_TASK_STEPS = 8192
 MAX_TASK_PAYLOAD = 65536
+MAX_COALESCED_REQUESTS = 128
 
 
 class TaskConflict(ValueError):
@@ -58,13 +61,25 @@ class TaskKnownFailure(RuntimeError):
     pass
 
 
+class TrafficStopped(RuntimeError):
+    def __init__(self, message, *, cancelled=False):
+        super().__init__(message)
+        self.cancelled = cancelled
+
+
+class TaskPaused(RuntimeError):
+    """Stop future traffic reads during shutdown without replaying mutations."""
+
+
 class TaskContext:
-    def __init__(self, engine: Engine, task_id: str, token: str, payload: dict):
+    def __init__(self, engine: Engine, task_id: str, token: str, payload: dict, *, shutdown_event=None):
         self.engine = engine
         self.task_id = task_id
         self.token = token
         self.payload = payload
         self.step_errors = []
+        self.collecting_traffic = False
+        self.shutdown_event = shutdown_event
 
     def _credential_is_current(self) -> bool:
         with Session(self.engine) as db:
@@ -85,6 +100,38 @@ class TaskContext:
         # Renew only while this worker still owns the task and the captured
         # credential identity is unchanged. Every AWS subcall uses this gate.
         load_task_credentials(self.engine, self.task_id, self.token)
+
+    def check_traffic(self) -> None:
+        if self.shutdown_event is not None and self.shutdown_event.is_set():
+            raise TaskPaused("服务正在停止，流量后续读取将在重启后继续")
+        self.check()
+        with Session(self.engine) as db:
+            task = db.get(OperationTask, self.task_id)
+            if task is None or task.worker_token != self.token or task.status != "running":
+                raise TaskLeaseLost("task worker lease no longer owns this task")
+            if db.get(TrafficTaskCancellation, self.task_id):
+                raise TrafficStopped("流量同步的后续步骤已取消", cancelled=True)
+            user, credential = db.get(User, task.user_id), db.get(AwsCredential, task.credential_id)
+            if user is None or credential is None or credential_version(credential) != task.credential_version:
+                raise TaskCredentialChanged("凭证或代理版本已变化，任务停止")
+            from app.services.snapshots import version_for
+            invalid = db.scalar(select(DataSnapshot.key).where(DataSnapshot.credential_id == credential.id,
+                DataSnapshot.version == version_for(user, credential), DataSnapshot.kind == "billing-identity",
+                DataSnapshot.error_status == "credential_invalid").limit(1))
+            if invalid:
+                raise TrafficStopped("凭证身份已确认失效，请重新校验凭证")
+
+    def pause(self) -> None:
+        with self.transaction() as (db, task):
+            steps = db.execute(select(OperationTaskStep.intent_json, OperationTaskStep.status).where(
+                OperationTaskStep.task_id == self.task_id)).all()
+            has_effect = any(json.loads(intent).get("mutation") and status != "failed"
+                             for intent, status in steps)
+            # A completed or unconfirmed mutation keeps the existing manual
+            # reconciliation boundary. Pure reads retain their queue/locks.
+            task.status = "reconciliation_required" if has_effect else "queued"
+            task.worker_token, task.lease_until = None, 0
+            task.updated_at, task.error_message = _utcnow(), "服务停止，后续读取已暂停"
 
     def step(self, name: str) -> dict | None:
         with Session(self.engine) as db:
@@ -249,7 +296,7 @@ class TaskContext:
 
     def finish(self, status: str, *, result: dict | None = None, error: str | None = None,
                fail_if_no_effect: bool = False) -> None:
-        if status not in {"succeeded", "failed", "partial", "reconciliation_required"}:
+        if status not in {"succeeded", "failed", "partial", "cancelled", "reconciliation_required"}:
             raise ValueError("invalid task terminal state")
         with self.engine.begin() as connection:
             connection.exec_driver_sql("BEGIN IMMEDIATE")
@@ -261,6 +308,11 @@ class TaskContext:
             )).first()
             if not task:
                 raise TaskLeaseLost("task worker lease no longer owns this task")
+            if status in {"succeeded", "partial"} and connection.scalar(
+                select(TrafficTaskCancellation.task_id).where(TrafficTaskCancellation.task_id == self.task_id)
+            ):
+                status = "cancelled"
+                error = "流量同步的后续步骤已取消"
             unresolved = connection.execute(select(func.count()).select_from(OperationTaskStep).where(
                 OperationTaskStep.task_id == self.task_id,
                 OperationTaskStep.status.in_(("intent", "unknown")),
@@ -294,10 +346,16 @@ class TaskContext:
                 updated_at=now,
                 finished_at=now if status in TERMINAL_STATES else None,
             ))
-            user_id = connection.execute(select(OperationTask.user_id).where(
-                OperationTask.id == self.task_id)).scalar_one()
-            connection.execute(update(DataSnapshot).where(DataSnapshot.user_id == user_id,
-                DataSnapshot.kind == "instances").values(expires_at=0, lease_token=None, lease_until=0))
+            user_id, kind = connection.execute(select(OperationTask.user_id, OperationTask.kind).where(
+                OperationTask.id == self.task_id)).one()
+            has_mutation = kind != "traffic_sync" or connection.execute(select(OperationTaskStep.id).where(
+                OperationTaskStep.task_id == self.task_id,
+                func.json_extract(OperationTaskStep.intent_json, "$.mutation") == 1,
+                OperationTaskStep.status != "failed").limit(1)).first() is not None
+            if has_mutation:
+                connection.execute(update(DataSnapshot).where(DataSnapshot.user_id == user_id,
+                    DataSnapshot.kind.in_(("instances", "query-instances"))).values(
+                        expires_at=0, lease_token=None, lease_until=0))
             connection.execute(OperationLog.__table__.insert().values(user_id=user_id,
                 action="persistent_task", target=self.task_id, status=status,
                 message="任务执行状态已更新，详情通过任务接口查询"))
@@ -325,6 +383,8 @@ def _safe_value(value):
             "read_interrupted", "restored", "partial", "step_errors", "static_ip_name", "operation", "new_ip",
             "related", "released_static_ips", "count", "errors", "step", "year_month", "window_start", "window_end",
             "message", "manual_resolution", "aws_outcome_confirmed",
+            "successful_regions", "failed_regions", "code", "reason", "retry_condition", "next_retry_at",
+            "regions", "discovery_state",
         }
         return {key: _safe_value(item) for key, item in value.items()
                 if key in allowed}
@@ -362,6 +422,25 @@ def _fingerprint(payload: dict) -> str:
     return hmac.new(get_settings().secret_key.encode(), _json(payload).encode(), hashlib.sha256).hexdigest()
 
 
+def task_for_key(db: Session, user_id: int, key: str) -> tuple[OperationTask | None, str | None]:
+    task = db.scalar(select(OperationTask).where(
+        OperationTask.user_id == user_id, OperationTask.idempotency_key == key))
+    if task is not None:
+        return task, task.request_fingerprint
+    alias = db.get(OperationTaskRequest, (user_id, key))
+    if alias is not None:
+        task = db.scalar(select(OperationTask).where(OperationTask.id == alias.task_id,
+                                                    OperationTask.user_id == user_id))
+        if task is not None:
+            return task, alias.request_fingerprint
+    return None, None
+
+
+def _default_traffic_fingerprint(credential_id: int) -> str:
+    return _fingerprint({"kind": "traffic_sync", "credential_id": credential_id,
+                         "region": None, "resource_name": None, "payload": {"credential_id": credential_id}})
+
+
 def _lock_key(user_id: int, scope: str, region: str | None, resource: str | None, kind: str) -> str:
     resource_scope = "*" if kind == "account" else (resource or "*")
     raw = f"{user_id}:{scope}:{region or '*'}:{resource_scope}"
@@ -371,10 +450,13 @@ def _lock_key(user_id: int, scope: str, region: str | None, resource: str | None
 def task_view(db: Session, task: OperationTask) -> dict:
     steps = db.scalars(select(OperationTaskStep).where(
         OperationTaskStep.task_id == task.id).order_by(OperationTaskStep.sequence)).all()
+    traffic = task.kind == "traffic_sync"
+    cancel_requested = traffic and db.get(TrafficTaskCancellation, task.id) is not None
     return {
         "task_id": task.id,
         "kind": task.kind,
         "status": task.status,
+        "cancel_requested": cancel_requested,
         "credential_id": task.credential_id,
         "account_id": task.account_id,
         "region": task.region,
@@ -390,8 +472,10 @@ def task_view(db: Session, task: OperationTask) -> dict:
         "created_at": task.created_at.isoformat() if task.created_at else None,
         "updated_at": task.updated_at.isoformat() if task.updated_at else None,
         "finished_at": task.finished_at.isoformat() if task.finished_at else None,
-        "can_cancel": task.status == "queued" and task.attempt == 0 and task.started_at is None,
-        "can_resume": task.status == "reconciliation_required" and
+        "can_cancel": (task.status == "queued" and (task.attempt == 0 and task.started_at is None
+                       or traffic and task.worker_token is None)
+                       or traffic and not cancel_requested and task.status in {"running", "reconciliation_required"}),
+        "can_resume": task.status == "reconciliation_required" and not cancel_requested and
             not any(step.status in {"intent", "unknown"} for step in steps),
     }
 
@@ -403,6 +487,7 @@ class DurableTaskQueue:
         self._guard = threading.Lock()
         self._futures = set()
         self.closed = False
+        self._shutdown_event = threading.Event()
 
     def accept(self, db: Session, user: User, credential: AwsCredential, kind: str,
                payload: dict, idempotency_key: str, *, region: str | None,
@@ -461,10 +546,9 @@ class DurableTaskQueue:
                 connection.exec_driver_sql("BEGIN IMMEDIATE")
             else:
                 connection.exec_driver_sql("UPDATE operation_tasks SET id=id WHERE 0")
-            existing = db.scalar(select(OperationTask).where(
-                OperationTask.user_id == user.id, OperationTask.idempotency_key == key))
+            existing, existing_fingerprint = task_for_key(db, user.id, key)
             if existing:
-                if not hmac.compare_digest(existing.request_fingerprint, payload_fp):
+                if not hmac.compare_digest(existing_fingerprint, payload_fp):
                     raise TaskConflict("幂等键已用于不同请求")
                 view = task_view(db, existing)
                 db.commit()
@@ -474,6 +558,24 @@ class DurableTaskQueue:
                     not current_credential or current_credential.user_id != user.id or
                     credential_version(current_credential) != task.credential_version):
                 raise TaskConflict("凭证版本已变化，请重新提交新意图")
+            if kind == "traffic_sync" and payload_fp == _default_traffic_fingerprint(credential.id):
+                active_sync = db.scalar(select(OperationTask).where(
+                    OperationTask.user_id == user.id, OperationTask.account_scope == scope,
+                    OperationTask.kind == kind, OperationTask.status.in_(("queued", "running"))))
+                if (active_sync is not None and active_sync.credential_id == credential.id
+                        and active_sync.request_fingerprint == _default_traffic_fingerprint(active_sync.credential_id)
+                        and db.get(TrafficTaskCancellation, active_sync.id) is None):
+                    active_credential = db.get(AwsCredential, active_sync.credential_id, populate_existing=True)
+                    if active_credential and credential_version(active_credential) == active_sync.credential_version:
+                        count = db.scalar(select(func.count()).select_from(OperationTaskRequest).where(
+                            OperationTaskRequest.task_id == active_sync.id))
+                        if count >= MAX_COALESCED_REQUESTS:
+                            raise TaskConflict("同步已在进行，请在任务中心查看进度")
+                        db.add(OperationTaskRequest(user_id=user.id, idempotency_key=key,
+                                                    task_id=active_sync.id, request_fingerprint=payload_fp))
+                        view = task_view(db, active_sync)
+                        db.commit()
+                        return view
             active_count = db.scalar(select(func.count()).select_from(OperationTask).where(
                 OperationTask.user_id == user.id, OperationTask.status.not_in(tuple(TERMINAL_STATES))))
             if active_count >= MAX_ACTIVE_PER_USER:
@@ -505,10 +607,9 @@ class DurableTaskQueue:
             db.rollback()
             if isinstance(exc, TaskConflict):
                 raise
-            duplicate = db.scalar(select(OperationTask).where(
-                OperationTask.user_id == user.id, OperationTask.idempotency_key == key))
+            duplicate, duplicate_fingerprint = task_for_key(db, user.id, key)
             if duplicate:
-                if not hmac.compare_digest(duplicate.request_fingerprint, payload_fp):
+                if not hmac.compare_digest(duplicate_fingerprint, payload_fp):
                     raise TaskConflict("幂等键已用于不同请求") from exc
                 return task_view(db, duplicate)
             holder = db.scalar(select(OperationTaskLock).where(
@@ -557,13 +658,24 @@ class DurableTaskQueue:
             try:
                 payload = json.loads(decrypt_secret(payload_enc))
                 handler = _HANDLERS[kind]
-                context = TaskContext(self.engine, task_id, token, payload)
+                context = TaskContext(self.engine, task_id, token, payload, shutdown_event=self._shutdown_event)
                 context.check()
-                result = handler(context)
+                with read_context(read_scope(task.user_id, task.account_id, task.credential_id)):
+                    result = handler(context)
                 context.finish(
                     "partial" if isinstance(result, dict) and result.get("partial") else "succeeded",
                     result=result if isinstance(result, dict) else {},
                 )
+            except TaskPaused:
+                try:
+                    context.pause()
+                except TaskLeaseLost:
+                    pass
+            except TrafficStopped as exc:
+                try:
+                    context.finish("cancelled" if exc.cancelled else "failed", error=str(exc))
+                except TaskLeaseLost:
+                    pass
             except TaskCredentialChanged as exc:
                 try:
                     TaskContext(self.engine, task_id, token, {}).finish("reconciliation_required", error=str(exc),
@@ -594,9 +706,20 @@ class DurableTaskQueue:
                 query = query.where(OperationTask.lease_until <= time.time())
             running = db.scalars(query).all()
             for task in running:
-                has_steps = db.scalar(select(func.count()).select_from(OperationTaskStep).where(
-                    OperationTaskStep.task_id == task.id))
-                task.status = "reconciliation_required" if has_steps else "queued"
+                step_query = select(OperationTaskStep.id).where(OperationTaskStep.task_id == task.id)
+                if task.kind == "traffic_sync":
+                    step_query = step_query.where(func.json_extract(OperationTaskStep.intent_json, "$.mutation") == 1)
+                has_steps = db.scalar(step_query.limit(1))
+                cancelled = task.kind == "traffic_sync" and db.get(TrafficTaskCancellation, task.id) is not None
+                if cancelled:
+                    unknown = db.scalar(select(OperationTaskStep.id).where(OperationTaskStep.task_id == task.id,
+                        OperationTaskStep.status.in_(("intent", "unknown"))).limit(1))
+                    task.status = "reconciliation_required" if unknown else "cancelled"
+                    if not unknown:
+                        task.finished_at = _utcnow()
+                        db.execute(delete(OperationTaskLock).where(OperationTaskLock.task_id == task.id))
+                else:
+                    task.status = "reconciliation_required" if has_steps else "queued"
                 task.worker_token = None
                 task.lease_until = 0
                 task.updated_at = _utcnow()
@@ -609,6 +732,7 @@ class DurableTaskQueue:
 
     def shutdown(self, *, wait: bool = False) -> None:
         self.closed = True
+        self._shutdown_event.set()
         self._pool.shutdown(wait=wait, cancel_futures=False)
 
     def purge_terminal(self) -> int:
@@ -639,17 +763,28 @@ class DurableTaskQueue:
             OperationTask.id == task_id,
             OperationTask.user_id == user_id,
             OperationTask.status == "queued",
-            OperationTask.attempt == 0,
-            OperationTask.started_at.is_(None),
+            ((OperationTask.attempt == 0) & OperationTask.started_at.is_(None))
+            | ((OperationTask.kind == "traffic_sync") & OperationTask.worker_token.is_(None)),
         ).values(status="cancelled", finished_at=now, updated_at=now)).rowcount
         if changed != 1:
-            db.rollback()
             task = db.scalar(select(OperationTask).where(
                 OperationTask.id == task_id, OperationTask.user_id == user_id))
             if not task:
+                db.rollback()
                 raise TaskNotFound(task_id)
+            if task.kind == "traffic_sync" and task.status in ("running", "reconciliation_required"):
+                if db.get(TrafficTaskCancellation, task_id) is None:
+                    db.add(TrafficTaskCancellation(task_id=task_id))
+                    task.updated_at = now
+                from app.services.query_rounds import release_task_queries
+                release_task_queries(db, user_id, task_id)
+                db.commit()
+                return self.get(db, user_id, task_id)
+            db.rollback()
             raise TaskConflict("任务已开始或已完成，不能取消")
         db.execute(delete(OperationTaskLock).where(OperationTaskLock.task_id == task_id))
+        from app.services.query_rounds import release_task_queries
+        release_task_queries(db, user_id, task_id)
         db.commit()
         return self.get(db, user_id, task_id)
 
@@ -668,7 +803,12 @@ class DurableTaskQueue:
         try:
             context.check()
             result = reconcile(context)
-            context.finish("reconciliation_required", result=result)
+            with Session(self.engine) as reader:
+                cancelled = reader.get(TrafficTaskCancellation, task_id) is not None
+            if cancelled:
+                context.finish("cancelled", result={"message": "后续步骤已取消，已提交操作核对完成"})
+            else:
+                context.finish("reconciliation_required", result=result)
         except TaskLeaseLost:
             pass
         except Exception as exc:
@@ -683,6 +823,8 @@ class DurableTaskQueue:
             raise TaskNotFound(task_id)
         if task.status != "reconciliation_required":
             raise TaskConflict("仅已核对的未解决任务可以继续")
+        if task.kind == "traffic_sync" and db.get(TrafficTaskCancellation, task.id) is not None:
+            raise TaskConflict("后续步骤已取消，请先核对已提交的操作")
         credential = db.get(AwsCredential, task.credential_id)
         if not credential or credential_version(credential) != task.credential_version:
             raise TaskConflict("原凭证版本已变化，禁止借新凭证继续旧任务")

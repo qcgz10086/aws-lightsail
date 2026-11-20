@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     establishQueryCacheScope(`${res.data.id}:${generation}`)
     if (res.data.has_credentials) {
       const path = window.location.pathname
-      const query = path === '/' || path === '/instances' ? '/v2/instances'
+      const query = path === '/' || path === '/instances' ? '/v2/query-instances'
         : path === '/billing' ? '/v2/billing/summary' : null
       // Share this read with the page while its components render. Scope changes
       // and auth cancellation retire the same request through the normal cache.

@@ -1,11 +1,13 @@
 """Region-granular instance snapshots; each successful scope is independently usable."""
 import asyncio
+import time
 from dataclasses import dataclass
 from functools import lru_cache
 import botocore.session
 
 from app.services import lightsail as ls
-from app.services.snapshots import (SnapshotError, credential_failure, permission_failure,
+from app.services.identity_validation import identity_scope_for, verify_identity
+from app.services.snapshots import (SnapshotError, SnapshotReadStopped, credential_failure, permission_failure,
                                     read_many, read_snapshot, revalidate_snapshot_views, scope_for, initial_dependency)
 from app.services.traffic import get_credential_keys, get_credential_proxy_url
 
@@ -29,6 +31,9 @@ def validate_region(region):
 
 
 async def cached_call(engine, user, credential, kind, scope, ttl, method, *args, wait=False, force=False):
+    checked_since = time.time()
+    identity_scope = identity_scope_for(user, credential)
+    account_id = credential.account_id
     try:
         ak, sk = get_credential_keys(credential)
         inputs = InstanceInput(ak, sk, get_credential_proxy_url(credential))
@@ -42,14 +47,19 @@ async def cached_call(engine, user, credential, kind, scope, ttl, method, *args,
         except Exception as exc:
             invalid = permission_failure(exc)
             status = "no_permission" if invalid and not credential_failure(exc) else "unavailable"
-            raise SnapshotError(str(exc), invalidate=invalid, status=status,
-                                invalidate_credential=credential_failure(exc)) from exc
+            if credential_failure(exc):
+                await verify_identity(engine, identity_scope, inputs.access_key, inputs.secret_key,
+                                      inputs.proxy, account_id, checked_since=checked_since)
+            raise SnapshotError(str(exc), invalidate=invalid, status=status) from exc
     return await read_snapshot(engine, scope_for(user, credential, kind, scope), ttl, loader, wait, force)
 
 
 async def instance_scopes(engine, user, credentials, wait=False, force=False, region=None):
     validate_region(region)
     async def one_credential(credential):
+        checked_since = time.time()
+        identity_scope = identity_scope_for(user, credential)
+        account_id = credential.account_id
         catalog = await cached_call(engine, user, credential, "catalog", "regions", 86400,
                                     ls.get_regions, wait=wait, force=False)
         if not wait:
@@ -69,16 +79,27 @@ async def instance_scopes(engine, user, credentials, wait=False, force=False, re
             name = item["name"]
             if name not in supported_regions():
                 continue
-            async def loader(name=name):
+            snapshot_scope = scope_for(user, credential, "instances", name)
+            async def loader(name=name, snapshot_scope=snapshot_scope):
+                from app.services.read_cooldowns import ReadCooldownStore, cooldown_context
+                cooldown = ReadCooldownStore(engine, snapshot_scope)
                 try:
-                    return await asyncio.to_thread(ls.list_instances_in_region, inputs.access_key, inputs.secret_key,
-                                                   name, proxy_url=inputs.proxy)
+                    with cooldown_context(cooldown):
+                        cooldown.require_available(name, "lightsail", "GetInstances")
+                        # Discovery carries this store into every page and
+                        # actual SDK send/retry, including after slot queueing.
+                        return await asyncio.to_thread(ls.list_instances_in_region, inputs.access_key, inputs.secret_key,
+                                                       name, proxy_url=inputs.proxy)
+                except SnapshotReadStopped:
+                    raise
                 except Exception as exc:
                     invalid = permission_failure(exc)
                     status = "no_permission" if invalid and not credential_failure(exc) else "unavailable"
-                    raise SnapshotError(str(exc), invalidate=invalid, status=status,
-                                        invalidate_credential=credential_failure(exc)) from exc
-            requests.append((scope_for(user, credential, "instances", name), 60, loader))
+                    if credential_failure(exc):
+                        await verify_identity(engine, identity_scope, inputs.access_key, inputs.secret_key,
+                                              inputs.proxy, account_id, checked_since=checked_since)
+                    raise SnapshotError(str(exc), invalidate=invalid, status=status) from exc
+            requests.append((snapshot_scope, 60, loader))
             names.append(name)
         views = await read_many(engine, requests, wait=wait, force=force)
         return [{"credential_id": credential.id, "account_id": credential.account_id, "region": name, **view}

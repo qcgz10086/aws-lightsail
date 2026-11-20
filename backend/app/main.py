@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from app.config import get_settings
 from app.database import SessionLocal, init_db
 from app.routers import auth, billing, billing_v2, cache_v2, catalog, credentials, instances, metrics, tasks, users
+from app.routers import settings as query_settings
 from app.seed import seed_admin
 from app.services.collector import start_scheduler, stop_scheduler
 
@@ -30,9 +31,11 @@ async def lifespan(_: FastAPI):
         db.close()
     from app.services.task_handlers import install_handlers
     from app.services.task_queue import queue_for
+    from app.services.query_rounds import resume_queries, shutdown_queries
     from app import database
     install_handlers()
     queue = queue_for(database.engine)
+    resume_queries(database.engine)
     queue.recover()
     start_scheduler()
     logger.info("Lightsail Manager API 已启动")
@@ -41,6 +44,7 @@ async def lifespan(_: FastAPI):
     finally:
         stop_scheduler()
         queue.shutdown()
+        shutdown_queries(database.engine)
         from app.services.snapshots import shutdown_refreshes
         shutdown_refreshes()
         logger.info("Lightsail Manager API 已停止")
@@ -105,6 +109,7 @@ app.include_router(billing.router, prefix="/api")
 app.include_router(billing_v2.router, prefix="/api")
 app.include_router(cache_v2.router, prefix="/api")
 app.include_router(tasks.router, prefix="/api")
+app.include_router(query_settings.router, prefix="/api")
 
 
 @app.get("/api/health")

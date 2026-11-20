@@ -15,6 +15,7 @@ class FakeLightsail:
         self.ips = {}
         self.operations = {}
         self.calls = []
+        self.call_configs = []
         self.clients = []
         self.lose = set()
         self.pending = set()
@@ -31,12 +32,16 @@ class FakeLightsail:
                 "createdAt": datetime.now(timezone.utc).replace(microsecond=0)}
 
     def factory(self, service, **kwargs):
-        assert service == "lightsail", service
+        assert service in {"lightsail", "account"}, service
         self.clients.append(kwargs)
         fake = self
         class Client:
             def __init__(self):
-                self._make_api_call = fake.call
+                client_config = kwargs.get("config")
+                def invoke(operation, parameters):
+                    fake.call_configs.append(client_config)
+                    return fake.call(operation, parameters)
+                self._make_api_call = invoke
             def __getattr__(self, method):
                 operation = ''.join(part.title() for part in method.split('_'))
                 return lambda **parameters: self._make_api_call(operation, parameters)
@@ -49,6 +54,8 @@ class FakeLightsail:
         if operation == "GetRegions":
             return {"regions": [{"name": self.region, "availabilityZones": [
                 {"zoneName": self.region + "a", "state": "available"}]}]}
+        if operation == "GetRegionOptStatus":
+            return {"RegionOptStatus": "ENABLED"}
         if operation == "GetInstances":
             return {"instances": deepcopy(list(self.instances.values()))}
         if operation == "GetInstance":
@@ -102,16 +109,31 @@ class FakeLightsail:
             yield self
 
 
+def seed_discovered_regions(db, user_id, account_id, *regions):
+    from app.query_models import QueryAccount, QueryRegion
+
+    db.add(QueryAccount(user_id=user_id, account_key=account_id, discovery_state="complete"))
+    db.add_all(QueryRegion(user_id=user_id, account_key=account_id, region=region, observed_state="active")
+               for region in regions)
+    db.commit()
+
+
 def run_traffic(db, user):
     """Exercise the real enqueue and worker synchronously inside the fake boundary."""
     from app.services.collector import sync_user_traffic
+    from app.services.query_rounds import QueryWorker, shutdown_queries
     from app.services.task_queue import queue_for
     queue = queue_for(db.get_bind())
-    with patch.object(queue, "schedule"):
-        accepted = sync_user_traffic(db, user)
-    db.commit()
-    for task in accepted:
-        queue._execute(task["task_id"])
+    try:
+        with patch.object(QueryWorker, "start", autospec=True,
+                          side_effect=lambda worker, round_id: worker.run(round_id)):
+            with patch.object(queue, "schedule"):
+                accepted = sync_user_traffic(db, user)
+            db.commit()
+            for task in accepted:
+                queue._execute(task["task_id"])
+    finally:
+        shutdown_queries(db.get_bind())
     db.expire_all()
     results = [queue.get(db, user.id, task["task_id"]) for task in accepted]
     assert all(task["status"] == "succeeded" for task in results), results

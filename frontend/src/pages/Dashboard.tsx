@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom'
 import api, { CachedInstancesResponse, Instance, readApi, SnapshotMetadata, TrafficSummary, getErrorMessage,
   invalidateQueryScope } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
-import { snapshotPollDelay } from '../api/snapshotPolling'
+import type { QueryRoundProgress, RegionDiscovery } from '../api/client'
+import QueryProgress, { RetryCountdown } from '../components/QueryProgress'
 
 export default function DashboardPage() {
   const { user, sessionKey } = useAuth()
@@ -13,6 +14,9 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [instancesRefreshing, setInstancesRefreshing] = useState(false)
+  const [rounds, setRounds] = useState<QueryRoundProgress[]>([])
+  const [discovery, setDiscovery] = useState<RegionDiscovery[]>([])
+  const roundIds = useRef<string[]>([])
   const [snapshotScopes, setSnapshotScopes] = useState<(SnapshotMetadata & {
     region: string | null; credential_id: number; account_id?: string | null
   })[]>([])
@@ -37,16 +41,20 @@ export default function DashboardPage() {
         return
       }
       if (refreshTraffic) void loadTraffic(force)
-      const nextInstances = await readApi<CachedInstancesResponse>('/v2/instances', {}, {
+      const nextInstances = await readApi<CachedInstancesResponse>('/v2/query-instances',
+        roundIds.current.length ? { round_ids: roundIds.current.join(',') } : {}, {
         signal: controller.signal, tags: ['instances'], force, cacheIf: (value) => !value.refreshing,
       })
       if (requestVersion.current === version) {
         setInstances(nextInstances.instances)
         setSnapshotScopes(nextInstances.scopes)
         setInstancesRefreshing(nextInstances.refreshing)
-        if (nextInstances.refreshing && Date.now() - pollStarted.current < 30000) {
+        setRounds(nextInstances.rounds || [])
+        setDiscovery(nextInstances.discovery || [])
+        roundIds.current = (nextInstances.rounds || []).map((round) => round.id)
+        if (nextInstances.refreshing) {
           if (pollTimer.current) clearTimeout(pollTimer.current)
-          pollTimer.current = setTimeout(() => void load(false, false), snapshotPollDelay(pollStarted.current))
+          pollTimer.current = setTimeout(() => void load(false, false), 1000)
         }
       }
     } catch (err) {
@@ -76,6 +84,9 @@ export default function DashboardPage() {
     setTraffic(null)
     setInstancesRefreshing(false)
     setSnapshotScopes([])
+    setRounds([])
+    setDiscovery([])
+    roundIds.current = []
     pollStarted.current = Date.now()
     void load()
     return () => {
@@ -120,18 +131,31 @@ export default function DashboardPage() {
           <Typography.Title level={3} style={{ margin: 0 }}>
             总览
           </Typography.Title>
-          <Button onClick={async () => {
+          <Space><Button onClick={async () => {
             try {
-              await api.post('/v2/refresh', { kind: 'instances' })
+              const response = await api.post<{ round_ids: string[] }>('/v2/queries', { mode: 'refresh' })
+              roundIds.current = response.data.round_ids
               invalidateQueryScope('instances')
               invalidateQueryScope('traffic')
               pollStarted.current = Date.now()
               void load(true)
             } catch (err) { setError(getErrorMessage(err)) }
-          }}>刷新</Button>
+          }}>刷新</Button><Button title="重新发现所有账号的全部支持区域" onClick={async () => {
+            try {
+              const response = await api.post<{ round_ids: string[] }>('/v2/queries', { mode: 'global' })
+              roundIds.current = response.data.round_ids
+              invalidateQueryScope('instances')
+              void load(true, false)
+            } catch (err) { setError(getErrorMessage(err)) }
+          }}>全局扫描</Button></Space>
         </div>
 
         {error && <Alert type="error" showIcon message={error} />}
+        <QueryProgress rounds={rounds} discovery={discovery} scopes={snapshotScopes} onCancel={(id) => {
+          void api.post(`/v2/queries/${id}/cancel`).then(() => {
+            invalidateQueryScope('instances'); return load(true, false)
+          }).catch((err) => setError(getErrorMessage(err)))
+        }} />
         {instancesRefreshing && <Alert type="info" showIcon message="实例快照后台刷新中，成功区域先行显示" />}
         {snapshotScopes.some((scope) => scope.stale || scope.error || scope.status === 'no_permission'
           || scope.status === 'unavailable' || scope.status === 'invalidated' || scope.status === 'error') ? (
@@ -147,6 +171,7 @@ export default function DashboardPage() {
                     最近成功：{scope.last_success_at}</Typography.Text> : null}
                   <Typography.Text type={scope.error ? 'danger' : 'secondary'}>
                     {scope.error || (scope.status === 'no_permission' ? '权限不足' : scope.status)}</Typography.Text>
+                  <RetryCountdown value={scope.next_retry_at} />
                 </Space>
               </List.Item>} />}
           />

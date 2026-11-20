@@ -4,7 +4,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import api, { CredentialItem, CredentialOut, readApi, TrafficSummary, getErrorMessage,
   invalidateQueryScope } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
-import { submitTask } from '../api/tasks'
+import { submitTask, taskLabels, type OperationTask } from '../api/tasks'
+
+const trafficSteps: Record<string, string> = { instances: '实例列表', NetworkIn: '入站流量',
+  NetworkOut: '出站流量', instance_state: '实例状态', auto_stop: '自动关机' }
 
 export default function TrafficPage() {
   const { user, sessionKey } = useAuth()
@@ -166,6 +169,34 @@ export default function TrafficPage() {
           </Card>
         </Col>
       </Row>
+
+      {(data?.latest_syncs || []).map((sync) => <Card key={sync.task_id}
+        title={`最近同步 · ${sync.account_id || `凭证 #${sync.credential_id}`}`}
+        extra={<Link to={`/tasks/${sync.task_id}`}>查看任务</Link>}>
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <Typography.Text>{taskLabels[sync.status as OperationTask['status']] || sync.status}
+            {` · 提交于 ${sync.created_at}`}</Typography.Text>
+          {typeof sync.result?.count === 'number' && <Typography.Text>
+            成功采集 {sync.result.count} 台实例
+            {sync.result.successful_regions !== undefined ? ` · 成功 ${sync.result.successful_regions} 个区域` : ''}
+            {sync.result.failed_regions !== undefined ? ` · 失败 ${sync.result.failed_regions} 个区域` : ''}
+          </Typography.Text>}
+          {sync.result?.message && <Alert type="info" showIcon message={sync.result.message} />}
+          {sync.error && <Alert type="error" showIcon message={sync.error} />}
+          {!!sync.result?.errors?.length && <>
+            <Alert type="warning" showIcon message="同步部分失败"
+              description="下方流量包含已保存的观测值；失败范围可能仍显示上次记录，缺失数据未计入本次成功数量。" />
+            <Table rowKey={(row, index) => `${row.region}/${row.name || ''}/${row.step}/${index}`}
+              dataSource={sync.result.errors} pagination={false} scroll={{ x: 800 }} columns={[
+                { title: '失败区域', dataIndex: 'region' }, { title: '实例', dataIndex: 'name' },
+                { title: '步骤', dataIndex: 'step', render: (step: string) => trafficSteps[step] || step },
+                { title: '错误码', dataIndex: 'code', render: (value?: string) => value || '历史任务未记录' },
+                { title: '原因', dataIndex: 'reason', render: (value?: string) => value || '请重新同步以获取详情' },
+                { title: '重试条件', dataIndex: 'retry_condition' },
+              ]} />
+          </>}
+        </Space>
+      </Card>)}
 
       <Card title="按地区汇总（同区多机相加）">
         <Table
