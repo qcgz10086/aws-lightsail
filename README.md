@@ -21,9 +21,25 @@
 
 > 流量基于 Lightsail 指标估算，与官方账单可能存在差异。月份按 **UTC 自然月** 统计。
 
-## IAM 权限（最小权限策略）
+## IAM 权限说明
 
-先在 AWS 建一个专门给本面板用的 IAM 用户，**不要用根账号 Access Key**，再把下面这段 JSON 建成策略挂到该用户上。这是按本项目实际调的接口整理的最小权限，`Resource` 只能写 `*`（Lightsail、Cost Explorer、Billing 都不支持按资源限权）。
+先在 AWS 建一个专门给本面板用的 IAM 用户，绑定该用户的长期 Access Key + Secret Key，再按要使用的功能添加授权。测试版「AWS 凭证」和「开通实例」页面均提供可展开的权限说明，以及可复制的只读查询、完整功能策略。
+
+| 功能 | 所需 IAM 操作 |
+| --- | --- |
+| 查询地区启用状态 | `account:GetRegionOptStatus`（当前面板逐地区查询） |
+| 手动启用地区（按需） | `account:EnableRegion`；请求后等待区域启用完成 |
+| 批量查看账号地区状态（按需） | `account:ListRegions`；用于 AWS 控制台或批量 API，当前面板未调用 |
+| 实例、镜像、套餐、静态 IP、流量查询 | 下方策略中的 `lightsail:Get*` 操作 |
+| 任务执行结果核对 | `lightsail:GetOperation`；资源变更任务需要读取 AWS Operation 终态 |
+| 创建实例（按需） | `lightsail:CreateInstances`、`lightsail:TagResource`（创建时添加任务追踪标签） |
+| 实例启停、删除、换 IP、防火墙（按需） | 下方策略中相应的 Lightsail 写操作；超限自动关机还需 `lightsail:StopInstance` |
+| 配额查询 | `servicequotas:GetServiceQuota`、`servicequotas:ListServiceQuotas` |
+| 账单、费用预测、官方赠金 | `ce:GetCostAndUsage`、`ce:GetCostForecast`、`billing:GetCredits` |
+
+`sts:GetCallerIdentity` 用于确认账号身份，AWS 明确说明无需额外 IAM Allow。身份校验成功不等于拥有查询或管理资源所需的权限。缺少地区状态查询权限时只能标为未知，不能据此判断地区未启用或整组密钥失效。地区启用还受账号类型、组织策略和权限边界等条件约束。
+
+下面的完整功能示例使用 `Resource: "*"` 以覆盖面板调用；部分 Lightsail 操作支持按资源 ARN 和条件进一步收紧，实际授权可按使用范围调整。只需要查询时，使用页面中的只读查询策略。
 
 ```json
 {
@@ -40,7 +56,9 @@
         "lightsail:GetBundles",
         "lightsail:GetStaticIps",
         "lightsail:GetInstanceMetricData",
+        "lightsail:GetOperation",
         "lightsail:CreateInstances",
+        "lightsail:TagResource",
         "lightsail:StartInstance",
         "lightsail:StopInstance",
         "lightsail:RebootInstance",
@@ -68,8 +86,7 @@
       "Action": [
         "ce:GetCostAndUsage",
         "ce:GetCostForecast",
-        "billing:GetCredits",
-        "sts:GetCallerIdentity"
+        "billing:GetCredits"
       ],
       "Resource": "*"
     },
@@ -86,7 +103,9 @@
 }
 ```
 
-建策略路径：IAM → 策略 → 创建策略 → JSON → 粘贴上面这段 → 创建后附加到 IAM 用户。只想只读不建机时，把 `CreateInstances`、`Start/Stop/Reboot/DeleteInstance` 和静态 IP 那几项删掉即可。
+建策略路径：IAM → 策略 → 创建策略 → JSON → 粘贴上面这段 → 创建后附加到 IAM 用户。只查询时使用页面中的只读查询策略；管理策略按需保留创建、标签、启停、删除、静态 IP、防火墙及区域启用等写操作。
+
+官方权限参考：[区域启用与查询](https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-regions.html)、[Lightsail 操作授权表](https://docs.aws.amazon.com/service-authorization/latest/reference/list_lightsail.html)、[GetCallerIdentity](https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html)。
 
 ## 部署（Docker Compose）
 
@@ -219,11 +238,11 @@ docker compose logs -f backend
 
 ## 区域启用
 
-香港（ap-east-1）等新区域在 AWS 账号里默认是关闭的（opt-in），没启用时调该区域接口会报 `UnrecognizedClientException`（跟密钥无关）。面板处理方式：
+香港（ap-east-1）等区域需要账号主动启用（opt-in）。区域未启用可能导致 `UnrecognizedClientException`，凭证无效也可能产生此错误，需要结合身份校验和区域状态确认原因。面板处理方式：
 
 - 在「开通实例」页选了未启用的区域、套餐/镜像加载失败时，页面会提示该区域未启用，并给出「启用该区域」按钮。
 - 点确认后，面板用当前凭证调 Account Management API（`account:EnableRegion`，固定走 us-east-1）启用该区域；启用不是立刻生效，面板会每 10 秒查一次状态（`account:GetRegionOptStatus`），最多等 5 分钟，变为可用后自动重载套餐/镜像。
-- 需要密钥有 `account:EnableRegion` 与 `account:GetRegionOptStatus` 权限（见上方 IAM 最小权限策略）；如果是组织成员账号，只能由管理账号启用该区域。
+- 查询状态需要 `account:GetRegionOptStatus`，启用地区还需要 `account:EnableRegion`（见上方 IAM 权限说明）。当前面板操作凭证所属账号；组织成员账号可在有效权限允许时启用自身区域，若受组织策略限制，请联系组织管理员。
 - 区域状态查询与启用接口有限流：状态查询每分钟 10 次、启用每分钟 5 次，超限返回 429，请稍后再试；启用成功与失败都会记操作日志。
 - 不想启用也可以直接换个已启用的地区（如东京、新加坡、美东）。
 
@@ -320,7 +339,7 @@ Vite 已将 `/api` 代理到 `http://127.0.0.1:8000`。
 使用前需要：
 
 1. 在 AWS 控制台启用 Cost Explorer（控制台 → Cost Explorer → 启用），启用后数据通常需要 24-48 小时才会出现；未启用或暂无数据时账单页显示 `unavailable` 提示，不会报 500。
-2. 给 IAM 用户/角色添加只读权限：`billing:GetCredits`、`sts:GetCallerIdentity`（官方赠金）、`ce:GetCostAndUsage`、`ce:GetCostForecast`（本月费用）；缺权限时账单页对应区域显示 `no_permission` 提示。不要用根账号 Access Key。
+2. 给 IAM 用户添加只读权限：`billing:GetCredits`（官方赠金）、`ce:GetCostAndUsage`、`ce:GetCostForecast`（本月费用）；缺权限时账单页对应区域显示 `no_permission` 提示。账号身份查询 `sts:GetCallerIdentity` 无需额外 IAM Allow。
 
 ## 安全建议
 

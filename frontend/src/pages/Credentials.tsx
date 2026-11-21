@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from 'react'
 import api, { CredentialItem, CredentialOut, getErrorMessage, invalidateQueryTags, readApi } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import dayjs from 'dayjs'
+import AwsPermissionHelp from '../components/AwsPermissionHelp'
 
 function tierColor(tier?: string | null): string {
   if (!tier) return 'default'
@@ -87,6 +88,8 @@ export default function CredentialsPage() {
       <Typography.Title level={3} style={{ margin: 0 }}>
         AWS 凭证
       </Typography.Title>
+
+      <AwsPermissionHelp />
 
       <Alert
         type="info"

@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import api, { CredentialItem, CredentialOut, getErrorMessage, readApi } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import { submitTask } from '../api/tasks'
+import AwsPermissionHelp from '../components/AwsPermissionHelp'
 
 interface Region {
   name: string
@@ -354,12 +355,15 @@ export default function CreateInstancePage() {
 
   if (!user?.has_credentials) {
     return (
-      <Alert
-        type="info"
-        showIcon
-        message="请先绑定 AWS 凭证"
-        description={<Link to="/credentials">前往绑定</Link>}
-      />
+      <Space direction="vertical" size="large" style={{ width: '100%', maxWidth: 720 }}>
+        <AwsPermissionHelp />
+        <Alert
+          type="info"
+          showIcon
+          message="请先绑定 AWS 凭证"
+          description={<Link to="/credentials">前往绑定</Link>}
+        />
+      </Space>
     )
   }
 
@@ -368,6 +372,7 @@ export default function CreateInstancePage() {
       <Typography.Title level={3} style={{ margin: 0 }}>
         开通实例
       </Typography.Title>
+      <AwsPermissionHelp />
       <Card>
         <Form
           form={form}
