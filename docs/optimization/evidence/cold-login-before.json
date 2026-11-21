@@ -1,0 +1,46 @@
+{
+  "created_at": "2026-11-21T07:36:00.756Z",
+  "dist": "C:\\Users\\admin\\Documents\\ChatGPT\\AWS lght\\test-release-source\\frontend\\dist",
+  "checks": [
+    {
+      "name": "冷登录 JavaScript 原始大小低于 190 KiB",
+      "passed": false,
+      "bytes": 262303
+    },
+    {
+      "name": "冷登录 JavaScript gzip 大小低于 65 KiB",
+      "passed": false,
+      "bytes": 89253
+    },
+    {
+      "name": "首屏没有外链样式表",
+      "passed": true,
+      "count": 0
+    },
+    {
+      "name": "初始模块图不包含 Axios",
+      "passed": false
+    },
+    {
+      "name": "初始模块图不包含 React Router",
+      "passed": false
+    }
+  ],
+  "scenarios": [],
+  "requests": [],
+  "build": {
+    "raw": 262303,
+    "gzip": 89253,
+    "resources": [
+      {
+        "url": "/assets/index-BqVdaEfR.js",
+        "raw": 262303,
+        "gzip": 89253,
+        "axios": true,
+        "router": true
+      }
+    ],
+    "stylesheets": 0
+  },
+  "passed": false
+}

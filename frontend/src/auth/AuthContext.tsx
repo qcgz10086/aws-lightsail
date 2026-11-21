@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import api, { establishQueryCacheScope, User, getErrorMessage, readApi } from '../api/client'
-import { clearTaskRequests } from '../api/tasks'
+import type { User } from '../api/client'
+import { authRequest, getAuthErrorMessage as getErrorMessage } from '../api/authHttp.mjs'
+import { setQueryCacheScope } from '../api/queryCache.mjs'
+import { clearTaskRequests } from '../api/taskState'
 
 interface AuthState {
   user: User | null
@@ -22,18 +24,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const authReadController = useRef<AbortController | null>(null)
 
   const applyCurrentUser = async (generation: number, signal: AbortSignal) => {
-    const res = await api.get<User>('/auth/me', { signal })
-    if (generation !== sessionGeneration.current) return
-    establishQueryCacheScope(`${res.data.id}:${generation}`)
-    if (res.data.has_credentials) {
+    const data = await authRequest<User>('/auth/me', { signal })
+    if (generation !== sessionGeneration.current || signal.aborted) return
+    setQueryCacheScope(`${data.id}:${generation}`)
+    if (data.has_credentials) {
       const path = window.location.pathname
       const query = path === '/' || path === '/instances' ? '/v2/query-instances'
         : path === '/billing' ? '/v2/billing/summary' : null
       // Share this read with the page while its components render. Scope changes
       // and auth cancellation retire the same request through the normal cache.
-      if (query) void readApi(query, {}, { signal }).catch(() => {})
+      if (query) {
+        void import('../api/client').then(({ readApi }) => {
+          if (generation !== sessionGeneration.current || signal.aborted) return
+          return readApi(query, {}, { signal })
+        }).catch(() => {})
+      }
     }
-    setUser(res.data)
+    setUser(data)
     setSessionKey(generation)
   }
 
@@ -54,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await applyCurrentUser(generation, controller.signal)
       } catch {
         if (generation === sessionGeneration.current) {
-          establishQueryCacheScope(null)
+          setQueryCacheScope('anonymous')
           setUser(null)
           setSessionKey(generation)
         }
@@ -71,10 +78,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     authReadController.current?.abort()
     authReadController.current = null
     try {
-      const res = await api.post('/auth/login', { username, password })
+      const data = await authRequest<{ user: User }>('/auth/login', { method: 'POST', body: { username, password } })
       if (generation !== sessionGeneration.current) return
-      establishQueryCacheScope(`${res.data.user.id}:${generation}`)
-      setUser(res.data.user)
+      setQueryCacheScope(`${data.user.id}:${generation}`)
+      setUser(data.user)
       setSessionKey(generation)
     } finally {
       if (generation === sessionGeneration.current) setLoading(false)
@@ -86,11 +93,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const generation = ++sessionGeneration.current
     authReadController.current?.abort()
     authReadController.current = null
-    establishQueryCacheScope(null)
+    setQueryCacheScope('anonymous')
     setUser(null)
     setSessionKey(generation)
     setLoading(false)
-    try { await api.post('/auth/logout') } catch { /* 本地退出不依赖服务端响应 */ }
+    try { await authRequest('/auth/logout', { method: 'POST' }) } catch { /* 本地退出不依赖服务端响应 */ }
   }
 
   const value = useMemo(

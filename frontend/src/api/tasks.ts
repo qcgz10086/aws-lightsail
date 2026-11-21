@@ -1,6 +1,9 @@
 import axios from 'axios'
 import api, { invalidateQueryTags } from './client'
 import { getQueryCacheScope } from './queryCache.mjs'
+import { liveTaskRequests as liveRequests } from './taskState'
+
+export { clearTaskRequests } from './taskState'
 
 export type TaskKind = 'create' | 'start' | 'stop' | 'reboot' | 'change_ip' | 'delete' | 'traffic_sync'
 export interface TaskRequest {
@@ -33,8 +36,6 @@ export const taskLabels: Record<OperationTask['status'], string> = {
   resolved: '已人工决议，AWS 结果未确认',
 }
 const storageKey = (userId: number) => `lightsail-task-intents:${userId}`
-const liveRequests = new Map<string, string>()
-export function clearTaskRequests() { liveRequests.clear() }
 export function pendingIntents(userId: number): PendingIntent[] {
   try { return JSON.parse(localStorage.getItem(storageKey(userId)) || '[]') } catch { return [] }
 }

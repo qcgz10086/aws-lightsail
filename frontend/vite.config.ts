@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { inlineInitialStyles } from './build/inlineInitialStyles.mjs'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), inlineInitialStyles()],
   server: {
     port: 5173,
     proxy: {

@@ -1,15 +1,11 @@
 import { useState, type FormEvent } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
 import { getErrorMessage, useAuth } from '../auth/AuthContext'
 
 export default function LoginPage() {
-  const { login, user, loading } = useAuth()
+  const { login } = useAuth()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
-  const navigate = useNavigate()
-
-  if (!loading && user) return <Navigate to="/" replace />
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -19,7 +15,6 @@ export default function LoginPage() {
     setError(null)
     try {
       await login(String(form.get('username')), String(form.get('password')))
-      navigate('/')
     } catch (err) {
       setError(getErrorMessage(err, '登录失败'))
     } finally {
