@@ -342,7 +342,8 @@ class MigrationV3Tests(unittest.TestCase):
                 tar.extractall(folder, filter="data")
             path = folder / "v2.db"
             env = {**os.environ, "DATABASE_URL": f"sqlite:///{path.as_posix()}",
-                   "PYTHONPATH": str(folder / "backend"), "PYTHONDONTWRITEBYTECODE": "1"}
+                   "PYTHONPATH": os.pathsep.join(filter(None, (str(folder / "backend"), os.environ.get("PYTHONPATH", "")))),
+                   "PYTHONDONTWRITEBYTECODE": "1"}
             seed = """from datetime import date
 from app.database import init_db,engine,SessionLocal
 from app.models import User,AwsCredential,CreditRecord
@@ -367,7 +368,7 @@ engine.dispose()
             self.assertEqual(file_sha256(path), before)
             migrations.upgrade_database(engine, Base.metadata)
             with closing(sqlite3.connect(path)) as conn:
-                self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,), (2,), (3,), (4,), (5,), (6,)])
+                self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,), (2,), (3,), (4,), (5,), (6,), (7,)])
                 value, account, precision = conn.execute("SELECT total_amount_decimal,account_id,amount_precision FROM credit_records").fetchone()
                 self.assertEqual(value, "0.12345678912345678")
                 self.assertIsNone(account)

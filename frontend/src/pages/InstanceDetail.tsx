@@ -1,19 +1,12 @@
 import { Alert, Button, Card, Col, Row, Space, Spin, Tag, Typography, message, Select } from 'antd'
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
 import api, { Instance, readApi, getErrorMessage } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
+import type { TrafficPoint } from '../components/TrafficChart'
 import dayjs from 'dayjs'
+
+const TrafficChart = lazy(() => import('../components/TrafficChart'))
 
 export default function InstanceDetailPage() {
   const { sessionKey } = useAuth()
@@ -23,7 +16,7 @@ export default function InstanceDetailPage() {
   const [inst, setInst] = useState<Instance | null>(null)
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState<'day' | 'week' | 'month'>('day')
-  const [points, setPoints] = useState<{ time: string; in_mb: number; out_mb: number }[]>([])
+  const [points, setPoints] = useState<TrafficPoint[]>([])
   const detailVersion = useRef(0)
   const metricsVersion = useRef(0)
   const detailController = useRef<AbortController | null>(null)
@@ -161,17 +154,9 @@ export default function InstanceDetailPage() {
             }
           >
             <div style={{ width: '100%', height: 320 }}>
-              <ResponsiveContainer>
-                <LineChart data={points}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" minTickGap={24} />
-                  <YAxis unit=" MB" />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="in_mb" name="入站 MB" stroke="#1677ff" dot={false} />
-                  <Line type="monotone" dataKey="out_mb" name="出站 MB" stroke="#52c41a" dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
+              <Suspense fallback={<Spin aria-label="正在加载流量图" />}>
+                <TrafficChart points={points} />
+              </Suspense>
             </div>
           </Card>
         </Col>

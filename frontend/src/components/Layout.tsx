@@ -9,13 +9,23 @@ import {
   SettingOutlined,
   WalletOutlined,
 } from '@ant-design/icons'
-import { Layout, Menu, Typography, theme } from 'antd'
+import { ConfigProvider, Layout, Menu, Spin, Typography, theme } from 'antd'
+import zhCN from 'antd/locale/zh_CN'
+import { Suspense } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 
 const { Header, Sider, Content } = Layout
 
 export default function AppLayout() {
+  return (
+    <ConfigProvider locale={zhCN} theme={{ token: { colorPrimary: '#1677ff', borderRadius: 8 } }}>
+      <PanelLayout />
+    </ConfigProvider>
+  )
+}
+
+function PanelLayout() {
   const { user, logout } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
@@ -73,7 +83,9 @@ export default function AppLayout() {
           </div>
         </Header>
         <Content style={{ margin: 24 }}>
-          <Outlet />
+          <Suspense fallback={<Spin aria-label="正在加载页面" />}>
+            <Outlet />
+          </Suspense>
         </Content>
       </Layout>
     </Layout>

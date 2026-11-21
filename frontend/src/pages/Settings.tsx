@@ -97,8 +97,9 @@ function SettingsEditor({ canEdit }: { canEdit: boolean }) {
           {canEdit && (
             <Form form={form} layout="vertical" initialValues={formValues(settings)} onFinish={save} disabled={loading || saving}>
               <Form.Item name="queryIntervalSeconds" label="AWS 读取间隔（秒）"
-                rules={[{ required: true }, { type: 'number', min: 0.2, max: 5, message: '请输入 0.2 至 5 秒' }]}>
-                <InputNumber min={0.2} max={5} step={0.1} precision={3} style={{ width: '100%', maxWidth: 220 }} />
+                extra="设为 0 时取消请求之间的固定等待；账号公平排队和最多 5 个 AWS 请求并发仍保留，AWS 仍可能限流。"
+                rules={[{ required: true }, { type: 'number', min: 0, max: 5, message: '请输入 0 至 5 秒' }]}>
+                <InputNumber min={0} max={5} step={0.1} precision={3} style={{ width: '100%', maxWidth: 220 }} />
               </Form.Item>
               <Form.Item name="trafficIntervalMinutes" label="自动流量同步周期（分钟）"
                 rules={[{ required: true }, { type: 'integer', min: MIN_TRAFFIC, max: MAX_TRAFFIC, message: '请输入 5 至 525600 的整数' }]}>

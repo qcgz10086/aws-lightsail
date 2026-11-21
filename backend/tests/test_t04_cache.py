@@ -852,7 +852,8 @@ class SnapshotMigrationTests(unittest.TestCase):
                 tar.extractall(folder, filter="data")
             path = folder / "v3.db"
             env = {**os.environ, "DATABASE_URL": f"sqlite:///{path.as_posix()}",
-                   "PYTHONPATH": str(folder / "backend"), "PYTHONDONTWRITEBYTECODE": "1"}
+                   "PYTHONPATH": os.pathsep.join(filter(None, (str(folder / "backend"), os.environ.get("PYTHONPATH", "")))),
+                   "PYTHONDONTWRITEBYTECODE": "1"}
             seeded = subprocess.run([sys.executable, "-c", "from app.database import init_db,engine;init_db();engine.dispose()"],
                                     cwd=folder, env=env, capture_output=True, text=True)
             self.assertEqual(seeded.returncode, 0, seeded.stderr)
@@ -867,7 +868,7 @@ class SnapshotMigrationTests(unittest.TestCase):
             self.assertEqual(file_sha256(path), before)
             migrations.upgrade_database(engine, Base.metadata)
             with closing(sqlite3.connect(path)) as conn:
-                self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,), (2,), (3,), (4,), (5,), (6,)])
+                self.assertEqual(conn.execute("SELECT version FROM schema_migrations").fetchall(), [(1,), (2,), (3,), (4,), (5,), (6,), (7,)])
                 self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone(), ("ok",))
                 self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(), [])
                 backup, sha = conn.execute("SELECT backup_path,backup_sha256 FROM schema_migrations WHERE version=4").fetchone()

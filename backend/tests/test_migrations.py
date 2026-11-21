@@ -13,11 +13,15 @@ os.environ.setdefault("SECRET_KEY", "test-only-secret-key-0123456789abcdef")
 os.environ.setdefault("ENCRYPTION_KEY", "WWevy1rc32FPbz51VPopb5qw2SqEo-6VNp0jX1b4_EE=")
 os.environ.setdefault("ADMIN_PASSWORD", "TestAdminPass123!")
 
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.schema import CreateTable
 from sqlalchemy.dialects import sqlite
 from app import database, models, migrations
+from app.routers import settings as settings_api
+from app.services.query_settings import query_interval_seconds
 from app.sqlite_backup import DatabaseRecoveryError, file_sha256, restore_database, snapshot_database, verify_backup
 
 
@@ -166,9 +170,68 @@ class MigrationTests(unittest.TestCase):
 
     def test_new_database_has_version_and_repeated_start_is_idempotent(self):
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,), (5,), (6,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,), (5,), (6,), (7,)])
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,), (5,), (6,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,), (5,), (6,), (7,)])
+
+    def test_v6_settings_upgrade_allows_zero_and_preserves_sync_schedule(self):
+        self.migrate()
+        with connect(self.path) as conn:
+            conn.execute("DELETE FROM schema_migrations WHERE version > 6")
+            conn.execute("DROP TABLE query_settings")
+            conn.execute("""CREATE TABLE query_settings (
+                id INTEGER NOT NULL PRIMARY KEY CHECK (id = 1),
+                query_interval_ms INTEGER NOT NULL CHECK (query_interval_ms BETWEEN 200 AND 5000),
+                traffic_interval_minutes INTEGER NOT NULL CHECK (traffic_interval_minutes BETWEEN 5 AND 525600),
+                next_sync_at FLOAT NOT NULL, pending_sync_at FLOAT, updated_at FLOAT NOT NULL)""")
+            conn.execute("INSERT INTO query_settings VALUES (1,375,72,2000.5,1000.25,500.125)")
+        with connect(self.path) as conn, self.assertRaises(sqlite3.IntegrityError):
+            conn.execute("UPDATE query_settings SET query_interval_ms=0")
+
+        self.migrate()
+        self.assertEqual(self.rows("SELECT * FROM query_settings"),
+                         [(1, 375, 72, 2000.5, 1000.25, 500.125)])
+        with connect(self.path) as conn:
+            conn.execute("UPDATE query_settings SET query_interval_ms=0")
+        with connect(self.path) as conn:
+            for invalid in (-1, 5001):
+                with self.subTest(interval=invalid), self.assertRaises(sqlite3.IntegrityError):
+                    conn.execute("UPDATE query_settings SET query_interval_ms=?", (invalid,))
+        self.migrate()
+        self.assertEqual(self.rows("SELECT * FROM query_settings"),
+                         [(1, 0, 72, 2000.5, 1000.25, 500.125)])
+        backup, checksum = self.rows("SELECT backup_path, backup_sha256 FROM schema_migrations WHERE version=7")[0]
+        verify_backup(Path(backup), checksum)
+        with connect(backup) as conn:
+            self.assertEqual(conn.execute("SELECT MAX(version) FROM schema_migrations").fetchone(), (6,))
+            self.assertEqual(conn.execute("SELECT * FROM query_settings").fetchall(),
+                             [(1, 375, 72, 2000.5, 1000.25, 500.125)])
+
+    def test_settings_api_saves_zero_as_the_effective_read_interval(self):
+        self.migrate()
+        sessions = sessionmaker(self.engine, expire_on_commit=False)
+        with sessions.begin() as db:
+            admin = models.User(username="interval-admin", password_hash="unused", is_admin=True)
+            db.add(admin)
+
+        app = FastAPI()
+        app.include_router(settings_api.router)
+        app.dependency_overrides[settings_api.get_current_admin] = lambda: admin
+        app.dependency_overrides[settings_api.get_current_user] = lambda: admin
+
+        with patch.object(database, "SessionLocal", sessions), TestClient(app) as client:
+            original = client.get("/settings").json()
+            self.assertEqual(original["query_interval_ms"], 200)
+            saved = client.put("/settings", json={"query_interval_ms": 0, "traffic_interval_minutes": 60})
+            self.assertEqual(saved.status_code, 200, saved.text)
+            self.assertEqual(saved.json()["query_interval_ms"], 0)
+            self.assertEqual(saved.json()["next_sync_at"], original["next_sync_at"])
+            self.assertEqual(client.get("/settings").json()["query_interval_ms"], 0)
+            self.assertEqual(query_interval_seconds(), 0)
+            for invalid in (-1, 5001):
+                with self.subTest(interval=invalid):
+                    response = client.put("/settings", json={"query_interval_ms": invalid, "traffic_interval_minutes": 60})
+                    self.assertEqual(response.status_code, 422)
 
     def test_v4_upgrade_snapshots_wal_and_adds_v5_tables_atomically(self):
         seed_v4_database(self.path)
@@ -184,7 +247,7 @@ class MigrationTests(unittest.TestCase):
             writer.close()
 
         self.assertEqual(self.rows("SELECT version FROM schema_migrations ORDER BY version"),
-                         [(1,), (2,), (3,), (4,), (5,), (6,)])
+                         [(1,), (2,), (3,), (4,), (5,), (6,), (7,)])
         self.assertEqual(self.rows("SELECT username FROM users WHERE id=1"), [("wal-v4",)])
         tables_after = {row[0] for row in self.rows("SELECT name FROM sqlite_master WHERE type='table'")}
         self.assertTrue({"operation_tasks", "operation_task_steps", "operation_task_locks"} <= tables_after)
@@ -210,7 +273,7 @@ class MigrationTests(unittest.TestCase):
         self.assertEqual(self.rows("SELECT type,name,sql FROM sqlite_master ORDER BY name"), before)
         self.assertEqual(self.rows("SELECT max(version) FROM schema_migrations"), [(4,)])
         self.migrate()
-        self.assertEqual(self.rows("SELECT max(version) FROM schema_migrations"), [(6,)])
+        self.assertEqual(self.rows("SELECT max(version) FROM schema_migrations"), [(7,)])
 
     def test_t01_database_upgrades_atomically_to_t02_with_paired_snapshot(self):
         seed_current(self.path)
@@ -219,7 +282,7 @@ class MigrationTests(unittest.TestCase):
         with connect(self.path) as conn:
             conn.execute("UPDATE instance_settings SET auto_stop_on_limit=1 WHERE id=9")
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations ORDER BY version"), [(1,), (2,), (3,), (4,), (5,), (6,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations ORDER BY version"), [(1,), (2,), (3,), (4,), (5,), (6,), (7,)])
         self.assertEqual(self.rows("SELECT account_id FROM aws_credentials WHERE id=7"), [(None,)])
         self.assertEqual(self.rows("SELECT last_confirmed_account_id FROM aws_credentials WHERE id=7"), [(None,)])
         self.assertEqual(self.rows("SELECT auto_stop_configured,auto_stop_account_id FROM instance_settings WHERE id=9"), [(1, None)])
@@ -275,7 +338,7 @@ class MigrationTests(unittest.TestCase):
         before = self.rows("SELECT * FROM aws_credentials")
         self.migrate()
         self.assertEqual(self.rows("SELECT * FROM aws_credentials"), before)
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,), (5,), (6,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,), (5,), (6,), (7,)])
 
 
     def test_migration_failure_rolls_back_ddl_and_keeps_verified_original_backup(self):
@@ -300,7 +363,7 @@ class MigrationTests(unittest.TestCase):
             self.assertEqual(conn.execute("SELECT type,name,sql FROM sqlite_master ORDER BY name").fetchall(), before)
         # No version is committed on failure; the same original DB can upgrade next time.
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,), (5,), (6,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,), (5,), (6,), (7,)])
 
     def test_backup_failure_prevents_any_schema_change(self):
         with connect(self.path) as conn:
@@ -314,12 +377,12 @@ class MigrationTests(unittest.TestCase):
     def test_future_version_and_versioned_schema_drift_stop_startup(self):
         self.migrate()
         with connect(self.path) as conn:
-            conn.execute("INSERT INTO schema_migrations VALUES (7,'future','2026-11-19',NULL,NULL)")
+            conn.execute("INSERT INTO schema_migrations VALUES (8,'future','2026-11-19',NULL,NULL)")
         with self.assertRaises(migrations.MigrationError):
             self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,), (5,), (6,), (7,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,), (5,), (6,), (7,), (8,)])
         with connect(self.path) as conn:
-            conn.execute("DELETE FROM schema_migrations WHERE version=7")
+            conn.execute("DELETE FROM schema_migrations WHERE version=8")
             conn.execute("ALTER TABLE aws_credentials DROP COLUMN quota_message")
         with self.assertRaises(migrations.MigrationError):
             self.migrate()
@@ -434,7 +497,7 @@ database.init_db()
         self.assertEqual(result.returncode, 86, result.stderr)
         self.assertEqual(self.rows("SELECT type,name,sql FROM sqlite_master ORDER BY name"), before)
         self.migrate()
-        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,), (5,), (6,)])
+        self.assertEqual(self.rows("SELECT version FROM schema_migrations"), [(1,), (2,), (3,), (4,), (5,), (6,), (7,)])
 
     def test_roundtrip_backup_upgrade_restore_for_three_database_generations(self):
         for kind in ("new", "single", "multi"):

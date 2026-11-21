@@ -26,7 +26,8 @@ class OriginalMigrationTests(unittest.TestCase):
             with tarfile.open(fileobj=io.BytesIO(archive)) as bundle:bundle.extractall(folder,filter='data')
             database=folder/'original.db'
             env={**os.environ,'DATABASE_URL':'sqlite:///'+database.as_posix(),
-                'PYTHONPATH':str(folder/'backend'),'PYTHONDONTWRITEBYTECODE':'1'}
+                'PYTHONPATH':os.pathsep.join(filter(None,(str(folder/'backend'),os.environ.get('PYTHONPATH','')))),
+                'PYTHONDONTWRITEBYTECODE':'1'}
             seed='''from datetime import date
 from app.database import init_db,engine,SessionLocal
 from app.models import User,AwsCredential,CreditRecord,TrafficUsage,InstanceSetting
@@ -55,7 +56,7 @@ engine.dispose()
                 self.assertEqual(file_sha256(database),before)
                 migrations.upgrade_database(engine,Base.metadata)
                 with closing(sqlite3.connect(database)) as db:
-                    self.assertEqual(db.execute('SELECT version FROM schema_migrations ORDER BY version').fetchall(),[(1,),(2,),(3,),(4,),(5,),(6,)])
+                    self.assertEqual(db.execute('SELECT version FROM schema_migrations ORDER BY version').fetchall(),[(1,),(2,),(3,),(4,),(5,),(6,),(7,)])
                     self.assertEqual(db.execute('SELECT total_amount_decimal,account_id,amount_precision FROM credit_records').fetchall(),[('0.12345678912345678',None,'legacy_float')])
                     self.assertEqual(db.execute('SELECT network_in_bytes,network_out_bytes FROM traffic_usage').fetchall(),[(2**55+17,2**54+23)])
                     self.assertEqual(db.execute('SELECT note,auto_stop_on_limit,monthly_limit_gb FROM instance_settings').fetchall(),[('preserve',0,123.5)])
