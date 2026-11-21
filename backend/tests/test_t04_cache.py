@@ -227,8 +227,15 @@ class SnapshotTests(unittest.TestCase):
         self.addCleanup(lambda: event.remove(self.engine, "before_cursor_execute", count))
         async def scenario():
             slow_gate = asyncio.Event()
+            fast_ready = asyncio.Event()
+            fast_gate = asyncio.Event()
+            fast_started = 0
             async def fast():
-                await asyncio.sleep(0.02)
+                nonlocal fast_started
+                fast_started += 1
+                if fast_started == 2:
+                    fast_ready.set()
+                await fast_gate.wait()
                 return {"value": "ready"}
             async def slow():
                 await slow_gate.wait()
@@ -236,6 +243,8 @@ class SnapshotTests(unittest.TestCase):
             task = asyncio.create_task(read_many(self.engine,
                 [(scope, 60, fast if index < 2 else slow) for index, scope in enumerate(scopes)], wait=True))
             try:
+                await asyncio.wait_for(fast_ready.wait(), timeout=5)
+                fast_gate.set()
                 for _ in range(200):
                     with Session(self.engine) as db:
                         if all((row := db.get(DataSnapshot, scope["key"])) is not None and row.payload
@@ -247,6 +256,7 @@ class SnapshotTests(unittest.TestCase):
                 else:
                     self.fail("Ready scopes were blocked by slow scope")
             finally:
+                fast_gate.set()
                 slow_gate.set()
                 result = await task
             self.assertEqual([row["data"]["value"] for row in result], ["ready", "ready", "later"])
